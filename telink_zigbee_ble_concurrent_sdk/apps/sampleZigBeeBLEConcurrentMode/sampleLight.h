@@ -59,6 +59,9 @@ typedef struct{
 	bool bdbFindBindFlg;
 	bool lightAttrsChanged;
 
+	u8	powerCntFacRst:1;
+	u8  powerCntFacRst2SigMesh:7;
+
 	app_linkkey_info_t linkKey;
 }app_ctx_t;
 

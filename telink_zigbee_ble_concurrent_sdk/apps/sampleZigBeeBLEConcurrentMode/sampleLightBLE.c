@@ -179,32 +179,20 @@ const u8 PROP_READ_WRITE_NORSP_NOTIFY = CHAR_PROP_READ | CHAR_PROP_WRITE_WITHOUT
 
 
 
- u8	my_devName[] = {'i','t','i','a','n','y','y'};
+ u8	my_devName[] = {'t','e','l','i','n','k'};
 //////////////////////////////////////////////////////////////////////////////
 //	 Adv Packet, Response Packet
 //////////////////////////////////////////////////////////////////////////////
  u8	tbl_advData[] = {
-	 0x05, 0x09, 'i', 't', 'y', 'y',
+	 0x07, 0x09, 't', 'e', 'l', 'i', 'n', 'k',
 	 0x02, 0x01, 0x05, 							// BLE limited discoverable mode and BR/EDR not supported
 	 0x03, 0x19, 0x80, 0x01, 					// 384, Generic Remote Control, Generic category
 	 0x05, 0x02, 0x12, 0x18, 0x0F, 0x18,		// incomplete list of service class UUIDs (0x1812, 0x180F)
 };
 
  u8	tbl_scanRsp [] = {
-		 0x08, 0x09, 'i', 't', 'i', 'a', 'n', 'y', 'y',
+		 0x07, 0x09, 't', 'e', 'l', 'i', 'n', 'k',
 	};
-
- //begin
-u16 ChipId = 0;
-void test_init(void)
-{
-    ChipId = *((u16 *)0x42000);
-    my_devName[0] = 'a' + ChipId - 1;
-    tbl_advData[2] = my_devName[0];
-    tbl_scanRsp[2] = my_devName[0];
-}
-//end
-
 
 const u8	my_PnPtrs [] = {0x02, 0x8a, 0x24, 0x66, 0x82, 0x01, 0x00};
 
@@ -608,15 +596,17 @@ void 	ble_remote_terminate(u8 e,u8 *p, int n) //*p is terminate reason
 	}
 #endif
 
-
+	 bls_ll_setAdvEnable(0);  //adv disable
 
 	advertise_begin_tick = clock_time();
 
     bls_ll_setAdvEnable(1);  //adv enable
 }
 
-
-
+volatile u8 T_bleDataAbandom;
+void 	ble_exception_data_abandom(u8 e,u8 *p, int n){
+	T_bleDataAbandom++;
+}
 
 _attribute_ram_code_ void	user_set_rf_power (u8 e, u8 *p, int n)
 {
@@ -703,8 +693,55 @@ void blc_initMacAddress(int flash_addr, u8 *mac_public, u8 *mac_random_static)
 	}
 }
 
+volatile bool g_bleConnDoing = 0;
+bool ble_connection_doing(void){
+	return g_bleConnDoing;
+}
+
+int app_host_event_callback (u32 h, u8 *para, int n)
+{
+
+	u8 event = h & 0xFF;
+
+	switch(event)
+	{
+		case GAP_EVT_SMP_PARING_BEAGIN:
+		{
+			g_bleConnDoing = 1;
+		}
+		break;
+
+		case GAP_EVT_SMP_PARING_SUCCESS:
+		{
+			g_bleConnDoing = 0;
+		}
+		break;
+
+		case GAP_EVT_SMP_PARING_FAIL:
+		{
+			g_bleConnDoing = 0;
+		}
+		break;
+
+		case GAP_EVT_SMP_CONN_ENCRYPTION_DONE:
+		{
+
+		}
+		break;
+
+		case GAP_EVT_ATT_EXCHANGE_MTU:
+		{
+
+		}
+		break;
 
 
+		default:
+		break;
+	}
+
+	return 0;
+}
 
 
 void user_init_normal(void)
@@ -764,6 +801,14 @@ void user_init_normal(void)
 
 
 
+	blc_gap_registerHostEventHandler( app_host_event_callback );
+	blc_gap_setEventMask( GAP_EVT_MASK_SMP_PARING_BEAGIN 			|  \
+						  GAP_EVT_MASK_SMP_PARING_SUCCESS   		|  \
+						  GAP_EVT_MASK_SMP_PARING_FAIL				|  \
+						  GAP_EVT_MASK_SMP_CONN_ENCRYPTION_DONE 	|  \
+						  GAP_EVT_MASK_ATT_EXCHANGE_MTU);
+
+
 
 ///////////////////// USER application initialization ///////////////////
 	bls_ll_setAdvData( (u8 *)tbl_advData, sizeof(tbl_advData) );
@@ -820,6 +865,7 @@ void user_init_normal(void)
 	//ble event call back
 	bls_app_registerEventCallback (BLT_EV_FLAG_CONNECT, &task_connect);
 	bls_app_registerEventCallback (BLT_EV_FLAG_TERMINATE, &ble_remote_terminate);
+	bls_app_registerEventCallback (BLT_EV_FLAG_RX_DATA_ABANDOM, &ble_exception_data_abandom);
 
 
 	bls_app_registerEventCallback (BLT_EV_FLAG_CONN_PARA_REQ, &task_conn_update_req);

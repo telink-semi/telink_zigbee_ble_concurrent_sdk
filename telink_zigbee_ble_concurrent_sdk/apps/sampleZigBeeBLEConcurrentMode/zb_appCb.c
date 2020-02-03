@@ -63,6 +63,8 @@ ota_callBack_t sampleLight_otaCb =
 };
 #endif
 
+static ev_time_event_t *pairingTimeoutEvt = NULL;
+
 volatile u8 T_zbdemoBdbInfo[6] = {0};
 
 /**********************************************************************
@@ -110,12 +112,12 @@ void zbdemo_bdbInitCb(u8 status, u8 joinedNetwork){
 #endif
 		}else{
 #if	(!ZBHCI_EN)
-			//u16 jitter=0;
-			//do{
-			//	jitter = zb_random();
-			//	jitter &= 0xfff;
-			//}while(jitter==0);
-			//TL_ZB_TIMER_SCHEDULE(sampleLight_bdbNetworkSteerStart, NULL, jitter * 1000);
+			u16 jitter=0;
+			do{
+				jitter = zb_random();
+				jitter &= 0xfff;
+			}while(jitter==0);
+			TL_ZB_TIMER_SCHEDULE(sampleLight_bdbNetworkSteerStart, NULL, jitter * 1000);
 #endif
 		}
 	}else{
@@ -123,6 +125,20 @@ void zbdemo_bdbInitCb(u8 status, u8 joinedNetwork){
 	}
 }
 
+
+#if DUAL_MODE
+s32 sampleLight_pairingTimeoutTimerStart(void *arg)
+{
+	nlme_leave_cnf_t leaveCnf;
+	ZB_IEEE_ADDR_ZERO(leaveCnf.deviceAddr);
+	leaveCnf.status = NWK_STATUS_SUCCESS;
+
+	sampleLight_leaveCnfHandler(&leaveCnf);
+
+	pairingTimeoutEvt = NULL;
+	return -1;
+}
+#endif
 /*********************************************************************
   * @fn      zbdemo_bdbCommissioningCb
   *
@@ -138,6 +154,12 @@ void zbdemo_bdbCommissioningCb(u8 status, void *arg){
 	T_zbdemoBdbInfo[2]++;
 	if(status == BDB_COMMISSION_STA_SUCCESS){
 	    T_zbdemoBdbInfo[3]++;
+
+#if DUAL_MODE
+	    if(pairingTimeoutEvt){
+	    	TL_ZB_TIMER_CANCEL(&pairingTimeoutEvt);
+	    }
+#endif
 
 #if FIND_AND_BIND_SUPPORT
 	    if(!gLightCtx.bdbFindBindFlg){
@@ -166,6 +188,13 @@ void zbdemo_bdbCommissioningCb(u8 status, void *arg){
 			jitter &= 0xfff;
 		}while(jitter==0);
 		TL_ZB_TIMER_SCHEDULE(sampleLight_bdbNetworkSteerStart, NULL, jitter * 1000);
+
+#if DUAL_MODE
+		/* start a pairing timeout timer */
+		if(!pairingTimeoutEvt){
+			pairingTimeoutEvt = TL_ZB_TIMER_SCHEDULE(sampleLight_pairingTimeoutTimerStart, NULL, 5 * 1000 * 1000);
+		}
+#endif
 	}else if(status == BDB_COMMISSION_STA_TARGET_FAILURE){
 
 	}else if(status == BDB_COMMISSION_STA_FORMATION_FAILURE){
@@ -218,11 +247,15 @@ void sampleLight_otaProcessMsgHandler(u8 evt, u8 status)
 }
 #endif
 
-s32 sampleLight_softReset(void *arg){
-	SYSTEM_RESET();
+
+#if DUAL_MODE
+s32 sampleLight_dualModeRecoryStart(void *arg)
+{
+	dualModeRecovery();
 
 	return -1;
 }
+#endif
 
 /*********************************************************************
   * @fn      sampleGW_leaveCnfHandler
@@ -240,8 +273,12 @@ void sampleLight_leaveCnfHandler(void *p)
     if(pCnf->status == SUCCESS){
     	light_blink_start(3, 200, 200);
 
-    	//waiting blink over
-    	TL_ZB_TIMER_SCHEDULE(sampleLight_softReset, NULL, 2 * 1000 * 1000);
+#if DUAL_MODE
+//    	if(gLightCtx.powerCntFacRst2SigMesh){
+//    		dualModeRecovery();
+//    	}
+    	TL_ZB_TIMER_SCHEDULE(sampleLight_dualModeRecoryStart, NULL, 3 * 1000 * 1000);
+#endif
     }
 }
 

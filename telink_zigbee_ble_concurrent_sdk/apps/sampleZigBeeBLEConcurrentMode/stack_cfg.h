@@ -130,7 +130,7 @@ typedef enum{
 #endif
 
 #if ZB_ROUTER_ROLE
-	#define GP_SUPPORT_ENABLE					  1
+	#define GP_SUPPORT_ENABLE					  0
 #endif
 
 #if (SECURITY_ENABLE)

@@ -342,4 +342,17 @@ extern void rf_tx_500k_simulate_100k(unsigned char *preamble, unsigned char prea
                                      unsigned char *tx_buf, unsigned short crc_init);
 extern signed char rf_ed_detecct_154(void);
 extern unsigned char rf_stop_ed_154(void);
+
+void ble_rf_drv_init (RF_ModeTypeDef rf_mode);
+
+void backup_zigbee_rf_context(void);
+
+void restore_zigbee_rf_context(unsigned char *rxBuf);
+
+void backup_ble_rf_context(void);
+
+void restore_ble_rf_context(void);
+
+void rf_baseband_reset(void);
+
 #endif

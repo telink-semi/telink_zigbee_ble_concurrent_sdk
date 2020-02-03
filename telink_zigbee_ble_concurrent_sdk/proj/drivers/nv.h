@@ -49,7 +49,7 @@
 #define FACTORY_CFG_BASE_ADD			0x77000
 
 #if BLE_CONCURRENT_MODE
-#define	NV_BASE_ADDRESS					0x36000	
+#define	NV_BASE_ADDRESS					0x34000
 #else
 #define	NV_BASE_ADDRESS					0x34000//start from 208K address
 #endif
@@ -120,7 +120,7 @@ typedef enum{
 
 #define CFG_TELINK_SDK_TYPE				(0x73000)
 #define CFG_TELINK_SIG_MESH_CRC			(0x73040)
-#define CFG_TELINK_SIG_MESH_CODE_4K		(0x75000)
+#define CFG_TELINK_SIG_MESH_CODE_4K		(0x33000)
 #define CFG_TELINK_DUAL_MODE_ENABLE		(0x76080)
 #endif	/* DUAL_MODE */
 

@@ -22,10 +22,31 @@
 #include "user_config.h"
 #include "zb_common.h"
 #include "../../ble/blt_config.h"
+#include "../../ble/ll/ll.h"
 
 #if BLE_CONCURRENT_MODE
 
+#define  ZIGBEE_PRE_TIME      (16 * 1000 * 2)   //2ms
+#define  ZIGBEE_AFTER_TIME    (16 * 1000 * 4)	//4ms
+#define  BLE_IDLE_TIME   	  (16 * 1000 * 5)	//5ms
+
+unsigned  long  g_process_zigbee_en = 0;
+unsigned  long  g_process_clock_timeout;
+unsigned  long  g_process_clock_start;
+
+
+signed char ble_channel = 0;
+
+extern u8	*rf_rxBuf;
+extern u8 	rf_busyFlag;
+extern u8	blt_state ;
+extern  volatile u8	blt_busy;
+extern signed char ble_current_channel;
+extern unsigned  long  g_process_zigbee_en;
+extern _attribute_data_retention_	my_fifo_t	blt_rxfifo;
+
 extern void user_init();
+extern void user_init_normal(void);
 
 /* system clock configuration
  *
@@ -89,8 +110,7 @@ static u8 platform_init(void){
 #endif
 
 	cpu_wakeup_init();
-//ble_rf_drv_init(RF_MODE_BLE_1M);
-	//clock_init(g_sysClk);
+
 	clock_init(/*SYS_CLK_16M_Crystal*/SYS_CLK_32M_Crystal);//BLE 16M
 
 	gpio_init();
@@ -102,300 +122,137 @@ static u8 platform_init(void){
 }
 
 
-volatile int zb_task_counter = 0;
-void zb_task()
-{
-    zb_task_counter++;
-    tl_zbTaskProcedure();
+int is_switch_to_ble(void){
+	s32 t0 = g_process_clock_timeout - clock_time();
+	s32 t1 = clock_time() - g_process_clock_timeout;
 
-#if(MODULE_WATCHDOG_ENABLE)
-		wd_clear();
-#endif
-		ev_main();
+    if(t0 < ZIGBEE_AFTER_TIME || t1 > 16*1000*50){
+        return 1;
+    }else{
+    	return 0;
+    }
 }
 
-unsigned  long  g_process_thread_en = 0;
-unsigned  long  g_process_clock_timeout;
-unsigned  long  g_process_clock_start;
-extern 	u8					blt_state ;
-//_attribute_data_retention_  u8					ble_state;
-extern  volatile u8			blt_busy;
-int ble_stack_idle()
-{
-    if(g_process_thread_en&&(blt_busy == 0)&&((blt_state == 8)||(blt_state == 1)))
-    {
+int is_switch_to_zigbee(void){
+    if((g_process_clock_timeout - clock_time()) > BLE_IDLE_TIME){
         return 1;
-    }else
-    {
+    }else{
+    	return 0;
+    }
+}
+
+int ble_stack_idle(void){
+    if(g_process_zigbee_en&&(blt_busy == 0)&&((blt_state == 8)||(blt_state == 1))){
+        return 1;
+    }else{
         return 0;
     }
 }
-u32 thr_reg_508 = 0;
-static u32 thr_reg_520 = 0;
-static u32 thr_reg_528 = 0;
-static u32 thr_reg_640 = 0;
-static u16 thr_reg_f1c = 0;
-static u32 thr_reg_408 = 0;
 
-static u32 thr_reg_f00 = 0;
-static u8  thr_reg_f04 = 0;
-static u8  thr_reg_f16 = 0;
-static u8  thr_reg_f18 = 0;
-static u8  thr_reg_f28 = 0;
-static u8  thr_reg_428 = 0;
-static u8  thr_reg_44c = 0;
 
-void backup_thread_rf_context(void){
-    thr_reg_508 = read_reg32(0xc08);
-    thr_reg_520 = read_reg32(0xc20);
-    thr_reg_528 = read_reg32(0xc28);
-    //thr_reg_640 = read_reg32(0x640);
-    //thr_reg_f1c = read_reg16(0xf1c);
-    //thr_reg_408 = read_reg32(0x408);
-
-    //thr_reg_f00 = read_reg32(0xf00);
-    //thr_reg_f04 = read_reg8(0xf04);
-    //thr_reg_f16 = read_reg8(0xf16);
-    //thr_reg_f18 = read_reg8(0xf18);
-    //thr_reg_f28 = read_reg8(0xf28);
-    //thr_reg_428 = read_reg8(0x428);//note
-    //thr_reg_44c = read_reg8(0x44c);
-}
-extern u8*        rf_rxBuf;
-void restore_thread_rf_context(void){
-    //write_reg32(0xc08, thr_reg_508);
-    ZB_RADIO_RX_BUF_SET((u16)(u32)(rf_rxBuf));
-    write_reg32(0xc20, thr_reg_520);
-    write_reg32(0xc28, thr_reg_528);
-    //write_reg32(0x640, thr_reg_640);
-    //write_reg16(0xf1c, thr_reg_f1c);
-   // write_reg32(0x408, thr_reg_408);
-
-    //write_reg32(0xf00,thr_reg_f00);
-    //write_reg8(0xf04,thr_reg_f04);
-    //write_reg8(0xf16,thr_reg_f16);
-    //write_reg8(0xf18,thr_reg_f18);
-    //write_reg8(0xf28,thr_reg_f28);
-    //write_reg8(0x428,thr_reg_428);
-    //write_reg8(0x44c,thr_reg_44c);
-}
-static u32 ble_reg_508 = 0;
-static u32 ble_reg_520 = 0;
-static u32 ble_reg_528 = 0;
-u32 ble_reg_640 = 0;
-static u16 ble_reg_f1c = 0;
-static u32 ble_reg_408 = 0;
-
-static u32 ble_reg_f00 = 0;
-static u8  ble_reg_f04 = 0;
-static u8  ble_reg_f16 = 0;
-static u8  ble_reg_f18 = 0;
-static u8  ble_reg_f28 = 0;
-static u8  ble_reg_428 = 0;
-static u8  ble_reg_44c = 0;
-void backup_ble_rf_context(void){
-    ble_reg_508 = read_reg32(0xc08);
-    ble_reg_520 = read_reg32(0xc20);
-    ble_reg_528 = read_reg32(0xc28);
-   // ble_reg_640 = read_reg32(0x640);
-  //  ble_reg_f1c = read_reg16(0xf1c);
-  //  ble_reg_408 = read_reg32(0x408);
-
-   // ble_reg_f00 = read_reg32(0xf00);
-   // ble_reg_f04 = read_reg8(0xf04);
-    //ble_reg_f16 = read_reg8(0xf16);
-    //ble_reg_f18 = read_reg8(0xf18);
-    //ble_reg_f28 = read_reg8(0xf28);
-    //ble_reg_428 = read_reg8(0x428);
-   // ble_reg_44c = read_reg8(0x44c);
+void switch_to_zb_context(void){
+	rf_baseband_reset();
+	backup_ble_rf_context();
+	restore_zigbee_rf_context(rf_rxBuf);
+	//rf_drv_250k();
+	write_reg8(0x401, 0);
+	ZB_RADIO_INIT();
+	ZB_RADIO_TRX_CFG((RF_PKT_BUFF_LEN));
+	ble_channel = ble_current_channel;
+	rf_setChannel(rf_getChannel());
+	rf_setTrxState(RF_STATE_RX);
+	sleep_us(150);//delete
+	reg_rf_irq_status = 0xffff;
+	reg_irq_mask |= FLD_IRQ_ZB_RT_EN;
+	reg_rf_irq_mask |= (FLD_RF_IRQ_TX | FLD_RF_IRQ_RX);
+	//Rf_BaseBandReset ();
 }
 
-void restore_ble_rf_context(void){
-    write_reg32(0xc08, ble_reg_508);
-    write_reg32(0xc20, ble_reg_520);
-    write_reg32(0xc28, ble_reg_528);
-    //write_reg32(0x640, ble_reg_640);
-    //write_reg16(0xf1c, ble_reg_f1c);
-    //write_reg32(0x408, ble_reg_408);
-
-   // write_reg32(0xf00,ble_reg_f00);
-   // write_reg8(0xf04,ble_reg_f04);
-   // write_reg8(0xf16,ble_reg_f16);
-   // write_reg8(0xf18,ble_reg_f18);
-   // write_reg8(0xf28,ble_reg_f28);
-   // write_reg8(0x428,ble_reg_428);
-   // write_reg8(0x44c,ble_reg_44c);
-}
-signed char ble_channel = 0;
-extern signed char ble_current_channel;
-
-static inline void rf_baseband_reset(void)
-{
-	REG_ADDR8(0x61) = BIT(0);		//reset_baseband
-	REG_ADDR8(0x61) = 0;			//release reset signal
-}
-void switch_to_zb_context()
-{
-    rf_baseband_reset();
-    backup_ble_rf_context();
-        restore_thread_rf_context();
-		//rf_drv_250k();
-		write_reg8(0x401, 0);
-		ZB_RADIO_INIT();
-        ZB_RADIO_TRX_CFG((RF_PKT_BUFF_LEN));
-        ble_channel = ble_current_channel;
-        rf_setChannel(rf_getChannel());
-        rf_setTrxState(RF_STATE_RX);
-        sleep_us(150);//delete
-        reg_rf_irq_status = 0xffff;
-		reg_irq_mask |= FLD_IRQ_ZB_RT_EN;
-        reg_rf_irq_mask |= (FLD_RF_IRQ_TX | FLD_RF_IRQ_RX);
-        //Rf_BaseBandReset ();
-
-}
-#define  THREAD_PRE_TIME      (16 * 2 * 1000)
-#define  THREAD_AFTER_TIME    (16*4*1000)
-int is_switch_to_ble()
-{
-    if((g_process_clock_timeout - clock_time()) < THREAD_AFTER_TIME)
-    {
-        return 1;
-    }else{
-    return 0;}
-}
-extern unsigned  long  g_process_thread_en;
-void switch_to_ble_context()
-{
+void switch_to_ble_context(void){
     // do some rf init, set to ble mode
-						// ble_rf_init()  // maybe 1~2 ms
-						 backup_thread_rf_context();
-						rf_baseband_reset();
-                        //write_reg32(0x640, ble_reg_640);
+	backup_zigbee_rf_context();
+	rf_baseband_reset();
 
-                        restore_ble_rf_context();
-                        reg_irq_mask &= ~FLD_IRQ_ZB_RT_EN;
-    	                reg_rf_irq_status = 0xffff;
-    	                reg_irq_mask |= FLD_IRQ_ZB_RT_EN;
-		                //rf_drv_1m ();
-		                ble_rf_drv_init(RF_MODE_BLE_1M);
-                        rf_set_ble_channel (ble_channel);
+	restore_ble_rf_context();
+	reg_irq_mask &= ~FLD_IRQ_ZB_RT_EN;
+	reg_rf_irq_status = 0xffff;
+	reg_irq_mask |= FLD_IRQ_ZB_RT_EN;
+	//rf_drv_1m ();
+	ble_rf_drv_init(RF_MODE_BLE_1M);
+	rf_set_ble_channel (ble_channel);
 
-						g_process_thread_en = 0;
+	g_process_zigbee_en = 0;
 }
 
-volatile int zb_test_cnt = 0;
-extern _attribute_data_retention_	my_fifo_t	blt_rxfifo;
 
 
-void zb_process()
-{
-     static u8 zigbee_process = 0;
-     static int zb_task_number = 0;
-    if(ble_stack_idle()&& (blt_rxfifo.rptr == blt_rxfifo.wptr))
-    {
-        irq_disable();
-        ZB_RADIO_RX_DISABLE;
-        switch_to_zb_context();
-        ZB_RADIO_RX_ENABLE;
-        irq_enable();
+void zb_task(void){
+    tl_zbTaskProcedure();
 
-        extern u8 rf_busyFlag;
-        while(1)
-        {
-            if(is_switch_to_ble()&&!rf_busyFlag )
-            {
-                irq_disable();
-                switch_to_ble_context();
-                irq_enable();
-                g_process_thread_en = 0;
-                zigbee_process = 0;
-                gpio_write(GPIO_PB3, 0);
-                break;
-            }else
-            {
-                if(zigbee_process==0)
-            	{
-            		zigbee_process = 1;
-            		gpio_write(GPIO_PB3, 1);
-            	}
-
-                //if(!zb_isDeviceJoinedNwk()){
-
-                zb_task();
-                //}
-
-
-            }
-        }
-    }
+#if(MODULE_WATCHDOG_ENABLE)
+	wd_clear();
+#endif
+	ev_main();
 }
 
-void concurrent_mode_main_loop (void)
-{
-	//tick_loop ++;
 
-	////////////////////////////////////// BLE entry /////////////////////////////////
+void concurrent_mode_main_loop (void){
+	 static u8 zigbee_process = 0;
 
-	blt_sdk_main_loop();
+	 if(zigbee_process == 0){
+		 /*
+		  * ble task
+		  *
+		  * */
+		 blt_sdk_main_loop();
+	 }else{
+		 /*
+		  * now in zigbee mode
+		  *
+		  * */
+		 if(!rf_busyFlag && is_switch_to_ble()){
+			 /*
+			  * ready to switch to BLE mode
+			  *
+			  * */
+			 irq_disable();
+			 switch_to_ble_context();
+			 irq_enable();
+			 g_process_zigbee_en = 0;
+			 zigbee_process = 0;
+			 gpio_write(GPIO_PB3, 0);
+		 }else{
+			 zb_task();
+		 }
+	 }
 
-	////////////////////////////////////// UI entry /////////////////////////////////
-	//if(ui_mic_enable){
-	//	task_audio();
-	//}
-
-	//proc_keyboard (0,0, 0);
-
-	//device_led_process();
-
-	zb_process();
-
-	//blt_pm_proc();
-	//led_process();
+	 if(zigbee_process == 0 && ble_stack_idle()&& (blt_rxfifo.rptr == blt_rxfifo.wptr) && is_switch_to_zigbee()){
+		 /*
+		  * ready to switch to ZIGBEE mode
+		  *
+		  * */
+		 irq_disable();
+		 ZB_RADIO_RX_DISABLE;
+		 switch_to_zb_context();
+		 ZB_RADIO_RX_ENABLE;
+		 irq_enable();
+		 zb_task();
+		 zigbee_process = 1;
+	 }
 }
-
-volatile int T_ble_irq_counter = 0;
-volatile int T_zb_irq_counter = 0;
-volatile unsigned int tx_state=0;
-volatile unsigned int rx_state=0;
-volatile unsigned int timeout_state=0;
-
-
-
-//extern int zb_tx_irq_cnt;
-//begin : new irq handler
-extern u8 rf_busyFlag;
-
-//end
-
-
-
-
 
 int main (void) {
 	if(platform_init() == SYSTEM_RETENTION_NONE){
 		os_init(0);
 	}
-   // ble_rf_drv_init(RF_MODE_BLE_1M);
-
 	user_init();
-//backup the registers
-backup_thread_rf_context();
-test_init();
-//while(1);
-    //ble init
-    //rf_baseband_reset();
+	//backup the registers
+	backup_zigbee_rf_context();
     ble_rf_drv_init(RF_MODE_BLE_1M);
     blc_app_loadCustomizedParameters();  //load customized freq_offset cap value
-
-
-		user_init_normal ();
-
-    //end
+	user_init_normal ();
 
     irq_enable();
-
-
-
 	while (1) {
     	concurrent_mode_main_loop ();
 	}

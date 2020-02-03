@@ -69,13 +69,13 @@ ota_preamble_t sampleLight_otaInfo = {
 #endif
 
 extern void bdb_zdoStartDevCnf(zdo_start_device_confirm_t* startDevCnf);
-void DevAnnounceIndCB(void *arg);
+//void DevAnnounceIndCB(void *arg);
 
 //Must declare the application call back function which used by ZDO layer
 const zdo_appIndCb_t appCbLst = {
 		bdb_zdoStartDevCnf,//start device cnf cb
 		NULL,//reset cnf cb
-		DevAnnounceIndCB,//NULL,//device announce indication cb
+		NULL,//NULL,//device announce indication cb
 		sampleLight_leaveIndHandler,//leave ind cb
 		sampleLight_leaveCnfHandler,//leave cnf cb
 		NULL,//nwk update ind cb
@@ -111,6 +111,113 @@ bdb_commissionSetting_t g_bdbCommissionSetting = {
  */
 ev_time_event_t *sampleLightAttrsStoreTimerEvt = NULL;
 
+#if DUAL_MODE
+void dualModeDisable(void)
+{
+	u8 dualModeEnable = 0;
+	flash_read(CFG_TELINK_DUAL_MODE_ENABLE, 1, (u8 *)&dualModeEnable);
+	if(dualModeEnable == 0x5a){
+		dualModeEnable = 0;
+		flash_write(CFG_TELINK_DUAL_MODE_ENABLE, 1, (u8 *)&dualModeEnable);
+	}
+}
+
+bool isDualModeEnable(void)
+{
+	u8 dualModeEnable = 0;
+	flash_read(CFG_TELINK_DUAL_MODE_ENABLE, 1, (u8 *)&dualModeEnable);
+
+	return (dualModeEnable == 0x5a) ? TRUE : FALSE;
+}
+
+
+volatile u8 T_dualModeSwInfo[8] = {0};
+void dualModeInit(void)
+{
+    u32 sdkType = 0;
+    u32 zigbeeSdkType = TYPE_TLK_ZIGBEE;
+
+    T_dualModeSwInfo[0]++;
+
+    flash_read(CFG_TELINK_SDK_TYPE, 4, (u8 *)&sdkType);
+    if(sdkType != TYPE_TLK_ZIGBEE){
+    	T_dualModeSwInfo[1]++;
+    	//Store SDK type.
+		if(sdkType == 0xFFFFFFFF){
+			flash_write(CFG_TELINK_SDK_TYPE, 4, (u8 *)&zigbeeSdkType);
+		}else{
+			nv_resetAll();
+			flash_erase(CFG_TELINK_SDK_TYPE);
+			flash_write(CFG_TELINK_SDK_TYPE, 4, (u8 *)&zigbeeSdkType);
+		}
+		T_dualModeSwInfo[2]++;
+
+		if(!isDualModeEnable()){
+			return;
+		}
+
+		T_dualModeSwInfo[3]++;
+		u8 flashInfo = 0;
+		flash_read(0 + 8, 1, &flashInfo);
+		if((flashInfo != 0x4b) && (flashInfo != 0xff)){
+			T_dualModeSwInfo[4]++;
+			//Store SIG Mesh Code.
+			flash_erase(CFG_TELINK_SIG_MESH_CODE_4K);
+
+			u32 crcValue = 0xffffffff;
+			u32 addressOffset = 0;
+			u8 buf[FLASH_PAGE_SIZE] = {0};
+			for(u8 i = 0; i < (FLASH_SECTOR_SIZE /FLASH_PAGE_SIZE ); i++){
+				memset((u8 *)buf, 0, FLASH_PAGE_SIZE);
+				flash_read(addressOffset, FLASH_PAGE_SIZE, buf);
+				crcValue = xcrc32(buf, FLASH_PAGE_SIZE, crcValue);
+				flash_write(CFG_TELINK_SIG_MESH_CODE_4K + addressOffset, FLASH_PAGE_SIZE, buf);
+				addressOffset += FLASH_PAGE_SIZE;
+			}
+
+			flash_write(CFG_TELINK_SIG_MESH_CRC, 4, (u8 *)&crcValue);
+		}
+    }else{
+    	//do nothing.
+    }
+}
+
+void dualModeRecovery(void)
+{
+	u32 value = 0xffffffff;
+	flash_read(CFG_TELINK_SIG_MESH_CRC, 4, (u8 *)&value);
+
+	if(isDualModeEnable() && (value != 0xffffffff)){
+		u32 crcValue = 0xffffffff;
+		u32 addressOffset = 0;
+
+		flash_erase(0);
+
+		for(u8 i = 0; i < (FLASH_SECTOR_SIZE /FLASH_PAGE_SIZE ); i++){
+			u8 buf[FLASH_PAGE_SIZE] = {0};
+			flash_read(CFG_TELINK_SIG_MESH_CODE_4K + addressOffset, FLASH_PAGE_SIZE, buf);
+			crcValue = xcrc32(buf, FLASH_PAGE_SIZE, crcValue);
+			if(addressOffset == 0){
+				buf[8] = 0xff;
+			}
+			flash_write(addressOffset, FLASH_PAGE_SIZE, buf);
+			addressOffset += FLASH_PAGE_SIZE;
+		}
+
+		if(crcValue == value){
+			u8 flashInfo = 0x4b;
+			flash_write((0 + 8), 1, &flashInfo);//enable boot-up flag
+
+			u32 sdkType = TYPE_DUAL_MODE_RECOVER;
+			flash_erase(CFG_TELINK_SDK_TYPE);
+			flash_write(CFG_TELINK_SDK_TYPE, 4, (u8 *)&sdkType);
+		}
+	}
+	SYSTEM_RESET();
+}
+#endif
+
+
 
 /**********************************************************************
  * FUNCTIONS
@@ -128,6 +235,10 @@ ev_time_event_t *sampleLightAttrsStoreTimerEvt = NULL;
  */
 void stack_init(void)
 {
+#if DUAL_MODE
+	dualModeInit();
+#endif
+
 	/* Initialize ZB stack */
 	zb_init();
 
@@ -243,6 +354,28 @@ static void sampleLightSysException(void)
 	SYSTEM_RESET();
 }
 
+void factoryRst_init(void)
+{
+	gLightCtx.powerCntFacRst = 0;
+	if(factory_reset_handle()){
+		gLightCtx.powerCntFacRst = 1;
+	}
+}
+
+void factoryRst_task(void)
+{
+	if(BDB_STATE_GET() == BDB_STATE_IDLE){
+		if(gLightCtx.powerCntFacRst){
+			gLightCtx.powerCntFacRst = 0;
+			gLightCtx.powerCntFacRst2SigMesh = 1;
+
+			factory_reset();
+		}else{
+			factory_reset_cnt_check();
+		}
+	}
+}
+
 /*********************************************************************
  * @fn      user_init
  *
@@ -265,6 +398,9 @@ void user_init(void)
 	led_init();
 	hwLight_init();
 
+	/* Power up counter check */
+	factoryRst_init();
+
 	/* Initialize Stack */
 	stack_init();
 
@@ -282,6 +418,8 @@ void user_init(void)
 	zbhciInit();
 	ev_on_poll(EV_POLL_HCI, zbhciTask);
 #endif
+
+	ev_on_poll(EV_POLL_FACTORY_RST, factoryRst_task);
 	ev_on_poll(EV_POLL_IDLE, app_task);
 
     /* Read the pre-insatll code from NV */
@@ -293,9 +431,11 @@ void user_init(void)
     						0x0000, 0x003c, (u8 *)&reportableChange);
 
     /* Initialize BDB */
-	//bdb_init((af_simple_descriptor_t *)&sampleLight_simpleDesc, &g_bdbCommissionSetting, &g_zbDemoBdbCb, 1);
+	bdb_init((af_simple_descriptor_t *)&sampleLight_simpleDesc, &g_bdbCommissionSetting, &g_zbDemoBdbCb, 1);
 }
 
+
+#if 0
 //configure zigbee network
 #define ZB_BLE_CI_CMD_CFG_SET_CHANNEL           0x0001
 #define ZB_BLE_CI_CMD_CFG_SET_PANID             0x0002
@@ -422,11 +562,12 @@ void onoff_light_broadcast(void * p)
 			zcl_onOff_toggleCmd(SAMPLE_SWITCH_ENDPOINT, &dstEpInfo, FALSE);
 
 }
+#endif
 
 int zb_ble_ci_cmd_handler(u16 cmd_type , u8 * payload)
 {
     
-
+#if 0
     if(cmd_type == ZB_BLE_CI_CMD_CFG_SET_CHANNEL)
     {
         zb_ble_ci_channel = payload[0];
@@ -489,6 +630,7 @@ int zb_ble_ci_cmd_handler(u16 cmd_type , u8 * payload)
             }
         }
     }
+#endif
 }
 
 

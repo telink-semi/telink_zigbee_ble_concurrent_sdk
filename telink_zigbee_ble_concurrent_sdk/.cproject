@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?fileVersion 4.0.0?>
-
-<cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
+<?fileVersion 4.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
 	<storageModule moduleId="org.eclipse.cdt.core.settings">
 		<cconfiguration id="com.telink.tc32eclipse.configuration.app.release.1121156933.1715305487.2075187956.1454992863.132969007.501524205.2117998501.1779379481.1344738772.929095336.381428464.2012762577.1865946464.2093486770.294318875">
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.telink.tc32eclipse.configuration.app.release.1121156933.1715305487.2075187956.1454992863.132969007.501524205.2117998501.1779379481.1344738772.929095336.381428464.2012762577.1865946464.2093486770.294318875" moduleId="org.eclipse.cdt.core.settings" name="zigbee_ble_concurrent_mode">
@@ -15,7 +13,7 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactName="${ProjName}" buildArtefactType="com.telink.tc32eclipse.buildArtefactType.app" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release,org.eclipse.cdt.build.core.buildArtefactType=com.telink.tc32eclipse.buildArtefactType.app" description="zigbee ble concurrent mode demo runs on 8258" errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GASErrorParser;org.eclipse.cdt.core.GLDErrorParser" id="com.telink.tc32eclipse.configuration.app.release.1121156933.1715305487.2075187956.1454992863.132969007.501524205.2117998501.1779379481.1344738772.929095336.381428464.2012762577.1865946464.2093486770.294318875" name="zigbee_ble_concurrent_mode" parent="com.telink.tc32eclipse.configuration.app.release" postannouncebuildStep="" postbuildStep="&quot;${workspace_loc:/${ProjName}}/tl_check_fw.sh&quot;   ${ConfigName}   ${ProjName}" preannouncebuildStep="" prebuildStep="&quot;${workspace_loc:/${ProjName}}/tl_link_load.sh&quot;   &quot;${workspace_loc:/${ProjName}}/platform/bootlink/boot_8258.link&quot; &quot;${workspace_loc:/${ProjName}}/boot.link&quot;">
+				<configuration artifactName="${ProjName}" buildArtefactType="com.telink.tc32eclipse.buildArtefactType.app" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=com.telink.tc32eclipse.buildArtefactType.app,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release" description="zigbee ble concurrent mode demo runs on 8258" errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GASErrorParser;org.eclipse.cdt.core.GLDErrorParser" id="com.telink.tc32eclipse.configuration.app.release.1121156933.1715305487.2075187956.1454992863.132969007.501524205.2117998501.1779379481.1344738772.929095336.381428464.2012762577.1865946464.2093486770.294318875" name="zigbee_ble_concurrent_mode" parent="com.telink.tc32eclipse.configuration.app.release" postannouncebuildStep="" postbuildStep="&quot;${workspace_loc:/${ProjName}}/tl_check_fw.sh&quot;   ${ConfigName}   ${ProjName}" preannouncebuildStep="" prebuildStep="&quot;${workspace_loc:/${ProjName}}/tl_link_load.sh&quot;   &quot;${workspace_loc:/${ProjName}}/platform/bootlink/boot_8258.link&quot; &quot;${workspace_loc:/${ProjName}}/boot.link&quot;">
 					<folderInfo id="com.telink.tc32eclipse.configuration.app.release.1121156933.1715305487.2075187956.1454992863.132969007.501524205.2117998501.1779379481.1344738772.929095336.381428464.2012762577.1865946464.2093486770.294318875." name="/" resourcePath="">
 						<toolChain errorParsers="" id="com.telink.tc32eclipse.toolchain.TC32Win.app.release.593198947" name="TC32-GCC Toolchain" superClass="com.telink.tc32eclipse.toolchain.TC32Win.app.release">
 							<option id="com.telink.tc32eclipse.toolchain.options.toolchain.objcopy.flash.app.release.1941208713" name="Generate binary file for Flash memory" superClass="com.telink.tc32eclipse.toolchain.options.toolchain.objcopy.flash.app.release"/>
@@ -40,6 +38,7 @@
 									<listOptionValue builtIn="false" value="ROUTER=1"/>
 									<listOptionValue builtIn="false" value="BLE_CONCURRENT_MODE=1"/>
 									<listOptionValue builtIn="false" value="MCU_CORE_8258=1"/>
+									<listOptionValue builtIn="false" value="DUAL_MODE=1"/>
 									<listOptionValue builtIn="false" value="__PROJECT_TL_CONCURRENT_MODE__=1"/>
 								</option>
 								<option id="com.telink.tc32eclipse.compiler.option.incpath.129103389" name="Include Paths (-I)" superClass="com.telink.tc32eclipse.compiler.option.incpath" valueType="includePath">
@@ -60,12 +59,14 @@
 							</tool>
 							<tool command="tc32-elf-ld --gc-sections" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GLDErrorParser" id="com.telink.tc32eclipse.tool.linker.TC32Win.app.release.790364360" name="TC32 C Linker" superClass="com.telink.tc32eclipse.tool.linker.TC32Win.app.release">
 								<option id="com.telink.tc32eclipse.linker.option.libs.1430628192" name="Libraries (-l)" superClass="com.telink.tc32eclipse.linker.option.libs" valueType="libs">
-									<listOptionValue builtIn="false" value="drv_8258"/>
-									<listOptionValue builtIn="false" value="lt_8258"/>
-									<listOptionValue builtIn="false" value="zb_8258"/>
+									<listOptionValue builtIn="false" value="ble"/>
+									<listOptionValue builtIn="false" value="zb_router"/>
+									<listOptionValue builtIn="false" value="drivers_8258"/>
 								</option>
 								<option id="com.telink.tc32eclipse.linker.option.libpath.1174083274" name="Libraries Path (-L)" superClass="com.telink.tc32eclipse.linker.option.libpath" valueType="stringList">
-									<listOptionValue builtIn="false" value="../proj_lib"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/ble/lib}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/zigbee/lib}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/platform/lib}&quot;"/>
 								</option>
 								<option id="com.telink.tc32eclipse.linker.option.otherobjs.601134435" name="Other Objects (*.o)" superClass="com.telink.tc32eclipse.linker.option.otherobjs" valueType="userObjs">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/platform/libfirmware_encrypt.a}&quot;"/>
