@@ -43,7 +43,13 @@ extern "C" {
 #define USB_PRINTF_MODE         0
 
 /* Running chip flash size select. If '1' - 1M, otherwise (or undefined) - 512K. */
-#define FLASH_SIZE_1M			0
+#define FLASH_SIZE_1M			1
+
+#define	DUAL_MODE_SW_BOOT		1
+#define	DUAL_MODE_HW_BOOT		0
+#if (DUAL_MODE_SW_BOOT || DUAL_MODE_HW_BOOT)
+#define DUAL_MODE				1
+#endif
 
 /* board ID */
 #define BOARD_826x_EVK			0
@@ -103,6 +109,7 @@ extern "C" {
 #if TOUCHLINK_SUPPORT
 #define ZCL_ZLL_COMMISSIONING_SUPPORT				1
 #endif
+#define	ZCL_WWAH_SUPPORT							1
 
 
 ///////////////////  Zigbee Profile Configuration /////////////////////////////////

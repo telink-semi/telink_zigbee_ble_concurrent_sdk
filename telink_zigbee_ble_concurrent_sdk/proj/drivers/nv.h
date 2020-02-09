@@ -42,7 +42,7 @@
 #if FLASH_SIZE_1M
 #define MAC_BASE_ADD					0xFF000
 #define FACTORY_CFG_BASE_ADD			0xFE000
-#define NV_BASE_ADDRESS					0x80000
+#define NV_BASE_ADDRESS					0xE0000
 #define MODULES_START_ADDR(id)			(NV_BASE_ADDRESS + FLASH_SECTOR_SIZE * (2 * id))
 #else
 #define MAC_BASE_ADD					0x76000
@@ -87,25 +87,35 @@
  * Following configuration could be changed by customer.
  */
 #if FLASH_SIZE_1M
-/* pre-install key
-	0x77050:	preCnfLinkKey;	 		pre-configure link key for central network(global: ZC/ZR/ZED; unique: only for ZR/ZED)
-	0x77061:	distributeLinkKey;		distribute link key for distribute network
-	0x77072:	preCnfTouchlinkLinkKey;	 touch-link key for distribute network
- */
-#define CFG_PRE_INSTALL_CODE			(0xFD000)
-
 /* One sector for factory reset by power up/down N times */
-#define CFG_FACTORY_RST_CNT			  	(0xFC000)
-#else
+#define CFG_FACTORY_RST_CNT			  	(0xF6000)
+
+/* 2 sectors for BLE */
+#define CFG_NV_START_FOR_BLE		  	(0xF7000)
+
 /* pre-install key
-	0x77050:	preCnfLinkKey;	 		pre-configure link key for central network(global: ZC/ZR/ZED; unique: only for ZR/ZED)
-	0x77061:	distributeLinkKey;		distribute link key for distribute network
-	0x77072:	preCnfTouchlinkLinkKey;	 touch-link key for distribute network
+	preCnfLinkKey;	 		pre-configure link key for central network(global: ZC/ZR/ZED; unique: only for ZR/ZED)
+	distributeLinkKey;		distribute link key for distribute network
+	preCnfTouchlinkLinkKey;	 touch-link key for distribute network
+ */
+#define CFG_PRE_INSTALL_CODE			(0xFC000)
+
+#else
+/* 2 sectors for BLE */
+#define CFG_NV_START_FOR_BLE		  	(0x74000)
+
+/* pre-install key
+	preCnfLinkKey;	 		pre-configure link key for central network(global: ZC/ZR/ZED; unique: only for ZR/ZED)
+	distributeLinkKey;		distribute link key for distribute network
+	preCnfTouchlinkLinkKey;	 touch-link key for distribute network
  */
 #define CFG_PRE_INSTALL_CODE			(0x78000)
 
 /* One sector for factory reset by power up/down N times */
 #define CFG_FACTORY_RST_CNT			  	(0x79000)
+
+#endif
+
 
 #if DUAL_MODE
 //NOTE: firmware must less then 192K if UDAL_MODE used
@@ -118,13 +128,17 @@ typedef enum{
 	TYPE_DUAL_MODE_RECOVER 				= 0x00000056,// don't change, must same with telink mesh SDK, recover for mesh
 }telink_sdk_type_t;
 
+#if FLASH_SIZE_1M
+#define CFG_TELINK_SDK_TYPE				(0xFD000)
+#else
 #define CFG_TELINK_SDK_TYPE				(0x73000)
+#endif
+
 #define CFG_TELINK_SIG_MESH_CRC			(0x73040)
 #define CFG_TELINK_SIG_MESH_CODE_4K		(0x33000)
 #define CFG_TELINK_DUAL_MODE_ENABLE		(0x76080)
-#endif	/* DUAL_MODE */
 
-#endif
+#endif	/* DUAL_MODE */
 
 /******************************************** END ***********************************************************/
 

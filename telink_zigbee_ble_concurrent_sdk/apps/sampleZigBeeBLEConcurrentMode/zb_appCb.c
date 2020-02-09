@@ -252,7 +252,7 @@ void sampleLight_otaProcessMsgHandler(u8 evt, u8 status)
 s32 sampleLight_dualModeRecoryStart(void *arg)
 {
 	dualModeRecovery();
-
+	SYSTEM_RESET();
 	return -1;
 }
 #endif

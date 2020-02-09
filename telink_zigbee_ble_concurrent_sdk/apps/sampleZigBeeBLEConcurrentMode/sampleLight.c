@@ -112,6 +112,7 @@ bdb_commissionSetting_t g_bdbCommissionSetting = {
 ev_time_event_t *sampleLightAttrsStoreTimerEvt = NULL;
 
 #if DUAL_MODE
+#if DUAL_MODE_HW_BOOT
 void dualModeDisable(void)
 {
 	u8 dualModeEnable = 0;
@@ -128,58 +129,6 @@ bool isDualModeEnable(void)
 	flash_read(CFG_TELINK_DUAL_MODE_ENABLE, 1, (u8 *)&dualModeEnable);
 
 	return (dualModeEnable == 0x5a) ? TRUE : FALSE;
-}
-
-
-volatile u8 T_dualModeSwInfo[8] = {0};
-void dualModeInit(void)
-{
-    u32 sdkType = 0;
-    u32 zigbeeSdkType = TYPE_TLK_ZIGBEE;
-
-    T_dualModeSwInfo[0]++;
-
-    flash_read(CFG_TELINK_SDK_TYPE, 4, (u8 *)&sdkType);
-    if(sdkType != TYPE_TLK_ZIGBEE){
-    	T_dualModeSwInfo[1]++;
-    	//Store SDK type.
-		if(sdkType == 0xFFFFFFFF){
-			flash_write(CFG_TELINK_SDK_TYPE, 4, (u8 *)&zigbeeSdkType);
-		}else{
-			nv_resetAll();
-			flash_erase(CFG_TELINK_SDK_TYPE);
-			flash_write(CFG_TELINK_SDK_TYPE, 4, (u8 *)&zigbeeSdkType);
-		}
-		T_dualModeSwInfo[2]++;
-
-		if(!isDualModeEnable()){
-			return;
-		}
-
-		T_dualModeSwInfo[3]++;
-		u8 flashInfo = 0;
-		flash_read(0 + 8, 1, &flashInfo);
-		if((flashInfo != 0x4b) && (flashInfo != 0xff)){
-			T_dualModeSwInfo[4]++;
-			//Store SIG Mesh Code.
-			flash_erase(CFG_TELINK_SIG_MESH_CODE_4K);
-
-			u32 crcValue = 0xffffffff;
-			u32 addressOffset = 0;
-			u8 buf[FLASH_PAGE_SIZE] = {0};
-			for(u8 i = 0; i < (FLASH_SECTOR_SIZE /FLASH_PAGE_SIZE ); i++){
-				memset((u8 *)buf, 0, FLASH_PAGE_SIZE);
-				flash_read(addressOffset, FLASH_PAGE_SIZE, buf);
-				crcValue = xcrc32(buf, FLASH_PAGE_SIZE, crcValue);
-				flash_write(CFG_TELINK_SIG_MESH_CODE_4K + addressOffset, FLASH_PAGE_SIZE, buf);
-				addressOffset += FLASH_PAGE_SIZE;
-			}
-
-			flash_write(CFG_TELINK_SIG_MESH_CRC, 4, (u8 *)&crcValue);
-		}
-    }else{
-    	//do nothing.
-    }
 }
 
 void dualModeRecovery(void)
@@ -213,7 +162,66 @@ void dualModeRecovery(void)
 			flash_write(CFG_TELINK_SDK_TYPE, 4, (u8 *)&sdkType);
 		}
 	}
-	SYSTEM_RESET();
+}
+#elif DUAL_MODE_SW_BOOT
+void dualModeRecovery(void){
+	u32 sdkType = TYPE_DUAL_MODE_RECOVER;
+	flash_erase(CFG_TELINK_SDK_TYPE);
+	flash_write(CFG_TELINK_SDK_TYPE, 4, (u8 *)&sdkType);
+}
+#endif
+
+volatile u8 T_dualModeSwInfo[8] = {0};
+void dualModeInit(void)
+{
+    u32 sdkType = 0;
+    u32 zigbeeSdkType = TYPE_TLK_ZIGBEE;
+
+    T_dualModeSwInfo[0]++;
+
+    flash_read(CFG_TELINK_SDK_TYPE, 4, (u8 *)&sdkType);
+    if(sdkType != TYPE_TLK_ZIGBEE){
+    	T_dualModeSwInfo[1]++;
+    	//Store SDK type.
+		if(sdkType == 0xFFFFFFFF){
+			flash_write(CFG_TELINK_SDK_TYPE, 4, (u8 *)&zigbeeSdkType);
+		}else{
+			nv_resetAll();
+			flash_erase(CFG_TELINK_SDK_TYPE);
+			flash_write(CFG_TELINK_SDK_TYPE, 4, (u8 *)&zigbeeSdkType);
+		}
+		T_dualModeSwInfo[2]++;
+
+        #if DUAL_MODE_HW_BOOT
+		if(!isDualModeEnable()){
+			return;
+		}
+
+		T_dualModeSwInfo[3]++;
+		u8 flashInfo = 0;
+		flash_read(0 + 8, 1, &flashInfo);
+		if((flashInfo != 0x4b) && (flashInfo != 0xff)){
+			T_dualModeSwInfo[4]++;
+			//Store SIG Mesh Code.
+			flash_erase(CFG_TELINK_SIG_MESH_CODE_4K);
+
+			u32 crcValue = 0xffffffff;
+			u32 addressOffset = 0;
+			u8 buf[FLASH_PAGE_SIZE] = {0};
+			for(u8 i = 0; i < (FLASH_SECTOR_SIZE /FLASH_PAGE_SIZE ); i++){
+				memset((u8 *)buf, 0, FLASH_PAGE_SIZE);
+				flash_read(addressOffset, FLASH_PAGE_SIZE, buf);
+				crcValue = xcrc32(buf, FLASH_PAGE_SIZE, crcValue);
+				flash_write(CFG_TELINK_SIG_MESH_CODE_4K + addressOffset, FLASH_PAGE_SIZE, buf);
+				addressOffset += FLASH_PAGE_SIZE;
+			}
+
+			flash_write(CFG_TELINK_SIG_MESH_CRC, 4, (u8 *)&crcValue);
+		}
+		#endif
+    }else{
+    	//do nothing.
+    }
 }
 #endif
 

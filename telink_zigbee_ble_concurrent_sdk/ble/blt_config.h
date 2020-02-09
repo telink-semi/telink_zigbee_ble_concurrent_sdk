@@ -27,6 +27,7 @@
  */
 //#include "drivers.h"
 #include "../proj/tl_common.h"
+#include "../proj/drivers/nv.h"
 
 #define  MAX_DEV_NAME_LEN 				18
 
@@ -39,18 +40,18 @@
 
 /////////////////// Flash  Address Config ////////////////////////////
 #ifndef		CFG_ADR_MAC
-#define		CFG_ADR_MAC						0x76000
+#define		CFG_ADR_MAC						MAC_BASE_ADD		//0x76000
 #endif
 
 #ifndef		CUST_CAP_INFO_ADDR
-#define		CUST_CAP_INFO_ADDR				0x77000
+#define		CUST_CAP_INFO_ADDR				FACTORY_CFG_BASE_ADD	//0x77000
 #endif
 
 
 
 //master
 #ifndef		CFG_ADR_PEER
-#define		CFG_ADR_PEER					0x78000
+#define		CFG_ADR_PEER					CFG_PRE_INSTALL_CODE	//0x78000
 #endif
 
 

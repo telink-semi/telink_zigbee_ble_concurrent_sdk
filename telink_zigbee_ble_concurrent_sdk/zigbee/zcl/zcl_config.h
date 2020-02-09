@@ -195,7 +195,9 @@
 /****************************************************** WWAH ****************************************************/
 /* Work with all hub */
 //#define ZCL_WWAH
-
+#if ZCL_WWAH_SUPPORT
+#define ZCL_WWAH
+#endif
 
 
 #endif	/* _ZCL_CONFIG_H_ */

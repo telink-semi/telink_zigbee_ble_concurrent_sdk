@@ -25,6 +25,8 @@
 #include "../../ble/ll/ll.h"
 
 #if BLE_CONCURRENT_MODE
+asm(".equ __FW_OFFSET,      0x60000");
+asm(".global     __FW_OFFSET");
 
 #define  ZIGBEE_PRE_TIME      (16 * 1000 * 2)   //2ms
 #define  ZIGBEE_AFTER_TIME    (16 * 1000 * 4)	//4ms
@@ -249,6 +251,7 @@ int main (void) {
 	//backup the registers
 	backup_zigbee_rf_context();
     ble_rf_drv_init(RF_MODE_BLE_1M);
+    bls_smp_configParingSecurityInfoStorageAddr(CFG_NV_START_FOR_BLE);
     blc_app_loadCustomizedParameters();  //load customized freq_offset cap value
 	user_init_normal ();
 
