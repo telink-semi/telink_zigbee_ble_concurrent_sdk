@@ -115,13 +115,22 @@ void ota_upgradeComplete(u8 status);
  */
 u8 mcuBootAddrGet(void)
 {
+#if DUAL_MODE_SW_BOOT
+	return 0;
+#else
 	u8 flashInfo = 0;
 	flash_read(OTA_TLNK_KEYWORD_ADDROFFSET, 1, &flashInfo);
 	return ((flashInfo == 0x4b) ? 0 : 1);
+#endif
 }
 
 void ota_mcuReboot(void)
 {
+#if DUAL_MODE_SW_BOOT
+	u8 flashInfo = 0x4b;
+	flash_write((FLASH_OTA_NEWIMAGE_ADDR + 8), 1, &flashInfo);//enable boot-up flag
+	mcu_reset();
+#else
 	u32 baseAddr = 0;
 	u32 newAddr = FLASH_OTA_NEWIMAGE_ADDR;
 	u8 flashInfo = 0x4b;
@@ -136,6 +145,7 @@ void ota_mcuReboot(void)
 	flash_write((baseAddr + 8),1,&flashInfo);//disable boot-up flag
 
 	mcu_reset();
+#endif
 }
 
 /**********************************************************************
@@ -245,7 +255,11 @@ void ota_init(ota_type_e type, af_simple_descriptor_t *simpleDesc, ota_preamble_
 
 		otaClientInfo.clientOtaFlg = OTA_FLAG_INIT_DONE;
 		otaClientInfo.crcValue = 0xffffffff;
+#if OTA_CONTINUE_SUPPORT
 		ota_clientInfoRecover();
+#else
+		nv_resetModule(NV_MODULE_OTA);
+#endif
 	}
 }
 
@@ -1023,7 +1037,7 @@ static status_t ota_imageNotifyHandler(zclIncomingAddrInfo_t *pAddrInfo, ota_ima
 		}
 
 		if((zb_random() % 100) > pImageNotify->queryJitter){
-			return ZCL_STA_SUCCESS;
+			//return ZCL_STA_SUCCESS;
 		}
 	}
 

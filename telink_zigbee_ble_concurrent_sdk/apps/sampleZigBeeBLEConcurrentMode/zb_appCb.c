@@ -229,20 +229,28 @@ void zbdemo_bdbIdentifyCb(u8 endpoint, u16 srcAddr, u16 identifyTime){
 
 
 #ifdef ZCL_OTA
+volatile u8 T_sampleLightOtaSta[4] = {0};
 void sampleLight_otaProcessMsgHandler(u8 evt, u8 status)
 {
 	if(evt == OTA_EVT_START){
 		if(status == ZCL_STA_SUCCESS){
-
+			light_blink_start(0, 200, 200);
+			//light_blink_start(0, 500, 2000);
 		}else{
 
 		}
+		T_sampleLightOtaSta[0] = 1;
 	}else if(evt == OTA_EVT_COMPLETE){
+		T_sampleLightOtaSta[0] = 0;
 		if(status == ZCL_STA_SUCCESS){
+			T_sampleLightOtaSta[1]++;
 			ota_mcuReboot();
 		}else{
+			T_sampleLightOtaSta[2]++;
+			T_sampleLightOtaSta[3] = status;
 			ota_queryStart(30);
 		}
+		light_blink_stop();
 	}
 }
 #endif
