@@ -7,7 +7,7 @@ typedef struct{
 	zdp_funcCb		func;
 }zdp_funcList_t;
 
-zdp_funcList_t g_zdpClientFunc[] = {
+const zdp_funcList_t g_zdpClientFunc[] = {
 	{NWK_ADDR_CLID,  				zdo_nwkAddrIndicate},
 	{IEEE_ADDR_CLID,  				zdo_ieeeAddrIndicate},
 	{NODE_DESCRIPTOR_CLID, 			zdo_descriptorsIndicate},
@@ -59,10 +59,9 @@ const u16 zdoOutCluster[8] = {
 };
 
 const af_simple_descriptor_t zdoSd = {
-	TL_ZB_PROFILE_ID,		//Profile id
+	ZDO_PROFILE_ID,			/* Profile id */
 	0,              		/* Application device identifier */
-
-	ZDO_EP,					//EP
+	ZDO_EP,					/* EP */
 	0,                      /* Application device version */
 	0,						/* Reserved */
 	7,              		/* Application input cluster count */

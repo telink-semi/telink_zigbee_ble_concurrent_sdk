@@ -5,7 +5,7 @@
 //#include "vendor/common/blt_led.h"
 //#include "vendor/common/blt_common.h"
 
-
+#if (__PROJECT_TL_CONCURRENT_LIGHT__)
 
 
 typedef enum
@@ -924,3 +924,4 @@ void ble_main_loop (void)
 	//blt_pm_proc();
 }
 
+#endif

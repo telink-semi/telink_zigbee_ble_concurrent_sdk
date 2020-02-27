@@ -74,7 +74,9 @@
 #define ZB_RADIO_RX_BUF_SET(addr)			rf_rx_buffer_reconfig(addr)
 
 /* Rx buffer clear */
-#define ZB_RADIO_RX_BUF_CLEAR(p)
+#define ZB_RADIO_RX_BUF_CLEAR(p)			do{\
+											p[0] = 0;	\
+											}while(0)
 
 /* set Rx mode, maxium receiver buffer size, enable Rx/Tx interrupt */
 #define ZB_RADIO_TRX_CFG(size)				do{\
@@ -110,10 +112,13 @@
 #define ZB_RADIO_TX_0DBM				RF_POWER_P0p04dBm
 
 /* radio initialization */
-#define ZB_RADIO_INIT()					rf_drv_init(RF_MODE_ZIGBEE_250K)
+#define ZB_RADIO_INIT()					do{\
+											rf_drv_init(RF_MODE_ZIGBEE_250K); \
+											rf_drv_cap(CFG_FREQUENCY_OFFSET); \
+										}while(0);
 
-/* hardware timer initialization for mac-csma */
-#define ZB_TIMER_INIT()					hwTmr_init(TIMER_IDX_1, TIMER_MODE_SCLK)
+/* sys timer initialization for mac-csma */
+#define ZB_TIMER_INIT()					hwTmr_init(TIMER_IDX_3, TIMER_MODE_SCLK)
 
 static inline u8 ZB_RADIO_RSSI_TO_LQI(rf_rxGainMode_t mode, u8 inRssi){
 	u8 lqi;

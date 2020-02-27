@@ -56,6 +56,11 @@ _attribute_ram_code_ void irq_handler(void){
 		reg_irq_src = FLD_IRQ_TMR2_EN;
 	}
 
+    if((src & FLD_IRQ_SYSTEM_TIMER)){
+    	reg_irq_src = FLD_IRQ_SYSTEM_TIMER;
+    	timer_irq3_handler();
+    }
+
 	if((src & FLD_IRQ_GPIO_EN)==FLD_IRQ_GPIO_EN){
 		reg_irq_src = FLD_IRQ_GPIO_EN;
 		gpio_irq_handler(GPIO_IRQ_MODE);

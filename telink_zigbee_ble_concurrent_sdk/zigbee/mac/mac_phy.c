@@ -46,7 +46,7 @@
 /**********************************************************************
  * LOCAL TYPES
  */
-
+extern volatile u8 zigbee_process;
 extern u8 rf_txTpGain;
 volatile s8 soft_rssi;
 volatile s32 sum_rssi, cnt_rssi = 1;
@@ -274,6 +274,9 @@ void rf_setRxBuf(u8* pBuf)
  */
 _attribute_ram_code_ void rf_setTrxState(u8 state)
 {
+	if(!zigbee_process){
+		return;
+	}
 #ifndef WIN32
     if (RF_STATE_RX == state || RF_STATE_ED == state) {
     	if(TL_ZB_MAC_STATUS_GET() == ZB_MAC_STATE_ACTIVE_SCAN || RF_STATE_ED == state){
@@ -436,8 +439,12 @@ u8 rf_stopED(void)
 }
 
 #if BLE_CONCURRENT_MODE
-_attribute_ram_code_ u8 rf_performCCA(void)
-{
+
+_attribute_ram_code_ u8 rf_performCCA(void){
+	if(zigbee_process == 0){
+		return PHY_CCA_BUSY;
+	}
+
     if(rf_busyFlag & TX_BUSY)
     {
         return PHY_CCA_BUSY;
@@ -676,7 +683,9 @@ _attribute_ram_code_ __attribute__((optimize("-Os"))) void rf_tx_irq_handler(voi
     }
     g_sysDiags.macTxIrqCnt++;
 
-	ZB_RADIO_TRX_SWITCH(RF_MODE_RX,LOGICCHANNEL_TO_PHYSICAL(rf_getChannel()));
+    if(zigbee_process){
+    	ZB_RADIO_TRX_SWITCH(RF_MODE_RX,LOGICCHANNEL_TO_PHYSICAL(rf_getChannel()));
+    }
 
     rf_busyFlag &= ~TX_BUSY;//Clear TX busy flag after receive TX done signal
 	extern u8 rfMode;

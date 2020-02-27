@@ -65,6 +65,7 @@ typedef enum
 	NLME_IDLE,
 	NLME_PERMIT_JOIN_REQ,
 	NLME_SEND_DEV_ANN,
+	NLME_LEAVING,
 }user_state_t;
 
 typedef struct
@@ -139,7 +140,8 @@ typedef struct
 	u8	joinAccept:1;
 	u8	known_panids_cnt:4;
 	u8	discoverRoute:1;	/*!< Always TRUE for NLDE data request! see 2.2.4.1.1.3 */
-	u8  resv:3;
+	u8  resv:2;
+	u8	parentIsChanged:1;	/*!< A flag indicates that the device's parent is changed through rejoin */
 	u8 	user_state:4;		/*!< Current network user_state_t */
 	u8 	state:4; 			/*!< Current network subsystem state nlme_state_t */
 
@@ -158,17 +160,10 @@ typedef struct
 nwk_ctx_t g_zbNwkCtx;
 
 
-
-
-
-
-
-
-#define ZB_SET_USER_STATE(_state_)    	(g_zbNwkCtx.user_state = _state_)
-#define ZB_GET_USER_STATE()    			(g_zbNwkCtx.user_state)
-
 #define ZB_SET_DISCOVER_ROUTE(v)		(g_zbNwkCtx.discoverRoute = v)
 #define ZB_GET_DISCOVER_ROUTE			(g_zbNwkCtx.discoverRoute)
 
+#define ZB_SET_USER_STATE(v)			(g_zbNwkCtx.user_state = v)
+#define ZB_GET_USER_STATE				(g_zbNwkCtx.user_state)
 
 #endif /* ZB_NWK_GLOBALS_H */

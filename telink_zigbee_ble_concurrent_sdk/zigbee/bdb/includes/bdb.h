@@ -545,7 +545,7 @@ status_t bdb_defaultReportingCfg(u8 endpoint, u16 profileID, u16 clusterID, u16 
  * @param 	startDevCnf
  *
  */
-void bdb_zdoStartDevCnf(zdo_start_device_confirm_t* startDevCnf);
+void bdb_zdoStartDevCnf(void *arg);   //zdo_start_device_confirm_t* startDevCnf);
 
 /**
  * @brief      bdb attribute initialization

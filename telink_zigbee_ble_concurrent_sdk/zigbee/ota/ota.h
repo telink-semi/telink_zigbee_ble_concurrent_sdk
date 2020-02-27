@@ -26,13 +26,13 @@
 #include "../zdo/zb_af.h"
 #include "../zcl/zcl.h"
 
-
 //OTA: define for 8267/8269
 #if DUAL_MODE_SW_BOOT
-#define	FLASH_OTA_NEWIMAGE_ADDR						0xA0000//256K
+#define	FLASH_OTA_NEWIMAGE_ADDR						0x40000//256K
 #else
 #define	FLASH_OTA_NEWIMAGE_ADDR						0x40000//256K
 #endif
+
 #define	OTA_TLNK_KEYWORD_ADDROFFSET					8
 #define	OTA_IMAGESECTORHDR_SIZE						6
 #define OTA_IMAGE_MAX_DATA_SIZE						48
@@ -192,7 +192,7 @@ extern u16 zcl_attr_imageTypeID;
 extern u16 zcl_attr_minBlockPeriod;//in seconds
 //extern u32 zcl_attr_imageStamp;
 
-extern zcl_specClusterInfo_t g_otaClusterList[];
+extern const zcl_specClusterInfo_t g_otaClusterList[];
 extern u8 OTA_CB_CLUSTER_NUM;
 
 

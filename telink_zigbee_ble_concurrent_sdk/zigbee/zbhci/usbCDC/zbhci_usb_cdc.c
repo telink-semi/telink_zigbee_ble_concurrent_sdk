@@ -25,11 +25,16 @@
 #include "../zbhci.h"
 
 #if (ZBHCI_EN && ZBHCI_USB_CDC)
+
+typedef void (*zbhciRxCbFun)(u8 *buf, u8 len);
+typedef void (*zbhciTxDoneCbFun)(u8 *buf);
+
 //define rx buffer
-#define RX_BUF_LEN    64 //in bytes
-#define TX_BUF_LEN    64 //in bytes
-#define RX_BUF_NUM    4
-#define RX_NDATA_LEN	7
+#define RX_BUF_LEN    		64 //in bytes
+#define TX_BUF_LEN    		64 //in bytes
+#define RX_BUF_NUM    		4
+#define RX_NDATA_LEN		7
+
 static unsigned char rx_buf[RX_BUF_NUM][RX_BUF_LEN];
 static unsigned char rx_ptr = 0;
 __attribute__((aligned(4))) u8 usb_cdcTxbuf[TX_BUF_LEN] = {0};
@@ -37,6 +42,9 @@ __attribute__((aligned(4))) u8 usb_cdcTxbuf[TX_BUF_LEN] = {0};
 u8 tx_rdPtr = 0;
 zbhciRxCbFun hciCb = NULL;
 zbhciTxDoneCbFun hciTxDoneCb = NULL;
+
+void usbcdc_data_handler(void *arg);
+
 static void USBCDC_RxCb(unsigned char *data){
     USBCDC_RxBufSet(rx_buf[(rx_ptr++&0x03)]);
     if(hciCb){
@@ -53,8 +61,7 @@ u8 checksum(u8 *data,u8 len){
 	return ret;
 }
 
-
-bool usbRwBusy(void ){
+bool usbRwBusy(void){
 	return (!USBCDC_IsAvailable());
 }
 
@@ -124,7 +131,6 @@ bool zbhciPacketRxCompleted(u8 **buf){
 	return FALSE;
 }
 
-void usbcdc_data_handler(void *arg);
 void zbhciRxCb(u8 *buf,u8 len){
 	if(zbhciPacketRxCompleted(&buf)!=TRUE){
 		return;
@@ -164,7 +170,6 @@ void usbcdc_data_handler(void *arg){
 		st = ZBHCI_MSG_STATUS_ERROR_START_CHAR;
 	}
 
-
 	if(st == SUCCESS){
 		u16 pktLen = (msg->msgLen16H << 8) | msg->msgLen16L;
 		u16 msgType = (msg->msgType16H<<8) + msg->msgType16L;
@@ -186,18 +191,15 @@ void usbcdc_data_handler(void *arg){
 	}
 }
 
-
 void USB_LogInit(void)
 {
     write_reg8(0x80013c, 0x40);
     write_reg8(0x80013d, 0x09);
 }
 
-
 void zbhciTxDoneCb(u8 *buf){
 
 }
-
 
 void usb_cdc_init(void){
 	USB_Init();
@@ -211,7 +213,7 @@ void usb_cdc_init(void){
 	hciTxDoneCb = zbhciTxDoneCb;
 }
 
-void usbRwTask(void ){
+void usbRwTask(void){
 	USB_IrqHandle();
 }
 #endif

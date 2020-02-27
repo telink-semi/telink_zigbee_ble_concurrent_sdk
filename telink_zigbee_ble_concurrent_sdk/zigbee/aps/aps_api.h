@@ -104,11 +104,11 @@ typedef union
 typedef enum
 {
 	APS_TX_OPT_SECURITY_ENABLED = BIT(0), //0x01 = Security enabled transmission
-	APS_TX_OPT_USE_NWK_KEY = BIT(1),      //0x02 = Use NWK key
-	APS_TX_OPT_ACK_TX = BIT(2),           //0x04 = Acknowledged transmission
-	APS_TX_OPT_FRAG_PERMITTED = BIT(3),   //0x08 = Fragmentation permitted
-	APS_TX_OPT_INCLUDE_NONCE	= BIT(4),	//0x10 = Include extended nonce in APS security frame
-	APS_TX_OPT_INTRA_PAN = BIT(7)        //0x80 = Intra-PAN delivery
+	APS_TX_OPT_DISABLE_NWK_KEY 	= BIT(1), //0x02 = Disable NWK key
+	APS_TX_OPT_ACK_TX 			= BIT(2), //0x04 = Acknowledged transmission
+	APS_TX_OPT_FRAG_PERMITTED 	= BIT(3), //0x08 = Fragmentation permitted
+	APS_TX_OPT_INCLUDE_NONCE	= BIT(4), //0x10 = Include extended nonce in APS security frame
+	APS_TX_OPT_INTRA_PAN 		= BIT(7)  //0x80 = Intra-PAN delivery
 }aps_tx_options;
 
 typedef enum{
@@ -116,7 +116,6 @@ typedef enum{
 	APS_SHORT_GROUPADDR_NOEP,			/* for group-casting: only need group address */
 	APS_SHORT_DSTADDR_WITHEP,			/* for unicasting with nwk address, with Endpoint */
 	APS_LONG_DSTADDR_WITHEP,			/* for unicasting with ieee address, with Endpoint */
-	APS_LONG_DSTADDR_NOEP				/* for unicasting with ieee address, without Endpoint */
 }aps_dst_addr_mode;
 
 typedef enum{
@@ -320,8 +319,6 @@ typedef struct{
 
 typedef		aps_me_bind_req_t	aps_me_unbind_req_t;
 
-extern u8 APS_GROUP_TABLE_SIZE;
-
 
 //APSME-ADD-GROUP.request Parameters
 typedef struct{
@@ -416,13 +413,21 @@ typedef struct{
 
 	//default value 2
 	u8		aps_nonmember_radius;//The value to be used for the NonmemberRadius  parameter when using NWK layer multicast.
+
+	u8		aps_interframe_delay;
+	u8		aps_max_window_size;
+	u8		aps_fragment_payload_size;
+
 	u8		aps_use_insecure_join:1;//A flag controlling the use of insecure join at startup. Default TRUE
 	u8		aps_authenticated:1;//authenticted or not
 	u8		aps_reserved:6;
 	u8		aps_flags;//Flag used in APS layers, see the enum of aps_flag_e
 }aps_pib_attributes_t;
 
-
+extern bool APS_SECUTIRY_ENABLE;
+extern u8 APS_INTERFRAME_DELAY;
+extern u8 APS_MAX_WINDOW_SIZE;
+extern u8 APS_FRAGMEMT_PAYLOAD_SIZE;
 extern u8 APS_BINDING_TABLE_SIZE;
 extern u8 APS_GROUP_TABLE_SIZE;
 extern aps_binding_table_t aps_binding_tbl;
@@ -430,7 +435,7 @@ extern aps_group_tbl_ent_t aps_group_tbl[];
 
 extern aps_pib_attributes_t aps_ib;
 
-#define APS_IB()			 aps_ib
+#define APS_IB() aps_ib
 
 /******************************************************************************
                               Prototypes section
@@ -452,6 +457,16 @@ void aps_init(void);
  *
  **************************************************************************/
 u8 aps_get_current_counter_value(void );
+
+/***********************************************************************//**
+ * @brief   get the sequence number for the new aps frame
+ *
+ * @param
+ *
+ * @return	the sequence number
+ *
+ **************************************************************************/
+u8 aps_get_counter_value(void);
 
 zdo_status_t aps_me_bind_req(aps_me_bind_req_t *amr);
 
@@ -581,3 +596,23 @@ u8 aps_me_find_dst_ref(aps_me_bind_req_t *req);
  *
  **************************************************************************/
 u8 aps_me_free_src_table_find(void);
+
+/***********************************************************************//**
+ * @brief       Send an APS data request
+ *
+ * @param[in]   dataReq - Pointer to the apsde data request structure
+ *
+ * @param[in]   asdu    - Pointer to the asdu
+ *
+ * @param[in]   length  - Length of asdu
+ *
+ * @return      Status
+ *
+ **************************************************************************/
+u8 apsDataRequest(aps_data_req_t *dataReq, u8 *asdu, u8 length);
+
+u8 apsDataFragmentRequest(aps_data_req_t *dataReq, u8 *asdu, u16 length);
+
+
+typedef void (*apsDataIndCb_t)(void *p);
+void tl_apsDataIndRegister(apsDataIndCb_t cb);

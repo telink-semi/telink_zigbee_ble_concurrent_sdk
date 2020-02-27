@@ -38,7 +38,6 @@ typedef struct{
 __attribute__((aligned(4))) u8 uartTxBuf[UART_TX_BUF_SIZE] = {0};
 __attribute__((aligned(4))) u8 uartRxBuf[UART_RX_BUF_SIZE] = {0};
 
-extern void zbhciCmdHandler(u16 msgType, u16 msgLen, u8 *p);
 void uart_data_handler(void *arg){
 
 	 /*

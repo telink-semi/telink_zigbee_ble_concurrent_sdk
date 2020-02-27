@@ -12,7 +12,7 @@
 #elif defined ZB_ED_ROLE && (ZB_ED_ROLE == 1)
 	#define LOGICAL_TYPE			DEVICE_TYPE_END_DEVICE
 	#define SERVER_MASK				(ND_SERVER_MASK_REV21)
-#if ZB_MAC_RX_ON_WHEN_IDEL
+#if ZB_MAC_RX_ON_WHEN_IDLE
 	#define MAC_CAPABILITY_FLAGS	(MAC_CAP_DEVICE_TYPE_RFD | MAC_CAP_RX_ON_WHEN_IDLE | MAC_CAP_ALLOCATE_ADDRESS)
 #else
 	#define MAC_CAPABILITY_FLAGS	(MAC_CAP_DEVICE_TYPE_RFD | MAC_CAP_ALLOCATE_ADDRESS)
@@ -255,15 +255,19 @@ _CODE_ZDO_ zdo_status_t af_clusterMatchedLocal(u16 clusterID, u8 ep){
 }
 
 
-_CODE_ZDO_ zdo_status_t af_profileMatchedLocal(u16 profileID){
-	for(u8 i=0; i<available_active_ep_num;i++){
-		if(aed[i].correspond_simple_desc->app_profile_id == profileID){
-			return ZDO_SUCCESS;
-		}
+_CODE_ZDO_ zdo_status_t af_profileMatchedLocal(u16 profileID, u8 ep){
+	if(profileID == LL_PROFILE_ID){
+		return ZDO_SUCCESS;
 	}
 
-	if(zdo_epDesc.correspond_simple_desc->app_profile_id == profileID){
+	if((ep == ZDO_EP) && (profileID == ZDO_PROFILE_ID)){
 		return ZDO_SUCCESS;
+	}
+
+	for(u8 i=0; i < available_active_ep_num; i++){
+		if(((aed[i].ep == ep) || (ep == 0xFF)) && ((aed[i].correspond_simple_desc->app_profile_id == profileID) || (profileID == 0xFFFF))){
+			return ZDO_SUCCESS;
+		}
 	}
 
 	return ZDO_NO_DESCRIPTOR;
@@ -423,7 +427,9 @@ _CODE_ZDO_ void af_dataSendCnfCb(apsdeDataConf_t *pApsDataCnf){
 	}
 }
 
-u8 af_dataSend(u8 srcEp, epInfo_t* pDstEpInfo, u16 clusterId, u8 cmdPldLen, u8* cmdPld, u8 *seqNo){
+u8 af_dataSend(u8 srcEp, epInfo_t *pDstEpInfo, u16 clusterId, u16 cmdPldLen, u8 *cmdPld, u8 *apsCnt){
+	u8 status = RET_OK;
+
 	aps_data_req_t apsdeData;
 	TL_SETSTRUCTCONTENT(apsdeData, 0);
 
@@ -439,7 +445,7 @@ u8 af_dataSend(u8 srcEp, epInfo_t* pDstEpInfo, u16 clusterId, u8 cmdPldLen, u8* 
 			ZB_IEEE_ADDR_COPY(apsdeData.aps_addr.dst_ext_addr, pDstEpInfo->dstAddr.extAddr);
 		}
 	}else if(APS_SHORT_GROUPADDR_NOEP == pDstEpInfo->dstAddrMode){
-		apsdeData.aps_addr.dst_short_addr = pDstEpInfo->dstAddr.shortAddr;
+		apsdeData.aps_addr.dst_group_addr = pDstEpInfo->dstAddr.shortAddr;
 	}else{
 		//APS_DSTADDR_EP_NOTPRESETNT
 	}
@@ -448,18 +454,47 @@ u8 af_dataSend(u8 srcEp, epInfo_t* pDstEpInfo, u16 clusterId, u8 cmdPldLen, u8* 
 	apsdeData.profile_id = pDstEpInfo->profileId; //TODO: which place to decide the profile ID
 	apsdeData.tx_options = pDstEpInfo->txOptions;
 	apsdeData.radius = pDstEpInfo->radius;
-	apsdeData.enableNWKsecurity = 1;
-	if((pDstEpInfo->txOptions & APS_TX_OPT_USE_NWK_KEY) == 0){
-		apsdeData.enableNWKsecurity = 0;
-	}
-
+	apsdeData.enableNWKsecurity = (pDstEpInfo->txOptions & APS_TX_OPT_DISABLE_NWK_KEY) ? 0 : 1;
 	apsdeData.useAlias = pDstEpInfo->useAlias;
 	apsdeData.aliasSrcAddr = pDstEpInfo->aliasSrcAddr;
 	apsdeData.aliasSeqNum = pDstEpInfo->aliasSeqNum;
+	apsdeData.handle = (apsdeData.profile_id == ZDO_PROFILE_ID && apsdeData.cluster_id == DEVICE_ANNCE_CLID) ? APS_CMD_HANDLE_DEVICE_ANNOUNCE : af_handleGet();
+	apsdeData.apsCnt = aps_get_counter_value();
 
-	u8 handle = (apsdeData.profile_id == ZDO_PROFILE_ID && apsdeData.cluster_id == DEVICE_ANNCE_CLID) ? APS_CMD_HANDLE_DEVICE_ANNOUNCE : af_handleGet();
-	u8 status = zb_apsdeDataRequest(&apsdeData, handle, cmdPld, cmdPldLen);
-	*seqNo = aps_get_current_counter_value();
+	*apsCnt = apsdeData.apsCnt;
+
+	if(apsdeData.tx_options & APS_TX_OPT_FRAG_PERMITTED){
+		if(aps_ib.aps_fragment_payload_size){
+			if((apsdeData.dst_addr_mode == APS_SHORT_GROUPADDR_NOEP) ||
+				((apsdeData.dst_addr_mode == APS_SHORT_DSTADDR_WITHEP) && ZB_NWK_IS_ADDRESS_BROADCAST(apsdeData.aps_addr.dst_short_addr))){
+				/* Multicast and broadcast transmissions are not permitted to use fragmentation. */
+				status = RET_ERROR;
+			}else{
+				if(cmdPldLen > aps_ib.aps_fragment_payload_size){
+					/* Fragmentation need aps acknowledgements. */
+					apsdeData.tx_options |= APS_TX_OPT_ACK_TX;
+				}else{
+					/* If the payload length is less then fragment payload size, clear it. */
+					apsdeData.tx_options &= (u8)(~(u16)APS_TX_OPT_FRAG_PERMITTED);
+				}
+			}
+		}else{
+			/* Not support. */
+			status = RET_ERROR;
+		}
+	}
+
+	if(status == RET_OK){
+		if(apsdeData.tx_options & APS_TX_OPT_FRAG_PERMITTED){
+			/* Fragmented transmissions. */
+			//TODO, not support
+			status = apsDataFragmentRequest(&apsdeData, cmdPld, cmdPldLen);
+		}else{
+			/* Single frame request. */
+			status = apsDataRequest(&apsdeData, cmdPld, (u8)cmdPldLen);
+		}
+	}
+
 	return status;
 }
 

@@ -26,8 +26,8 @@
  *  @{
  */
 
-#define HA_PROFILE_ID                      				0x0104
-#define LL_PROFILE_ID                      				0xC05E
+//#define HA_PROFILE_ID                      				0x0104
+//#define LL_PROFILE_ID                      				0xC05E
 
 /** @addtogroup  ZCL_Module ZCL
  *  @{
@@ -147,6 +147,10 @@
 
 // test cluster
 #define ZCL_CLUSTER_TELINK_SDK_TEST						  0xFF00
+#define ZCL_CLUSTER_TELINK_SDK_TEST_REQ					  0xFF01
+#define ZCL_CLUSTER_TELINK_SDK_TEST_RSP					  0xFF02
+#define ZCL_CLUSTER_TELINK_SDK_TEST_CLEAR_REQ			  0xFF03
+#define ZCL_CLUSTER_TELINK_SDK_TEST_CLEAR_RSP			  0xFF04
 
 /** @} end of group zcl_cluster_id */
 

@@ -178,8 +178,6 @@ int my_fifo_push (my_fifo_t *f, u8 *p, int n);
 void my_fifo_pop (my_fifo_t *f);
 u8 * my_fifo_get (my_fifo_t *f);
 
-unsigned int xcrc32 (const unsigned char *buf, int len, unsigned int init);
-
 #define		MYFIFO_INIT(name,size,n)		u8 name##_b[size * n]={0};my_fifo_t name = {size,n,0,0, name##_b}
 
 

@@ -19,7 +19,7 @@
  *			 file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
  *
  *******************************************************************************************************/
-#if (__PROJECT_TL_CONCURRENT_MODE__)
+#if (__PROJECT_TL_CONCURRENT_LIGHT__)
 
 
 /**********************************************************************

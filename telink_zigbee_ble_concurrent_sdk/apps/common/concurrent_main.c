@@ -25,7 +25,8 @@
 #include "../../ble/ll/ll.h"
 
 #if BLE_CONCURRENT_MODE
-asm(".equ __FW_OFFSET,      0x60000");
+
+asm(".equ __FW_OFFSET,      0xC0000");
 asm(".global     __FW_OFFSET");
 
 #define  ZIGBEE_PRE_TIME      (16 * 1000 * 2)   //2ms
@@ -69,6 +70,8 @@ extern void user_init_normal(void);
 #elif defined(MCU_CORE_8258)
 	#if(CLOCK_SYS_CLOCK_HZ == 24000000)
 		SYS_CLK_TYPEDEF g_sysClk = SYS_CLK_24M_Crystal;
+	#elif(CLOCK_SYS_CLOCK_HZ == 32000000)
+		SYS_CLK_TYPEDEF g_sysClk = SYS_CLK_32M_Crystal;
 	#elif(CLOCK_SYS_CLOCK_HZ == 16000000)
 		SYS_CLK_TYPEDEF g_sysClk = SYS_CLK_16M_Crystal;
 	#elif(CLOCK_SYS_CLOCK_HZ == 48000000)
@@ -115,6 +118,10 @@ static u8 platform_init(void){
 
 	clock_init(/*SYS_CLK_16M_Crystal*/SYS_CLK_32M_Crystal);//BLE 16M
 
+#if defined(MCU_CORE_8258)
+	internalFlashSizeCheck();
+#endif
+
 	gpio_init();
 
 	ZB_RADIO_INIT();
@@ -155,6 +162,7 @@ int ble_stack_idle(void){
 void switch_to_zb_context(void){
 	rf_baseband_reset();
 	backup_ble_rf_context();
+	ZB_RADIO_RX_BUF_CLEAR(rf_rxBuf);
 	restore_zigbee_rf_context(rf_rxBuf);
 	//rf_drv_250k();
 	write_reg8(0x401, 0);
@@ -172,6 +180,8 @@ void switch_to_zb_context(void){
 
 void switch_to_ble_context(void){
     // do some rf init, set to ble mode
+	ZB_RADIO_RX_DISABLE;
+	ZB_RADIO_RX_BUF_CLEAR(rf_rxBuf);
 	backup_zigbee_rf_context();
 	rf_baseband_reset();
 
@@ -186,21 +196,18 @@ void switch_to_ble_context(void){
 	g_process_zigbee_en = 0;
 }
 
-
-
+volatile u8 zigbee_process = 0;
 void zb_task(void){
     tl_zbTaskProcedure();
 
 #if(MODULE_WATCHDOG_ENABLE)
 	wd_clear();
 #endif
+
 	ev_main();
 }
 
-
 void concurrent_mode_main_loop (void){
-	 static u8 zigbee_process = 0;
-
 	 if(zigbee_process == 0){
 		 /*
 		  * ble task
@@ -218,10 +225,10 @@ void concurrent_mode_main_loop (void){
 			  *
 			  * */
 			 irq_disable();
+			 zigbee_process = 0;
 			 switch_to_ble_context();
 			 irq_enable();
-			 g_process_zigbee_en = 0;
-			 zigbee_process = 0;
+
 			 gpio_write(GPIO_PB3, 0);
 		 }else{
 			 zb_task();
@@ -236,10 +243,11 @@ void concurrent_mode_main_loop (void){
 		 irq_disable();
 		 ZB_RADIO_RX_DISABLE;
 		 switch_to_zb_context();
-		 ZB_RADIO_RX_ENABLE;
+
 		 irq_enable();
 		 zb_task();
 		 zigbee_process = 1;
+		 ZB_RADIO_RX_ENABLE;
 	 }
 }
 

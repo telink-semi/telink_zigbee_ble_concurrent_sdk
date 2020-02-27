@@ -175,7 +175,7 @@ ev_bufItem_t* ev_buf_getHead(u8* pd);
  */
 u8 is_ev_buf(void *arg);
 
-
+u16 ev_buf_getFreeMaxSize(void);
 /**  @} end of group EV_BUFFER_FUNCTIONS */
 
 /**  @} end of group EV_BUFFER */

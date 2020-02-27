@@ -447,16 +447,6 @@ typedef struct {
 extern zcl_reportingTab_t reportingTab;
 
 /**
- *  @brief  Definition for ZCL TELINK TEST
- */
-typedef struct {
-	u16 seqNo;
-	u16 ackNum;
-	u8  payload[1];
-} zcl_telinkTest_t;
-
-
-/**
  *  @brief  Definition for the incoming cluster command address information
  */
 typedef struct {

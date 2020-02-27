@@ -80,7 +80,7 @@
 //#define NWK_BROADCAST_DELIVERY_TIME	  (2*NWK_NIB().maxDepth*(((50+(NWK_MAX_BROADCAST_JITTER*1000)/2)) + NWK_NIB().passiveAckTimeout*NWK_MAX_BROADCAST_RETRIES)/1000)
 #define NWK_BROADCAST_DELIVERY_TIME	  (2*NWK_MAX_DEPTH*(((50+(NWK_MAX_BROADCAST_JITTER*1000)/2)) + NWK_PASSIVE_ACK_TIMEOUT*NWK_MAX_BROADCAST_RETRIES)/1000)
 #else
-#define NWK_BROADCAST_DELIVERY_TIME	 	2000//ms
+#define NWK_BROADCAST_DELIVERY_TIME	 	5000//ms
 #endif
 
 /****************************************************************************
@@ -890,7 +890,6 @@ typedef struct
 	}linkStatus;
 }linkStatus_entry_t;
 
-#define	LINK_ST_PAYLOADHDRLEN			2
 /****************************************************************************
 * @brief	Link status command payload
 */
@@ -1307,7 +1306,7 @@ void tl_zbNwkLinkStatusStop(void);
 void tl_zbNwkRouteDiscStart(void *arg);
 
 void nwkEndDevTimeoutReqSend(reqTimeoutEnum_t reqTimeoutEnum, u8 endDevCfg);
-
+void keepaliveMsgSendStop(void);
 /**
    Confirms start procedure.
    @param - reference to buffer.
@@ -1369,9 +1368,8 @@ void tl_zbNwkNlmeSetRequestHandler(void *arg);
 #define tl_zbNwkNlmeNwkFormationConfirmPost(p)	tl_zbPrimitivePost(TL_Q_NWK2HIGH, NWK_NLME_NWK_FORMATION_CNF, p)
 #define tl_zbNwkNlmeNwkDiscConfirmPost(p)		tl_zbPrimitivePost(TL_Q_NWK2HIGH, NWK_NLME_NWK_DISCOVERY_CNF, p)
 
-typedef void (*edpollIndication2APS)(u16 dstAddr);
-
-void nwk_routingTabParamConfig(u8 tableNum);
+typedef void (*nwkDataIndCb_t)(void *p);
+void tl_nwkDataIndRegister(nwkDataIndCb_t cb);
 
 u8 is_device_factory_new(void);
 

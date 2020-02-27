@@ -161,6 +161,7 @@ u8 tl_zbTaskPost(tl_zb_callback_t func, void *arg);
 #define	TL_SCHEDULE_TASK	tl_zbTaskPost
 
 u8 zb_timerTaskIdle(void);
+u8 zb_isTimerTaskQEnough(void);
 u8 zb_isTaskDone(void);
 bool tl_stackBusy(void);
 

@@ -43,14 +43,14 @@
 
 #define 		ZDO_MAX_ALLOWED_LINK_FAILURE_CNT	12
 
-#define			MAX_ACTIVE_EP_NUMBER				16
+#define			MAX_ACTIVE_EP_NUMBER				8
 
 #define			INVALID_CMP_RESULT					0xff
 #define			AF_BROADCAST_EP						0xff
 
 
 /* max nsdulength = aMaxPHYFrameSize -(nwkcMACFrameOverhead + nwkcMinHeaderOverhead) (D.4 aMaxMACFrameSize) */
-#define			AF_NSDU_MAX_LEN					(MAX_PHY_FRM_SIZE - (ZB_NWKC_MAC_FRAME_OVERHEAD + ZB_NWKC_MIN_HEADER_OVERHEAD))
+#define			AF_NSDU_MAX_LEN					(MAX_PHY_FRM_SIZE - (ZB_MAC_FRAME_HEADER + ZB_NWK_FRAME_HEADER + ZB_APS_FRAME_HEADER))
 
 
 typedef enum{
@@ -114,7 +114,7 @@ typedef struct {
 	u8 	 dstAddrMode;
 	u8   dstEp;
 
-	u8   txOptions;
+	u8   txOptions;//aps_tx_options
 	u8   radius;
 } epInfo_t;
 
@@ -265,13 +265,6 @@ typedef struct{
 typedef void (*af_endpoint_cb_t)(void *p);
 
 typedef void (*af_dataCnf_cb_t)(void *p);
-
-
-typedef struct{
-	u8 ep;
-	u8 status;
-	u8 apsCnt;
-}app_data_confirm_t;
 
 typedef struct{
 	af_endpoint_cb_t				cb_rx;		/* data indication callback for this endoint */
@@ -503,10 +496,12 @@ u8 af_clusterMatchedLocal(u16 clusterID, u8 ep);
  *
  * @param	profileID - profile identifier to compare
  *
+ * @param	ep 		  - end point to compare
+ *
  * @return	INVALID_CMP_RESULT - Not matched
  * 			i - idnex of the local information base
  */
-u8 af_profileMatchedLocal(u16 profileID);
+u8 af_profileMatchedLocal(u16 profileID, u8 ep);
 
 
 /**************************************************************************************
@@ -516,7 +511,7 @@ u8 af_profileMatchedLocal(u16 profileID);
  *
  * @return	number of active end point
  */
-af_endpoint_descriptor_t *af_epDescriptorGet(void );
+af_endpoint_descriptor_t *af_epDescriptorGet(void);
 
 
 /**************************************************************************************
@@ -528,6 +523,7 @@ af_endpoint_descriptor_t *af_epDescriptorGet(void );
  */
 af_endpoint_descriptor_t *af_zdoSimpleDescriptorGet(void);
 
+
 /*******************************************************************************************//**
  * @brief       Send an APSDE data request
  *
@@ -537,16 +533,16 @@ af_endpoint_descriptor_t *af_zdoSimpleDescriptorGet(void);
  *
  * @param[in]   clusterId  		- cluster indentifer
  *
- * @param[in]   cmdPldLen   	- date length
+ * @param[in]   cmdPldLen   	- data length
  *
- * @param[in]   cmdPldLen   	- date payload
+ * @param[in]   cmdPld		   	- data payload
  *
- * @param[in]   seqNo   		- the APS count
+ * @param[in]   apsCnt   		- the APS count
  *
  * @return      Status
  *
  **************************************************************************/
-u8 af_dataSend(u8 srcEp, epInfo_t* pDstEpInfo, u16 clusterId, u8 cmdPldLen, u8* cmdPld, u8 *seqNo);
+u8 af_dataSend(u8 srcEp, epInfo_t *pDstEpInfo, u16 clusterId, u16 cmdPldLen, u8 *cmdPld, u8 *apsCnt);
 
 /****************************************************************************************************
  * @brief	Theb:Config_Parent_Link_Retry_Thres hold is either created when the  application is first loaded or

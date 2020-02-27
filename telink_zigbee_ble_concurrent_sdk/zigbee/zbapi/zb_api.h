@@ -152,22 +152,6 @@ u32 zb_getPollRate(void);
  * @return
  */
 void zb_endDeviceSyncReq(void);
-/*******************************************************************************************//**
- * @brief       Send an APSDE data request
- *
- * @param[in]   dataReq - Pointer to the apsde data request structure
- *
- * @param[in]   handle	- the handle used in stack
- *
- * @param[in]   asdu    - Pointer to the asdu
- *
- * @param[in]   length  - Length of asdu
- *
- * @return      Status
- *
- **************************************************************************/
-u8 zb_apsdeDataRequest(aps_data_req_t *dataReq, u8 handle, u8* asdu, u8 length);
-
 
 /***********************************************************************//**
  * @brief       Send a mac layer scan request

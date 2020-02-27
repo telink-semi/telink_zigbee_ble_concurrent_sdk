@@ -56,27 +56,52 @@ hwTmr_ctrl_t hwTmr_vars;
 
 
 void hwTmr_reset(u8 tmrIdx){
-    memset((u8*)&hwTmr_vars.timerInfo[tmrIdx], 0x00, sizeof(hwTmr_info_t));
+	if(tmrIdx < TIMER_NUM){
+		memset((u8*)&hwTmr_vars.timerInfo[tmrIdx], 0x00, sizeof(hwTmr_info_t));
+	}
 }
 
 void hwTmr_init(u8 tmrIdx, u8 mode){
-    hwTmr_reset(tmrIdx);
-    TIMER_INIT(tmrIdx, mode);
+	if(tmrIdx < TIMER_NUM){
+		hwTmr_reset(tmrIdx);
+
+		if(tmrIdx < TIMER_IDX_3){
+			TIMER_INIT(tmrIdx, mode);
+		}else{
+
+#if defined (MCU_CORE_8278)
+			reg_system_ctrl &= ~(u8)FLD_SYSTEM_TIMER_AUTO_EN;
+#else
+			reg_system_tick_mode &= ~(u8)FLD_SYSTEM_TICK_IRQ_EN;
+#endif
+			reg_irq_mask &= ~(u32)FLD_IRQ_SYSTEM_TIMER;
+		}
+	}
 }
 
 
-void hwTmr_cancel(u8 tmrIdx)
-{
-    u8 r = irq_disable();
+void hwTmr_cancel(u8 tmrIdx){
+	if(tmrIdx < TIMER_NUM){
+		u8 r = irq_disable();
 
-    /* Write 1 to clear, even if the timer is already set, cancel */
-    TIMER_STATE_CLEAR(tmrIdx);
-    TIMER_STOP(tmrIdx);
+		if(tmrIdx < TIMER_IDX_3){
+			/* Write 1 to clear, even if the timer is already set, cancel */
+			TIMER_STATE_CLEAR(tmrIdx);
+			TIMER_STOP(tmrIdx);
+		}else{
+#if defined (MCU_CORE_8278)
+			reg_system_ctrl &= ~(u8)FLD_SYSTEM_TIMER_AUTO_EN;
+#else
+			reg_system_tick_mode &= ~(u8)FLD_SYSTEM_TICK_IRQ_EN;
+#endif
+			reg_irq_mask &= ~(u32)FLD_IRQ_SYSTEM_TIMER;
+		}
 
-    hwTmr_info_t *pTimer = &hwTmr_vars.timerInfo[tmrIdx];
-    memset(pTimer, 0, sizeof(hwTmr_info_t));
+		hwTmr_info_t *pTimer = &hwTmr_vars.timerInfo[tmrIdx];
+		memset(pTimer, 0, sizeof(hwTmr_info_t));
 
-    irq_restore(r);
+		irq_restore(r);
+	}
 }
 
 hw_timer_sts_t hwTmr_setAbs(u8 tmrIdx, ext_clk_t* absTimer, timerCb_t func, void* arg)
@@ -111,12 +136,22 @@ hw_timer_sts_t hwTmr_setAbs(u8 tmrIdx, ext_clk_t* absTimer, timerCb_t func, void
 		}
         return (hw_timer_sts_t)SUCCESS;
     } else {
-        /* Set compare value */
-        TIMER_TICK_CLEAR(tmrIdx);
-        TIMER_INTERVAL_SET(tmrIdx, pTimer->expireInfo.high ? TIMER_OVERFLOW_VALUE : pTimer->expireInfo.low);
+    	if(tmrIdx < TIMER_IDX_3){
+			/* Set compare value */
+			TIMER_TICK_CLEAR(tmrIdx);
+			TIMER_INTERVAL_SET(tmrIdx, pTimer->expireInfo.high ? TIMER_OVERFLOW_VALUE : pTimer->expireInfo.low);
 
-        /* Enable Timer */
-        TIMER_START(tmrIdx);
+			/* Enable Timer */
+			TIMER_START(tmrIdx);
+    	}else{
+#if defined (MCU_CORE_8278)
+    		reg_system_ctrl |= FLD_SYSTEM_TIMER_AUTO_EN;
+#else
+    		reg_system_tick_mode |= FLD_SYSTEM_TICK_IRQ_EN;
+#endif
+    		reg_irq_mask |= FLD_IRQ_SYSTEM_TIMER;
+    		reg_system_tick_irq = clock_time() + (pTimer->expireInfo.high ? TIMER_OVERFLOW_VALUE : pTimer->expireInfo.low);
+    	}
     }
 
     irq_restore(r);
@@ -127,10 +162,14 @@ hw_timer_sts_t hwTmr_setAbs(u8 tmrIdx, ext_clk_t* absTimer, timerCb_t func, void
 
 
 
-hw_timer_sts_t hwTmr_set(u8 tmrIdx, u32 t_us, timerCb_t func, void* arg){
+hw_timer_sts_t hwTmr_set(u8 tmrIdx, u32 t_us, timerCb_t func, void *arg){
     ext_clk_t t;
     t.high = 0;
-    t.low = t_us * MASTER_CLK_FREQ;
+    if(tmrIdx < TIMER_IDX_3){
+    	t.low = t_us * MASTER_CLK_FREQ;
+    }else{
+    	t.low = t_us * CLOCK_SYS_CLOCK_1US;
+    }
     return hwTmr_setAbs(tmrIdx, &t, func, arg);
 }
 
@@ -139,10 +178,20 @@ void timer_irq_handler(u8 tmrIdx)
 {
     hwTmr_info_t *pTimer = &hwTmr_vars.timerInfo[tmrIdx];
 
-    /* Write 1 to clear */
-    TIMER_STATE_CLEAR(tmrIdx);
-    TIMER_STOP(tmrIdx);
-    TIMER_TICK_CLEAR(tmrIdx);
+    if(tmrIdx < TIMER_IDX_3){
+		/* Write 1 to clear */
+		TIMER_STATE_CLEAR(tmrIdx);
+		TIMER_STOP(tmrIdx);
+		TIMER_TICK_CLEAR(tmrIdx);
+    }else{
+    	reg_system_tick_irq ^= BIT(31);
+#if defined (MCU_CORE_8278)
+    	reg_system_ctrl &= ~(u8)FLD_SYSTEM_TIMER_AUTO_EN;
+#else
+    	reg_system_tick_mode &= ~(u8)FLD_SYSTEM_TICK_IRQ_EN;
+#endif
+    	reg_irq_mask &= ~(u32)FLD_IRQ_SYSTEM_TIMER;
+    }
 
     if (TIMER_WTO == pTimer->flags.bf.status) {
         /* Expired, callback */
@@ -154,35 +203,82 @@ void timer_irq_handler(u8 tmrIdx)
         	if(t < 0){
         		memset(pTimer, 0, sizeof(hwTmr_info_t));
         	}else if(t == 0){
-                TIMER_INTERVAL_SET(tmrIdx, pTimer->expireInfo.high ? TIMER_OVERFLOW_VALUE : pTimer->expireInfo.low);
-
-                /* Enable Timer */
-                TIMER_START(tmrIdx);
+        		if(tmrIdx < TIMER_IDX_3){
+					TIMER_INTERVAL_SET(tmrIdx, pTimer->expireInfo.high ? TIMER_OVERFLOW_VALUE : pTimer->expireInfo.low);
+					/* Enable Timer */
+					TIMER_START(tmrIdx);
+        		}else{
+					reg_system_tick_irq = clock_time() + (pTimer->expireInfo.high ? TIMER_OVERFLOW_VALUE : pTimer->expireInfo.low);
+					reg_irq_mask |= FLD_IRQ_SYSTEM_TIMER;
+#if defined (MCU_CORE_8278)
+					reg_system_ctrl |= FLD_SYSTEM_TIMER_AUTO_EN;
+#else
+					reg_system_tick_mode |= FLD_SYSTEM_TICK_IRQ_EN;
+#endif
+        		}
         	}else{
         		pTimer->expireInfo.low = t * MASTER_CLK_FREQ;
 
-                TIMER_INTERVAL_SET(tmrIdx, pTimer->expireInfo.high ? TIMER_OVERFLOW_VALUE : pTimer->expireInfo.low);
-
-                /* Enable Timer */
-                TIMER_START(tmrIdx);
+        		if(tmrIdx < TIMER_IDX_3){
+					TIMER_INTERVAL_SET(tmrIdx, pTimer->expireInfo.high ? TIMER_OVERFLOW_VALUE : pTimer->expireInfo.low);
+					/* Enable Timer */
+					TIMER_START(tmrIdx);
+        		}else{
+					reg_system_tick_irq = clock_time() + (pTimer->expireInfo.high ? TIMER_OVERFLOW_VALUE : pTimer->expireInfo.low);
+					reg_irq_mask |= FLD_IRQ_SYSTEM_TIMER;
+#if defined (MCU_CORE_8278)
+					reg_system_ctrl |= FLD_SYSTEM_TIMER_AUTO_EN;
+#else
+					reg_system_tick_mode |= FLD_SYSTEM_TICK_IRQ_EN;
+#endif
+        		}
         	}
         }
     } else{
         if (--pTimer->expireInfo.high) {
-        	TIMER_INTERVAL_SET(tmrIdx, TIMER_OVERFLOW_VALUE);
+        	if(tmrIdx < TIMER_IDX_3){
+        		TIMER_INTERVAL_SET(tmrIdx, TIMER_OVERFLOW_VALUE);
+        	}else{
+        		reg_system_tick_irq = clock_time() + TIMER_OVERFLOW_VALUE;
+        	}
         } else {
-        	TIMER_INTERVAL_SET(tmrIdx, pTimer->expireInfo.low);
+        	if(tmrIdx < TIMER_IDX_3){
+        		TIMER_INTERVAL_SET(tmrIdx, pTimer->expireInfo.low);
+        	}else{
+        		reg_system_tick_irq = clock_time() + pTimer->expireInfo.low;
+        	}
             pTimer->flags.bf.status = TIMER_WTO;
         }
 
         /* Enable Timer again */
-        TIMER_START(tmrIdx);
+        if(tmrIdx < TIMER_IDX_3){
+        	TIMER_START(tmrIdx);
+        }else{
+        	reg_irq_mask |= FLD_IRQ_SYSTEM_TIMER;
+#if defined (MCU_CORE_8278)
+					reg_system_ctrl |= FLD_SYSTEM_TIMER_AUTO_EN;
+#else
+					reg_system_tick_mode |= FLD_SYSTEM_TICK_IRQ_EN;
+#endif
+        }
+    }
+}
+
+void timer_irq0_process(u8 tmrIdx){
+    hwTmr_info_t *pTimer = &hwTmr_vars.timerInfo[tmrIdx];
+
+    /* Write 1 to clear */
+    TIMER_STATE_CLEAR(tmrIdx);
+
+    if(pTimer->cb){
+    	pTimer->cb(pTimer->arg);
     }
 }
 
 void timer_irq0_handler(void)
 {
-    timer_irq_handler(TIMER_IDX_0);
+	timer_irq_handler(TIMER_IDX_0);
+	//timer_irq0_process(TIMER_IDX_0);
 }
 
 void timer_irq1_handler(void)
@@ -193,5 +289,10 @@ void timer_irq1_handler(void)
 void timer_irq2_handler(void)
 {
     timer_irq_handler(TIMER_IDX_2);
+}
+
+void timer_irq3_handler(void)
+{
+    timer_irq_handler(TIMER_IDX_3);
 }
 

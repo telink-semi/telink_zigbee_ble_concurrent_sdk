@@ -31,7 +31,7 @@ extern "C" {
 #define	__LOG_RT_ENABLE__		0
 
 //////////// product  Information  //////////////////////////////
-#define TOUCHLINK_SUPPORT		1
+#define TOUCHLINK_SUPPORT		0
 #define FIND_AND_BIND_SUPPORT	0
 
 #define COLOR_RGB_SUPPORT		0
@@ -39,7 +39,7 @@ extern "C" {
 
 
 /* debug mode config */
-#define	UART_PRINTF_MODE		0
+#define	UART_PRINTF_MODE		1
 #define USB_PRINTF_MODE         0
 
 /* Running chip flash size select. If '1' - 1M, otherwise (or undefined) - 512K. */
@@ -62,7 +62,7 @@ extern "C" {
 #ifdef MCU_CORE_8258
 	#define BOARD					BOARD_8258_DONGLE//BOARD_8258_EVK
 	/* system clock config */
-	#define CLOCK_SYS_CLOCK_HZ  	24000000
+	#define CLOCK_SYS_CLOCK_HZ  	32000000
 #else
 	#define BOARD					BOARD_826x_DONGLE
 	/* system clock config */
@@ -94,8 +94,7 @@ extern "C" {
 #define	MODULE_UART_ENABLE		0
 
 /* Rf mode: 250K */
-#define	RF_MODE_250K		1
-
+#define	RF_MODE_250K			1
 
 /**
  *  @brief ZCL cluster support setting
@@ -105,12 +104,15 @@ extern "C" {
 #if (COLOR_RGB_SUPPORT || COLOR_CCT_SUPPORT)
 #define ZCL_LIGHT_COLOR_CONTROL_SUPPORT				1
 #endif
+#define ZCL_GROUP_SUPPORT							1
+#define ZCL_SCENE_SUPPORT							1
 #define ZCL_OTA_SUPPORT								1
 #if TOUCHLINK_SUPPORT
 #define ZCL_ZLL_COMMISSIONING_SUPPORT				1
 #endif
-#define	ZCL_WWAH_SUPPORT							1
 
+
+#define AF_TEST_ENABLE			1
 
 ///////////////////  Zigbee Profile Configuration /////////////////////////////////
 #include "stack_cfg.h"

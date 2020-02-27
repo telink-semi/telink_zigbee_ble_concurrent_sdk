@@ -20,7 +20,7 @@
  *
  *******************************************************************************************************/
 
-#if (__PROJECT_TL_CONCURRENT_MODE__)
+#if (__PROJECT_TL_CONCURRENT_GW__)
 
 /**********************************************************************
  * INCLUDES
@@ -29,9 +29,10 @@
 #include "zb_api.h"
 #include "zcl_include.h"
 #include "bdb.h"
-#include "ota.h"
-#include "sampleLight.h"
-#include "sampleLightCtrl.h"
+#include "sampleGw.h"
+#if ZBHCI_EN
+#include "zbhci.h"
+#endif
 
 /**********************************************************************
  * LOCAL CONSTANTS
@@ -50,20 +51,15 @@ void zbdemo_bdbInitCb(u8 status, u8 joinedNetwork);
 void zbdemo_bdbCommissioningCb(u8 status, void *arg);
 void zbdemo_bdbIdentifyCb(u8 endpoint, u16 srcAddr, u16 identifyTime);
 
-
 /**********************************************************************
  * GLOBAL VARIABLES
  */
 bdb_appCb_t g_zbDemoBdbCb = {zbdemo_bdbInitCb, zbdemo_bdbCommissioningCb, zbdemo_bdbIdentifyCb, NULL};
 
-#ifdef ZCL_OTA
-ota_callBack_t sampleLight_otaCb =
-{
-	sampleLight_otaProcessMsgHandler,
-};
+#if ZBHCI_EN
+bool sampleGw_macAssocReqIndHandler(void *arg);
+mac_appIndCb_t macAppIndCbList = {NULL, NULL, sampleGw_macAssocReqIndHandler};
 #endif
-
-static ev_time_event_t *pairingTimeoutEvt = NULL;
 
 volatile u8 T_zbdemoBdbInfo[6] = {0};
 
@@ -74,20 +70,6 @@ volatile u8 T_zbdemoBdbInfo[6] = {0};
 /**********************************************************************
  * FUNCTIONS
  */
-s32 sampleLight_bdbNetworkSteerStart(void *arg){
-	bdb_networkSteerStart();
-
-	return -1;
-}
-
-#if FIND_AND_BIND_SUPPORT
-s32 sampleLight_bdbFindAndBindStart(void *arg){
-	bdb_findAndBindStart(BDB_COMMISSIONING_ROLE_TARGET);
-
-	return -1;
-}
-#endif
-
 /*********************************************************************
   * @fn      zbdemo_bdbInitCb
   *
@@ -102,43 +84,29 @@ s32 sampleLight_bdbFindAndBindStart(void *arg){
 void zbdemo_bdbInitCb(u8 status, u8 joinedNetwork){
 	if(status == BDB_INIT_STATUS_SUCCESS){
 		T_zbdemoBdbInfo[0]++;
-
 		/*
-		 * start bdb commissioning
+		 * for a non-factory-new device:
+		 * 		steer a network
+		 *
+		 * for a factory-new device:
+		 * 	 	do nothing until receiving the command from host if HCI is enable, .
+		 * 		forms a central network if HCI is disable,
+		 *
 		 * */
 		if(joinedNetwork){
-#ifdef ZCL_OTA
-			ota_queryStart(30);
-#endif
-		}else{
-#if	(!ZBHCI_EN)
-			u16 jitter=0;
-			do{
-				jitter = zb_random();
-				jitter &= 0xfff;
-			}while(jitter==0);
-			TL_ZB_TIMER_SCHEDULE(sampleLight_bdbNetworkSteerStart, NULL, jitter * 1000);
-#endif
+			//bdb_networkSteerStart();
 		}
+#if	(!ZBHCI_EN)
+		else{
+			bdb_networkFormationStart();
+		}
+#endif
+
 	}else{
 		T_zbdemoBdbInfo[1]++;
 	}
 }
 
-
-#if DUAL_MODE
-s32 sampleLight_pairingTimeoutTimerStart(void *arg)
-{
-	nlme_leave_cnf_t leaveCnf;
-	ZB_IEEE_ADDR_ZERO(leaveCnf.deviceAddr);
-	leaveCnf.status = NWK_STATUS_SUCCESS;
-
-	sampleLight_leaveCnfHandler(&leaveCnf);
-
-	pairingTimeoutEvt = NULL;
-	return -1;
-}
-#endif
 /*********************************************************************
   * @fn      zbdemo_bdbCommissioningCb
   *
@@ -152,49 +120,16 @@ s32 sampleLight_pairingTimeoutTimerStart(void *arg)
   */
 void zbdemo_bdbCommissioningCb(u8 status, void *arg){
 	T_zbdemoBdbInfo[2]++;
+
 	if(status == BDB_COMMISSION_STA_SUCCESS){
 	    T_zbdemoBdbInfo[3]++;
 
-#if DUAL_MODE
-	    if(pairingTimeoutEvt){
-	    	TL_ZB_TIMER_CANCEL(&pairingTimeoutEvt);
-	    }
-#endif
-
-#if FIND_AND_BIND_SUPPORT
-	    if(!gLightCtx.bdbFindBindFlg){
-	    	gLightCtx.bdbFindBindFlg = TRUE;
-#endif
-
-	    	light_blink_start(2, 200, 200);
-
-#ifdef ZCL_OTA
-	    	ota_queryStart(30);
-#endif
-
-#if FIND_AND_BIND_SUPPORT
-	    	//start Finding & Binding
-        	TL_ZB_TIMER_SCHEDULE(sampleLight_bdbFindAndBindStart, NULL, 1 * 1000 * 1000);
-        }
-#endif
 	}else if(status == BDB_COMMISSION_STA_IN_PROGRESS){
 
 	}else if(status == BDB_COMMISSION_STA_NOT_AA_CAPABLE){
 
-	}else if((status == BDB_COMMISSION_STA_NO_NETWORK)||(status == BDB_COMMISSION_STA_TCLK_EX_FAILURE)){
-		u16 jitter = 0;
-		do{
-			jitter = zb_random();
-			jitter &= 0xfff;
-		}while(jitter==0);
-		TL_ZB_TIMER_SCHEDULE(sampleLight_bdbNetworkSteerStart, NULL, jitter * 1000);
+	}else if(status == BDB_COMMISSION_STA_NO_NETWORK){
 
-#if DUAL_MODE
-		/* start a pairing timeout timer */
-		if(!pairingTimeoutEvt){
-			pairingTimeoutEvt = TL_ZB_TIMER_SCHEDULE(sampleLight_pairingTimeoutTimerStart, NULL, 5 * 1000 * 1000);
-		}
-#endif
 	}else if(status == BDB_COMMISSION_STA_TARGET_FAILURE){
 
 	}else if(status == BDB_COMMISSION_STA_FORMATION_FAILURE){
@@ -207,63 +142,57 @@ void zbdemo_bdbCommissioningCb(u8 status, void *arg){
 
 	}else if(status == BDB_COMMISSION_STA_NOT_PERMITTED){
 
-//	}else if(status == BDB_COMMISSION_STA_TCLK_EX_FAILURE){
+	}else if(status == BDB_COMMISSION_STA_TCLK_EX_FAILURE){
 
 	}else if(status == BDB_COMMISSION_STA_FORMATION_DONE){
-		T_zbdemoBdbInfo[4]++;
-		#if ZBHCI_EN
-		#else
-			tl_zbMacChannelSet(DEFAULT_CHANNEL);  //set default channel
-		#endif
+#if COORDINATOR
+        #if ZBHCI_EN
+        #else
+	    tl_zbMacChannelSet(DEFAULT_CHANNEL);  //set default channel
+	    #endif
+#endif
 	}
 }
 
 
-extern void sampleLight_zclIdentifyCmdHandler(u8 endpoint, u16 srcAddr, u16 identifyTime);
+extern void sampleGW_zclIdentifyCmdHandler(u8 endpoint, u16 srcAddr, u16 identifyTime);
 void zbdemo_bdbIdentifyCb(u8 endpoint, u16 srcAddr, u16 identifyTime){
-#if FIND_AND_BIND_SUPPORT
-	sampleLight_zclIdentifyCmdHandler(endpoint, srcAddr, identifyTime);
-#endif
+	sampleGW_zclIdentifyCmdHandler(endpoint, srcAddr, identifyTime);
 }
 
 
 
-#ifdef ZCL_OTA
-volatile u8 T_sampleLightOtaSta[4] = {0};
-void sampleLight_otaProcessMsgHandler(u8 evt, u8 status)
+/*********************************************************************
+  * @fn      sampleGW_devAnnHandler
+  *
+  * @brief   Handler for ZDO Device Announce message. When this function be called means
+  *          there is new node join PAN or a node rejoin the PAN.
+  *
+  * @param   pInd - parameter of device announce indication
+  *
+  * @return  None
+  */
+void sampleGW_devAnnHandler(void *arg)
 {
-	if(evt == OTA_EVT_START){
-		if(status == ZCL_STA_SUCCESS){
-			light_blink_start(0, 200, 200);
-			//light_blink_start(0, 500, 2000);
-		}else{
+#if ZBHCI_EN
+	zdo_device_annce_req_t *pDevAnnceReq = (zdo_device_annce_req_t *)arg;
 
-		}
-		T_sampleLightOtaSta[0] = 1;
-	}else if(evt == OTA_EVT_COMPLETE){
-		T_sampleLightOtaSta[0] = 0;
-		if(status == ZCL_STA_SUCCESS){
-			T_sampleLightOtaSta[1]++;
-			ota_mcuReboot();
-		}else{
-			T_sampleLightOtaSta[2]++;
-			T_sampleLightOtaSta[3] = status;
-			ota_queryStart(30);
-		}
-		light_blink_stop();
-	}
-}
+	u8 array[64];
+	memset(array, 0, 64);
+
+	u8 *pBuf = array;
+
+	*pBuf++ = HI_UINT16(pDevAnnceReq->nwk_addr_local);
+	*pBuf++ = LO_UINT16(pDevAnnceReq->nwk_addr_local);
+	memcpy(pBuf, pDevAnnceReq->ieee_addr_local, 8);
+	ZB_LEBESWAP(pBuf, 8);
+	pBuf += 8;
+	memcpy(pBuf, (u8 *)&(pDevAnnceReq->mac_capability), 1);
+	pBuf++;
+
+	zbhciTx(ZBHCI_CMD_NODES_DEV_ANNCE_IND, pBuf - array, array);
 #endif
-
-
-#if DUAL_MODE
-s32 sampleLight_dualModeRecoryStart(void *arg)
-{
-	dualModeRecovery();
-	SYSTEM_RESET();
-	return -1;
 }
-#endif
 
 /*********************************************************************
   * @fn      sampleGW_leaveCnfHandler
@@ -274,24 +203,15 @@ s32 sampleLight_dualModeRecoryStart(void *arg)
   *
   * @return  None
   */
-void sampleLight_leaveCnfHandler(void *p)
+void sampleGW_leaveCnfHandler(void *arg)
 {
-	nlme_leave_cnf_t *pCnf = (nlme_leave_cnf_t *)p;
+//	nlmeLeaveConf_t *pCnf = (nlmeLeaveConf_t *)arg;
+//	printf("sampleGW_leaveCnfHandler, status = %x\n", pCnf->status);
 
-    if(pCnf->status == SUCCESS){
-    	light_blink_start(3, 200, 200);
-
-#if DUAL_MODE
-//    	if(gLightCtx.powerCntFacRst2SigMesh){
-//    		dualModeRecovery();
-//    	}
-    	TL_ZB_TIMER_SCHEDULE(sampleLight_dualModeRecoryStart, NULL, 3 * 1000 * 1000);
-#endif
-    }
 }
 
 /*********************************************************************
-  * @fn      sampleLight_leaveIndHandler
+  * @fn      sampleGW_leaveIndHandler
   *
   * @brief   Handler for ZDO leave indication message.
   *
@@ -300,11 +220,31 @@ void sampleLight_leaveCnfHandler(void *p)
   * @return  None
   */
 
-void sampleLight_leaveIndHandler(void *p)
+void sampleGW_leaveIndHandler(void* arg)
 {
-//	nlmeLeaveInd_t *pInd = (nlmeLeaveInd_t *)p;
+#if ZBHCI_EN
+//	nlmeLeaveInd_t *p = (nlmeLeaveInd_t*)arg;
+	//zbhciLeaveIndMsgPush(p);
+#if 0
+	static u16 leaveNodeCnt = 0;
+	hci_nodeLeaveInd_t ind;
+	ind.totalCnt = leaveNodeCnt++;
+	memcpy(ind.macAddr, arg, 8);
+	zbhciAppNodeLeaveIndPush((void *)&ind);
+#endif
+#endif
+}
+
+void sampleGW_dataSendConfirm(void *arg){
 
 }
 
+#if ZBHCI_EN
+bool sampleGw_macAssocReqIndHandler(void *arg){
+	zb_mlme_associate_ind_t *ind = (zb_mlme_associate_ind_t *)arg;
+
+	return zbhciMacAddrGetPush(ind->devAddress);
+}
+#endif
 
 #endif  /* __PROJECT_TL_DIMMABLE_LIGHT__ */

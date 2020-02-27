@@ -19,7 +19,7 @@
  *			 file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
  *
  *******************************************************************************************************/
-#if (__PROJECT_TL_CONCURRENT_MODE__)
+#if (__PROJECT_TL_CONCURRENT_LIGHT__)
 
 /**********************************************************************
  * INCLUDES
@@ -115,6 +115,54 @@ const af_simple_descriptor_t sampleLight_simpleDesc =
 	(u16 *)sampleLight_inClusterList,    		/* Application input cluster list */
 	(u16 *)sampleLight_outClusterList,   		/* Application output cluster list */
 };
+
+
+#if AF_TEST_ENABLE
+/**
+ *  @brief Definition for Incoming cluster / Sever Cluster
+ */
+const u16 sampleTest_inClusterList[] =
+{
+	ZCL_CLUSTER_TELINK_SDK_TEST_REQ,
+	ZCL_CLUSTER_TELINK_SDK_TEST_RSP,
+	ZCL_CLUSTER_TELINK_SDK_TEST_CLEAR_REQ,
+	ZCL_CLUSTER_TELINK_SDK_TEST_CLEAR_RSP,
+};
+
+
+/**
+ *  @brief Definition for Outgoing cluster / Client Cluster
+ */
+const u16 sampleTest_outClusterList[] =
+{
+	ZCL_CLUSTER_TELINK_SDK_TEST_REQ,
+	ZCL_CLUSTER_TELINK_SDK_TEST_RSP,
+	ZCL_CLUSTER_TELINK_SDK_TEST_CLEAR_REQ,
+	ZCL_CLUSTER_TELINK_SDK_TEST_CLEAR_RSP,
+};
+
+/**
+ *  @brief Definition for Server cluster number and Client cluster number
+ */
+#define SAMPLE_TEST_IN_CLUSTER_NUM		(sizeof(sampleTest_inClusterList)/sizeof(sampleTest_inClusterList[0]))
+#define SAMPLE_TEST_OUT_CLUSTER_NUM		(sizeof(sampleTest_outClusterList)/sizeof(sampleTest_outClusterList[0]))
+
+/**
+ *  @brief Definition for simple description for HA profile
+ */
+const af_simple_descriptor_t sampleTestDesc =
+{
+	HA_PROFILE_ID,                      /* Application profile identifier */
+	HA_DEV_DIMMABLE_LIGHT,              /* Application device identifier */
+	SAMPLE_TEST_ENDPOINT,               /* Endpoint */
+	0,                                  /* Application device version */
+	0,									/* Reserved */
+	SAMPLE_TEST_IN_CLUSTER_NUM,         /* Application input cluster count */
+	SAMPLE_TEST_OUT_CLUSTER_NUM,        /* Application output cluster count */
+	(u16 *)sampleTest_inClusterList,    /* Application input cluster list */
+	(u16 *)sampleTest_outClusterList,   /* Application output cluster list */
+};
+#endif	/* AF_TEST_ENABLE */
 
 
 

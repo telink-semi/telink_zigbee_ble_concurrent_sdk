@@ -290,6 +290,21 @@ u8 is_ev_buf(void *arg){
 	 return 0;
 }
 
+u16 ev_buf_getFreeMaxSize(void)
+{
+	u16 size = 0;
+
+	for(u8 i = 0; i < DEFAULT_BUFFER_GROUP_NUM; i++){
+		if(ev_buf_v->bufGroups[i].availBufNum){
+			if((ev_buf_v->bufGroups[i].size - OFFSETOF(ev_bufItem_t, data)) > size){
+				size = ev_buf_v->bufGroups[i].size - OFFSETOF(ev_bufItem_t, data);
+			}
+		}
+	}
+
+	return size;
+}
+
 #endif  /* MODULE_BUFM_ENABLE */
 
 

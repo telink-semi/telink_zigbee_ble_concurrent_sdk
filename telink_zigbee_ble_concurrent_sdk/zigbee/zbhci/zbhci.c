@@ -20,13 +20,28 @@
  *			 file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
  *
  *******************************************************************************************************/
+
+/**********************************************************************
+ * INCLUDES
+ */
 #include "../include/zb_common.h"
 #include "zbhci.h"
 
 
-
 #if ZBHCI_EN
+/**********************************************************************
+ * LOCAL CONSTANTS
+ */
 
+
+/**********************************************************************
+ * TYPEDEFS
+ */
+
+
+/**********************************************************************
+ * LOCAL FUNCTIONS
+ */
 #if ZBHCI_USB_PRINT
 	extern void usb_print_init(void);
 	extern u8 usb_printTxMsg(u16 u16Type, u16 u16Length, u8 *pu8Data);
@@ -60,7 +75,7 @@ u8 crc8Calculate(u16 type, u16 length, u8 *data){
 		crc8 ^= data[n];
 	}
 
-	return(crc8);
+	return crc8;
 }
 
 
@@ -71,14 +86,11 @@ u8 crc8Calculate(u16 type, u16 length, u8 *data){
 zbhciTx_e zbhciTx(u16 u16Type, u16 u16Length, u8 *pu8Data){
 #if ZBHCI_USB_PRINT
 	return usb_printTxMsg(u16Type, u16Length, pu8Data);
-
 #elif ZBHCI_USB_CDC
 	return usb_cdc_txMsg(u16Type,u16Length,pu8Data);
-
 #elif ZBHCI_UART
     uart_txMsg(u16Type, u16Length, pu8Data);
     return ZBHCI_TX_SUCCESS;
-
 #elif ZBHCI_SPI
 
 #elif ZBHCI_I2C
@@ -90,13 +102,10 @@ zbhciTx_e zbhciTx(u16 u16Type, u16 u16Length, u8 *pu8Data){
 void zbhciInit(void){
 #if ZBHCI_USB_PRINT
 	usb_print_init();
-
 #elif ZBHCI_USB_CDC
-	usb_cdc_init(); //zbhciRxCb, zbhciTxDoneCb);
-
+	usb_cdc_init();
 #elif ZBHCI_UART
     hci_uart_init();
-
 #elif ZBHCI_USB_HID
     usb_hid_init();
 #elif ZBHCI_SPI
@@ -104,20 +113,18 @@ void zbhciInit(void){
 #elif ZBHCI_I2C
 
 #endif
-
 }
 
 void zbhciTask(void){
 #if ZBHCI_USB_PRINT
 	usbPrintTask();
-
 #elif ZBHCI_USB_CDC
 	usbRwTask();
 #elif ZBHCI_USB_HID
 	usbHidTask();
 #elif ZBHCI_UART
-	/* process in the uart ISR */
-
+	/* process messages in the uart ISR, and we must check the uart RX state in main loop. */
+	uart_exceptionProcess();
 #elif ZBHCI_SPI
 
 #elif ZBHCI_I2C

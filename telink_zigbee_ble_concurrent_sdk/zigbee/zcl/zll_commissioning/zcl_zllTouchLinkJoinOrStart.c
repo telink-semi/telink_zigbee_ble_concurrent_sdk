@@ -117,9 +117,12 @@ _CODE_ZCL_ void tl_zbNwkZllCommissionScanConfirm(void *arg){
 	}else{
 		/* network info backup */
 		zcl_zllTouchLinkNetworkStartReq_t *startParams = (zcl_zllTouchLinkNetworkStartReq_t *)&g_zllTouchLink.networkStartInfo->params.networkStartCmd;
-
-		memcpy(startParams->epanId, extPanId, 8);
-		startParams->panId = panId;
+		if(ZB_EXTPANID_IS_ZERO(startParams->epanId)){
+			memcpy(startParams->epanId, extPanId, 8);
+		}
+		if(startParams->panId == 0){
+			startParams->panId = panId;
+		}
 		startParams->logicalChannel = g_zllTouchLink.workingChannelBackUp;//channel;
 
 		if(g_zllTouchLink.transId != 0 && channel != 0xff){
@@ -195,7 +198,9 @@ _CODE_ZCL_ void zcl_zllTouchLinkNetworkStartDirectJoin(void *arg){
 	if(g_zllTouchLink.transId){
 		g_zbNwkCtx.joined = 1;
 
+#ifdef ZB_ROUTER_ROLE
 		zcl_zllTouchLinkNetworkStartReq_t *pInitiator = &g_zllTouchLink.networkStartInfo->params.networkStartCmd;
+#endif
 		if((g_zllTouchLink.networkStartInfo->joinNetworkMode == ZCL_ZLL_COMMISSIONING_TOUCH_LICK_MODE_START)
 			&& (g_zllTouchLink.networkStartInfo->params.networkStartCmd.initiatorNwkAddr != 0)){
 #ifdef ZB_ROUTER_ROLE
@@ -373,8 +378,6 @@ _CODE_ZCL_ static s32 zcl_zllTouchLinkNetworkStartOrJoinNwkLeave(void *arg){
  *
  */
 _CODE_ZCL_ static void zcl_zllTouchLinNetworkStartRespCmdSend(void *arg){
-	u32 status = (u32)arg;
-
 	if(!g_zllTouchLink.networkStartInfo){
 		return;
 	}
@@ -383,6 +386,7 @@ _CODE_ZCL_ static void zcl_zllTouchLinNetworkStartRespCmdSend(void *arg){
 	}
 
 #ifdef ZB_ROUTER_ROLE
+	u32 status = (u32)arg;
 	zcl_zllTouchLinkNetworkStartReq_t *startParams = &g_zllTouchLink.networkStartInfo->params.networkStartCmd;
 	u8 tcAddr[8] = { 0 };
 	zcl_zllTouchLinkNetworkStartResp_t startResp = { 0 };

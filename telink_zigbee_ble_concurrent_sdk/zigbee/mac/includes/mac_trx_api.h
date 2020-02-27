@@ -135,6 +135,24 @@ typedef enum {
     PHY_CCA_BUSY       = 0x00,
 } phy_ccaSts_t;
 
+/**
+ *  @brief Definition of MAC generic frame type, used in both TX and RX
+ */
+typedef struct {
+	u8		fAck; //--                /*!< Used in TX  */
+	u8		fFramePending;//--        /*!< Used in Poll  */
+	u8		psduLen;//--
+	u8		cnfStatus;//--
+    u8		*txData;//--
+} mac_genFrame_t;
+
+typedef	mac_genFrame_t	tx_data_queue;
+
+#define	TX_QUEUE_BN		8
+
+tx_data_queue *tx_queue[TX_QUEUE_BN];
+
+extern u8 MAC_TX_QUEUE_SIZE;
 extern u8 rf_busyFlag;
 
 u8 mac_getTrxState(void);

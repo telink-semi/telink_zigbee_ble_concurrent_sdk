@@ -640,9 +640,7 @@ _CODE_ZCL_ status_t zcl_sendCmd(u8 srcEp, epInfo_t *pDstEpInfo, u16 clusterId, u
 	
 	/* Add ZCL payload */
 	memcpy(pAsdu, cmdPld, cmdPldLen);
-	u8 asdulength = pAsdu - asdu + cmdPldLen;
-
-	pDstEpInfo->txOptions |= APS_TX_OPT_USE_NWK_KEY;   //force to enable nwk security for ZCL
+	u16 asdulength = pAsdu - asdu + cmdPldLen;
 
 	u8 apsCnt = 0;
 	u8 status = af_dataSend(srcEp, pDstEpInfo, clusterId, asdulength, asdu, &apsCnt);
@@ -662,16 +660,12 @@ _CODE_ZCL_ status_t zcl_sendInterPANCmd(u8 srcEp, epInfo_t *pDstEpInfo, u16 clus
 
 	u8 *pAsdu = asdu;
 
-	aps_data_req_t apsdeData;
-	TL_SETSTRUCTCONTENT(apsdeData, 0);
-    u8 asdulength;
-
 	/* Build ZCL header */
 	pAsdu += zcl_buildHdr(asdu, specific, direction, disableDefaultRsp, manuCode, seqNo, cmd);
 
 	/* Add ZCL payload */
 	memcpy(pAsdu, cmdPld, cmdPldLen);
-	asdulength = pAsdu - asdu + cmdPldLen;
+	u16 asdulength = pAsdu - asdu + cmdPldLen;
 
 	if(ZCL_CLUSTER_TOUCHLINK_COMMISSIONING == clusterId){
 		pDstEpInfo->txOptions |= APS_TX_OPT_INTRA_PAN;

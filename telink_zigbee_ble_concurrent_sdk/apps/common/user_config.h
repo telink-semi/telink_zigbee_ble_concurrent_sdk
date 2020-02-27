@@ -21,42 +21,12 @@
  *******************************************************************************************************/
 #pragma once
 
-
-
 #if (__PROJECT_TL_GW__)
 	#include "../sampleGW/app_cfg.h"
-#elif (__PROJECT_TL_DIMMABLE_LIGHT__)
-	#include "../sampleLight/app_cfg.h"
-#elif (__PROJECT_TL_SWITCH__)
-	#include "../sampleSwitch/app_cfg.h"
-#elif (__PROJECT_TL_SWITCH_8258__)
-    #include "../sampleSwitch_8258/app_cfg.h"
-#elif (__PROJECT_TL_CONTACT_SENSOR__)
-	#include "../sampleContactSensor/app_cfg.h"
-#elif (__PROJECT_TL_TEMPERATURE_SENSOR_8258__)
-	#include "../sampleTemperatureSensor_8258/app_cfg.h"
-#elif (__PROJECT_TL_DOOR_LOCK_8258__)
-	#include "../sampleDoorLock_8258/app_cfg.h"
-#elif (__PROJECT_TL_SWITCH_HAWK__)
-    #include "../sampleSwitch_hawk/app_cfg.h"
-#elif (__PROJECT_DUAL_MODE_LIGHT__)
-	#include "../dualModeLight/app_cfg.h"
-#elif (__PROJECT_TLZBRC__)
-	#include "../TelinkZbRC/app_cfg.h"
-#elif (__PROJECT_TELINK_LIGHT__)
-	#include "../telinkLight/app_cfg.h"
-#elif (__PROJECT_HUE_DIM_LIGHT__)
-	#include "../hueDimLight/app_cfg.h"
-#elif (__PROJECT_NANO_CONTACT_SENSOR__)
-	#include "../nanoContactSensor/app_cfg.h"
-#elif (__PROJECT_GW_MAIKE__)
-	#include "../gw_Maike/app_cfg.h"
-#elif (__PROJECT_LIGHTING_HT__)
-	#include "../lighting_HT/app_cfg.h"
-#elif (__PROJECT_PERFORMANCE_TEST__)
-	#include "../appNetworkPerformanceTest/app_cfg.h"
-#elif (__PROJECT_TL_CONCURRENT_MODE__)
-    #include "../sampleZigBeeBLEConcurrentMode/app_cfg.h"
+#elif (__PROJECT_TL_CONCURRENT_LIGHT__)
+    #include "../sample_concurrentLight/app_cfg.h"
+#elif (__PROJECT_TL_CONCURRENT_GW__)
+    #include "../sample_concurrentGw/app_cfg.h"
 #else
 
 #endif

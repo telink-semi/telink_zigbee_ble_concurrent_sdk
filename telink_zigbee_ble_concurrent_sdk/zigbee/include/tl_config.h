@@ -34,11 +34,7 @@
  */
 
 //Stack profile
-#ifdef ZB_EMBER_GOLDEN_UNIT
-  #define ZB_STACK_PROFILE 		0
-#else
-  #define ZB_STACK_PROFILE 		2
-#endif
+#define ZB_STACK_PROFILE 		2
 
 #define ZB_FRAME_TYPE_MASK		0x03
 
@@ -97,10 +93,10 @@
 #define ZDO_MAX_REJOIN_INTERVAL						120
 /******************************************************************************************************************************/
 
-#if defined (MCU_CORE_8258)
+#if defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
 #if ZB_ROUTER_ROLE
 #if ZB_COORDINATOR_ROLE
-	#define NWK_ROUTE_RECORD_TABLE_NUM				128
+	#define NWK_ROUTE_RECORD_TABLE_NUM				127
 #endif
 	#define TL_ZB_NWK_ADDR_MAP_NUM					128
 	#define ROUTING_TABLE_NUM						48

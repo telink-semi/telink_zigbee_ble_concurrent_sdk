@@ -335,6 +335,17 @@ static inline void rf_nordic_shockburst(int len)
     WRITE_REG8(0x404, READ_REG8(0x404)|0x03); //select shockburst header mode
     WRITE_REG8(0x406, len);
 }
+
+static inline void rf_drv_cap(unsigned long addr)
+{
+	unsigned char cap = 0xff;
+	flash_read_page(addr, 1, &cap);
+	if(cap != 0xff){
+		cap &= 0x3f;
+		WriteAnalogReg(0x8a, (ReadAnalogReg(0x8a) & 0xc0) | cap);
+	}
+}
+
 extern unsigned short crc16_ccitt_cal(unsigned char *input, unsigned int len, unsigned short init_val);
 extern void rf_tx_500k_simulate_100k(unsigned char *preamble, unsigned char preamble_len,
                                      unsigned char *acc_code, unsigned char acc_len,

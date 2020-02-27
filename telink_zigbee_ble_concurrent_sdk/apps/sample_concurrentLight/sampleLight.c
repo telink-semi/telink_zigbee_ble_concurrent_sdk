@@ -20,7 +20,7 @@
  *
  *******************************************************************************************************/
 
-#if (__PROJECT_TL_CONCURRENT_MODE__)
+#if (__PROJECT_TL_CONCURRENT_LIGHT__)
 
 /**********************************************************************
  * INCLUDES
@@ -68,7 +68,7 @@ ota_preamble_t sampleLight_otaInfo = {
 };
 #endif
 
-extern void bdb_zdoStartDevCnf(zdo_start_device_confirm_t* startDevCnf);
+extern void bdb_zdoStartDevCnf(void* startDevCnf);
 //void DevAnnounceIndCB(void *arg);
 
 //Must declare the application call back function which used by ZDO layer
@@ -192,7 +192,7 @@ void dualModeInit(void)
 		}
 		T_dualModeSwInfo[2]++;
 
-        #if DUAL_MODE_HW_BOOT
+#if DUAL_MODE_HW_BOOT
 		if(!isDualModeEnable()){
 			return;
 		}
@@ -218,7 +218,7 @@ void dualModeInit(void)
 
 			flash_write(CFG_TELINK_SIG_MESH_CRC, 4, (u8 *)&crcValue);
 		}
-		#endif
+#endif
     }else{
     	//do nothing.
     }
@@ -273,6 +273,11 @@ void user_app_init(void)
 
 	/* Register endPoint */
 	af_endpointRegister(SAMPLE_LIGHT_ENDPOINT, (af_simple_descriptor_t *)&sampleLight_simpleDesc, zcl_rx_handler, NULL);
+
+#if AF_TEST_ENABLE
+	/* A sample of AF data handler. */
+	af_endpointRegister(SAMPLE_TEST_ENDPOINT, (af_simple_descriptor_t *)&sampleTestDesc, afTest_rx_handler, afTest_dataSendConfirm);
+#endif
 
 	/* Initialize or restore attributes, this must before 'zcl_register()' */
 	zcl_sampleLightAttrsInit();

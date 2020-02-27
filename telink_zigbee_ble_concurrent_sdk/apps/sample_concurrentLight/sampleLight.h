@@ -29,6 +29,7 @@
  * CONSTANT
  */
 #define SAMPLE_LIGHT_ENDPOINT   0x01
+#define SAMPLE_TEST_ENDPOINT	0x02
 
 /**********************************************************************
  * TYPEDEFS
@@ -191,6 +192,9 @@ extern bdb_appCb_t g_zbDemoBdbCb;
 extern u8 SAMPLELIGHT_CB_CLUSTER_NUM;
 extern zcl_specClusterInfo_t g_sampleLightClusterList[];
 extern const af_simple_descriptor_t sampleLight_simpleDesc;
+#if AF_TEST_ENABLE
+extern const af_simple_descriptor_t sampleTestDesc;
+#endif
 
 /* Attributes */
 extern zcl_basicAttr_t g_zcl_basicAttrs;
@@ -228,5 +232,10 @@ void zcl_sampleLightAttrsInit(void);
 nv_sts_t zcl_onOffAttr_save(void);
 nv_sts_t zcl_levelAttr_save(void);
 nv_sts_t zcl_colorCtrlAttr_save(void);
+
+#if AF_TEST_ENABLE
+void afTest_rx_handler(void *arg);
+void afTest_dataSendConfirm(void *arg);
+#endif
 
 #endif /* _SAMPLE_LIGHT_H_ */

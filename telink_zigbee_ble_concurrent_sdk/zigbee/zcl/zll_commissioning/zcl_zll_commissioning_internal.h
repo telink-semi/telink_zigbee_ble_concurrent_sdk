@@ -91,4 +91,6 @@ void zcl_zllTouchLinkDeviceInformationRequestHandler(epInfo_t *dstEp,u8 start_id
 
 void zcl_zllTouchLinkDeviceInformationResponseHandler(zcl_zllTouchLinkDeviceInfoResp_t *dev_info_resp);
 
+s32 zcl_zllTouchLinkStartNetworkStartOrJoinTimerStop(void);
+
 void ll_zllAttrClr(void);

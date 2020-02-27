@@ -20,6 +20,7 @@
  *
  *******************************************************************************************************/
 #include "../tl_common.h"
+#include "../../zigbee/mac/includes/mac_phy.h"
 
 void gpio_user_irq_handler(void);
 void timer_irq1_handler(void);
@@ -35,37 +36,37 @@ void timer_irq2_handler(void);
 #endif
 
 #if BLE_CONCURRENT_MODE
-extern int zb_rf802154_tx_flag;
-_attribute_ram_code_ void zb_irq_handler(void){
 
-	u16  src_rf = rf_irq_src_get();
-	if(src_rf & FLD_RF_IRQ_TX){
-        //zb_tx_irq_cnt++;
+extern u8 rfMode;
+extern volatile u8 zigbee_process;
+extern int zb_rf802154_tx_flag;
+
+extern void switch_to_ble_context(void);
+volatile u8 T_irqExceptCnt = 0;
+_attribute_ram_code_ void irq_handler(void){
+    u32 src = reg_irq_src;
+	if(src & FLD_IRQ_SYSTEM_TIMER){
+		if(zigbee_process){
+			/* need switch to ble mode */
+			switch_to_ble_context();
+			zigbee_process = 0;
+			T_irqExceptCnt++;
+		}
+		irq_blt_sdk_handler();
+	}
+
+    u16  src_rf = rf_irq_src_get();
+	if((src_rf & FLD_RF_IRQ_TX) && (zb_rf802154_tx_flag == 1)){
         zb_rf802154_tx_flag = 0;
 		rf_tx_irq_handler();
 	}
 
-	if(src_rf & FLD_RF_IRQ_RX){
-        //zb_rx_irq_cnt++;
-		rf_rx_irq_handler();
-	}
-#if 0
-	u32 src = irq_get_src();
+    if(zigbee_process && rfMode == RF_STATE_RX && (src_rf & FLD_RF_IRQ_RX) && ble_stack_idle()&& (ble_rxfifo_empty())){
+       rf_rx_irq_handler();
+    }else{
+       irq_blt_sdk_handler();
+    }
 
-	if(IRQ_TIMER1_ENABLE && (src & FLD_IRQ_TMR1_EN)){
-		reg_irq_src = FLD_IRQ_TMR1_EN;
-		timer_irq1_handler();
-	}
-
-    if((src & FLD_IRQ_TMR2_EN)){
-		reg_irq_src = FLD_IRQ_TMR2_EN;
-	}
-
-	if((src & FLD_IRQ_GPIO_EN)==FLD_IRQ_GPIO_EN)
-	{
-		gpio_irq_handler();
-	}
-#endif
 #if (MODULE_UART_ENABLE)
     u16  dma_irq_source = dma_chn_irq_status_get();
 	if(dma_irq_source & FLD_DMA_CHN_UART_RX){
@@ -78,58 +79,6 @@ _attribute_ram_code_ void zb_irq_handler(void){
 		dma_chn_irq_status_clr(~(FLD_DMA_CHN_UART_TX | FLD_DMA_CHN_UART_RX));
 	}
 #endif
-
-}
-
-volatile int zb_irq_flag = 0;
-
-_attribute_ram_code_ void irq_handler(void)
-{
-    volatile unsigned char mode_flag;
-    mode_flag = read_reg8(0x404);
-    #if 1
-    u16  src_rf = rf_irq_src_get();
-	if((src_rf & FLD_RF_IRQ_TX)&&(zb_rf802154_tx_flag == 1)){
-        //zb_tx_irq_cnt++;
-        zb_rf802154_tx_flag = 0;
-        if(mode_flag == 0xf5)
-        {
-            zb_irq_flag = 1;
-        }
-		rf_tx_irq_handler();
-	}
-
-    #endif
-
-    #if 1
-    u32 src = reg_irq_src;
-	if(src & FLD_IRQ_SYSTEM_TIMER){
-		//log_task_begin (TR_T_irq_sysTimer);
-
-		//reg_irq_src = FLD_IRQ_SYSTEM_TIMER;
-
-		//irq_ll_system_timer();
-		irq_blt_sdk_handler();
-
-		//log_task_end (TR_T_irq_sysTimer);
-	}
-    #endif
-    
-    if(ble_stack_idle()&& (ble_rxfifo_empty()))
-    {
-        if(mode_flag == 0xf5)
-        {
-            zb_irq_flag = 2;
-        }
-        zb_irq_handler();
-    }else
-    {
-        if(mode_flag == 0xc0)
-        {
-            zb_irq_flag = 3;
-        }
-        irq_blt_sdk_handler();
-    }
 }
 
 #endif

@@ -39,9 +39,10 @@
  * @{
  */
 #define TIMER_IDX_0             0                   //!< Timer0
-#define TIMER_IDX_1             1                   //!< Timer1, for MAC-CSMA.
+#define TIMER_IDX_1             1                   //!< Timer1
 #define TIMER_IDX_2             2                   //!< Timer2, for Watch dog.
-#define TIMER_NUM               3                   //!< Total number of timer
+#define TIMER_IDX_3				3					//!< SYS Timer, for MAC-CSMA.
+#define TIMER_NUM               4                   //!< Total number of timer
 /** @} end of group hardware_timer_index */
 
 /** @addtogroup hardware_timer_mode Hardware Timer Mode
@@ -156,14 +157,15 @@ hw_timer_sts_t hwTmr_setAbs(u8 tmrIdx, ext_clk_t* absTimer, timerCb_t func, void
 void hwTmr_cancel(u8 tmrIdx);
 
 /**
-  * @brief       Interrupt handler of Timer1
+  * @brief       Interrupt handler of Timer
   *
   * @param       None
   *
   * @return      None
   */
+void timer_irq0_handler(void);
 void timer_irq1_handler(void);
-
+void timer_irq3_handler(void);
 
 /**  @} end of group HARDWARETIMER_Functions */
 

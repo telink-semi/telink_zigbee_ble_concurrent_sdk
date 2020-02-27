@@ -40,6 +40,11 @@
 #define FILTER_PANID		MAC_INVALID_PANID
 u16 TL_ZB_ASSOCJOIN_FILTER_PANID = FILTER_PANID;
 
+/* APS data fragmentation setting */
+u8 APS_INTERFRAME_DELAY = 100;
+u8 APS_MAX_WINDOW_SIZE = 1;
+u8 APS_FRAGMEMT_PAYLOAD_SIZE = 64;
+
 /* queue size of the software timer event */
 u8 TIMER_EVENT_SIZE = TIMER_EVENT_NUM;
 
@@ -101,12 +106,24 @@ aps_binding_table_t aps_binding_tbl;
 u8 APS_GROUP_TABLE_SIZE = APS_GROUP_TABLE_NUM;
 aps_group_tbl_ent_t aps_group_tbl[APS_GROUP_TABLE_NUM];
 
+/* APS layer security */
+bool APS_SECUTIRY_ENABLE = TRUE;
+
 /* the offset of the rx buffer to the zb-buffer*/
 u8 RX_ZBBUF_OFFSET = TL_RXPRIMITIVEHDR;
 
+/* MAC layer TX Queue size */
+u8 MAC_TX_QUEUE_SIZE = TX_QUEUE_BN;
+
 //default network key
-const u8 nwkKeyDefault[] = { 0x12, 0x23, 0x34, 0x45, 0x56, 0x67, 0x78, 0x89,
+/* If all zero, will generate 16-bytes network key randomly. */
+
+const u8 nwkKeyDefault[] = {0, 0, 0, 0, 0, 0, 0, 0,
+							  0, 0, 0, 0, 0, 0, 0, 0};
+
+/*const u8 nwkKeyDefault[] = { 0x12, 0x23, 0x34, 0x45, 0x56, 0x67, 0x78, 0x89,
 			  	  	  	0x9a, 0xab, 0xbc, 0xcd, 0xde, 0xef, 0xf0, 0x01};
+*/
 
 
 //Global trust center link key which used in centralized security network
@@ -145,7 +162,7 @@ const tl_zb_mac_pib_t macPibDefault = {
 	.associationPermit = 0,
 	.coordShortAddress = 0xffff,
 #if ZB_ED_ROLE
-	.rxOnWhenIdle = ZB_MAC_RX_ON_WHEN_IDEL,/*NOTE: If set MAC_CAP_RX_ON_WHEN_IDLE, PM_ENABLE must be CLEAR (apps/sampleSwitch_xx/app_cfg.h). */
+	.rxOnWhenIdle = ZB_MAC_RX_ON_WHEN_IDLE,
 #else
 	.rxOnWhenIdle = 1,
 #endif
