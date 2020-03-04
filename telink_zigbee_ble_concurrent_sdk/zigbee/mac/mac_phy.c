@@ -438,28 +438,15 @@ u8 rf_stopED(void)
 #endif
 }
 
-#if BLE_CONCURRENT_MODE
 
 _attribute_ram_code_ u8 rf_performCCA(void){
-	if(zigbee_process == 0){
-		return PHY_CCA_BUSY;
-	}
-
-    if(rf_busyFlag & TX_BUSY)
-    {
-        return PHY_CCA_BUSY;
-    }else
-    {
-        return PHY_CCA_IDLE;
-    }
-}
-#else
-
-_attribute_ram_code_ u8 rf_performCCA(void)
-{
 	u32 t1 = clock_time();
 	s8 rssi_peak = -110;
 	s8 rssi_cur = -110;
+
+	if(zigbee_process == 0){
+		return PHY_CCA_BUSY;
+	}
 
 	while(!clock_time_exceed(t1,128)){
 		rssi_cur = ZB_RADIO_RSSI_GET();
@@ -475,7 +462,6 @@ _attribute_ram_code_ u8 rf_performCCA(void)
 	}
 }
 
-#endif
 /*********************************************************************
  * @fn      rf_set
  *

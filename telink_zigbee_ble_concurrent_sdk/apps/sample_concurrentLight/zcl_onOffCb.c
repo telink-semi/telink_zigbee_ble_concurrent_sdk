@@ -253,7 +253,7 @@ status_t sampleLight_onOffCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *c
 {
 	zcl_onOffAttr_t *pOnOff = zcl_onoffAttrGet();
 
-	if(pAddrInfo->dstEp == SAMPLE_LIGHT_ENDPOINT){
+	if(pAddrInfo == NULL || pAddrInfo->dstEp == SAMPLE_LIGHT_ENDPOINT){
 		switch(cmdId){
 			case ZCL_CMD_ONOFF_ON:
 			case ZCL_CMD_ONOFF_OFF:

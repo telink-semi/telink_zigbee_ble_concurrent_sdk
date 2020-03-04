@@ -4537,6 +4537,7 @@
 									<listOptionValue builtIn="false" value="MCU_CORE_8258=1"/>
 									<listOptionValue builtIn="false" value="__PROJECT_TL_CONCURRENT_LIGHT__=1"/>
 									<listOptionValue builtIn="false" value="BOOT_LOAD_MODE=1"/>
+									<listOptionValue builtIn="false" value="DUAL_MODE_SW_BOOT=1"/>
 								</option>
 								<option id="com.telink.tc32eclipse.compiler.option.incpath.239961515" name="Include Paths (-I)" superClass="com.telink.tc32eclipse.compiler.option.incpath" valueType="includePath">
 									<listOptionValue builtIn="false" value="../proj/common"/>
@@ -9030,7 +9031,7 @@
 								<option id="com.telink.tc32eclipse.compiler.option.optimize.packstruct.1144446436" name="Pack structs (-fpack-struct)" superClass="com.telink.tc32eclipse.compiler.option.optimize.packstruct" value="true" valueType="boolean"/>
 								<option id="com.telink.tc32eclipse.compiler.option.optimize.shortenums.1300836509" name="Short enums (-fshort-enums)" superClass="com.telink.tc32eclipse.compiler.option.optimize.shortenums" value="true" valueType="boolean"/>
 								<option id="com.telink.tc32eclipse.compiler.option.def.1810086043" name="Define Syms (-D)" superClass="com.telink.tc32eclipse.compiler.option.def" valueType="definedSymbols">
-									<listOptionValue builtIn="false" value="ROUTER=1"/>
+									<listOptionValue builtIn="false" value="COORDINATOR=1"/>
 									<listOptionValue builtIn="false" value="BLE_CONCURRENT_MODE=1"/>
 									<listOptionValue builtIn="false" value="MCU_CORE_8258=1"/>
 									<listOptionValue builtIn="false" value="__PROJECT_TL_CONCURRENT_GW__=1"/>
@@ -9054,7 +9055,7 @@
 							<tool command="tc32-elf-ld --gc-sections" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GLDErrorParser" id="com.telink.tc32eclipse.tool.linker.TC32Win.app.release.607106991" name="TC32 C Linker" superClass="com.telink.tc32eclipse.tool.linker.TC32Win.app.release">
 								<option id="com.telink.tc32eclipse.linker.option.libs.44022931" name="Libraries (-l)" superClass="com.telink.tc32eclipse.linker.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="ble"/>
-									<listOptionValue builtIn="false" value="zb_router"/>
+									<listOptionValue builtIn="false" value="zb_coordinator"/>
 									<listOptionValue builtIn="false" value="drivers_8258"/>
 								</option>
 								<option id="com.telink.tc32eclipse.linker.option.libpath.637949701" name="Libraries Path (-L)" superClass="com.telink.tc32eclipse.linker.option.libpath" valueType="stringList">

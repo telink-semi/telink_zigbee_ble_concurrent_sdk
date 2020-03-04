@@ -157,8 +157,7 @@ s32 brc_toggleCb(void *arg)
 	return 0;
 }
 
-void brc_toggle()
-{
+void brc_toggle(void){
 	if(!brc_toggleEvt){
 		brc_toggleEvt = TL_ZB_TIMER_SCHEDULE(brc_toggleCb, NULL, 1 * 1000 * 1000);
 	}else{

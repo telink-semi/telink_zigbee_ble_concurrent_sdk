@@ -36,6 +36,7 @@ extern "C" {
 #define USB_PRINTF_MODE         	0
 #define	ZBHCI_UART					0
 #define ZBHCI_USB_CDC				0
+#define ZBHCI_BLE					1
 
 #define PA_ENABLE					0
 

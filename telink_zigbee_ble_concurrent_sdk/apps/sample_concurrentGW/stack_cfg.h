@@ -137,7 +137,7 @@ typedef enum{
     #define ZB_SECURITY
 #endif
 
-#if (ZBHCI_USB_PRINT || ZBHCI_USB_CDC || ZBHCI_UART)
+#if (ZBHCI_USB_PRINT || ZBHCI_USB_CDC || ZBHCI_UART || ZBHCI_BLE)
 #define ZBHCI_EN								  1
 #endif
 

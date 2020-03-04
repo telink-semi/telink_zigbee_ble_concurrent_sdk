@@ -53,6 +53,7 @@ void led_on(u32 pin);
 void led_off(u32 pin);
 
 void app_key_handler(void);
+void brc_toggle(void);
 
 
 /**

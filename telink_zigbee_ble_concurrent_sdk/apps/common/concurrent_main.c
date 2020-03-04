@@ -31,7 +31,7 @@ asm(".global     __FW_OFFSET");
 
 #define  ZIGBEE_PRE_TIME      (16 * 1000 * 2)   //2ms
 #define  ZIGBEE_AFTER_TIME    (16 * 1000 * 4)	//4ms
-#define  BLE_IDLE_TIME   	  (16 * 1000 * 5)	//5ms
+#define  BLE_IDLE_TIME   	  (16 * 1000 * 2)	//5ms
 
 unsigned  long  g_process_zigbee_en = 0;
 unsigned  long  g_process_clock_timeout;

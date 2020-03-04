@@ -309,7 +309,7 @@ static void sampleLight_stopProcess(u8 cmdId, stop_t *cmd)
  */
 status_t sampleLight_levelCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayload)
 {
-	if(pAddrInfo->dstEp == SAMPLE_LIGHT_ENDPOINT){
+	if(pAddrInfo->dstEp == SAMPLE_LIGHT_ENDPOINT || pAddrInfo == NULL){
 		switch(cmdId){
 			case ZCL_CMD_LEVEL_MOVE_TO_LEVEL:
 			case ZCL_CMD_LEVEL_MOVE_TO_LEVEL_WITH_ON_OFF:

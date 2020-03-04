@@ -43,9 +43,9 @@ extern "C" {
 #define USB_PRINTF_MODE         0
 
 /* Running chip flash size select. If '1' - 1M, otherwise (or undefined) - 512K. */
-#define FLASH_SIZE_1M			1
+//#define FLASH_SIZE_1M			1
 
-#define	DUAL_MODE_SW_BOOT		1
+#define	DUAL_MODE_SW_BOOT		0
 #define	DUAL_MODE_HW_BOOT		0
 #if (DUAL_MODE_SW_BOOT || DUAL_MODE_HW_BOOT)
 #define DUAL_MODE				1
@@ -55,7 +55,8 @@ extern "C" {
 #define BOARD_826x_EVK			0
 #define BOARD_826x_DONGLE		1
 #define BOARD_8258_EVK			2
-#define BOARD_8258_DONGLE		3
+#define BOARD_8258_EVK_V1P2		3
+#define BOARD_8258_DONGLE		4
 
 
 /* board define */
@@ -76,6 +77,8 @@ extern "C" {
 	#include "board_8258_dongle.h"
 #elif(BOARD == BOARD_8258_EVK)
 	#include "board_8258_evk.h"
+#elif(BOARD == BOARD_8258_EVK_V1P2)
+	#include "board_8258_evk_v1p2.h"
 #else
 	#include "board_826x_evk.h"
 #endif

@@ -98,7 +98,7 @@ void zbdemo_bdbInitCb(u8 status, u8 joinedNetwork){
 		}
 #if	(!ZBHCI_EN)
 		else{
-			bdb_networkFormationStart();
+			//bdb_networkFormationStart();
 		}
 #endif
 
