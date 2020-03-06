@@ -254,14 +254,14 @@ void sampleLight_otaProcessMsgHandler(u8 evt, u8 status)
 #endif
 
 
+s32 sampleLight_recoryStart(void *arg){
 #if DUAL_MODE
-s32 sampleLight_dualModeRecoryStart(void *arg)
-{
 	dualModeRecovery();
+#endif
+
 	SYSTEM_RESET();
 	return -1;
 }
-#endif
 
 /*********************************************************************
   * @fn      sampleGW_leaveCnfHandler
@@ -279,12 +279,7 @@ void sampleLight_leaveCnfHandler(void *p)
     if(pCnf->status == SUCCESS){
     	light_blink_start(3, 200, 200);
 
-#if DUAL_MODE
-//    	if(gLightCtx.powerCntFacRst2SigMesh){
-//    		dualModeRecovery();
-//    	}
-    	TL_ZB_TIMER_SCHEDULE(sampleLight_dualModeRecoryStart, NULL, 3 * 1000 * 1000);
-#endif
+    	TL_ZB_TIMER_SCHEDULE(sampleLight_recoryStart, NULL, 3 * 1000 * 1000);
     }
 }
 
