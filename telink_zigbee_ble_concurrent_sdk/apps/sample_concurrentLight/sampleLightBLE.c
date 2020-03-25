@@ -1,9 +1,11 @@
 #include "../../proj/tl_common.h"
 ///#include "drivers.h"
-#include "../../ble/ble.h"
+#include <stack/ble/ble.h>
+#include "tl_common.h"
+#include "zb_api.h"
+#include "zcl_include.h"
+#include "sampleLight.h"
 
-//#include "vendor/common/blt_led.h"
-//#include "vendor/common/blt_common.h"
 
 #if (__PROJECT_TL_CONCURRENT_LIGHT__)
 
@@ -179,19 +181,19 @@ const u8 PROP_READ_WRITE_NORSP_NOTIFY = CHAR_PROP_READ | CHAR_PROP_WRITE_WITHOUT
 
 
 
- u8	my_devName[] = {'t','e','l','i','n','k'};
+ u8	my_devName[] = {'t','L','i','g','h','t'};
 //////////////////////////////////////////////////////////////////////////////
 //	 Adv Packet, Response Packet
 //////////////////////////////////////////////////////////////////////////////
  u8	tbl_advData[] = {
-	 0x07, 0x09, 't', 'e', 'l', 'i', 'n', 'k',
+	 0x07, 0x09, 't', 'L','i','g','h','t',
 	 0x02, 0x01, 0x05, 							// BLE limited discoverable mode and BR/EDR not supported
 	 0x03, 0x19, 0x80, 0x01, 					// 384, Generic Remote Control, Generic category
 	 0x05, 0x02, 0x12, 0x18, 0x0F, 0x18,		// incomplete list of service class UUIDs (0x1812, 0x180F)
 };
 
  u8	tbl_scanRsp [] = {
-		 0x07, 0x09, 't', 'e', 'l', 'i', 'n', 'k',
+		 0x07, 0x09, 't', 'L','i','g','h','t',
 	};
 
 const u8	my_PnPtrs [] = {0x02, 0x8a, 0x24, 0x66, 0x82, 0x01, 0x00};
@@ -352,11 +354,27 @@ const u16 userdesc_UUID		= GATT_UUID_CHAR_USER_DESC;
 
 u8		my_MicData 		= 0x80;
 u8		my_SpeakerData 	= 0x81;
-u8	 	my_OtaData 		= 0x00;
+u32	 	my_OtaData 		= 0x00;
 
 const u8  my_MicName[] = {'M', 'i', 'c'};
 const u8  my_SpeakerName[] = {'S', 'p', 'e', 'a', 'k', 'e', 'r'};
 const u8  my_OtaName[] = {'O', 'T', 'A'};
+
+int app_bleOtaWrite(void *p){
+	rf_packet_att_data_t *req = (rf_packet_att_data_t*)p;
+	u8 len = req->rf_len - 9;
+	u16 cmd_type =  req->dat[0] ;
+	cmd_type <<= 8;
+	cmd_type |= req->dat[1] ;
+
+	zb_ble_ci_cmd_handler(cmd_type, len, &(req->dat[2]));
+	return 0;
+}
+
+int app_bleOtaRead(void *p){
+	my_OtaData++;  //for testing, user can fill the valid data here
+	return 0;
+}
 
 
 // Include attribute (Battery service)
@@ -456,7 +474,7 @@ const attribute_t my_Attributes[] = {
 	// 002e - 0031
 	{4,ATT_PERMISSIONS_READ, 2,16,(u8*)(&my_primaryServiceUUID), 	(u8*)(&my_OtaServiceUUID), 0},
 	{0,ATT_PERMISSIONS_READ, 2, 1,(u8*)(&my_characterUUID), 		(u8*)(&PROP_READ_WRITE_NORSP), 0},				//prop
-	{0,ATT_PERMISSIONS_RDWR,16,sizeof(my_OtaData),(u8*)(&my_OtaUUID),	(&my_OtaData), &otaWrite, &otaRead},			//value
+	{0,ATT_PERMISSIONS_RDWR,16,sizeof(my_OtaData),(u8*)(&my_OtaUUID),	(u8 *)(&my_OtaData), &app_bleOtaWrite, &app_bleOtaRead},			//value
 	{0,ATT_PERMISSIONS_READ, 2,sizeof (my_OtaName),(u8*)(&userdesc_UUID), (u8*)(my_OtaName), 0},
 
 };
@@ -539,7 +557,8 @@ _attribute_data_retention_	u8	sendTerminate_before_enterDeep = 0;
 
 _attribute_data_retention_	u32	latest_user_event_tick;
 
-
+static u8  g_appBleInterval = 160;
+static u16 g_appBleLatency = 0x0;
 
 _attribute_ram_code_ int ble_rxfifo_empty(void)
 {
@@ -610,19 +629,24 @@ void 	ble_exception_data_abandom(u8 e,u8 *p, int n){
 
 _attribute_ram_code_ void	user_set_rf_power (u8 e, u8 *p, int n)
 {
-	rf_set_power_level_index (MY_RF_POWER_INDEX);
+	rf_set_power_level_index (g_zb_txPowerSet);   //same to ZB
 	//rf_set_power_level_index (0);
 }
 
+static s32 app_bleIntervalChange(void *arg){
+	bls_l2cap_requestConnParamUpdate (g_appBleInterval, g_appBleInterval, g_appBleLatency, 400);  // 1 S
 
+	return -1;
+}
 
-void	task_connect (u8 e, u8 *p, int n)
-{
-	bls_l2cap_requestConnParamUpdate (160, 160, /*19*/0, /*400*/3200);  // 1 S
-//	bls_l2cap_requestConnParamUpdate (8, 8, 149, 600);  // 1.5 S
-//	bls_l2cap_requestConnParamUpdate (8, 8, 199, 800);  // 2 S
-//	bls_l2cap_requestConnParamUpdate (8, 8, 249, 800);  // 2.5 S
-//	bls_l2cap_requestConnParamUpdate (8, 8, 299, 800);  // 3 S
+void	task_connect (u8 e, u8 *p, int n){
+	/* interval: 	n*1.25 ms
+	 * lantency:	(n+1)*8*1.25 ms
+	 * timeout:     n*10 ms
+	 * */
+    bls_l2cap_requestConnParamUpdate (g_appBleInterval, g_appBleInterval, g_appBleLatency, 400);
+
+    TL_ZB_TIMER_SCHEDULE(app_bleIntervalChange, NULL, 4*1000*1000);
 
 	latest_user_event_tick = clock_time();
 
@@ -743,12 +767,27 @@ int app_host_event_callback (u32 h, u8 *para, int n)
 	return 0;
 }
 
+void app_bleConnIntervalSet(u8 interval, u16 latency){
+	g_appBleInterval = interval;
+	g_appBleLatency  = latency;
+}
 
-void user_init_normal(void)
+
+void	app_bleAdvIntervalSwitch(u16 minInterval, u16 maxInterval){
+	bls_ll_setAdvParam( minInterval, maxInterval,
+						ADV_TYPE_CONNECTABLE_UNDIRECTED, app_own_address_type,
+						0,  NULL,
+						MY_APP_ADV_CHANNEL,
+						ADV_FP_NONE);
+
+	bls_ll_setAdvEnable(1);  //must: set adv enable
+}
+
+void user_ble_init(void)
 {
 	//random number generator must be initiated here( in the beginning of user_init_nromal)
 	//when deepSleep retention wakeUp, no need initialize again
-	random_generator_init();  //this is must
+	//random_generator_init();  //this is must
 
 
 /*****************************************************************************************
@@ -763,10 +802,13 @@ void user_init_normal(void)
 
 #endif
 
+	bls_smp_configParingSecurityInfoStorageAddr(CFG_NV_START_FOR_BLE);
+	// blc_app_loadCustomizedParameters();  //load customized freq_offset cap value
+
 ////////////////// BLE stack initialization ////////////////////////////////////
 	u8  mac_public[6];
 	u8  mac_random_static[6];
-	blc_initMacAddress(CFG_ADR_MAC, mac_public, mac_random_static);
+	blc_initMacAddress(CFG_NV_BLE_MAC_ADDR, mac_public, mac_random_static);
 
 	#if(BLE_DEVICE_ADDRESS_TYPE == BLE_DEVICE_ADDRESS_PUBLIC)
 		app_own_address_type = OWN_ADDRESS_PUBLIC;
@@ -799,8 +841,6 @@ void user_init_normal(void)
 	blc_smp_setSecurityLevel(No_Security);
 #endif
 
-
-
 	blc_gap_registerHostEventHandler( app_host_event_callback );
 	blc_gap_setEventMask( GAP_EVT_MASK_SMP_PARING_BEAGIN 			|  \
 						  GAP_EVT_MASK_SMP_PARING_SUCCESS   		|  \
@@ -808,41 +848,36 @@ void user_init_normal(void)
 						  GAP_EVT_MASK_SMP_CONN_ENCRYPTION_DONE 	|  \
 						  GAP_EVT_MASK_ATT_EXCHANGE_MTU);
 
-
-
 ///////////////////// USER application initialization ///////////////////
 	bls_ll_setAdvData( (u8 *)tbl_advData, sizeof(tbl_advData) );
 	bls_ll_setScanRspData( (u8 *)tbl_scanRsp, sizeof(tbl_scanRsp));
 
-
-
-
 	////////////////// config adv packet /////////////////////
-#if (BLE_REMOTE_SECURITY_ENABLE)
-//	u8 bond_number = blc_smp_param_getCurrentBondingDeviceNumber();  //get bonded device number
-//	smp_param_save_t  bondInfo;
-//	if(bond_number)   //at least 1 bonding device exist
-//	{
-//		bls_smp_param_loadByIndex( bond_number - 1, &bondInfo);  //get the latest bonding device (index: bond_number-1 )
-//
-//	}
-//
-//	if(bond_number)   //set direct adv
-//	{
-//		//set direct adv
-//		u8 status = bls_ll_setAdvParam( MY_ADV_INTERVAL_MIN, MY_ADV_INTERVAL_MAX,
-//										ADV_TYPE_CONNECTABLE_DIRECTED_LOW_DUTY, app_own_address_type,
-//										bondInfo.peer_addr_type,  bondInfo.peer_addr,
-//										MY_APP_ADV_CHANNEL,
-//										ADV_FP_NONE);
-//		if(status != BLE_SUCCESS) { write_reg8(0x40002, 0x11); 	while(1); }  //debug: adv setting err
-//
-//		//it is recommended that direct adv only last for several seconds, then switch to indirect adv
-//		bls_ll_setAdvDuration(MY_DIRECT_ADV_TMIE, 1);
-//	//	bls_app_registerEventCallback (BLT_EV_FLAG_ADV_DURATION_TIMEOUT, &app_switch_to_indirect_adv);
-//
-//	}
-//	else   //set indirect adv
+#if 1//(BLE_REMOTE_SECURITY_ENABLE)
+	u8 bond_number = blc_smp_param_getCurrentBondingDeviceNumber();  //get bonded device number
+	smp_param_save_t  bondInfo;
+	if(bond_number)   //at least 1 bonding device exist
+	{
+		bls_smp_param_loadByIndex( bond_number - 1, &bondInfo);  //get the latest bonding device (index: bond_number-1 )
+
+	}
+
+	if(bond_number)   //set direct adv
+	{
+		//set direct adv
+		u8 status = bls_ll_setAdvParam( MY_ADV_INTERVAL_MIN, MY_ADV_INTERVAL_MAX,
+										ADV_TYPE_CONNECTABLE_DIRECTED_LOW_DUTY, app_own_address_type,
+										bondInfo.peer_addr_type,  bondInfo.peer_addr,
+										MY_APP_ADV_CHANNEL,
+										ADV_FP_NONE);
+		if(status != BLE_SUCCESS) { write_reg8(0x40002, 0x11); 	while(1); }  //debug: adv setting err
+
+		//it is recommended that direct adv only last for several seconds, then switch to indirect adv
+		bls_ll_setAdvDuration(MY_DIRECT_ADV_TMIE, 1);
+		bls_app_registerEventCallback (BLT_EV_FLAG_ADV_DURATION_TIMEOUT, &app_switch_to_indirect_adv);
+
+	}
+	else   //set indirect adv
 #endif
 	{
 		u8 status = bls_ll_setAdvParam(  MY_ADV_INTERVAL_MIN, MY_ADV_INTERVAL_MAX,
@@ -891,37 +926,7 @@ void user_init_normal(void)
 	bls_pm_setSuspendMask (SUSPEND_DISABLE);
 #endif
 
-
-
 	advertise_begin_tick = clock_time();
-}
-
-
-
-
-
-
-
-/////////////////////////////////////////////////////////////////////
-// main loop flow
-/////////////////////////////////////////////////////////////////////
-u32 tick_loop;
-
-
-
-void ble_main_loop (void)
-{
-	tick_loop ++;
-
-
-	////////////////////////////////////// BLE entry /////////////////////////////////
-	blt_sdk_main_loop();
-
-
-	////////////////////////////////////// UI entry /////////////////////////////////
-
-	////////////////////////////////////// PM Process /////////////////////////////////
-	//blt_pm_proc();
 }
 
 #endif

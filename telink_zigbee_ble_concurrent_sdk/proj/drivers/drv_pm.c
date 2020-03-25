@@ -56,7 +56,7 @@ void platform_lowpower_enter(platform_mode_e mode, platform_wakeup_e src, u32 cy
 	if(mode == PLATFORM_MODE_SUSPEND){
 		sleep_mode = SUSPEND_MODE;
 	}else if(mode == PLATFORM_MODE_DEEPSLEEP){
-		sleep_mode = DEEPSLEEP_MODE_RET_SRAM_LOW32K;
+		sleep_mode = DEEPSLEEP_MODE;  //DEEPSLEEP_MODE_RET_SRAM_LOW32K;
 	}
 
 	SleepWakeupSrc_TypeDef srcType = 0;

@@ -42,16 +42,50 @@ extern volatile u8 zigbee_process;
 extern int zb_rf802154_tx_flag;
 
 extern void switch_to_ble_context(void);
-volatile u8 T_irqExceptCnt = 0;
+volatile u8 T_irqExceptCnt[2] = {0};
+
+
+extern u8 rf_busyFlag;
 _attribute_ram_code_ void irq_handler(void){
+	u32 src = reg_irq_src;
+	u16  src_rf = rf_irq_src_get();
+	if(zigbee_process){
+		DBG_ZIGBEE_STATUS(0x20);
+
+		if(src_rf & FLD_RF_IRQ_TX){
+			zb_rf802154_tx_flag = 0;
+			rf_tx_irq_handler();
+			DBG_ZIGBEE_STATUS(0x21);
+		}
+		if(src_rf & FLD_RF_IRQ_RX){
+			DBG_ZIGBEE_STATUS(0x22);
+			rf_rx_irq_handler();
+		}
+
+		if((src & FLD_IRQ_SYSTEM_TIMER) && !rf_busyFlag){
+			/* need switch to ble mode */
+			switch_to_ble_context();
+			zigbee_process = 0;
+			T_irqExceptCnt[0]++;
+			irq_blt_sdk_handler();
+
+			DBG_ZIGBEE_STATUS(0x23);
+		}
+	}else{
+		DBG_ZIGBEE_STATUS(0x24);
+		irq_blt_sdk_handler();
+	}
+
+#if 0
     u32 src = reg_irq_src;
 	if(src & FLD_IRQ_SYSTEM_TIMER){
 		if(zigbee_process){
 			/* need switch to ble mode */
 			switch_to_ble_context();
 			zigbee_process = 0;
-			T_irqExceptCnt++;
+			T_irqExceptCnt[0]++;
 		}
+		T_irqExceptCnt[1]++;
 		irq_blt_sdk_handler();
 	}
 
@@ -61,11 +95,12 @@ _attribute_ram_code_ void irq_handler(void){
 		rf_tx_irq_handler();
 	}
 
-    if(zigbee_process && rfMode == RF_STATE_RX && (src_rf & FLD_RF_IRQ_RX) && ble_stack_idle()&& (ble_rxfifo_empty())){
+    if(zigbee_process && rfMode == RF_STATE_RX && (src_rf & FLD_RF_IRQ_RX) && get_ble_event_state()){
        rf_rx_irq_handler();
     }else{
        irq_blt_sdk_handler();
     }
+#endif
 
 #if (MODULE_UART_ENABLE)
     u16  dma_irq_source = dma_chn_irq_status_get();

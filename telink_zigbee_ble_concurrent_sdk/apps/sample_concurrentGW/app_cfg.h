@@ -40,6 +40,7 @@ extern "C" {
 
 #define PA_ENABLE					0
 
+#define FLASH_SIZE_1M			1
 
 /* board ID */
 #define BOARD_826x_EVK				0

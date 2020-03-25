@@ -1050,6 +1050,17 @@ void adc_vbat_init(GPIO_PinTypeDef pin);
 unsigned int adc_sample_and_get_result(void);
 
 
+/**
+ * @brief      This function sets  ADC RNS channel source and random updata type.
+ * @param[in]  src - the type of ADC RNS channel source
+ * @param[in]  update_type - the type of random updata
+ * @return     none
+ */
+static inline void RNG_Set(RNG_SrcTypeDef src,RNG_UpdataTypeDef update_type)
+{
+	WriteAnalogReg(0xfe, src|update_type);//Set
+}
+
 /** \defgroup GP0  About Usage
  * __Introduction__ \n
  * 	In order to be convenient to introduce all API interface of Module, it is necessary to make a brief description.

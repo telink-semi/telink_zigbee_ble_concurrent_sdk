@@ -28,6 +28,20 @@
 #include "tl_common.h"
 #include "zcl_include.h"
 
+enum{
+	/*
+	 * the command identifier to configure the zigbee network
+	 * */
+	APP_BLE_CMD_ZB_NETWORK_JOIN		=	0xFF00,
+	APP_BLE_CMD_ZB_NETWORK_KEY_SET	=	0xFF01,
+	APP_BLE_CMD_ZB_LINK_KEY_SET		=	0xFF02,
+
+	/*
+	 * the command identifier to change some ble setting
+	 * */
+	APP_BLE_CMD_INTERVAL_SET		=	0xFF10
+};
+
 int zb_ble_ci_cmd_handler(u16 clusterId, u8 len, u8 *payload){
 	u8 cmdId = payload[0];
 	u8 *pCmd = &payload[1];
@@ -36,6 +50,8 @@ int zb_ble_ci_cmd_handler(u16 clusterId, u8 len, u8 *payload){
 		sampleLight_onOffCb(NULL, cmdId, pCmd);
 	}else if(clusterId == ZCL_CLUSTER_GEN_LEVEL_CONTROL){
 		sampleLight_levelCb(NULL, cmdId, pCmd);
+	}else if(clusterId == APP_BLE_CMD_INTERVAL_SET){
+		app_bleConnIntervalSet(payload[0], ((payload[1] << 8) | payload[2]));
 	}
 }
 

@@ -21,12 +21,12 @@
  *******************************************************************************************************/
 #pragma once
 
-#if (__PROJECT_TL_GW__)
-	#include "../sampleGW/app_cfg.h"
-#elif (__PROJECT_TL_CONCURRENT_LIGHT__)
+#if (__PROJECT_TL_CONCURRENT_LIGHT__)
     #include "../sample_concurrentLight/app_cfg.h"
 #elif (__PROJECT_TL_CONCURRENT_GW__)
     #include "../sample_concurrentGw/app_cfg.h"
+#elif (__PROJECT_TL_CONCURRENT_SWITCH__)
+    #include "../sample_concurrentSwitch/app_cfg.h"
 #else
 
 #endif

@@ -142,21 +142,40 @@ void app_key_handler(void){
 	}
 }
 
-void zb_pre_install_code_load(bdb_linkKey_info_t *bdbLinkKey, app_linkkey_info_t *appLinkKey){
-	flash_read(CFG_PRE_INSTALL_CODE, sizeof(app_linkkey_info_t), (u8*)appLinkKey);
-	if(appLinkKey->tcLinkKey.keyType != 0xff){
-		bdbLinkKey->tcLinkKey.keyType = appLinkKey->tcLinkKey.keyType;
-		bdbLinkKey->tcLinkKey.key = appLinkKey->tcLinkKey.key;
+
+void zb_pre_install_code_load(app_linkkey_info_t *appLinkKey){
+	u8 invalidInstallCode[SEC_KEY_LEN] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+										   0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
+	u8 installCode[SEC_KEY_LEN];
+
+	flash_read(CFG_PRE_INSTALL_CODE, SEC_KEY_LEN, (u8 *)installCode);
+
+	if(!memcmp((u8 *)installCode, (u8 *)invalidInstallCode, SEC_KEY_LEN)){
+		return;
 	}
-	if(appLinkKey->distributeLinkKey.keyType != 0xff){
-		bdbLinkKey->distributeLinkKey.keyType = appLinkKey->distributeLinkKey.keyType;
-		bdbLinkKey->distributeLinkKey.key = appLinkKey->distributeLinkKey.key;
-	}
-	if(appLinkKey->touchlinkKey.keyType != 0xff){
-		bdbLinkKey->touchLinkKey.keyType = appLinkKey->touchlinkKey.keyType;
-		bdbLinkKey->touchLinkKey.key = appLinkKey->touchlinkKey.key;
-	}
+
+	u8 key[SEC_KEY_LEN];
+	tl_bdbUseInstallCode(installCode, key);
+
+	appLinkKey->tcLinkKey.keyType = SS_UNIQUE_LINK_KEY;
+	memcpy(appLinkKey->tcLinkKey.key, key, SEC_KEY_LEN);
+
+	gLightCtx.installCodeAvailable = TRUE;
+	gLightCtx.useInstallCodeFlg = TRUE;
 }
 
+
+#if(TX_POWER_CAL_ENABLE)
+void app_txPowerCal(void){
+	u8 tx_cal_power = 0xff;
+	flash_read(TX_POWER_CAL_ADDR, 1, &tx_cal_power);
+
+	if(tx_cal_power != 0xff &&
+	   tx_cal_power >= RF_POWER_P3p23dBm &&
+	   tx_cal_power <= RF_POWER_P10p46dBm){
+		RF_TX_POWER_DEFAULT_SET(tx_cal_power);
+	}
+}
+#endif
 
 #endif  /* __PROJECT_TL_DIMMABLE_LIGHT__ */

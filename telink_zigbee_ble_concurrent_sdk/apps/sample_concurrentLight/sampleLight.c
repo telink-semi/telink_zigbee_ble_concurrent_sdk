@@ -64,7 +64,7 @@ extern ota_callBack_t sampleLight_otaCb;
 ota_preamble_t sampleLight_otaInfo = {
 		.fileVer = CURRENT_FILE_VERSION,
 		.imageType = IMAGE_TYPE,
-		.manufaurerCode = TELINK_MANUFACTURER_CODE,
+		.manufacturerCode = TELINK_MANUFACTURER_CODE,
 };
 #endif
 
@@ -398,7 +398,7 @@ void factoryRst_task(void)
  *
  * @return  None
  */
-void user_init(void)
+void user_zb_init(void)
 {
 #if USB_PRINTF_MODE
 	/* Enable USB Port*/
@@ -436,7 +436,7 @@ void user_init(void)
 	ev_on_poll(EV_POLL_IDLE, app_task);
 
     /* Read the pre-insatll code from NV */
-    zb_pre_install_code_load(&g_bdbCommissionSetting.linkKey, &gLightCtx.linkKey);
+    zb_pre_install_code_load(&gLightCtx.linkKey);
 
     /* Set default reporting configuration */
     u8 reportableChange = 0x00;

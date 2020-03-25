@@ -22,7 +22,7 @@
 
 #pragma once
 
-
+#include "version.h"
 
 typedef enum{
 	TL_IMAGETYPE_LIGHT				= 0xd3a3,
@@ -45,7 +45,6 @@ typedef enum{
 //	u8	appBuild;
 //	u8	appRelease;
 //}tl_fileVersionDef_e;
-#define	CURRENT_FILE_VERSION					  0x01000200//
 
 /**
  *  @brief Telink Manufacturer Code

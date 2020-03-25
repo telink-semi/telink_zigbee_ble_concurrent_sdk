@@ -32,6 +32,7 @@
 #include "ota.h"
 #include "sampleLight.h"
 #include "sampleLightCtrl.h"
+#include "stack/ble/ble.h"
 
 /**********************************************************************
  * LOCAL CONSTANTS
@@ -108,7 +109,7 @@ void zbdemo_bdbInitCb(u8 status, u8 joinedNetwork){
 		 * */
 		if(joinedNetwork){
 #ifdef ZCL_OTA
-			ota_queryStart(30);
+			ota_queryStart(OTA_CHECK_PERIOD_MIN);
 #endif
 		}else{
 #if	(!ZBHCI_EN)
@@ -169,7 +170,7 @@ void zbdemo_bdbCommissioningCb(u8 status, void *arg){
 	    	light_blink_start(2, 200, 200);
 
 #ifdef ZCL_OTA
-	    	ota_queryStart(30);
+	    	ota_queryStart(OTA_CHECK_PERIOD_MIN);
 #endif
 
 #if FIND_AND_BIND_SUPPORT
@@ -182,12 +183,20 @@ void zbdemo_bdbCommissioningCb(u8 status, void *arg){
 	}else if(status == BDB_COMMISSION_STA_NOT_AA_CAPABLE){
 
 	}else if((status == BDB_COMMISSION_STA_NO_NETWORK)||(status == BDB_COMMISSION_STA_TCLK_EX_FAILURE)){
-		u16 jitter = 0;
-		do{
-			jitter = zb_random();
-			jitter &= 0xfff;
-		}while(jitter==0);
-		TL_ZB_TIMER_SCHEDULE(sampleLight_bdbNetworkSteerStart, NULL, jitter * 1000);
+		if(gLightCtx.installCodeAvailable){
+			/* Switch the two kinds of link keys to attempt join network. */
+			if(gLightCtx.useInstallCodeFlg){
+				g_bdbCommissionSetting.linkKey.tcLinkKey.keyType = gLightCtx.linkKey.tcLinkKey.keyType;
+				g_bdbCommissionSetting.linkKey.tcLinkKey.key = gLightCtx.linkKey.tcLinkKey.key;
+			}else{
+				g_bdbCommissionSetting.linkKey.tcLinkKey.keyType = SS_GLOBAL_LINK_KEY;
+				g_bdbCommissionSetting.linkKey.tcLinkKey.key = (u8 *)tcLinkKeyCentralDefault;
+			}
+
+			bdb_linkKeyCfg(&g_bdbCommissionSetting, TRUE);
+			gLightCtx.useInstallCodeFlg = !gLightCtx.useInstallCodeFlg;
+		}
+		TL_ZB_TIMER_SCHEDULE(sampleLight_bdbNetworkSteerStart, NULL, 100 * 1000);
 
 #if DUAL_MODE
 		/* start a pairing timeout timer */
@@ -233,12 +242,24 @@ void sampleLight_otaProcessMsgHandler(u8 evt, u8 status)
 	if(evt == OTA_EVT_START){
 		if(status == ZCL_STA_SUCCESS){
 			light_blink_start(0, 200, 200);
-			//light_blink_start(0, 500, 2000);
+
+			/* switch ble adv interval(from default 30ms to 500ms) during OTA to avoid missing
+			 * the data from ota server
+			 * like the image block data is delayed for 20-30ms after image block Request sends out
+			 * or the re-transmitted data will be missed when the signal is not good.
+			 *
+			 */
+			app_bleAdvIntervalSwitch(ADV_INTERVAL_500MS, ADV_INTERVAL_505MS);
 		}else{
 
 		}
 		T_sampleLightOtaSta[0] = 1;
 	}else if(evt == OTA_EVT_COMPLETE){
+		/*
+		 * recovery the default BLE ADV interval after OTA is done
+		 *
+		 * */
+		app_bleAdvIntervalSwitch(ADV_INTERVAL_30MS, ADV_INTERVAL_35MS);
 		T_sampleLightOtaSta[0] = 0;
 		if(status == ZCL_STA_SUCCESS){
 			T_sampleLightOtaSta[1]++;
@@ -246,7 +267,7 @@ void sampleLight_otaProcessMsgHandler(u8 evt, u8 status)
 		}else{
 			T_sampleLightOtaSta[2]++;
 			T_sampleLightOtaSta[3] = status;
-			ota_queryStart(30);
+			ota_queryStart(OTA_CHECK_PERIOD_MIN);
 		}
 		light_blink_stop();
 	}
@@ -254,11 +275,11 @@ void sampleLight_otaProcessMsgHandler(u8 evt, u8 status)
 #endif
 
 
-s32 sampleLight_recoryStart(void *arg){
+s32 sampleLight_recoveryStart(void *arg)
+{
 #if DUAL_MODE
 	dualModeRecovery();
 #endif
-
 	SYSTEM_RESET();
 	return -1;
 }
@@ -279,7 +300,7 @@ void sampleLight_leaveCnfHandler(void *p)
     if(pCnf->status == SUCCESS){
     	light_blink_start(3, 200, 200);
 
-    	TL_ZB_TIMER_SCHEDULE(sampleLight_recoryStart, NULL, 3 * 1000 * 1000);
+    	TL_ZB_TIMER_SCHEDULE(sampleLight_recoveryStart, NULL, 3 * 1000 * 1000);
     }
 }
 

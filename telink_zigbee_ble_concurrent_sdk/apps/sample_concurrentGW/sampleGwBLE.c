@@ -1,6 +1,6 @@
 #include "../../proj/tl_common.h"
 ///#include "drivers.h"
-#include "../../ble/ble.h"
+#include <stack/ble/ble.h>
 
 //#include "vendor/common/blt_led.h"
 //#include "vendor/common/blt_common.h"
@@ -352,11 +352,27 @@ const u16 userdesc_UUID		= GATT_UUID_CHAR_USER_DESC;
 
 u8		my_MicData 		= 0x80;
 u8		my_SpeakerData 	= 0x81;
-u8	 	my_OtaData 		= 0x00;
+u8	 	my_OtaData[8] 		= {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07};
 
 const u8  my_MicName[] = {'M', 'i', 'c'};
 const u8  my_SpeakerName[] = {'S', 'p', 'e', 'a', 'k', 'e', 'r'};
 const u8  my_OtaName[] = {'O', 'T', 'A'};
+extern int zb_ble_ci_cmd_handler(u16 cmdId, u8 len, u8 * payload);
+
+int app_bleOtaWrite(void *p){
+	rf_packet_att_data_t *req = (rf_packet_att_data_t*)p;
+	u8 len = req->rf_len - 9;
+	u16 cmd_type =  req->dat[0] ;
+	cmd_type <<= 8;
+	cmd_type |= req->dat[1] ;
+
+	zb_ble_ci_cmd_handler(cmd_type, len, &(req->dat[2]));
+	return 0;
+}
+
+int app_bleOtaRead(void *p){
+	return 0;
+}
 
 
 // Include attribute (Battery service)
@@ -456,7 +472,7 @@ const attribute_t my_Attributes[] = {
 	// 002e - 0031
 	{4,ATT_PERMISSIONS_READ, 2,16,(u8*)(&my_primaryServiceUUID), 	(u8*)(&my_OtaServiceUUID), 0},
 	{0,ATT_PERMISSIONS_READ, 2, 1,(u8*)(&my_characterUUID), 		(u8*)(&PROP_READ_WRITE_NORSP), 0},				//prop
-	{0,ATT_PERMISSIONS_RDWR,16,sizeof(my_OtaData),(u8*)(&my_OtaUUID),	(&my_OtaData), &otaWrite, &otaRead},			//value
+	{0,ATT_PERMISSIONS_RDWR,16,sizeof(my_OtaData),(u8*)(&my_OtaUUID),	(my_OtaData), &app_bleOtaWrite, &app_bleOtaRead},			//value
 	{0,ATT_PERMISSIONS_READ, 2,sizeof (my_OtaName),(u8*)(&userdesc_UUID), (u8*)(my_OtaName), 0},
 
 };
@@ -616,13 +632,13 @@ _attribute_ram_code_ void	user_set_rf_power (u8 e, u8 *p, int n)
 
 
 
-void	task_connect (u8 e, u8 *p, int n)
-{
-	bls_l2cap_requestConnParamUpdate (160, 160, /*19*/0, /*400*/3200);  // 1 S
-//	bls_l2cap_requestConnParamUpdate (8, 8, 149, 600);  // 1.5 S
-//	bls_l2cap_requestConnParamUpdate (8, 8, 199, 800);  // 2 S
-//	bls_l2cap_requestConnParamUpdate (8, 8, 249, 800);  // 2.5 S
-//	bls_l2cap_requestConnParamUpdate (8, 8, 299, 800);  // 3 S
+void	task_connect (u8 e, u8 *p, int n){
+	/* interval: 	n*1.25 ms
+	 * lantency:	(n+1)*8*1.25 ms
+	 * timeout:     n*10 ms
+	 * */
+	//bls_l2cap_requestConnParamUpdate (8, 8, 99, 400);
+	bls_l2cap_requestConnParamUpdate (160, 160, 0, 400);  // 200 mS
 
 	latest_user_event_tick = clock_time();
 
@@ -744,11 +760,11 @@ int app_host_event_callback (u32 h, u8 *para, int n)
 }
 
 
-void user_init_normal(void)
+void user_ble_init(void)
 {
 	//random number generator must be initiated here( in the beginning of user_init_nromal)
 	//when deepSleep retention wakeUp, no need initialize again
-	random_generator_init();  //this is must
+	//random_generator_init();  //this is must
 
 
 /*****************************************************************************************
@@ -763,10 +779,13 @@ void user_init_normal(void)
 
 #endif
 
+	bls_smp_configParingSecurityInfoStorageAddr(CFG_NV_START_FOR_BLE);
+	//blc_app_loadCustomizedParameters();  //load customized freq_offset cap value
+
 ////////////////// BLE stack initialization ////////////////////////////////////
 	u8  mac_public[6];
 	u8  mac_random_static[6];
-	blc_initMacAddress(CFG_ADR_MAC, mac_public, mac_random_static);
+	blc_initMacAddress(CFG_NV_BLE_MAC_ADDR, mac_public, mac_random_static);
 
 	#if(BLE_DEVICE_ADDRESS_TYPE == BLE_DEVICE_ADDRESS_PUBLIC)
 		app_own_address_type = OWN_ADDRESS_PUBLIC;
@@ -814,35 +833,32 @@ void user_init_normal(void)
 	bls_ll_setAdvData( (u8 *)tbl_advData, sizeof(tbl_advData) );
 	bls_ll_setScanRspData( (u8 *)tbl_scanRsp, sizeof(tbl_scanRsp));
 
-
-
-
 	////////////////// config adv packet /////////////////////
-#if (BLE_REMOTE_SECURITY_ENABLE)
-//	u8 bond_number = blc_smp_param_getCurrentBondingDeviceNumber();  //get bonded device number
-//	smp_param_save_t  bondInfo;
-//	if(bond_number)   //at least 1 bonding device exist
-//	{
-//		bls_smp_param_loadByIndex( bond_number - 1, &bondInfo);  //get the latest bonding device (index: bond_number-1 )
-//
-//	}
-//
-//	if(bond_number)   //set direct adv
-//	{
-//		//set direct adv
-//		u8 status = bls_ll_setAdvParam( MY_ADV_INTERVAL_MIN, MY_ADV_INTERVAL_MAX,
-//										ADV_TYPE_CONNECTABLE_DIRECTED_LOW_DUTY, app_own_address_type,
-//										bondInfo.peer_addr_type,  bondInfo.peer_addr,
-//										MY_APP_ADV_CHANNEL,
-//										ADV_FP_NONE);
-//		if(status != BLE_SUCCESS) { write_reg8(0x40002, 0x11); 	while(1); }  //debug: adv setting err
-//
-//		//it is recommended that direct adv only last for several seconds, then switch to indirect adv
-//		bls_ll_setAdvDuration(MY_DIRECT_ADV_TMIE, 1);
-//	//	bls_app_registerEventCallback (BLT_EV_FLAG_ADV_DURATION_TIMEOUT, &app_switch_to_indirect_adv);
-//
-//	}
-//	else   //set indirect adv
+#if 1//(BLE_REMOTE_SECURITY_ENABLE)
+	u8 bond_number = blc_smp_param_getCurrentBondingDeviceNumber();  //get bonded device number
+	smp_param_save_t  bondInfo;
+	if(bond_number)   //at least 1 bonding device exist
+	{
+		bls_smp_param_loadByIndex( bond_number - 1, &bondInfo);  //get the latest bonding device (index: bond_number-1 )
+
+	}
+
+	if(bond_number)   //set direct adv
+	{
+		//set direct adv
+		u8 status = bls_ll_setAdvParam( MY_ADV_INTERVAL_MIN, MY_ADV_INTERVAL_MAX,
+										ADV_TYPE_CONNECTABLE_DIRECTED_LOW_DUTY, app_own_address_type,
+										bondInfo.peer_addr_type,  bondInfo.peer_addr,
+										MY_APP_ADV_CHANNEL,
+										ADV_FP_NONE);
+		if(status != BLE_SUCCESS) { write_reg8(0x40002, 0x11); 	while(1); }  //debug: adv setting err
+
+		//it is recommended that direct adv only last for several seconds, then switch to indirect adv
+		bls_ll_setAdvDuration(MY_DIRECT_ADV_TMIE, 1);
+		bls_app_registerEventCallback (BLT_EV_FLAG_ADV_DURATION_TIMEOUT, &app_switch_to_indirect_adv);
+
+	}
+	else   //set indirect adv
 #endif
 	{
 		u8 status = bls_ll_setAdvParam(  MY_ADV_INTERVAL_MIN, MY_ADV_INTERVAL_MAX,
@@ -896,32 +912,5 @@ void user_init_normal(void)
 	advertise_begin_tick = clock_time();
 }
 
-
-
-
-
-
-
-/////////////////////////////////////////////////////////////////////
-// main loop flow
-/////////////////////////////////////////////////////////////////////
-u32 tick_loop;
-
-
-
-void ble_main_loop (void)
-{
-	tick_loop ++;
-
-
-	////////////////////////////////////// BLE entry /////////////////////////////////
-	blt_sdk_main_loop();
-
-
-	////////////////////////////////////// UI entry /////////////////////////////////
-
-	////////////////////////////////////// PM Process /////////////////////////////////
-	//blt_pm_proc();
-}
 
 #endif

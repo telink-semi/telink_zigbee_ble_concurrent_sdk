@@ -64,6 +64,10 @@ typedef struct{
 	u8  powerCntFacRst2SigMesh:7;
 
 	app_linkkey_info_t linkKey;
+
+	bool installCodeAvailable:1;	//flag indicates if support install code
+	bool useInstallCodeFlg:1;		//flag indicates switch link key between install code and default link key
+	bool reserved:6;
 }app_ctx_t;
 
 /**
@@ -188,6 +192,8 @@ extern app_ctx_t gLightCtx;
 
 extern bdb_appCb_t g_zbDemoBdbCb;
 
+extern bdb_commissionSetting_t g_bdbCommissionSetting;
+
 
 extern u8 SAMPLELIGHT_CB_CLUSTER_NUM;
 extern zcl_specClusterInfo_t g_sampleLightClusterList[];
@@ -237,5 +243,8 @@ nv_sts_t zcl_colorCtrlAttr_save(void);
 void afTest_rx_handler(void *arg);
 void afTest_dataSendConfirm(void *arg);
 #endif
+
+void 	app_bleConnIntervalSet(u8 interval, u16 latency);
+void	app_bleAdvIntervalSwitch(u16 minInterval, u16 maxInterval);
 
 #endif /* _SAMPLE_LIGHT_H_ */

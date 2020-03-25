@@ -31,34 +31,109 @@
 #define FLASH_PAGE_SIZE					256
 #define	FLASH_SECTOR_SIZE				4096//4K
 
+/* macro for the offset of the data element
+ *
+ * note: make sure you update the new element when you add to dev_info_t!
+ *          DO NOT REMOVE
+ *          ADD ONLY TO THE END
+ * 
+ */
+
+typedef struct {
+    // 0x00
+    u8 version[1];          // version of this structure
+    // 0x01
+    u8 checksum[4];         // 2's compliment checksum of this structure
+    // 0x05
+    u8 block_length[4];     // size of this structure
+    // 0x09
+	u8 mac_mesh[6];         // BLE Mesh MAC address
+    // 0x0F
+	u8 mac_zigbee[8];   // Zigbee MAC address
+    // 0x17
+	u8 mesh_static_oob[16];     // OOB data for BLE mesh
+    // 0x27 
+	u8 zb_pre_install_code[17]; // install code for zigbee
+    // 0x38
+    u8 device_serial_number[16]; // string denoting the DSN
+    // 0x48
+    u8 build_info[32];  // string denoting the build (eg: "HVT 1")
+    // 0x68
+    u8 min_color_k[2];   // for future light/color cal use
+    // 0x6A
+    u8 max_color_k[2];   // for future light/color cal use
+    // 0x6C
+    u8 cal_data_1[4];   // for future light/color cal use
+    // 0x70
+    u8 cal_data_2[4];   // for future light/color cal use
+    // 0x74
+    u8 cal_data_3[4];   // for future light/color cal use
+    // 0x78
+    u8 cal_data_4[4];   // for future light/color cal use
+    // 0x7C
+} static_dev_info_t;
+
+#define CFG_STATIC_FLASH_START		( 0x6000 )
+#define STATIC_ADDR_VERSION         (CFG_STATIC_FLASH_START+OFFSETOF(static_dev_info_t, version))
+#define STATIC_ADDR_CHECKSUM        (CFG_STATIC_FLASH_START+OFFSETOF(static_dev_info_t, checksum))
+#define STATIC_ADDR_BLOCK_LENGTH    (CFG_STATIC_FLASH_START+OFFSETOF(static_dev_info_t, block_length))
+#define STATIC_ADDR_MAC_MESH	    (CFG_STATIC_FLASH_START+OFFSETOF(static_dev_info_t, mac_mesh))
+#define STATIC_ADDR_MAC_ZB		    (CFG_STATIC_FLASH_START+OFFSETOF(static_dev_info_t, mac_zigbee))
+#define STATIC_ADDR_MESH_STATIC_OOB (CFG_STATIC_FLASH_START+OFFSETOF(static_dev_info_t, mesh_static_oob))
+#define STATIC_ZB_PRE_INSTALL_CODE  (CFG_STATIC_FLASH_START+OFFSETOF(static_dev_info_t, zb_pre_install_code))
+#define STATIC_ADDR_DSN             (CFG_STATIC_FLASH_START+OFFSETOF(static_dev_info_t, device_serial_number))
+#define STATIC_ADDR_BUILD_INFO      (CFG_STATIC_FLASH_START+OFFSETOF(static_dev_info_t, build_info))
+#define STATIC_ADDR_MIN_COLOR_K     (CFG_STATIC_FLASH_START+OFFSETOF(static_dev_info_t, min_color_k))
+#define STATIC_ADDR_MAX_COLOR_K     (CFG_STATIC_FLASH_START+OFFSETOF(static_dev_info_t, max_color_k))
+#define STATIC_ADDR_CAL_DATA_1      (CFG_STATIC_FLASH_START+OFFSETOF(static_dev_info_t, cal_data_1))
+#define STATIC_ADDR_CAL_DATA_2      (CFG_STATIC_FLASH_START+OFFSETOF(static_dev_info_t, cal_data_2))
+#define STATIC_ADDR_CAL_DATA_3      (CFG_STATIC_FLASH_START+OFFSETOF(static_dev_info_t, cal_data_3))
+#define STATIC_ADDR_CAL_DATA_4      (CFG_STATIC_FLASH_START+OFFSETOF(static_dev_info_t, cal_data_4))
+#define STATIC_ADDR_FREQ_OFFSET	    ( 0x7000 )
+#define STATIC_ADDR_TX_PWR_OFFSET	( 0x7001 )
+#define USER_BLOCK_ONE              ( 0x8000 )
+#define USER_BLOCK_TWO              ( 0x9000 )
+
+#define CHECKSUM_ADDR               STATIC_ADDR_CHECKSUM/* TBD: temporary use the last 64 bytes */
+
+
+
 /* Flash address of MAC address. */
 enum{
 	MAC_ADDR_512K_FLASH		= 0x76000,
-	MAC_ADDR_1M_FLASH		= 0x8010,
+	MAC_ADDR_1M_FLASH		= STATIC_ADDR_MAC_ZB,
 };
 
 /* Flash address of factory pre-configured parameters. */
 enum{
 	CFG_ADDR_512K_FLASH		= 0x77000,
-	CFG_ADDR_1M_FLASH		= 0x8020,
+	CFG_ADDR_1M_FLASH		= STATIC_ADDR_FREQ_OFFSET,
 };
 
 extern u32 g_u32MacFlashAddr;
 extern u32 g_u32CfgFlashAddr;
 
 
+enum{
+	NV_ADDR_FACTORY_RST_CNT	   	=	0x23000,
+	NV_ADDR_FOR_ZB_INFO			=	0x26000,
+	NV_ADDR_FOR_BLE_INFO		=	0x3C000,
+
+#if DUAL_MODE
+	NV_ADDR_FOR_SDK_TYPE		=	0x24000,
+	/* the following setting not be used in boot load mode*/
+	NV_ADDR_FOR_SIG_MESH_CRC	= 	0x73040,
+	NV_ADDR_FOR_SIG_MESH_CODE_4K=	0x33000,
+	NV_ADDR_FOR_DUAL_MODE_ENABLE=	0x76080,
+#endif
+};
+
 /*******************************************************************************************************
  * Following configuration could NOT be changed by customer.
  */
 /* Modules start address  */
-#if FLASH_SIZE_1M
-#define NV_BASE_ADDRESS					0x26000
+#define NV_BASE_ADDRESS					(NV_ADDR_FOR_ZB_INFO)
 #define MODULES_START_ADDR(id)			(NV_BASE_ADDRESS + FLASH_SECTOR_SIZE * (2 * id))
-#else
-#define	NV_BASE_ADDRESS					0x34000//start from 208K address
-#define	NV_BASE_ADDRESS2				0x7A000//start from 488K address
-#define MODULES_START_ADDR(id)			((id<6) ? (NV_BASE_ADDRESS + FLASH_SECTOR_SIZE * (2 * id)) : (NV_BASE_ADDRESS2 + FLASH_SECTOR_SIZE * (2 * (id-6))))
-#endif
 
 /* Chipset pre-configured parameters */
 #define MAC_BASE_ADD					(g_u32MacFlashAddr)
@@ -68,59 +143,20 @@ extern u32 g_u32CfgFlashAddr;
 #define CFG_MAC_ADDRESS              	(MAC_BASE_ADD)
 #define CFG_TELINK_USB_ID				(MAC_BASE_ADD + 0x40)
 
-/*0x76180~0x76fff is for vendor specific use, to store parameters which don't need to
- * be calibrated, can be defined by user*/
+/* used for frequency offset calibration*/
+#define CFG_FREQUENCY_OFFSET			(STATIC_ADDR_FREQ_OFFSET)
+/* zigbee pre-install code*/
+#define CFG_PRE_INSTALL_CODE			(STATIC_ZB_PRE_INSTALL_CODE)
+/* tx power calibration */
+#define	TX_POWER_CAL_ADDR				(STATIC_ADDR_TX_PWR_OFFSET)
+/* ble mac address */
+#define	CFG_NV_BLE_MAC_ADDR				(STATIC_ADDR_MAC_MESH)
 
-/*The block start from 0x77000~0x77fff is used to store the parameters which need to be calibrated */
 
-/*0x77000~0x7703f, 1 byte, used for frequency offset calibration*/
-#define CFG_FREQUENCY_OFFSET			(FACTORY_CFG_BASE_ADD)
-/*0x77040~0x7707F, 2 byte, 0x77040 for BLE TP_GAIN_0, 0x77041 for BLE TP_GAIN_1,
-  0x77042 for zigbee TP_GAIN_0, 0x77043 for zigbee TP_GAIN_1 */
-#define CFG_TP_GAIN                  	(FACTORY_CFG_BASE_ADD + 0x42)
-/*Not supported for current SDK*/
-#define CFG_32K_COUNTER_CALIBRATION	 	(FACTORY_CFG_BASE_ADD + 0x80)
-/*Not supported for current SDK*/
-#define CFG_ADC_CALIBRATION           	(FACTORY_CFG_BASE_ADD + 0xC0)
-/*Not supported for current SDK*/
-#define CFG_24M_CRYSTAL_CALIBRATION     (FACTORY_CFG_BASE_ADD + 0x100)
-/*Not supported for current SDK*/
-#define CFG_T_SENSOR_CALIBRATION     	(FACTORY_CFG_BASE_ADD + 0x140)
-/*UID-based Firmware Encryption data(16 bytes), 0x77180 ~ 0x7718F*/
-#define CFG_FIRMWARE_ENCRYPTION			(FACTORY_CFG_BASE_ADD + 0x180)
-
-/*******************************************************************************************************
- * Following configuration could be changed by customer.
- */
-#if FLASH_SIZE_1M
+/* ble pairing info */
+#define CFG_NV_START_FOR_BLE		  	(NV_ADDR_FOR_BLE_INFO)
 /* One sector for factory reset by power up/down N times */
-#define CFG_FACTORY_RST_CNT			  	(0x25000)
-
-/* 2 sectors for BLE */
-#define CFG_NV_START_FOR_BLE		  	(0x3C000)
-
-/* pre-install key
-	preCnfLinkKey;	 		pre-configure link key for central network(global: ZC/ZR/ZED; unique: only for ZR/ZED)
-	distributeLinkKey;		distribute link key for distribute network
-	preCnfTouchlinkLinkKey;	 touch-link key for distribute network
- */
-#define CFG_PRE_INSTALL_CODE			(0x8040)
-
-#else
-/* 2 sectors for BLE */
-#define CFG_NV_START_FOR_BLE		  	(0x74000)
-
-/* pre-install key
-	preCnfLinkKey;	 		pre-configure link key for central network(global: ZC/ZR/ZED; unique: only for ZR/ZED)
-	distributeLinkKey;		distribute link key for distribute network
-	preCnfTouchlinkLinkKey;	 touch-link key for distribute network
- */
-#define CFG_PRE_INSTALL_CODE			(0x78000)
-
-/* One sector for factory reset by power up/down N times */
-#define CFG_FACTORY_RST_CNT			  	(0x79000)
-
-#endif
+#define CFG_FACTORY_RST_CNT			  	(NV_ADDR_FACTORY_RST_CNT)
 
 
 #if DUAL_MODE
@@ -134,16 +170,10 @@ typedef enum{
 	TYPE_DUAL_MODE_RECOVER 				= 0x00000056,// don't change, must same with telink mesh SDK, recover for mesh
 }telink_sdk_type_t;
 
-#if FLASH_SIZE_1M
-#define CFG_TELINK_SDK_TYPE				(0x24000)
-#else
-#define CFG_TELINK_SDK_TYPE				(0x73000)
-#endif
-
-#define CFG_TELINK_SIG_MESH_CRC			(0x73040)
-#define CFG_TELINK_SIG_MESH_CODE_4K		(0x33000)
-#define CFG_TELINK_DUAL_MODE_ENABLE		(0x76080)
-
+#define CFG_TELINK_SDK_TYPE				(NV_ADDR_FOR_SDK_TYPE)
+#define CFG_TELINK_SIG_MESH_CRC			(NV_ADDR_FOR_SIG_MESH_CRC)
+#define CFG_TELINK_SIG_MESH_CODE_4K		(NV_ADDR_FOR_SIG_MESH_CODE_4K)
+#define CFG_TELINK_DUAL_MODE_ENABLE		(NV_ADDR_FOR_DUAL_MODE_ENABLE)
 #endif	/* DUAL_MODE */
 /******************************************** END ***********************************************************/
 

@@ -548,6 +548,17 @@ enum{
 	FLD_USB_ENP8_FIFO_MODE =	BIT(0),
 	FLD_USB_ENP8_FULL_FLAG =	BIT(1),
 };
+
+#define reg_rf_acc_len			REG_ADDR8(0x405)
+enum{
+	FLD_RF_ACC_LEN	    = 		BIT_RNG(0,2),
+	FLD_RF_LR_MAN_EN	=       BIT(3),   //long range manual enable
+	FLD_RF_LR_TX_SEL	=   	BIT(4),
+	FLD_RF_BLE_LR		=   	BIT(5),
+	FLD_RF_LR_ACC_TRIG	=   	BIT(7),
+};
+
+
 /****************************************************
 	RF : begin  addr : 0x4e8
  *****************************************************/
@@ -660,10 +671,29 @@ enum{
 	FLD_RF_TX_INTR =			BIT(7),
 };
 
-
+/*******************************      linklayer registers: 0xf00      ******************************/
 
 #define reg_rf_ll_ctrl_0		REG_ADDR8(0xf02)
+
 #define reg_rf_ll_ctrl_1		REG_ADDR8(0xf03)
+enum{
+	FLD_RF_FSM_TIMEOUT_EN 		=   BIT(0),
+	FLD_RF_RX_FIRST_TIMEOUT_EN	=   BIT(1),
+	FLD_RF_RX_TIMEOUT_EN		=   BIT(2),
+	FLD_RF_CRC_2_EN 			=   BIT(3),
+
+	//BLE mode
+	FLD_RF_BRX_SN_INIT	 		=   BIT(4),
+	FLD_RF_BRX_NESN_INIT	 	=   BIT(5),
+	FLD_RF_BTX_SN_INIT	 		=   BIT(6),
+	FLD_RF_BTX_NESN_INIT	 	=   BIT(7),
+};
+
+#define  	FSM_TIMEOUT_ENABLE 	 	( reg_rf_ll_ctrl_1 |= FLD_RF_FSM_TIMEOUT_EN )
+#define  	FSM_TIMEOUT_DISABLE		( reg_rf_ll_ctrl_1 &= (~FLD_RF_FSM_TIMEOUT_EN) )
+
+#define reg_rf_rx_timeout		REG_ADDR16(0xf0a)
+
 #define reg_rf_ll_ctrl_2		REG_ADDR8(0xf15)
 
 #define reg_rf_ll_ctrl_3		REG_ADDR8(0xf16)
@@ -685,7 +715,7 @@ enum{
 	FLD_RF_IRQ_RX = 			BIT(0),
 	FLD_RF_IRQ_TX =				BIT(1),
 	FLD_RF_IRQ_RX_TIMEOUT =		BIT(2),
-	FLD_RF_IRQ_CRC =			BIT(4),
+	FLD_RF_IRQ_RX_CRC_2 =		BIT(4),
 	FLD_RF_IRQ_CMD_DONE  =		BIT(5),
 	FLD_RF_IRQ_FSM_TIMEOUT  =	BIT(6),
 	FLD_RF_IRQ_RETRY_HIT =		BIT(7),

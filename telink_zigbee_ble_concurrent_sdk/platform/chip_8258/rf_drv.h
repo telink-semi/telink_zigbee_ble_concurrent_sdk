@@ -55,6 +55,8 @@ typedef enum {
     RF_MODE_AUTO=2
 } RF_StatusTypeDef;
 
+
+#if 0
 typedef enum {
  /*VBAT*/
  RF_POWER_P10p46dBm,
@@ -108,6 +110,69 @@ typedef enum {
  RF_POWER_N15p88dBm,
  RF_POWER_N19p27dBm,
  RF_POWER_N25p18dBm,
+} RF_PowerTypeDef;
+#endif
+
+/**
+ *  @brief  Define power list of RF
+ */
+typedef enum {
+	 /*VBAT*/
+	 RF_POWER_P10p46dBm = 63, //  10.46 dbm
+	 RF_POWER_P10p29dBm = 61, //  10.29 dbm
+	 RF_POWER_P10p01dBm = 58, //  10.01 dbm
+	 RF_POWER_P9p81dBm  = 56, //   9.81 dbm
+	 RF_POWER_P9p48dBm  = 53, //   9.48 dbm
+	 RF_POWER_P9p24dBm  = 51, //   9.24 dbm
+	 RF_POWER_P8p97dBm  = 49, //   8.97 dbm
+	 RF_POWER_P8p73dBm  = 47, //   8.73 dbm
+	 RF_POWER_P8p44dBm  = 45, //   8.44 dbm
+	 RF_POWER_P8p13dBm  = 43, //   8.13 dbm
+	 RF_POWER_P7p79dBm  = 41, //   7.79 dbm
+	 RF_POWER_P7p41dBm  = 39, //   7.41 dbm
+	 RF_POWER_P7p02dBm  = 37, //   7.02 dbm
+	 RF_POWER_P6p60dBm  = 35, //   6.60 dbm
+	 RF_POWER_P6p14dBm  = 33, //   6.14 dbm
+	 RF_POWER_P5p65dBm  = 31, //   5.65 dbm
+	 RF_POWER_P5p13dBm  = 29, //   5.13 dbm
+	 RF_POWER_P4p57dBm  = 27, //   4.57 dbm
+	 RF_POWER_P3p94dBm  = 25, //   3.94 dbm
+	 RF_POWER_P3p23dBm  = 23, //   3.23 dbm
+	 /*VANT*/
+	 RF_POWER_P3p01dBm  = BIT(7) | 63,   //   3.01 dbm
+	 RF_POWER_P2p81dBm  = BIT(7) | 61,   //   2.81 dbm
+	 RF_POWER_P2p61dBm  = BIT(7) | 59,   //   2.61 dbm
+	 RF_POWER_P2p39dBm  = BIT(7) | 57,   //   2.39 dbm
+	 RF_POWER_P1p99dBm  = BIT(7) | 54,   //   1.99 dbm
+	 RF_POWER_P1p73dBm  = BIT(7) | 52,   //   1.73 dbm
+	 RF_POWER_P1p45dBm  = BIT(7) | 50,   //   1.45 dbm
+	 RF_POWER_P1p17dBm  = BIT(7) | 48,   //   1.17 dbm
+	 RF_POWER_P0p90dBm  = BIT(7) | 46,   //   0.90 dbm
+	 RF_POWER_P0p58dBm  = BIT(7) | 44,   //   0.58 dbm
+	 RF_POWER_P0p04dBm  = BIT(7) | 41,   //   0.04 dbm
+	 RF_POWER_N0p14dBm  = BIT(7) | 40,   //  -0.14 dbm
+	 RF_POWER_N0p97dBm  = BIT(7) | 36,   //  -0.97 dbm
+	 RF_POWER_N1p42dBm  = BIT(7) | 34,   //  -1.42 dbm
+	 RF_POWER_N1p89dBm  = BIT(7) | 32,   //  -1.89 dbm
+	 RF_POWER_N2p48dBm  = BIT(7) | 30,   //  -2.48 dbm
+	 RF_POWER_N3p03dBm  = BIT(7) | 28,   //  -3.03 dbm
+	 RF_POWER_N3p61dBm  = BIT(7) | 26,   //  -3.61 dbm
+	 RF_POWER_N4p26dBm  = BIT(7) | 24,   //  -4.26 dbm
+	 RF_POWER_N5p03dBm  = BIT(7) | 22,   //  -5.03 dbm
+	 RF_POWER_N5p81dBm  = BIT(7) | 20,   //  -5.81 dbm
+	 RF_POWER_N6p67dBm  = BIT(7) | 18,   //  -6.67 dbm
+	 RF_POWER_N7p65dBm  = BIT(7) | 16,   //  -7.65 dbm
+	 RF_POWER_N8p65dBm  = BIT(7) | 14,   //  -8.65 dbm
+	 RF_POWER_N9p89dBm  = BIT(7) | 12,   //  -9.89 dbm
+	 RF_POWER_N11p4dBm  = BIT(7) | 10,   //  -11.4 dbm
+	 RF_POWER_N13p29dBm = BIT(7) | 8,   //  -13.29 dbm
+	 RF_POWER_N15p88dBm = BIT(7) | 6,   //  -15.88 dbm
+	 RF_POWER_N19p27dBm = BIT(7) | 4,   //  -19.27 dbm
+	 RF_POWER_N25p18dBm = BIT(7) | 2,   //  -25.18 dbm
+
+	 RF_POWER_N30dBm    = 0xff,         //  -30 dbm
+	 RF_POWER_N50dBm    = BIT(7) | 0,   //  -50 dbm
+
 } RF_PowerTypeDef;
 
 

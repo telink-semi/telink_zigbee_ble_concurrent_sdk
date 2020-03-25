@@ -55,28 +55,21 @@ void led_off(u32 pin);
 void app_key_handler(void);
 void brc_toggle(void);
 
-
-/**
- * @brief      load pre-install key from NV
- *
- * @param[in]   bdbLinkKey poniter to bdb_commissionSetting_t
- *
- * @param[in]   appLinkKey restored in application layer for global distribute link key ,
- * 				touch link key,  global tc link key and unique tc link key for ZR/ZC
- *
- *
- * @return      None
- */
-void zb_pre_install_code_load(bdb_linkKey_info_t *bdbLinkKey, app_linkkey_info_t *appLinkKey);
-
-
-
 /**
  * @brief      store pre-install code into NV
  *
  * @param[in]   ieeeAdrr:  the ieee address of the device using unique link key join
  *
- * @param[in]   uniqueLinkKey: the unique link key of the device using unique link key join
+ * @param[in]   pre_installCode: the pre-install code
+ *
+ *
+ * @return      None
+ */
+void zb_pre_install_code_store(addrExt_t ieeeAdrr, u8 *pre_installCode);
+
+
+/**
+ * @brief      get tx power calibration from NV
  *
  * @param[in]   appLinkKey restored in application layer for global distribute link key ,
  * 				touch link key,  global tc link key and unique tc link key for ZR/ZC
@@ -84,6 +77,6 @@ void zb_pre_install_code_load(bdb_linkKey_info_t *bdbLinkKey, app_linkkey_info_t
  *
  * @return      None
  */
-void zb_pre_install_code_store(addrExt_t ieeeAdrr, u8 *uniqueLinkKey, app_linkkey_info_t *appLinkKey);
+void app_txPowerCal(void);
 
 #endif	/* _APP_UI_H_ */

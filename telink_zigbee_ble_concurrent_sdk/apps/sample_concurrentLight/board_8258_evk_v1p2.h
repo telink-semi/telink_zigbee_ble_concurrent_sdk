@@ -131,6 +131,119 @@ enum{
 #define	KB_LINE_HIGH_VALID	0
 
 
+
+//BLE DEBUG
+#define DEBUG_GPIO_ENABLE							0
+
+#if(DEBUG_GPIO_ENABLE)
+	//define debug GPIO here according to your hardware
+
+
+	#define PB0_FUNC			  		AS_GPIO
+	#define PB0_OUTPUT_ENABLE	  		1
+	#define PB0_INPUT_ENABLE	  		0
+
+	#define PC5_FUNC			  		AS_GPIO
+	#define PC5_OUTPUT_ENABLE	  		1
+	#define PC5_INPUT_ENABLE	  		0
+
+	#define PC6_FUNC			  		AS_GPIO
+	#define PC6_OUTPUT_ENABLE	  		1
+	#define PC6_INPUT_ENABLE	  		0
+
+	#define PC7_FUNC			  		AS_GPIO
+	#define PC7_OUTPUT_ENABLE	  		1
+	#define PC7_INPUT_ENABLE	  		0
+
+	#define PA2_FUNC			  		AS_GPIO
+	#define PA2_OUTPUT_ENABLE	  		1
+	#define PA2_INPUT_ENABLE	  		0
+
+	#define PA3_FUNC			  		AS_GPIO
+	#define PA3_OUTPUT_ENABLE	  		1
+	#define PA3_INPUT_ENABLE	  		0
+
+	#define PA4_FUNC			  		AS_GPIO
+	#define PA4_OUTPUT_ENABLE	  		1
+	#define PA4_INPUT_ENABLE	  		0
+
+	#define GPIO_CHN0							GPIO_PB0
+	#define GPIO_CHN1							GPIO_PC5
+	#define GPIO_CHN2							GPIO_PC6
+	#define GPIO_CHN3							GPIO_PC7  // PC2/PC3 may used for external crystal input
+	#define GPIO_CHN4							GPIO_PA2  // PC2/PC3 may used for external crystal input
+	#define GPIO_CHN5							GPIO_PA3
+	#define GPIO_CHN6							GPIO_PA4
+
+
+#if 0
+	#define PB4_OUTPUT_ENABLE					1
+	#define PB5_OUTPUT_ENABLE					1
+	#define PB6_OUTPUT_ENABLE					1
+//	#define PC2_OUTPUT_ENABLE					1
+//	#define PC3_OUTPUT_ENABLE					1
+	#define PB0_OUTPUT_ENABLE					1
+	#define PB1_OUTPUT_ENABLE					1
+#endif
+
+
+
+	#define DBG_CHN0_LOW		gpio_write(GPIO_CHN0, 0)
+	#define DBG_CHN0_HIGH		gpio_write(GPIO_CHN0, 1)
+	#define DBG_CHN0_TOGGLE		gpio_toggle(GPIO_CHN0)
+	#define DBG_CHN1_LOW		gpio_write(GPIO_CHN1, 0)
+	#define DBG_CHN1_HIGH		gpio_write(GPIO_CHN1, 1)
+	#define DBG_CHN1_TOGGLE		gpio_toggle(GPIO_CHN1)
+	#define DBG_CHN2_LOW		gpio_write(GPIO_CHN2, 0)
+	#define DBG_CHN2_HIGH		gpio_write(GPIO_CHN2, 1)
+	#define DBG_CHN2_TOGGLE		gpio_toggle(GPIO_CHN2)
+	#define DBG_CHN3_LOW		gpio_write(GPIO_CHN3, 0)
+	#define DBG_CHN3_HIGH		gpio_write(GPIO_CHN3, 1)
+	#define DBG_CHN3_TOGGLE		gpio_toggle(GPIO_CHN3)
+	#define DBG_CHN4_LOW		gpio_write(GPIO_CHN4, 0)
+	#define DBG_CHN4_HIGH		gpio_write(GPIO_CHN4, 1)
+	#define DBG_CHN4_TOGGLE		gpio_toggle(GPIO_CHN4)
+	#define DBG_CHN5_LOW		gpio_write(GPIO_CHN5, 0)
+	#define DBG_CHN5_HIGH		gpio_write(GPIO_CHN5, 1)
+	#define DBG_CHN5_TOGGLE		gpio_toggle(GPIO_CHN5)
+	#define DBG_CHN6_LOW		gpio_write(GPIO_CHN6, 0)
+	#define DBG_CHN6_HIGH		gpio_write(GPIO_CHN6, 1)
+	#define DBG_CHN6_TOGGLE		gpio_toggle(GPIO_CHN6)
+#else
+	#define DBG_CHN0_LOW
+	#define DBG_CHN0_HIGH
+	#define DBG_CHN0_TOGGLE
+	#define DBG_CHN1_LOW
+	#define DBG_CHN1_HIGH
+	#define DBG_CHN1_TOGGLE
+	#define DBG_CHN2_LOW
+	#define DBG_CHN2_HIGH
+	#define DBG_CHN2_TOGGLE
+	#define DBG_CHN3_LOW
+	#define DBG_CHN3_HIGH
+	#define DBG_CHN3_TOGGLE
+	#define DBG_CHN4_LOW
+	#define DBG_CHN4_HIGH
+	#define DBG_CHN4_TOGGLE
+	#define DBG_CHN5_LOW
+	#define DBG_CHN5_HIGH
+	#define DBG_CHN5_TOGGLE
+	#define DBG_CHN6_LOW
+	#define DBG_CHN6_HIGH
+	#define DBG_CHN6_TOGGLE
+	#define DBG_CHN7_LOW
+	#define DBG_CHN7_HIGH
+	#define DBG_CHN7_TOGGLE
+#endif  //end of DEBUG_GPIO_ENABLE
+
+
+
+
+
+
+
+
+
 /* Disable C linkage for C++ Compilers: */
 #if defined(__cplusplus)
 }

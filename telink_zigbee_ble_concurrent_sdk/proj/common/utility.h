@@ -74,6 +74,9 @@
 #define U16_CPY(addr1,addr2)	U16_SET(addr1, U16_GET(addr2))
 #define U32_CPY(addr1,addr2)	U32_SET(addr1, U32_GET(addr2))
 
+#define MAKE_U16(h,l) 			((unsigned short)(((h) << 8) | (l)))
+#define MAKE_U32(a,b,c,d)		((unsigned int)(((a) << 24) | ((b) << 16) | ((c) << 8) | (d)))
+
 #define BOUND(x, l, m)			((x) < (l) ? (l) : ((x) > (m) ? (m) : (x)))
 #define SET_BOUND(x, l, m)		((x) = BOUND(x, l, m))
 #define BOUND_INC(x, m)			do{++(x); (x) = (x) < (m) ? (x) :0;} while(0)
@@ -180,5 +183,22 @@ u8 * my_fifo_get (my_fifo_t *f);
 
 #define		MYFIFO_INIT(name,size,n)		u8 name##_b[size * n]={0};my_fifo_t name = {size,n,0,0, name##_b}
 
+#define log_write_data(id, type, dat)
+#define log_task_begin(id)
+#define log_task_end(id)
+#define log_event(id)
+#define log_data(id, dat)
+#define	LOG_TICK(id,e)			do{e;}while (0)
+
+#define LOG(x, s,...)
+
+
+#if DBG_ZIGBEE_STATUS_EN
+extern u8 T_rfStatusDbg[];
+extern u32 T_rfStatusCnt;
+#define DBG_ZIGBEE_STATUS(v)	T_rfStatusDbg[(T_rfStatusCnt++) & 0xff] = v;
+#else
+#define DBG_ZIGBEE_STATUS(v)
+#endif
 
 #endif

@@ -43,8 +43,6 @@ extern "C" {
 #define USB_PRINTF_MODE         0
 
 /* Running chip flash size select. If '1' - 1M, otherwise (or undefined) - 512K. */
-//#define FLASH_SIZE_1M			1
-
 #if (DUAL_MODE_SW_BOOT || DUAL_MODE_HW_BOOT)
 #define FLASH_SIZE_1M			1
 #define DUAL_MODE				1

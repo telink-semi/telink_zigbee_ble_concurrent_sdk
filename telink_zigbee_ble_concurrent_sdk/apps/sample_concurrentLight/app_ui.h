@@ -47,6 +47,17 @@ enum{
 void led_init(void);
 void localPermitJoinState(void);
 void app_key_handler(void);
-void zb_pre_install_code_load(bdb_linkKey_info_t *bdbLinkKey, app_linkkey_info_t *appLinkKey);
+void zb_pre_install_code_load(app_linkkey_info_t *appLinkKey);
+
+/**
+ * @brief      get tx power calibration from NV
+ *
+ * @param[in]   appLinkKey restored in application layer for global distribute link key ,
+ * 				touch link key,  global tc link key and unique tc link key for ZR/ZC
+ *
+ *
+ * @return      None
+ */
+void app_txPowerCal(void);
 
 #endif	/* _APP_UI_H_ */

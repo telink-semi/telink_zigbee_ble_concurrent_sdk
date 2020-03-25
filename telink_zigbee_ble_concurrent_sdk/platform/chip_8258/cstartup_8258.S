@@ -22,6 +22,8 @@
 
 #ifdef MCU_STARTUP_8258
 
+#include "version.h"
+
 #define MCU_RUN_SRAM_EN			  			0 /*caution: update the configuation in boot.link */
 
 #if MCU_RUN_SRAM_EN
@@ -96,10 +98,11 @@ __start:					@ MUST,  referenced by boot.link
 	.extern  _ramcode_size_align_256_
 	.extern  _ictag_start_
 	.extern  _ictag_end_
+	.extern	 CURRENT_FILE_VERSION
 
 	.org 0x0
 	tj	__reset
-@	.word	(firmwareVersion)
+	.word	(CURRENT_FILE_VERSION)
 	.org 0x8
 	.word	(0x544c4e4b)
 #if MOVE_BIN_CODE_EN
