@@ -341,6 +341,9 @@ static const u8 reportMap[] =
 static u16 extServiceUUID;
 
 
+static u32	latest_user_event_tick;
+
+
 /////////////////////////////////////////////////////////
 const u8 my_AudioUUID[16]   = TELINK_AUDIO_UUID_SERVICE;
 const u8 my_MicUUID[16]		= TELINK_MIC_DATA;
@@ -366,6 +369,8 @@ int app_bleOtaWrite(void *p){
 	cmd_type |= req->dat[1] ;
 
 	zb_ble_ci_cmd_handler(cmd_type, len, &(req->dat[2]));
+
+	latest_user_event_tick = clock_time();
 	return 0;
 }
 
@@ -496,8 +501,8 @@ void	my_att_init ()
 
 
 #define     MY_APP_ADV_CHANNEL					BLT_ENABLE_ADV_ALL
-#define 	MY_ADV_INTERVAL_MIN					ADV_INTERVAL_30MS
-#define 	MY_ADV_INTERVAL_MAX					ADV_INTERVAL_35MS
+#define 	MY_ADV_INTERVAL_MIN					ADV_INTERVAL_500MS
+#define 	MY_ADV_INTERVAL_MAX					ADV_INTERVAL_505MS
 
 
 #define		MY_RF_POWER_INDEX					RF_POWER_P3p01dBm
@@ -553,9 +558,6 @@ _attribute_data_retention_	u32 advertise_begin_tick;
 _attribute_data_retention_	u32	interval_update_tick;
 
 _attribute_data_retention_	u8	sendTerminate_before_enterDeep = 0;
-
-_attribute_data_retention_	u32	latest_user_event_tick;
-
 
 
 _attribute_ram_code_ int ble_rxfifo_empty(void)
@@ -639,8 +641,8 @@ void	task_connect (u8 e, u8 *p, int n)
 	 * lantency:	(n+1)*8*1.25 ms
 	 * timeout:     n*10 ms
 	 * */
-	//bls_l2cap_requestConnParamUpdate (8, 8, 99, 400);
-	bls_l2cap_requestConnParamUpdate (160, 160, 0, 3200);  // 200 mS
+	bls_l2cap_requestConnParamUpdate (8, 8, 99, 400);
+	//bls_l2cap_requestConnParamUpdate (160, 160, 0, 3200);  // 200 mS
 
 	latest_user_event_tick = clock_time();
 

@@ -26,6 +26,7 @@
 #include "ota.h"
 #include "sampleSwitch.h"
 #include "app_ui.h"
+#include "stack/ble/ll/ll_pm.h"
 
 #if PM_ENABLE
 #include "pm_interface.h"
@@ -45,8 +46,37 @@ pm_pinCfg_t g_switchPmCfg[] = {
 };
 
 
-u8 app_zigbeeIdle(void){
-	return (bdb_isIdle() && !tl_stackBusy() && zb_isTaskDone());
+bool app_zigbeeIdle(void){
+	bool ret = 0;
+	keepaliveMsgSendStop();
+	ret = (g_switchAppCtx.state != APP_STATE_ZB_JOINNING       \
+			&& bdb_isIdle() && !tl_stackBusy() && zb_isTaskDone() && zb_timerTaskIdle());
+
+	if(ret){
+		secondClockStop();
+	}
+	return ret;
+}
+
+
+s32 app_pollRateHold(void *arg){
+	if(!tl_stackBusy()){
+		zb_setPollRate(0);
+		g_switchAppCtx.timerPollHold = NULL;
+		return -1;
+	}
+
+	return 0;
+}
+
+void app_zigbeePollRateRecovery(void){
+	zb_setPollRate(RESPONSE_POLL_RATE);
+	secondClockRun();
+
+	if(g_switchAppCtx.timerPollHold){
+		TL_ZB_TIMER_CANCEL(&g_switchAppCtx.timerPollHold);
+	}
+	g_switchAppCtx.timerPollHold = TL_ZB_TIMER_SCHEDULE(app_pollRateHold, NULL, 500 * 1000);
 }
 
 void app_pm_init(void){

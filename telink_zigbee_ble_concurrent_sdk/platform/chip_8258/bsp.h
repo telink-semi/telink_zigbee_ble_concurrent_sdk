@@ -150,11 +150,5 @@ void sub_wr(unsigned int addr, unsigned char value, unsigned char e, unsigned ch
 void mcu_reset(void);
 #define SYSTEM_RESET	mcu_reset
 
-void deep_sleep_flag_set(unsigned int a);
-unsigned char deep_sleep_flag_get(void);
-unsigned int deep_sleep_framecount_get(void);
-void deep_sleep_except_set(void);
-void deep_sleep_except_clr(void);
-unsigned char deep_sleep_except_get(void);
 
 #endif /* BSP_H_ */

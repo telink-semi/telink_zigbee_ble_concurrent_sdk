@@ -79,6 +79,13 @@
 #define WAKEUP_STATUS_TIMER_CORE     	    ( WAKEUP_STATUS_TIMER | WAKEUP_STATUS_CORE)
 #define WAKEUP_STATUS_TIMER_PAD		        ( WAKEUP_STATUS_TIMER | WAKEUP_STATUS_PAD)
 
+/* used to restore data during deep sleep mode or reset by software */
+#define DATA_STORE_FLAG				0x55
+
+#define	REG_DEEP_BACK_FLAG			DEEP_ANA_REG0//0x3A, power on reset clean
+#define	REG_DEEP_FLAG				DEEP_ANA_REG6//0x35, watch dog reset clean
+#define	REG_FRAMECOUNT				DEEP_ANA_REG7//0x36, watch dog reset clean, 4Bytes from 0x36 to 0x39
+
 
 /**
  * @brief sleep mode.

@@ -47,6 +47,7 @@ typedef struct{
 typedef struct{
 	ev_time_event_t *bdbFBTimerEvt;
 	ev_time_event_t *timerLedEvt;
+	ev_time_event_t *timerPollHold;
     s32 Vbat;		//current voltage
 	u32 keyPressedTime;
 

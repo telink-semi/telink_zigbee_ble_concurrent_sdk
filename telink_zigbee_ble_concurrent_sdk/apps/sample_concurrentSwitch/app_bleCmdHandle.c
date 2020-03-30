@@ -43,6 +43,7 @@ enum{
 int zb_ble_ci_cmd_handler(u16 cmdId, u8 len, u8 *payload){
 	if(cmdId == APP_BLE_CMD_ZB_NETWORK_JOIN){
 		bdb_networkSteerStart();
+		g_switchAppCtx.state = APP_STATE_ZB_JOINNING;
 	}else if(cmdId == APP_BLE_CMD_ZB_FACTORY_RESET){
 		zb_resetDevice2FN();
 	}

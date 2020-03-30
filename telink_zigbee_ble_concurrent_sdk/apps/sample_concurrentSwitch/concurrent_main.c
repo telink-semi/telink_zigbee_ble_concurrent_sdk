@@ -28,6 +28,7 @@
 #include "zcl_include.h"
 #include "sampleSwitch.h"
 #include "app_ui.h"
+#include "app_pm.h"
 
 #if BLE_CONCURRENT_MODE
 
@@ -230,6 +231,7 @@ void concurrent_mode_main_loop (void){
 			  * ready to switch to ZIGBEE mode
 			  *
 			  * */
+			 
 			 DBG_ZIGBEE_STATUS(0x31);
 
 			 ZB_RADIO_RX_DISABLE;
@@ -238,7 +240,7 @@ void concurrent_mode_main_loop (void){
 			 ZB_RADIO_RX_ENABLE;
 			 irq_restore(r);
 			 zb_task();
-
+			
 			 DBG_ZIGBEE_STATUS(0x32);
 		 }else{
 			 irq_restore(r);

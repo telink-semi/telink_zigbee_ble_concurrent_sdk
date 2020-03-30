@@ -298,7 +298,7 @@ _attribute_ram_code_ void rf_setTrxState(u8 state)
     } else {
         /* Close RF */
     	rf_paShutDown();
-        ZB_RADIO_TRX_SWITCH(RF_MODE_TX,LOGICCHANNEL_TO_PHYSICAL(rf_getChannel()));
+        ZB_RADIO_TRX_SWITCH(RF_MODE_OFF,LOGICCHANNEL_TO_PHYSICAL(rf_getChannel()));
         rfMode = RF_MODE_TX;
     }
 #endif  /* WIN32 */

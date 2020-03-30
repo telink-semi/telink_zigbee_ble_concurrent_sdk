@@ -29,4 +29,8 @@ void app_pm_init(void);
 
 void app_pm_task(void);
 
+u8 app_zigbeeIdle(void);
+
+void app_zigbeePollRateRecovery(void);
+
 #endif	/* _APP_PM_H_ */

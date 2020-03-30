@@ -77,3 +77,20 @@ void platform_lowpower_enter(platform_mode_e mode, platform_wakeup_e src, u32 cy
 	ZB_TRANSCEIVER_SET_CHANNEL(value);
 #endif
 }
+
+void deep_sleep_flag_set(unsigned int a){
+	analog_write(REG_DEEP_FLAG, DATA_STORE_FLAG);
+
+	analog_write(REG_FRAMECOUNT,   (a));
+	analog_write(REG_FRAMECOUNT+1, (a)>>8);
+	analog_write(REG_FRAMECOUNT+2, (a)>>16);
+	analog_write(REG_FRAMECOUNT+3, (a)>>24);
+}
+
+u8 deep_sleep_flag_get(void){
+	return (analog_read(REG_DEEP_FLAG) == DATA_STORE_FLAG);
+}
+
+u32 deep_sleep_framecount_get(void){
+	return ((analog_read(REG_FRAMECOUNT+3) << 24) | (analog_read(REG_FRAMECOUNT+2) << 16) | (analog_read(REG_FRAMECOUNT+1) << 8) | analog_read(REG_FRAMECOUNT) );
+}

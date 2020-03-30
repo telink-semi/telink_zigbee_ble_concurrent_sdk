@@ -178,59 +178,69 @@ void brc_toggle(void)
 
 volatile u8 T_appOnOffHandler = 0xff;
 void buttonShortPressed(u8 btNum){
+	if(!zb_isDeviceJoinedNwk()){
+		return;
+	}
+
+#if PM_ENABLE
+	app_zigbeePollRateRecovery();
+#endif
+
 	if(btNum == VK_SW1){
-		if(zb_isDeviceJoinedNwk()){
-#if 1
-			epInfo_t dstEpInfo;
-			TL_SETSTRUCTCONTENT(dstEpInfo, 0);
+		epInfo_t dstEpInfo;
+		TL_SETSTRUCTCONTENT(dstEpInfo, 0);
 
-			dstEpInfo.profileId = HA_PROFILE_ID;
-#if FIND_AND_BIND_SUPPORT
-			dstEpInfo.dstAddrMode = APS_DSTADDR_EP_NOTPRESETNT;
-#else
+		dstEpInfo.profileId = HA_PROFILE_ID;
+		dstEpInfo.dstEp = SAMPLE_SWITCH_ENDPOINT;
+
+
+		static u8 addrFlag = 0;
+		if(addrFlag){
+			dstEpInfo.dstAddr.shortAddr = 0x0000;   //to TC
 			dstEpInfo.dstAddrMode = APS_SHORT_DSTADDR_WITHEP;
-			dstEpInfo.dstEp = SAMPLE_SWITCH_ENDPOINT;
-			dstEpInfo.dstAddr.shortAddr = 0xfffc;
-#endif
-			zcl_onOff_toggleCmd(SAMPLE_SWITCH_ENDPOINT, &dstEpInfo, FALSE);
-#else
-			brc_toggle();
-#endif
+		}else{
+			//addrExt_t *extAddr = tl_zbExtAddrPtrByShortAddr(0);
+			addrExt_t extAddr[] = {0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb};
+			ZB_IEEE_ADDR_COPY(dstEpInfo.dstAddr.extAddr, extAddr);
+			dstEpInfo.dstAddrMode = APS_LONG_DSTADDR_WITHEP;
 		}
+		//addrFlag ^= 1;
+		zcl_onOff_toggleCmd(SAMPLE_SWITCH_ENDPOINT, &dstEpInfo, FALSE);
+
 	}else if(btNum == VK_SW2){
-		if(zb_isDeviceJoinedNwk()){
-			static u8 lvl = 1;
-			static bool dir = 1;
 
-			epInfo_t dstEpInfo;
-			TL_SETSTRUCTCONTENT(dstEpInfo, 0);
+		static u8 lvl = 1;
+		static bool dir = 1;
 
-			dstEpInfo.dstAddrMode = APS_SHORT_DSTADDR_WITHEP;
-			dstEpInfo.dstEp = SAMPLE_SWITCH_ENDPOINT;
-			dstEpInfo.dstAddr.shortAddr = 0xfffc;
-			dstEpInfo.profileId = HA_PROFILE_ID;
+		epInfo_t dstEpInfo;
+		TL_SETSTRUCTCONTENT(dstEpInfo, 0);
 
-			moveToLvl_t move2Level;
+		dstEpInfo.dstAddrMode = APS_SHORT_DSTADDR_WITHEP;
+		dstEpInfo.dstEp = SAMPLE_SWITCH_ENDPOINT;
+		dstEpInfo.dstAddr.shortAddr = 0xfffc;
+		dstEpInfo.profileId = HA_PROFILE_ID;
 
-			move2Level.optPresent = 0;
-			move2Level.transitionTime = 0x0A;
-			move2Level.level = lvl;
+		moveToLvl_t move2Level;
 
-			zcl_level_move2levelCmd(SAMPLE_SWITCH_ENDPOINT, &dstEpInfo, FALSE, &move2Level);
+		move2Level.optPresent = 0;
+		move2Level.transitionTime = 0x0A;
+		move2Level.level = lvl;
 
-			if(dir){
-				lvl += 50;
-				if(lvl >= 250){
-					dir = 0;
-				}
-			}else{
-				lvl -= 50;
-				if(lvl <= 1){
-					dir = 1;
-				}
+		zcl_level_move2levelCmd(SAMPLE_SWITCH_ENDPOINT, &dstEpInfo, FALSE, &move2Level);
+
+		if(dir){
+			lvl += 50;
+			if(lvl >= 250){
+				dir = 0;
+			}
+		}else{
+			lvl -= 50;
+			if(lvl <= 1){
+				dir = 1;
 			}
 		}
 	}
+
 }
 
 

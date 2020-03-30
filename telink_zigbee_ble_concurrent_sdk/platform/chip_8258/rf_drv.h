@@ -52,7 +52,8 @@ typedef enum {
 typedef enum {
     RF_MODE_TX = 0,
     RF_MODE_RX = 1,
-    RF_MODE_AUTO=2
+    RF_MODE_AUTO = 2,
+    RF_MODE_OFF = 3
 } RF_StatusTypeDef;
 
 

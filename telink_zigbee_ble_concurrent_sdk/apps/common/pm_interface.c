@@ -48,51 +48,19 @@ u8 pm_wakeupValid(pm_pinCfg_t *pmCfg, int pinNum){
 	return 1;
 }
 
-#if 1
-extern u32 ss_outgoingFrameCntGet(void);
-//extern app_framework_conf_t zdo_conf_attributes;
-void sys_enterLowPower(u8 mode){
-	u32 interval = 0;
-	if(!tl_stackBusy() && zb_isTaskDone()
-        #ifdef MCU_CORE_HAWK
-        &&gpio_read(GPIOA_GP1)&&gpio_read(GPIOA_GP2)
-        #endif
-        ){
-		u8 r = irq_disable();
-		if(mode == PLATFORM_MODE_SUSPEND || !zb_timerTaskIdle()){
-			//10ms wakeup
-			interval = 50;  //unit: ms 50*CLOCK_SYS_CLOCK_1US*1000;
-			platform_lowpower_enter(PLATFORM_MODE_SUSPEND, PLATFORM_WAKEUP_TIMER, interval);
-		}else if(mode == PLATFORM_MODE_DEEPSLEEP){
-			deep_sleep_flag_set(ss_outgoingFrameCntGet());
-			platform_lowpower_enter(PLATFORM_MODE_DEEPSLEEP, PLATFORM_WAKEUP_PAD, 0);
-		}
-		irq_restore(r);
-	}
-}
-#endif
 
 void pm_lowPowerEnter(platform_mode_e mode, int wakeUpSrc, u32 ms){
-	/* If ms is 0, we use default value 120s for sleep mode. */
-	u32 interval = (ms == 0) ? (120 * 1000) : ms;
+	u8 r = irq_disable();
 
-	if(!tl_stackBusy() && zb_isTaskDone()){
-		u8 r = irq_disable();
+	extern void rf_paShutDown(void);
+	rf_paShutDown();
 
-		interval = (ev_nearestInterval() <= (interval * CLOCK_SYS_CLOCK_1US * 1000)) ? ev_nearestInterval() / (CLOCK_SYS_CLOCK_1US * 1000)
-																					 : interval;
-		if(interval){
-			extern void rf_paShutDown(void);
-			rf_paShutDown();
-
-			if(mode == PLATFORM_MODE_DEEPSLEEP){
-				deep_sleep_flag_set(ss_outgoingFrameCntGet());
-			}
-			platform_lowpower_enter(mode, wakeUpSrc, interval);
-		}
-
-		irq_restore(r);
+	if(mode == PLATFORM_MODE_DEEPSLEEP){
+		deep_sleep_flag_set(ss_outgoingFrameCntGet());
 	}
+	platform_lowpower_enter(mode, wakeUpSrc, ms);
+
+	irq_restore(r);
 }
 
 void pm_suspendEnter(int wakeUpSrc, u32 ms){

@@ -125,7 +125,7 @@ void zbdemo_bdbInitCb(u8 status, u8 joinedNetwork){
 		 *
 		 * */
 		if(joinedNetwork){
-			zb_setPollRate(POLL_RATE * 3);
+			app_zigbeePollRateRecovery();
 
 #ifdef ZCL_OTA
 			ota_queryStart(OTA_CHECK_PERIOD_MIN);
@@ -135,9 +135,11 @@ void zbdemo_bdbInitCb(u8 status, u8 joinedNetwork){
 			sampleSwitch_zclCheckInStart();
 #endif
 		}else{
+#if 0
 			u16 jitter = zb_random();
 			jitter &= 0xfff;
 			TL_ZB_TIMER_SCHEDULE(sampleSwitch_bdbNetworkSteerStart, NULL, jitter * 1000);
+#endif
 		}
 	}else{
 		T_zbdemoBdbInfo[1]++;
@@ -163,10 +165,13 @@ u8 sleepCnt = 0;
 void zbdemo_bdbCommissioningCb(u8 status, void *arg){
 	T_zbdemoBdbInfo[3]++;
 	T_zbdemoBdbInfo[4] = status;
+
+	g_switchAppCtx.state = APP_STATE_NORMAL;
+
 	if(status == BDB_COMMISSION_STA_SUCCESS){
 		T_zbdemoBdbInfo[5]++;
 
-		zb_setPollRate(POLL_RATE * 3);
+		app_zigbeePollRateRecovery();
 
 #ifdef ZCL_POLL_CTRL
 		sampleSwitch_zclCheckInStart();

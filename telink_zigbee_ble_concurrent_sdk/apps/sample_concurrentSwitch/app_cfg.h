@@ -94,7 +94,7 @@ extern "C" {
 #define ZCL_LEVEL_CTRL_SUPPORT						1
 #define ZCL_LIGHT_COLOR_CONTROL_SUPPORT				1
 #define ZCL_GROUP_SUPPORT							1
-#define ZCL_OTA_SUPPORT								1
+#define ZCL_OTA_SUPPORT								0
 #if TOUCHLINK_SUPPORT
 #define ZCL_ZLL_COMMISSIONING_SUPPORT				1
 #endif
