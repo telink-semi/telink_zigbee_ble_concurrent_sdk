@@ -21,6 +21,7 @@
  *******************************************************************************************************/
 #include "tl_common.h"
 #include "zb_task_queue.h"
+#include "zb_common.h"
 
 #if(PM_ENABLE)
 #include "pm_interface.h"
@@ -49,26 +50,37 @@ u8 pm_wakeupValid(pm_pinCfg_t *pmCfg, int pinNum){
 }
 
 
-void pm_lowPowerEnter(platform_mode_e mode, int wakeUpSrc, u32 ms){
+void pm_lowPowerEnter(platform_mode_e mode, platform_wakeup_e wakeUpSrc, u32 ms){
+
 	u8 r = irq_disable();
+	u32 interval = ms;
+	if(wakeUpSrc & PLATFORM_WAKEUP_TIMER){
+		/* If ms is 0, we use default value 120s for sleep mode. */
+		interval = (ms == 0) ? (120 * 1000) : ms;
 
-	extern void rf_paShutDown(void);
-	rf_paShutDown();
-
-	if(mode == PLATFORM_MODE_DEEPSLEEP){
-		deep_sleep_flag_set(ss_outgoingFrameCntGet());
+		interval = (ev_nearestInterval() <= (interval * CLOCK_SYS_CLOCK_1US * 1000)) ? ev_nearestInterval() / (CLOCK_SYS_CLOCK_1US * 1000)
+																				 : interval;
 	}
-	platform_lowpower_enter(mode, wakeUpSrc, ms);
+
+	if(interval || (wakeUpSrc & PLATFORM_WAKEUP_PAD)){
+		extern void rf_paShutDown(void);
+		rf_paShutDown();
+
+		if(mode == PLATFORM_MODE_DEEPSLEEP || mode == PLATFORM_MODE_DEEPSLEEP_RET_SRAM_LOW32K){
+			deep_sleep_flag_set(ss_outgoingFrameCntGet());
+		}
+		platform_lowpower_enter(mode, wakeUpSrc, interval);
+	}
 
 	irq_restore(r);
 }
 
-void pm_suspendEnter(int wakeUpSrc, u32 ms){
+void pm_suspendEnter(platform_wakeup_e wakeUpSrc, u32 ms){
 	pm_lowPowerEnter(PLATFORM_MODE_SUSPEND, wakeUpSrc, ms);
 }
 
-void pm_deepSleepEnter(int wakeUpSrc, u32 ms){
-	pm_lowPowerEnter(PLATFORM_MODE_DEEPSLEEP, wakeUpSrc, ms);
+void pm_deepSleepEnter(platform_mode_e mode, platform_wakeup_e wakeUpSrc, u32 ms){
+	pm_lowPowerEnter(mode, wakeUpSrc, ms);
 }
 
 

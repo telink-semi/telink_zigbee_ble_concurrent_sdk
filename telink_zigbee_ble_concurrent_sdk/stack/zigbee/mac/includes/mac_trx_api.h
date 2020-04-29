@@ -153,7 +153,7 @@ typedef	mac_genFrame_t	tx_data_queue;
 tx_data_queue *tx_queue[TX_QUEUE_BN];
 
 extern u8 MAC_TX_QUEUE_SIZE;
-extern u8 rf_busyFlag;
+extern volatile u8 rf_busyFlag;
 
 u8 mac_getTrxState(void);
 

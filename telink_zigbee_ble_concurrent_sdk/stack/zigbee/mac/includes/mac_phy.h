@@ -430,6 +430,8 @@ void rf802154_tx_ready(u8* buf, u8 len);
 
 void mac_phyReconfig(void);
 
+bool zb_rfSwitchAllow(void);
+bool zb_rfTxDoing(void);
 
 extern u8 g_zb_txPowerSet;
 #define RF_TX_POWER_DEFAULT_SET(v)		g_zb_txPowerSet = v

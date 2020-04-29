@@ -157,7 +157,7 @@ const u16 serviceChangeUIID = GATT_UUID_SERVICE_CHANGE;
 u16 serviceChangeVal[2] = {0};
 static u8 serviceChangeCCC[2]={0,0};
 
-
+#define MTU_SIZE_SETTING 	64
 
 const u8 PROP_READ = CHAR_PROP_READ;
 
@@ -361,6 +361,8 @@ const u8  my_MicName[] = {'M', 'i', 'c'};
 const u8  my_SpeakerName[] = {'S', 'p', 'e', 'a', 'k', 'e', 'r'};
 const u8  my_OtaName[] = {'O', 'T', 'A'};
 
+extern int zb_ble_ci_cmd_handler(u16 cmdId, u8 len, u8 *payload);
+
 int app_bleOtaWrite(void *p){
 	rf_packet_att_data_t *req = (rf_packet_att_data_t*)p;
 	u8 len = req->rf_len - 9;
@@ -559,6 +561,8 @@ _attribute_data_retention_	u32	interval_update_tick;
 
 _attribute_data_retention_	u8	sendTerminate_before_enterDeep = 0;
 
+_attribute_data_retention_ 	int  mtuExchange_started_flg = 0;
+
 
 _attribute_ram_code_ int ble_rxfifo_empty(void)
 {
@@ -591,7 +595,7 @@ void 	app_switch_to_indirect_adv(u8 e, u8 *p, int n)
 void 	ble_remote_terminate(u8 e,u8 *p, int n) //*p is terminate reason
 {
 	device_in_connection_state = 0;
-
+	mtuExchange_started_flg = 0;
 
 	if(*p == HCI_ERR_CONN_TIMEOUT){
 
@@ -718,6 +722,7 @@ bool ble_connection_doing(void){
 	return g_bleConnDoing;
 }
 
+volatile u8 T_final_MTU_size = 0;
 int app_host_event_callback (u32 h, u8 *para, int n)
 {
 
@@ -745,13 +750,17 @@ int app_host_event_callback (u32 h, u8 *para, int n)
 
 		case GAP_EVT_SMP_CONN_ENCRYPTION_DONE:
 		{
-
+			if(!mtuExchange_started_flg){  //master do not send MTU exchange request in time
+				blc_att_requestMtuSizeExchange(BLS_CONN_HANDLE, MTU_SIZE_SETTING);
+			}
 		}
 		break;
 
 		case GAP_EVT_ATT_EXCHANGE_MTU:
 		{
-
+			gap_gatt_mtuSizeExchangeEvt_t *pEvt = (gap_gatt_mtuSizeExchangeEvt_t *)para;
+			T_final_MTU_size = pEvt->effective_MTU;
+			mtuExchange_started_flg = 1;   //set MTU size exchange flag here
 		}
 		break;
 

@@ -89,7 +89,7 @@ u8 sys_exceptionPost(u16 line, u8 evt);
 #define ZB_EXCEPTION_POST(evt)  sys_exceptionPost(__LINE__, evt)
 
 //will be called in every main loop
-void ev_main(void);
+void ev_main(bool schedule);
 
 
 

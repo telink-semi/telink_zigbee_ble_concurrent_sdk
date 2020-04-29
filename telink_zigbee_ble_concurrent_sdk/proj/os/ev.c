@@ -282,8 +282,12 @@ void sys_exceptHandlerRegister(sys_exception_cb_t cb){
 	g_sysExceptCallbak = cb;
 }
 
-void ev_main(void){
+extern u8 zigbee_process;
+void ev_main(bool schedule){
+	if(schedule && zigbee_process == 0){return;}
     ev_process_timer();
+
+    if(schedule && zigbee_process == 0){return;}
     ev_poll();
 
 #if(MODULE_WATCHDOG_ENABLE)

@@ -34,6 +34,7 @@
 #include "sampleLight.h"
 #include "sampleLightCtrl.h"
 #include "app_ui.h"
+#include "../common/factory_reset.h"
 #if ZBHCI_EN
 #include "zbhci.h"
 #endif
@@ -81,6 +82,7 @@ const zdo_appIndCb_t appCbLst = {
 		NULL,//nwk update ind cb
 		NULL,//permit join ind cb
 		NULL,//nlme sync cnf cb
+		sampleLight_mgmtNwkUpdateIndHandler,//Mgmt_NWK_Update_req indication
 };
 
 
@@ -284,7 +286,7 @@ void user_app_init(void)
 	zcl_reportingTabInit();
 
 	/* Register ZCL specific cluster information */
-	zcl_register(SAMPLE_LIGHT_ENDPOINT, SAMPLELIGHT_CB_CLUSTER_NUM, g_sampleLightClusterList);
+	zcl_register(SAMPLE_LIGHT_ENDPOINT, SAMPLELIGHT_CB_CLUSTER_NUM, (zcl_specClusterInfo_t *)g_sampleLightClusterList);
 
 #ifdef ZCL_GREEN_POWER
 	/* Initialize GP */

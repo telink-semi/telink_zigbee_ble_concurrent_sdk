@@ -159,7 +159,7 @@ const u16 serviceChangeUIID = GATT_UUID_SERVICE_CHANGE;
 u16 serviceChangeVal[2] = {0};
 static u8 serviceChangeCCC[2]={0,0};
 
-
+#define MTU_SIZE_SETTING 	64
 
 const u8 PROP_READ = CHAR_PROP_READ;
 
@@ -186,14 +186,14 @@ const u8 PROP_READ_WRITE_NORSP_NOTIFY = CHAR_PROP_READ | CHAR_PROP_WRITE_WITHOUT
 //	 Adv Packet, Response Packet
 //////////////////////////////////////////////////////////////////////////////
  u8	tbl_advData[] = {
-	 0x07, 0x09, 't', 'L','i','g','h','t',
+	 0x07, 0x09, 't','L','i','g','h','t',
 	 0x02, 0x01, 0x05, 							// BLE limited discoverable mode and BR/EDR not supported
 	 0x03, 0x19, 0x80, 0x01, 					// 384, Generic Remote Control, Generic category
 	 0x05, 0x02, 0x12, 0x18, 0x0F, 0x18,		// incomplete list of service class UUIDs (0x1812, 0x180F)
 };
 
  u8	tbl_scanRsp [] = {
-		 0x07, 0x09, 't', 'L','i','g','h','t',
+		 0x07, 0x09, 't','L','i','g','h','t',
 	};
 
 const u8	my_PnPtrs [] = {0x02, 0x8a, 0x24, 0x66, 0x82, 0x01, 0x00};
@@ -367,6 +367,7 @@ int app_bleOtaWrite(void *p){
 	cmd_type <<= 8;
 	cmd_type |= req->dat[1] ;
 
+	extern int zb_ble_ci_cmd_handler(u16 clusterId, u8 len, u8 *payload);
 	zb_ble_ci_cmd_handler(cmd_type, len, &(req->dat[2]));
 	return 0;
 }
@@ -557,8 +558,10 @@ _attribute_data_retention_	u8	sendTerminate_before_enterDeep = 0;
 
 _attribute_data_retention_	u32	latest_user_event_tick;
 
-static u8  g_appBleInterval = 160;
-static u16 g_appBleLatency = 0x0;
+static u8  g_appBleInterval = 8;
+static u16 g_appBleLatency = 99;
+
+static u32  mtuExchange_started_flg = 0;
 
 _attribute_ram_code_ int ble_rxfifo_empty(void)
 {
@@ -591,7 +594,7 @@ void 	app_switch_to_indirect_adv(u8 e, u8 *p, int n)
 void 	ble_remote_terminate(u8 e,u8 *p, int n) //*p is terminate reason
 {
 	device_in_connection_state = 0;
-
+	mtuExchange_started_flg = 0;
 
 	if(*p == HCI_ERR_CONN_TIMEOUT){
 
@@ -722,6 +725,7 @@ bool ble_connection_doing(void){
 	return g_bleConnDoing;
 }
 
+volatile u8 T_final_MTU_size = 0;
 int app_host_event_callback (u32 h, u8 *para, int n)
 {
 
@@ -749,13 +753,17 @@ int app_host_event_callback (u32 h, u8 *para, int n)
 
 		case GAP_EVT_SMP_CONN_ENCRYPTION_DONE:
 		{
-
+			if(!mtuExchange_started_flg){  //master do not send MTU exchange request in time
+				blc_att_requestMtuSizeExchange(BLS_CONN_HANDLE, MTU_SIZE_SETTING);
+			}
 		}
 		break;
 
 		case GAP_EVT_ATT_EXCHANGE_MTU:
 		{
-
+			gap_gatt_mtuSizeExchangeEvt_t *pEvt = (gap_gatt_mtuSizeExchangeEvt_t *)para;
+			T_final_MTU_size = pEvt->effective_MTU;
+			mtuExchange_started_flg = 1;   //set MTU size exchange flag here
 		}
 		break;
 

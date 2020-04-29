@@ -176,10 +176,10 @@ typedef void (*blt_event_callback_t)(u8 e, u8 *p, int n);
 
 
 my_fifo_t			blt_rxfifo;
-u8					blt_rxfifo_b[];
+extern u8					blt_rxfifo_b[];
 
 my_fifo_t			blt_txfifo;
-u8					blt_txfifo_b[];
+extern u8					blt_txfifo_b[];
 //////////////////////////////////////
 
 
@@ -280,7 +280,7 @@ typedef 	int (*ll_conn_terminate_handler_t)(u16 conn, u8 *p);
 void 		blc_ll_registerConnectionCompleteHandler(ll_conn_complete_handler_t  handler);
 void 		blc_ll_registerConnectionTerminateHandler(ll_conn_terminate_handler_t  handler);
 
-
+int blc_ll_getRandomNumber (u8* randomNumber);
 
 typedef int (*blt_LTK_req_callback_t)(u16 handle, u8* rand, u16 ediv);
 

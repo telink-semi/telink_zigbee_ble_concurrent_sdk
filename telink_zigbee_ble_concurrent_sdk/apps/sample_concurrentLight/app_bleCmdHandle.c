@@ -27,14 +27,16 @@
  */
 #include "tl_common.h"
 #include "zcl_include.h"
+#include "sampleLight.h"
 
 enum{
 	/*
 	 * the command identifier to configure the zigbee network
 	 * */
-	APP_BLE_CMD_ZB_NETWORK_JOIN		=	0xFF00,
-	APP_BLE_CMD_ZB_NETWORK_KEY_SET	=	0xFF01,
-	APP_BLE_CMD_ZB_LINK_KEY_SET		=	0xFF02,
+	APP_BLE_CMD_ZB_NETWORK_JOIN			=	0xFF00,
+	APP_BLE_CMD_ZB_NETWORK_KEY_SET		=	0xFF01,
+	APP_BLE_CMD_ZB_LINK_KEY_SET			=	0xFF02,
+	APP_BLE_CMD_ZB_NWK_MANAGEMENT_SET	=	0xFF03,
 
 	/*
 	 * the command identifier to change some ble setting
@@ -42,17 +44,34 @@ enum{
 	APP_BLE_CMD_INTERVAL_SET		=	0xFF10
 };
 
+
 int zb_ble_ci_cmd_handler(u16 clusterId, u8 len, u8 *payload){
 	u8 cmdId = payload[0];
 	u8 *pCmd = &payload[1];
 
-	if(clusterId == ZCL_CLUSTER_GEN_ON_OFF){
+	int ret = 0;
+
+	if(clusterId == APP_BLE_CMD_ZB_NWK_MANAGEMENT_SET){
+		u16 dstAddr = 0xfffd;
+		u8 sn = 0;
+		zdo_mgmt_nwk_update_req_t req;
+
+		req.nwk_manager_addr = 0x1234;
+		req.scan_ch = 0x07fff800;
+		req.scan_duration = ZDO_NWK_MANAGER_ATTRIBUTES_CHANGE;
+		req.nwk_update_id = 0x00;
+
+		zb_mgmtNwkUpdateReq(dstAddr, &req, &sn);
+	}else if(clusterId == ZCL_CLUSTER_GEN_ON_OFF){
 		sampleLight_onOffCb(NULL, cmdId, pCmd);
 	}else if(clusterId == ZCL_CLUSTER_GEN_LEVEL_CONTROL){
 		sampleLight_levelCb(NULL, cmdId, pCmd);
 	}else if(clusterId == APP_BLE_CMD_INTERVAL_SET){
 		app_bleConnIntervalSet(payload[0], ((payload[1] << 8) | payload[2]));
+	}else{
+		ret = -1;
 	}
+	return ret;
 }
 
 #endif  /* __PROJECT_TL_DIMMABLE_LIGHT__ */

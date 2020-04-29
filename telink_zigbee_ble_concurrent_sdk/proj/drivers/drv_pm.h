@@ -28,6 +28,7 @@
 typedef enum{
 	PLATFORM_MODE_SUSPEND,
 	PLATFORM_MODE_DEEPSLEEP,
+	PLATFORM_MODE_DEEPSLEEP_RET_SRAM_LOW32K,
 	PLATFORM_MODE_MCU_STALL,
 }platform_mode_e;
 
@@ -48,3 +49,9 @@ void platform_wakeup_pad_cfg(u32 pin, platform_wakeup_level_e pol, int en);
 void platform_lowpower_enter(platform_mode_e mode, platform_wakeup_e src, u32 cycle_ms);
 
 void platform_longLowpower_enter(platform_mode_e mode, platform_wakeup_e src, u32 durationUs);
+
+void deep_sleep_flag_set(unsigned int a);
+
+u8 deep_sleep_flag_get(void);
+
+u32 deep_sleep_framecount_get(void);

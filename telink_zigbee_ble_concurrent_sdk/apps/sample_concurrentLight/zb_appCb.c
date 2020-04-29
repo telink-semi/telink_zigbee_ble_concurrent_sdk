@@ -64,9 +64,22 @@ ota_callBack_t sampleLight_otaCb =
 };
 #endif
 
+#if DUAL_MODE
 static ev_time_event_t *pairingTimeoutEvt = NULL;
+#endif
 
 volatile u8 T_zbdemoBdbInfo[6] = {0};
+
+
+#define OTA_INFO_DBG		0
+#if OTA_INFO_DBG
+typedef struct{
+	u32 T_otaTotalNum;
+	u32 T_otaRebootNum;
+}otaDbgInfo_t;
+
+otaDbgInfo_t  T_otaDbgInfo;
+#endif
 
 /**********************************************************************
  * LOCAL VARIABLES
@@ -101,6 +114,11 @@ s32 sampleLight_bdbFindAndBindStart(void *arg){
   * @return  None
   */
 void zbdemo_bdbInitCb(u8 status, u8 joinedNetwork){
+#if OTA_INFO_DBG
+	u32 addrDbg = MODULES_START_ADDR(NV_MODULE_APP);
+	flash_read(addrDbg, sizeof(T_otaDbgInfo), (u8 *)&T_otaDbgInfo);
+#endif
+
 	if(status == BDB_INIT_STATUS_SUCCESS){
 		T_zbdemoBdbInfo[0]++;
 
@@ -192,7 +210,7 @@ void zbdemo_bdbCommissioningCb(u8 status, void *arg){
 				g_bdbCommissionSetting.linkKey.tcLinkKey.keyType = SS_GLOBAL_LINK_KEY;
 				g_bdbCommissionSetting.linkKey.tcLinkKey.key = (u8 *)tcLinkKeyCentralDefault;
 			}
-
+			extern void bdb_linkKeyCfg( bdb_commissionSetting_t *setting, u8 fn);
 			bdb_linkKeyCfg(&g_bdbCommissionSetting, TRUE);
 			gLightCtx.useInstallCodeFlg = !gLightCtx.useInstallCodeFlg;
 		}
@@ -216,8 +234,9 @@ void zbdemo_bdbCommissioningCb(u8 status, void *arg){
 
 	}else if(status == BDB_COMMISSION_STA_NOT_PERMITTED){
 
-//	}else if(status == BDB_COMMISSION_STA_TCLK_EX_FAILURE){
-
+	}else if(status == BDB_COMMISSION_STA_PARENT_LOST){
+		zb_rejoin_mode_set(REJOIN_INSECURITY);
+		zb_rejoinReq(NLME_REJOIN_METHOD_REJOIN, zb_apsChannelMaskGet());
 	}else if(status == BDB_COMMISSION_STA_FORMATION_DONE){
 		T_zbdemoBdbInfo[4]++;
 		#if ZBHCI_EN
@@ -250,26 +269,63 @@ void sampleLight_otaProcessMsgHandler(u8 evt, u8 status)
 			 *
 			 */
 			app_bleAdvIntervalSwitch(ADV_INTERVAL_500MS, ADV_INTERVAL_505MS);
+
+#if OTA_INFO_DBG
+			u32 addrDbg = MODULES_START_ADDR(NV_MODULE_APP);
+			flash_read(addrDbg, sizeof(T_otaDbgInfo), (u8 *)&T_otaDbgInfo);
+			flash_erase(addrDbg);
+			if(T_otaDbgInfo.T_otaTotalNum != 0xffffffff){
+				T_otaDbgInfo.T_otaTotalNum++;
+			}else{
+				T_otaDbgInfo.T_otaTotalNum = 1;
+			}
+			flash_write(addrDbg, sizeof(T_otaDbgInfo), (u8 *)&T_otaDbgInfo);
+#endif
 		}else{
 
 		}
 		T_sampleLightOtaSta[0] = 1;
-	}else if(evt == OTA_EVT_COMPLETE){
+	}else if(evt == OTA_EVT_IMAGE_DONE){
 		/*
-		 * recovery the default BLE ADV interval after OTA is done
+		 * the whole image has been received, but need to wait some time to reboot
 		 *
 		 * */
 		app_bleAdvIntervalSwitch(ADV_INTERVAL_30MS, ADV_INTERVAL_35MS);
+		light_blink_stop();
+	}else if(evt == OTA_EVT_COMPLETE){
+		/* OTA complete,
+		 * abort if error occurs
+		 * reboot if success
+		*/
+
+		/* recovery the default BLE ADV interval after OTA is done
+		 *
+		 * */
+		app_bleAdvIntervalSwitch(ADV_INTERVAL_30MS, ADV_INTERVAL_35MS);
+		light_blink_stop();
+
 		T_sampleLightOtaSta[0] = 0;
 		if(status == ZCL_STA_SUCCESS){
 			T_sampleLightOtaSta[1]++;
+
+#if OTA_INFO_DBG
+			u32 addrDbg = MODULES_START_ADDR(NV_MODULE_APP);
+			flash_read(addrDbg, sizeof(T_otaDbgInfo), (u8 *)&T_otaDbgInfo);
+			flash_erase(addrDbg);
+			if(T_otaDbgInfo.T_otaRebootNum != 0xffffffff){
+				T_otaDbgInfo.T_otaRebootNum++;
+			}else{
+				T_otaDbgInfo.T_otaRebootNum = 1;
+			}
+			flash_write(addrDbg, sizeof(T_otaDbgInfo), (u8 *)&T_otaDbgInfo);
+#endif
+
 			ota_mcuReboot();
 		}else{
 			T_sampleLightOtaSta[2]++;
 			T_sampleLightOtaSta[3] = status;
 			ota_queryStart(OTA_CHECK_PERIOD_MIN);
 		}
-		light_blink_stop();
 	}
 }
 #endif
@@ -320,5 +376,30 @@ void sampleLight_leaveIndHandler(void *p)
 
 }
 
+/*********************************************************************
+  * @fn      sampleLight_mgmtNwkUpdateIndHandler
+  *
+  * @brief   Handler for ZDO Mgmt_NWK_Update_req indication
+  *
+  * @param   p - parameter of Mgmt_NWK_Update_req
+  *
+  * @return  None
+  */
+volatile u8 T_mgmtNwkUpdateIndInfo[16] = {0};
+void sampleLight_mgmtNwkUpdateIndHandler(void *p){
+	zdo_mgmt_nwk_update_req_t *pReq = (zdo_mgmt_nwk_update_req_t *)p;
+
+	if(pReq->scan_duration == ZDO_NWK_MANAGER_CHANNEL_CHANGE){
+		/* update channel */
+	}else if(pReq->scan_duration == ZDO_NWK_MANAGER_ATTRIBUTES_CHANGE){
+		/* update network management node */
+		memcpy(T_mgmtNwkUpdateIndInfo, p, 16);
+	}else if(pReq->scan_duration < ZDO_NWK_MANAGER_MAX_SCAN_DURATION){
+		/* do energy scan */
+	}else{
+		/* invalid command */
+	}
+
+}
 
 #endif  /* __PROJECT_TL_DIMMABLE_LIGHT__ */

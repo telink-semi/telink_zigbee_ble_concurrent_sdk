@@ -81,6 +81,7 @@ const zdo_appIndCb_t appCbLst = {
 		NULL,//nwk update ind cb
 		NULL,//permit join ind cb
 		NULL,//nlme sync cnf cb
+		NULL, //Mgmt_NWK_Update_req indication
 };
 
 

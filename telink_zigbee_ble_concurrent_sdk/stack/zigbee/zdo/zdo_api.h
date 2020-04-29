@@ -46,6 +46,12 @@
 #define			APS_MAXPACKET_LENGTH		(127 - MAC_HEADER_MAX_SIZE - NWK_HEADER_MAX_SIZE - SECURE_HEADER_SIZE - APS_HEADER_MAX_SIZE)
 
 
+#define			ZDO_NWK_MANAGER_MAX_SCAN_DURATION			5
+
+#define			ZDO_NWK_MANAGER_CHANNEL_CHANGE				0xfe
+
+#define			ZDO_NWK_MANAGER_ATTRIBUTES_CHANGE			0xff
+
 #define			SUPERFRAME_TIME2US(t)			((t*15360))
 typedef struct
 {
@@ -152,6 +158,7 @@ typedef struct{
 	zdo_nwkupdate_cb	zdpNwkUpdateIndCb;
 	zdo_callback		zdpPermitJoinIndCb;
 	zdo_callback		zdoNlmeSyncCnfCb;
+	zdo_callback		zdoMgmtNwkUpdateIndCb;
 }zdo_appIndCb_t;
 
 typedef bool (*zdo_leaveCallback)(void *p);
@@ -205,6 +212,11 @@ typedef struct{
 	u8		config_nwk_scan_attempts;//This attribute has default value of 5 and valid values between 1 and 255.
 	u8		config_permit_join_duration; //< Permit join duration, 0x00 - disable join, 0xff - join is allowed forever
 	u8		config_parent_link_retry_threshold;//number of retry parent syns before judged as connection lost and the default value is ZDO_MAX_PARENT_THRESHOLD_RETRY
+
+	u8		config_accept_nwk_update_channel;/* for wwah */
+	bool	config_disable_mgmt_leave_unSecurity;/* for wwah */
+	bool	config_enable_tcSecOnNwkKeyRotation;/* for wwah */
+	bool	config_disable_config_mode;/* for wwah */
 }zdo_attrCfg_t;
 
 
@@ -939,6 +951,14 @@ void zdo_af_set_link_retry_threshold(u8 threshold);
 void zdo_af_set_rejoin_interval(u16 interval);
 void zdo_af_set_max_rejoin_interval(u16 interval);
 void zdo_af_set_scan_attempts(u8 attempts);
+void zdo_af_set_accept_nwk_update_channel(u8 channel);
+u8 zdo_af_get_accept_nwk_update_channel(void);
+void zdo_af_set_disable_mgmtLeave_unsecurity(bool disable);
+bool zdo_af_get_disable_mgmtLeave_unsecurity(void);
+void zdo_af_set_enable_tcSecOnNwkKeyRotation(bool enable);
+bool zdo_af_get_enable_tcSecOnNwkKeyRotation(void);
+void zdo_af_set_disable_configuration_mode(bool disable);
+bool zdo_af_get_disable_configuration_mode(void);
 
 void zdo_nlmeForgetDev(addrExt_t nodeIeeeAddr, bool rejoin);
 #endif

@@ -31,6 +31,8 @@ SECTIONS
         *(.vectors)
         *(.vectors.*)	/* MUST as follows, when compile with -ffunction-sections -fdata-sections, session name may changed */
         }
+        
+        . = (. * (1 - __BOOT_LOADER_EN)) + (__FW_RAMCODE_SIZE_MAX * __BOOT_LOADER_EN);
         .ram_code :
         {
         *(.ram_code)

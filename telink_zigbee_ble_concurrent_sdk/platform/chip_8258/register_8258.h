@@ -484,6 +484,8 @@ enum{
 #define reg_usb_ep6_ptr			REG_ADDR8(0x116)
 #define reg_usb_ep7_ptr			REG_ADDR8(0x117)
 #define reg_usb_ep_ptr(i)		REG_ADDR8(0x110+((i) & 0x07))
+#define reg_usb_mic_dat0		REG_ADDR16(0x1800)
+#define reg_usb_mic_dat1		REG_ADDR16(0x1802)
 
 #define reg_usb_ep8123_dat		REG_ADDR32(0x118)
 #define reg_usb_ep8_dat			REG_ADDR8(0x118)
@@ -1429,10 +1431,10 @@ enum{  //core_b11<3:2>  audio input select
 
 
 #define reg_audio_wptr			reg_dfifo0_wptr
-static inline unsigned short get_mic_wr_ptr (void)
+/*static inline unsigned short get_mic_wr_ptr (void)
 {
 	return reg_audio_wptr >>1;
-}
+}*/
 
 #define reg_dfifo0_num			REG_ADDR16(0xb20)
 #define reg_dfifo1_num			REG_ADDR16(0xb24)
@@ -1582,7 +1584,7 @@ enum{
 /////////////////////////////////////////////////////////////////////////////////////
 
 
-
+#define areg_clk_setting			0x82
 #define anareg_82					0x82
 enum{
 	FLD_DCCC_DOUBLER_POWER_DOWN	  = BIT(3),

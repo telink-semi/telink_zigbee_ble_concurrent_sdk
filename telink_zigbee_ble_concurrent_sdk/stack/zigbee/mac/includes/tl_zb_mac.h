@@ -802,7 +802,8 @@ typedef struct  zb_mac_beacon_payload_s{
 	u8 stack_profile:4;
 	u8 protocol_version:4;
 
-	u8 reserved:2;
+	u8 tc:1;
+	u8 longUptime:1;
 	u8 router_capacity:1;
 	u8 device_depth:4;
 	u8 end_device_capacity:1;

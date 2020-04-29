@@ -27,6 +27,10 @@
     #include "../sample_concurrentGw/app_cfg.h"
 #elif (__PROJECT_TL_CONCURRENT_SWITCH__)
     #include "../sample_concurrentSwitch/app_cfg.h"
+#elif (__PROJECT_TL_CONCURRENT_TEMP_SENSOR__)
+    #include "../sample_concurrentTempSensor/app_cfg.h"
+#elif (__PROJECT_TL_BOOT_LOADER__)
+    #include "../boot_loader/app_cfg.h"
 #else
 
 #endif

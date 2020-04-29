@@ -155,6 +155,25 @@ typedef struct{
 #endif
 }zcl_lightColorCtrlAttr_t;
 
+/**
+ *  @brief Defined for wwah cluster attributes
+ */
+typedef struct{
+	bool disableOTADowngrades;
+	bool mgmtLeaveWithoutRejoinEnabled;
+	u8 	 nwkRetryCount;
+	u8 	 macRetryCount;
+	bool routerCheckInEnabled;
+	bool touchlinkInterpanEnabled;
+	bool parentClassificationEnabled;
+	bool configurationModeEnabled;
+	u8	 currentDebugReportID;
+	bool tcSecurityOnNwkKeyRotationEnabled;
+	u8	 pendingNwkUpdateChannel;
+	u16	 pendingNwkUpdatePanID;
+	u16	 otaMaxOfflineDuration;
+}zcl_wwahAttr_t;
+
 
 /**
  *  @brief Defined for saving on/off attributes
@@ -231,6 +250,7 @@ status_t sampleLight_colorCtrlCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, voi
 void sampleLight_leaveCnfHandler(void *p);
 void sampleLight_leaveIndHandler(void *p);
 void sampleLight_otaProcessMsgHandler(u8 evt, u8 status);
+void sampleLight_mgmtNwkUpdateIndHandler(void *p);
 
 void sampleLight_onoff(u8 cmd);
 

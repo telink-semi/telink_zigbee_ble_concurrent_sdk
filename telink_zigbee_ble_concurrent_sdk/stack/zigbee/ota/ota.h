@@ -170,6 +170,7 @@ typedef struct{
 
 typedef enum{
 	OTA_EVT_START,
+	OTA_EVT_IMAGE_DONE,
 	OTA_EVT_COMPLETE,
 }ota_evt_t;
 
@@ -201,6 +202,7 @@ status_t zcl_otaCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayload)
 
 unsigned int xcrc32 (const unsigned char *buf, int len, unsigned int init);
 
+void ota_wwah_useTrustCenter(u8 endpoint);
 void ota_init(ota_type_e type, af_simple_descriptor_t *simpleDesc, ota_preamble_t *otaPreamble, ota_callBack_t *cb);
 void ota_queryStart(u8 period);
 void ota_serverAddrPerprogrammed(addrExt_t ieeeAddr, u8 srvEndPoint);

@@ -23,7 +23,11 @@
 #pragma once
 
 #if BOOT_LOAD_MODE
-#include "nv_only_for_bootload_mode.h"
+	#if BOOT_LOAD_MODE_NORMAL_FLASH_MAPPING
+		#include "nv_normal_for_bootload_mode.h"
+	#else
+		#include "nv_only_for_bootload_mode.h"
+	#endif
 #else
-#include "nv_normal.h"
+	#include "nv_normal.h"
 #endif

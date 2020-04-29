@@ -93,7 +93,7 @@ static u8 platform_init(void){
 
 #if defined(MCU_CORE_8258)
 	if(ret == SYSTEM_RETENTION_NONE){
-		rng_init();
+		random_generator_init();
 	}
 #endif
 
@@ -128,12 +128,12 @@ int main (void) {
 #endif
 
 	while(1){
-    	tl_zbTaskProcedure();
+    	tl_zbTaskProcedure(0);
 
 #if(MODULE_WATCHDOG_ENABLE)
 		wd_clear();
 #endif
-		ev_main();
+		ev_main(0);
 	}
 }
 

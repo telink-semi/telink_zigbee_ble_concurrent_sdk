@@ -74,6 +74,10 @@ const zdo_attrCfg_t afAttrDefault = {
 		.config_permit_join_duration 		= ZDO_PERMIT_JOIN_DURATION,
 		.config_rejoin_interval 			= ZDO_REJOIN_INTERVAL,
 		.config_max_rejoin_interval			= ZDO_MAX_REJOIN_INTERVAL,
+		.config_accept_nwk_update_channel	= 0,
+		.config_disable_mgmt_leave_unSecurity = 0,
+		.config_enable_tcSecOnNwkKeyRotation  = 0,
+		.config_disable_config_mode			= 0,
 };
 
 zdo_attrCfg_t zdo_cfg_attributes;
@@ -137,7 +141,6 @@ void af_nodeDescStackRevisionSet(u8 revision){
 u8 af_nodeDescStackRevisionGet(void){
 	return ((u8)((ndt.server_mask & 0xfe00) >> 9));
 }
-
 
 u8 af_nodeMacCapabilityGet(void){
 	return ndt.mac_capability_flag;
@@ -630,3 +633,34 @@ _CODE_ZDO_ inline u8 zdo_af_get_permit_join_duration(void){
 	return zdo_cfg_attributes.config_permit_join_duration;
 }
 
+_CODE_ZDO_ inline void zdo_af_set_accept_nwk_update_channel(u8 channel){
+	zdo_cfg_attributes.config_accept_nwk_update_channel = channel;
+}
+
+_CODE_ZDO_ inline u8 zdo_af_get_accept_nwk_update_channel(void){
+	return zdo_cfg_attributes.config_accept_nwk_update_channel;
+}
+
+_CODE_ZDO_ inline void zdo_af_set_disable_mgmtLeave_unsecurity(bool disable){
+	zdo_cfg_attributes.config_disable_mgmt_leave_unSecurity = disable;
+}
+
+_CODE_ZDO_ inline bool zdo_af_get_disable_mgmtLeave_unsecurity(void){
+	return zdo_cfg_attributes.config_disable_mgmt_leave_unSecurity;
+}
+
+_CODE_ZDO_ inline void zdo_af_set_enable_tcSecOnNwkKeyRotation(bool enable){
+	zdo_cfg_attributes.config_enable_tcSecOnNwkKeyRotation = enable;
+}
+
+_CODE_ZDO_ inline bool zdo_af_get_enable_tcSecOnNwkKeyRotation(void){
+	return zdo_cfg_attributes.config_enable_tcSecOnNwkKeyRotation;
+}
+
+_CODE_ZDO_ inline void zdo_af_set_disable_configuration_mode(bool disable){
+	zdo_cfg_attributes.config_disable_config_mode = disable;
+}
+
+_CODE_ZDO_ inline bool zdo_af_get_disable_configuration_mode(void){
+	return zdo_cfg_attributes.config_disable_config_mode;
+}

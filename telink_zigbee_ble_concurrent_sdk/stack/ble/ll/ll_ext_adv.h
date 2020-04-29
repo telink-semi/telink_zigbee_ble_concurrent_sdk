@@ -276,7 +276,7 @@ ble_sts_t	blc_ll_clearAdvSets(void);
 
 
 // if Coded PHY is used, this API set default S2/S8 mode for Extended ADV
-void		blc_ll_setDefaultExtAdvCodingIndication(u8 advHandle, le_ci_prefer_t prefer_CI);
+ble_sts_t		blc_ll_setDefaultExtAdvCodingIndication(u8 advHandle, le_ci_prefer_t prefer_CI);
 
 
 void        blc_ll_setAuxAdvChnIdxByCustomers(u8 aux_chn);

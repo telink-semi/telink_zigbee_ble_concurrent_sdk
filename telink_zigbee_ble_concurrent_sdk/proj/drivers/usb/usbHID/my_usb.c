@@ -26,7 +26,7 @@
 #include "my_usb.h"
 #include "usbhw_i.h"
 #include "my_usbdesc.h"
-
+#include "usbhw.h"
 
 static USB_Request_Header_t control_request;
 static u8 *g_response = 0;
@@ -546,7 +546,7 @@ void my_usb_handle_irq(void) {
 		usbhw_reset_ep_ptr(EDP_ID_KEYBOARD_OUT);
 		my_g_stall = 0;
 
-		u8 led_state = usbhw_read_ep_data(EDP_ID_KEYBOARD_OUT);
+//		u8 led_state = usbhw_read_ep_data(EDP_ID_KEYBOARD_OUT);
 		//printf("read 1 byte:data = 0x%01X", led_state);
 
 		//Num Lock   :bit0
@@ -572,7 +572,7 @@ void my_usb_handle_irq(void) {
 		usbhw_reset_ep_ptr(EDP_ID_KEYS_OUT);
 		my_g_stall = 0;
 
-		u8 led_state = usbhw_read_ep_data(EDP_ID_KEYS_OUT);
+//		u8 led_state = usbhw_read_ep_data(EDP_ID_KEYS_OUT);
 		//printf("read 1 byte:data = 0x%01X", led_state);
 
 		//Num Lock   :bit0

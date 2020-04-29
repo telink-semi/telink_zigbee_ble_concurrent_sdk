@@ -87,7 +87,7 @@ extern u8 TIMER_EVENT_SIZE;
 extern void zb_sched_init() ;
 
 
-void tl_zbTaskProcedure(void) ;
+void tl_zbTaskProcedure(bool schedule) ;
 
 /**
   * @brief       get the valid task from task quenue list

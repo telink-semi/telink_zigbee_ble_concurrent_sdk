@@ -103,12 +103,13 @@ typedef union
  */
 typedef enum
 {
-	APS_TX_OPT_SECURITY_ENABLED = BIT(0), //0x01 = Security enabled transmission
-	APS_TX_OPT_DISABLE_NWK_KEY 	= BIT(1), //0x02 = Disable NWK key
-	APS_TX_OPT_ACK_TX 			= BIT(2), //0x04 = Acknowledged transmission
-	APS_TX_OPT_FRAG_PERMITTED 	= BIT(3), //0x08 = Fragmentation permitted
-	APS_TX_OPT_INCLUDE_NONCE	= BIT(4), //0x10 = Include extended nonce in APS security frame
-	APS_TX_OPT_INTRA_PAN 		= BIT(7)  //0x80 = Intra-PAN delivery
+	APS_TX_OPT_SECURITY_ENABLED 	= BIT(0), //0x01 = Security enabled transmission
+	APS_TX_OPT_DISABLE_NWK_KEY 		= BIT(1), //0x02 = Disable NWK key
+	APS_TX_OPT_ACK_TX 				= BIT(2), //0x04 = Acknowledged transmission
+	APS_TX_OPT_FRAG_PERMITTED 		= BIT(3), //0x08 = Fragmentation permitted
+	APS_TX_OPT_INCLUDE_NONCE		= BIT(4), //0x10 = Include extended nonce in APS security frame
+	APS_TX_OPT_UNICAST_SKIP_ROUTING	= BIT(5), //0x20 = Skip routing when unicast
+	APS_TX_OPT_INTRA_PAN 			= BIT(7)  //0x80 = Intra-PAN delivery
 }aps_tx_options;
 
 typedef enum{
@@ -472,6 +473,7 @@ zdo_status_t aps_me_bind_req(aps_me_bind_req_t *amr);
 
 zdo_status_t aps_me_unbind_req(aps_me_unbind_req_t *amr);
 
+void aps_bindingTab_clear(void);
 
 /***********************************************************************//**
  * @brief   get binding table number
@@ -611,8 +613,29 @@ u8 aps_me_free_src_table_find(void);
  **************************************************************************/
 u8 apsDataRequest(aps_data_req_t *dataReq, u8 *asdu, u8 length);
 
+/*********************************************************************
+ * @fn      apsDataFragmentRequest
+ *
+ * @brief
+ *
+ * @param   dataReq
+ * @param   asdu
+ * @param   length
+ *
+ * @return  status
+ */
 u8 apsDataFragmentRequest(aps_data_req_t *dataReq, u8 *asdu, u16 length);
 
+
+/***********************************************************************//**
+ * @brief       Check whether APS is busy
+ *
+ * @param[in]
+ *
+ * @return      Status 1--busy,0--idle
+ *
+ **************************************************************************/
+int shortAddrReqTxing(void);
 
 typedef void (*apsDataIndCb_t)(void *p);
 void tl_apsDataIndRegister(apsDataIndCb_t cb);

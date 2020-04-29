@@ -183,6 +183,7 @@ void buttonShortPressed(u8 btNum){
 	}
 
 #if PM_ENABLE
+	extern void app_zigbeePollRateRecovery(void);
 	app_zigbeePollRateRecovery();
 #endif
 
@@ -199,8 +200,8 @@ void buttonShortPressed(u8 btNum){
 			dstEpInfo.dstAddr.shortAddr = 0x0000;   //to TC
 			dstEpInfo.dstAddrMode = APS_SHORT_DSTADDR_WITHEP;
 		}else{
-			//addrExt_t *extAddr = tl_zbExtAddrPtrByShortAddr(0);
-			addrExt_t extAddr[] = {0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb};
+//			addrExt_t *extAddr = tl_zbExtAddrPtrByShortAddr(0);
+			u8 extAddr[] = {0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb};
 			ZB_IEEE_ADDR_COPY(dstEpInfo.dstAddr.extAddr, extAddr);
 			dstEpInfo.dstAddrMode = APS_LONG_DSTADDR_WITHEP;
 		}

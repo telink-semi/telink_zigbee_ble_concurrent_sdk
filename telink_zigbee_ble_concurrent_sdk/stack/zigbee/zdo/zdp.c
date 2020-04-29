@@ -97,6 +97,10 @@ _CODE_ZDO_ zdo_status_t zdp_serverCmdHandler(void *ind){
 	if(p->cluster_id == NWK_ADDR_RESP_CLID || p->cluster_id == IEEE_ADDR_RESP_CLID){
 		zdo_remoteAddrNotify(ind);
 	}
+
+	if(p->cluster_id == MGMT_NWK_UPDATE_NOTIFY_CLID){
+		/* TODO: */
+	}
 #endif
 
 	zdo_zdpDataInd_t *zdpInd = (zdo_zdpDataInd_t *)p;

@@ -299,7 +299,7 @@ _attribute_ram_code_ void rf_setTrxState(u8 state)
         /* Close RF */
     	rf_paShutDown();
         ZB_RADIO_TRX_SWITCH(RF_MODE_OFF,LOGICCHANNEL_TO_PHYSICAL(rf_getChannel()));
-        rfMode = RF_MODE_TX;
+        rfMode = RF_MODE_OFF;
     }
 #endif  /* WIN32 */
 }
@@ -446,21 +446,24 @@ _attribute_ram_code_ u8 rf_performCCA(void){
 	u32 t1 = clock_time();
 	s8 rssi_peak = -110;
 	s8 rssi_cur = -110;
+	s32 rssiSum = 0;
+	s32 cnt = 1;
 	u8 ret = PHY_CCA_IDLE;
 
-	DBG_ZIGBEE_STATUS(0x02);
-
-	//u8 irq = irq_disable();
+	rssi_cur = ZB_RADIO_RSSI_GET();
+	rssiSum += rssi_cur;
+	
 	while(!clock_time_exceed(t1,128)){
 		rssi_cur = ZB_RADIO_RSSI_GET();
-		if (rssi_cur > rssi_peak) {
-			rssi_peak = rssi_cur;
-		}
+		rssiSum += rssi_cur;
+		cnt++;
 	}
+	rssi_peak = rssiSum/cnt;
 
 	DBG_ZIGBEE_STATUS(0x03);
 
-	if (zigbee_process == 0 || rssi_peak > -60 || (rf_busyFlag & TX_BUSY)) {//Return if currently in TX state
+
+	if (zigbee_process == 0 || rssi_peak > -50 || (rf_busyFlag & TX_BUSY)) {//Return if currently in TX state
 		ret = PHY_CCA_BUSY;
 	} else {
 		ret = PHY_CCA_IDLE;
@@ -508,12 +511,12 @@ void rf_set(u8 id, u8 *pValue, u8 len){
 
 rx_buf_t pRxEvt;
 
-u8 rf_busyFlag = 0;
+volatile u8 rf_busyFlag = 0;
 
 void rf_802154_init(void);
 void rf_802154_reset(void);
 
-rf_specificFunc_t rf_802154_funcs =
+const rf_specificFunc_t rf_802154_funcs =
 {
 	rf_802154_init,
 	rf_802154_reset,
@@ -711,5 +714,11 @@ _attribute_ram_code_ __attribute__((optimize("-Os"))) void rf_tx_irq_handler(voi
 	}
 }
 
+inline bool zb_rfSwitchAllow(void){
+	return (rf_busyFlag !=  (TX_BUSY | TX_ACKPACKET));
+}
 
+inline bool zb_rfTxDoing(void){
+	return (rf_busyFlag & TX_BUSY);
+}
 

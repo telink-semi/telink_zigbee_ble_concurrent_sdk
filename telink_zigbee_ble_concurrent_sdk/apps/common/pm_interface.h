@@ -33,8 +33,8 @@ u8 pm_wakeupValid(pm_pinCfg_t *pmCfg, int pinNum);
 
 void sys_enterLowPower(u8 mode);
 
-void pm_suspendEnter(int wakeUpSrc, u32 ms);
+void pm_suspendEnter(platform_wakeup_e wakeUpSrc, u32 ms);
 
-void pm_deepSleepEnter(int wakeUpSrc, u32 ms);
+void pm_deepSleepEnter(platform_mode_e mode, platform_wakeup_e wakeUpSrc, u32 ms);
 
 #endif

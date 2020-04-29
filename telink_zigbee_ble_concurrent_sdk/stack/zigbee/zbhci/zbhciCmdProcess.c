@@ -516,6 +516,7 @@ static void zbhci_mgmtCmdHandler(void *arg){
 		req.lr_bitfields.rejoin = p[10];
 		req.lr_bitfields.remove_children = p[11];
 		req.lr_bitfields.reserved = 0;
+		g_hciCmd.rejoin = req.lr_bitfields.rejoin;
 		zb_mgmtLeaveReq(targetAddr, &req, &sn, zbhciMgmtLeaveRspMsgPush);
 		g_hciCmd.apsCnt = sn;
 		memcpy(g_hciCmd.macAddr, req.device_addr, 8);
@@ -761,6 +762,35 @@ s32 zbhci_nodeManageCmdHandler(void *arg){
 		}
 #endif
 	}
+	else if(cmdID == ZBHCI_CMD_OTA_NOTIFICATION_REQ){
+#if ZB_COORDINATOR_ROLE
+		u32 image_length;
+		ota_hdrFields_t ota_hdr;
+		u32 ota_start_addr = 0;
+		ota_start_addr = FLASH_OTA_NEWIMAGE_ADDR;
+
+		flash_read(ota_start_addr,sizeof(ota_hdrFields_t),(u8*)&ota_hdr);
+		image_length = ota_hdr.totalImageSize;
+
+		ota_imageNotify_t in;
+		in.payloadType = IMAGE_NOTIFY_QUERY_JITTER;
+		in.imageType = ota_hdr.imageType;
+		in.manuCode = ota_hdr.manufacturerCode;
+		in.newFileVer = ota_hdr.fileVer;
+		in.queryJitter = 150;  //**payload;
+
+		u8 srcEp = 0x01;
+		epInfo_t dstEpInfo;
+		TL_SETSTRUCTCONTENT(dstEpInfo, 0);
+		dstEpInfo.dstAddrMode = APS_SHORT_DSTADDR_WITHEP;
+		dstEpInfo.dstEp = 0x01;
+		dstEpInfo.dstAddr.shortAddr = 0xffff;
+		dstEpInfo.profileId = HA_PROFILE_ID;
+		dstEpInfo.txOptions = 0;
+		dstEpInfo.radius = 0;
+		zcl_ota_imageNotifyCmdSend(srcEp, &dstEpInfo, FALSE, &in);
+#endif
+	}
 
 	ev_buf_free(arg);
 
@@ -820,6 +850,7 @@ void zbhciCmdHandler(u16 msgType, u16 msgLen, u8 *p){
 			case ZBHCI_CMD_NODES_TOGLE_TEST_REQ:
 			case ZBHCI_CMD_TXRX_PERFORMANCE_TEST_REQ:
 			case ZBHCI_CMD_AF_DATA_SEND_TEST_REQ:
+			case ZBHCI_CMD_OTA_NOTIFICATION_REQ:
 				TL_ZB_TIMER_SCHEDULE(zbhci_nodeManageCmdHandler, cmdInfo, 100 * 1000);
 				break;
 

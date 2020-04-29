@@ -76,6 +76,7 @@ const zdo_appIndCb_t appCbLst = {
 		NULL,//nwk update ind cb
 		NULL,//permit join ind cb
 		NULL,//nlme sync cnf cb
+		NULL,//Mgmt_NWK_Update_req indication
 };
 
 
@@ -221,7 +222,7 @@ void user_zb_init(void)
 		g_switchAppCtx.restartLoopTimes = KEY_PRESSED_CHECK_TIMES;
 	}
 
-	if(1/*pmParam.back_mode == BACK_FROM_REPOWER || pmParam.back_mode == BACK_FROM_DEEP*/)
+	if(!pmParam.is_deepretn_back)
 	{
 		/* Initialize Stack */
 		stack_init();

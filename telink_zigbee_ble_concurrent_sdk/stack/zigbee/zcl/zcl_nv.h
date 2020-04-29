@@ -75,7 +75,7 @@ nv_sts_t zcl_sceneTable_restore(void);
  * @return
  *
  **************************************************************************/
-nv_sts_t zcl_attr_onOffParams_save(void);
+nv_sts_t zcl_apsLinkKeyAuthInfo_save(void);
 
 /***********************************************************************//**
  * @brief       Restore onOff attributes information
@@ -85,7 +85,7 @@ nv_sts_t zcl_attr_onOffParams_save(void);
  * @return
  *
  **************************************************************************/
-nv_sts_t zcl_attr_onOffParams_restore(void);
+nv_sts_t zcl_apsLinkKeyAuthInfo_restore(void);
 
 /***********************************************************************//**
  * @brief       Save level attributes information
@@ -95,7 +95,7 @@ nv_sts_t zcl_attr_onOffParams_restore(void);
  * @return
  *
  **************************************************************************/
-nv_sts_t zcl_attr_levelParams_save(void);
+nv_sts_t zcl_apsAcksRequireInfo_save(void);
 
 /***********************************************************************//**
  * @brief       Restore level attributes information
@@ -105,7 +105,7 @@ nv_sts_t zcl_attr_levelParams_save(void);
  * @return
  *
  **************************************************************************/
-nv_sts_t zcl_attr_levelParams_restore(void);
+nv_sts_t zcl_apsAcksRequireInfo_restore(void);
 
 /***********************************************************************//**
  * @brief       Save color control attributes information
@@ -115,7 +115,7 @@ nv_sts_t zcl_attr_levelParams_restore(void);
  * @return
  *
  **************************************************************************/
-nv_sts_t zcl_attr_colorCtrlParams_save(void);
+nv_sts_t zcl_useTCForClusterInfo_save(void);
 
 /***********************************************************************//**
  * @brief       Restore color control attributes information
@@ -125,11 +125,5 @@ nv_sts_t zcl_attr_colorCtrlParams_save(void);
  * @return
  *
  **************************************************************************/
-nv_sts_t zcl_attr_colorCtrlParams_restore(void);
-
-
-
-
-
-
+nv_sts_t zcl_useTCForClusterInfo_restore(void);
  

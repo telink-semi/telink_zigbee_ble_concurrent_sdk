@@ -73,6 +73,10 @@ const u16 sampleLight_inClusterList[] =
 #if TOUCHLINK_SUPPORT
 	ZCL_CLUSTER_TOUCHLINK_COMMISSIONING,
 #endif
+
+#ifdef ZCL_WWAH
+	ZCL_CLUSTER_WWAH,
+#endif
 };
 
 /**
@@ -350,6 +354,46 @@ const zclAttrInfo_t lightColorCtrl_attrTbl[] =
 
 #define ZCL_COLOR_ATTR_NUM	 sizeof(lightColorCtrl_attrTbl) / sizeof(zclAttrInfo_t)
 
+#ifdef ZCL_WWAH
+/* wwah */
+zcl_wwahAttr_t g_zcl_wwahAttrs =
+{
+	.disableOTADowngrades 				= FALSE,
+	.mgmtLeaveWithoutRejoinEnabled 		= TRUE,
+	.nwkRetryCount						= 3,
+	.macRetryCount						= 3,
+	.routerCheckInEnabled				= FALSE,
+	.touchlinkInterpanEnabled			= TRUE,
+	.parentClassificationEnabled		= FALSE,
+	.configurationModeEnabled			= TRUE,
+	.currentDebugReportID				= 0,
+	.tcSecurityOnNwkKeyRotationEnabled  = FALSE,
+	.pendingNwkUpdateChannel			= 0xFF,
+	.pendingNwkUpdatePanID				= 0xFFFF,
+	.otaMaxOfflineDuration				= 0,
+};
+
+const zclAttrInfo_t wwah_attrTbl[] =
+{
+	{ ZCL_ATTRID_WWAH_DISABLE_OTA_DOWNGRADES, 			ZCL_DATA_TYPE_BOOLEAN, 	ACCESS_CONTROL_READ, (u8*)&g_zcl_wwahAttrs.disableOTADowngrades },
+	{ ZCL_ATTRID_WWAH_MGMT_LEAVE_WITHOUT_REJOIN_ENABLED,ZCL_DATA_TYPE_BOOLEAN, 	ACCESS_CONTROL_READ, (u8*)&g_zcl_wwahAttrs.mgmtLeaveWithoutRejoinEnabled },
+	{ ZCL_ATTRID_WWAH_NWK_RETRY_COUNT, 					ZCL_DATA_TYPE_UINT8, 	ACCESS_CONTROL_READ, (u8*)&g_zcl_wwahAttrs.nwkRetryCount },
+	{ ZCL_ATTRID_WWAH_MAC_RETRY_COUNT, 					ZCL_DATA_TYPE_UINT8 , 	ACCESS_CONTROL_READ, (u8*)&g_zcl_wwahAttrs.macRetryCount },
+	{ ZCL_ATTRID_WWAH_ROUTER_CHECK_IN_ENABLED, 			ZCL_DATA_TYPE_BOOLEAN, 	ACCESS_CONTROL_READ, (u8*)&g_zcl_wwahAttrs.routerCheckInEnabled },
+	{ ZCL_ATTRID_WWAH_TOUCHLINK_INTERPAN_ENABLED, 		ZCL_DATA_TYPE_BOOLEAN, 	ACCESS_CONTROL_READ, (u8*)&g_zcl_wwahAttrs.touchlinkInterpanEnabled },
+	{ ZCL_ATTRID_WWAH_PARENT_CLASSIFICATION_ENABLED, 	ZCL_DATA_TYPE_BOOLEAN, 	ACCESS_CONTROL_READ, (u8*)&g_zcl_wwahAttrs.parentClassificationEnabled },
+	{ ZCL_ATTRID_WWAH_CONFIGURATION_MODE_ENABLED, 		ZCL_DATA_TYPE_BOOLEAN,  ACCESS_CONTROL_READ, (u8*)&g_zcl_wwahAttrs.configurationModeEnabled },
+	{ ZCL_ATTRID_WWAH_CURRENT_DEBUG_REPORT_ID, 			ZCL_DATA_TYPE_UINT8,  	ACCESS_CONTROL_READ, (u8*)&g_zcl_wwahAttrs.currentDebugReportID },
+	{ ZCL_ATTRID_WWAH_TC_SECURITY_ON_NWK_KEY_ROTATION_ENABLED, ZCL_DATA_TYPE_BOOLEAN,  	ACCESS_CONTROL_READ, (u8*)&g_zcl_wwahAttrs.tcSecurityOnNwkKeyRotationEnabled },
+	{ ZCL_ATTRID_WWAH_PENDING_NWK_UPDATE_CHANNEL, 		ZCL_DATA_TYPE_UINT8,  	ACCESS_CONTROL_READ, (u8*)&g_zcl_wwahAttrs.pendingNwkUpdateChannel },
+	{ ZCL_ATTRID_WWAH_PENDING_NWK_UPDATE_PANID, 		ZCL_DATA_TYPE_UINT16,  	ACCESS_CONTROL_READ, (u8*)&g_zcl_wwahAttrs.pendingNwkUpdatePanID },
+	{ ZCL_ATTRID_WWAH_OTA_MAX_OFFLINE_DURATION, 		ZCL_DATA_TYPE_UINT16,  	ACCESS_CONTROL_READ, (u8*)&g_zcl_wwahAttrs.otaMaxOfflineDuration },
+
+	{ ZCL_ATTRID_GLOBAL_CLUSTER_REVISION, 				ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ, (u8*)&zcl_attr_global_clusterRevision },
+};
+
+#define ZCL_WWAH_ATTR_NUM	 sizeof(wwah_attrTbl) / sizeof(zclAttrInfo_t)
+#endif
 
 /**
  *  @brief Definition for simple light ZCL specific cluster
@@ -363,6 +407,10 @@ zcl_specClusterInfo_t g_sampleLightClusterList[] =
 	{ZCL_CLUSTER_GEN_ON_OFF,			 ZCL_ONOFF_ATTR_NUM,	onOff_attrTbl,			zcl_onOff_register,			 sampleLight_onOffCb},
 	{ZCL_CLUSTER_GEN_LEVEL_CONTROL,		 ZCL_LEVEL_ATTR_NUM,	level_attrTbl,			zcl_level_register,			 sampleLight_levelCb},
 	{ZCL_CLUSTER_LIGHTING_COLOR_CONTROL, ZCL_COLOR_ATTR_NUM,	lightColorCtrl_attrTbl,	zcl_lightColorCtrl_register, sampleLight_colorCtrlCb},
+
+#ifdef ZCL_WWAH
+	{ZCL_CLUSTER_WWAH, 					 ZCL_WWAH_ATTR_NUM,		wwah_attrTbl,			zcl_wwah_register, 			 NULL},
+#endif
 };
 
 u8 SAMPLELIGHT_CB_CLUSTER_NUM = (sizeof(g_sampleLightClusterList)/sizeof(g_sampleLightClusterList[0]));

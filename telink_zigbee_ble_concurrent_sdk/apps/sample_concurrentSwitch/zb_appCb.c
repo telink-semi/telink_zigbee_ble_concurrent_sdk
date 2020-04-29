@@ -51,7 +51,7 @@ void zbdemo_bdbCommissioningCb(u8 status, void *arg);
 void zbdemo_bdbIdentifyCb(u8 endpoint, u16 srcAddr, u16 identifyTime);
 void zbdemo_bdbFindBindSuccessCb(findBindDst_t *pDstInfo);
 
-
+extern void app_zigbeePollRateRecovery(void);
 /**********************************************************************
  * LOCAL VARIABLES
  */
@@ -161,7 +161,6 @@ void zbdemo_bdbInitCb(u8 status, u8 joinedNetwork){
   *
   * @return  None
   */
-u8 sleepCnt = 0;
 void zbdemo_bdbCommissioningCb(u8 status, void *arg){
 	T_zbdemoBdbInfo[3]++;
 	T_zbdemoBdbInfo[4] = status;
@@ -203,7 +202,7 @@ void zbdemo_bdbCommissioningCb(u8 status, void *arg){
 				g_bdbCommissionSetting.linkKey.tcLinkKey.keyType = SS_GLOBAL_LINK_KEY;
 				g_bdbCommissionSetting.linkKey.tcLinkKey.key = (u8 *)tcLinkKeyCentralDefault;
 			}
-
+			extern void bdb_linkKeyCfg( bdb_commissionSetting_t *setting, u8 fn);
 			bdb_linkKeyCfg(&g_bdbCommissionSetting, TRUE);
 			g_switchAppCtx.useInstallCodeFlg = !g_switchAppCtx.useInstallCodeFlg;
 		}

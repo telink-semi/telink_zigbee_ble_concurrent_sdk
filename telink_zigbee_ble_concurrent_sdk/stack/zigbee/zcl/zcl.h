@@ -455,7 +455,9 @@ typedef struct {
 	u16 dstAddr;
 	u8  srcEp;
 	u8	dstEp;
-	u8	dirCluster;
+	u8	dirCluster:1;
+	u8	apsSec:1;
+	u8	reserved:6;
 } zclIncomingAddrInfo_t;
 
 /**
@@ -615,11 +617,11 @@ status_t zcl_registerCluster(u8 endpoint, u16 clusterId, u8 attrNum, const zclAt
  * @return      ZCL Status @ref zcl_error_codes
  */
 status_t zcl_sendCmd(u8 srcEp, epInfo_t *pDstEpInfo, u16 clusterId, u8 cmd, u8 specific,
-				 	 u8 direction, u8 disableDefaultRsp, u32 manuCode, u8 seqNo, u16 cmdPldLen, u8 *cmdPld);
+				 	 u8 direction, u8 disableDefaultRsp, u16 manuCode, u8 seqNo, u16 cmdPldLen, u8 *cmdPld);
 
 
 status_t zcl_sendInterPANCmd(u8 srcEp, epInfo_t *pDstEpInfo, u16 clusterId, u8 cmd, u8 specific,
-							 u8 direction, u8 disableDefaultRsp, u32 manuCode, u8 seqNo, u16 cmdPldLen, u8 *cmdPld);
+							 u8 direction, u8 disableDefaultRsp, u16 manuCode, u8 seqNo, u16 cmdPldLen, u8 *cmdPld);
 
 /**
  * @brief      Receive handler for data from APS/AF layer
@@ -715,11 +717,9 @@ zclAttrInfo_t *zcl_findAttribute(u8 endpoint, u16 clusterId, u16 attrId);
  *
  * @return      status_t
  */
-status_t zcl_read(u8 srcEp, epInfo_t *pDstEpInfo, u16 clusterId, u8 disableDefaultRsp, u8 direction, u8 seqNo, zclReadCmd_t *readCmd);
-#define zcl_sendReadCmd(a,b,c,d,e,f)	(zcl_read((a), (b), (c), (d), (e), ZCL_SEQ_NUM, (f)))
-
-status_t zcl_readWithMfgCode(u8 srcEp, epInfo_t *pDstEpInfo, u16 clusterId, u32 manuCode, u8 disableDefaultRsp, u8 direction, u8 seqNo, zclReadCmd_t *readCmd);
-#define zcl_sendReadWithMfgCodeCmd(a,b,c,d,e,f,g)	(zcl_readWithMfgCode((a), (b), (c), (d), (e), (f), ZCL_SEQ_NUM, (g)))
+status_t zcl_read(u8 srcEp, epInfo_t *pDstEpInfo, u16 clusterId, u16 manuCode, u8 disableDefaultRsp, u8 direction, u8 seqNo, zclReadCmd_t *readCmd);
+#define zcl_sendReadCmd(a,b,c,d,e,f)				(zcl_read((a), (b), (c), 0, (d), (e), ZCL_SEQ_NUM, (f)))
+#define zcl_sendReadWithMfgCodeCmd(a,b,c,d,e,f,g)	(zcl_read((a), (b), (c), (d), (e), (f), ZCL_SEQ_NUM, (g)))
 
 #endif /* ZCL_READ */
 
@@ -730,6 +730,7 @@ status_t zcl_readWithMfgCode(u8 srcEp, epInfo_t *pDstEpInfo, u16 clusterId, u32 
  * @param[in]   srcEp - source endpoint
  * @param[in]   pDstEpInfo - destination endpoint information
  * @param[in]   clusterId - cluster ID
+ * @param[in]   manuCode - manufacturer code for proprietary extensions to a profile
  * @param[in]   cmd - command ID
  * @param[in]   disableDefaultRsp - disable Default Response command
  * @param[in]   direction - specified the command direction
@@ -738,13 +739,11 @@ status_t zcl_readWithMfgCode(u8 srcEp, epInfo_t *pDstEpInfo, u16 clusterId, u32 
  *
  * @return      status_t
  */
-status_t zcl_writeReq(u8 srcEp, epInfo_t *pDstEpInfo, u16 clusterId, u8 cmd, u8 disableDefaultRsp, u8 direction, u8 seqNo, zclWriteCmd_t *writeCmd);
-#define zcl_sendWriteCmd(a,b,c,d,e,f)			(zcl_writeReq((a), (b), (c), ZCL_CMD_WRITE, (d), (e), ZCL_SEQ_NUM, (f)))
-#define zcl_sendWriteUndividedCmd(a,b,c,d,e,f)	(zcl_writeReq((a), (b), (c), ZCL_CMD_WRITE_UNDIVIDED, (d), (e), ZCL_SEQ_NUM, (f)))
-#define zcl_sendWriteNoRspCmd(a,b,c,d,e,f)		(zcl_writeReq((a), (b), (c), ZCL_CMD_WRITE_NO_RSP, (d), (e), ZCL_SEQ_NUM, (f)))
-
-status_t zcl_writeWithMfgCode(u8 srcEp, epInfo_t *pDstEpInfo, u16 clusterId, u32 manuCode, u8 disableDefaultRsp, u8 direction, u8 seqNo, zclWriteCmd_t *writeCmd);
-#define zcl_sendWriteWithMfgCodeCmd(a,b,c,d,e,f,g)	(zcl_writeWithMfgCode((a), (b), (c), (d), (e), (f), ZCL_SEQ_NUM, (g)))
+status_t zcl_writeReq(u8 srcEp, epInfo_t *pDstEpInfo, u16 clusterId, u16 manuCode, u8 cmd, u8 disableDefaultRsp, u8 direction, u8 seqNo, zclWriteCmd_t *writeCmd);
+#define zcl_sendWriteCmd(a,b,c,d,e,f)				(zcl_writeReq((a), (b), (c), 0, ZCL_CMD_WRITE, (d), (e), ZCL_SEQ_NUM, (f)))
+#define zcl_sendWriteWithMfgCodeCmd(a,b,c,d,e,f,g)	(zcl_writeReq((a), (b), (c), (d), ZCL_CMD_WRITE, (e), (f), ZCL_SEQ_NUM, (g)))
+#define zcl_sendWriteUndividedCmd(a,b,c,d,e,f)		(zcl_writeReq((a), (b), (c), 0, ZCL_CMD_WRITE_UNDIVIDED, (d), (e), ZCL_SEQ_NUM, (f)))
+#define zcl_sendWriteNoRspCmd(a,b,c,d,e,f)			(zcl_writeReq((a), (b), (c), 0, ZCL_CMD_WRITE_NO_RSP, (d), (e), ZCL_SEQ_NUM, (f)))
 
 #endif /* ZCL_WRITE */
 
@@ -762,20 +761,14 @@ status_t zcl_writeWithMfgCode(u8 srcEp, epInfo_t *pDstEpInfo, u16 clusterId, u32
  *
  * @return      None
  */
-status_t zcl_configReport(u8 srcEp, epInfo_t *pDstEpInfo, u16 clusterId, u8 disableDefaultRsp, u8 direction, u8 seqNo, zclCfgReportCmd_t *cfgReportCmd);
-#define zcl_sendCfgReportCmd(a,b,c,d,e,f)	(zcl_configReport((a), (b), (c), (d), (e), ZCL_SEQ_NUM, (f)))
+status_t zcl_configReport(u8 srcEp, epInfo_t *pDstEpInfo, u16 clusterId, u16 manuCode, u8 disableDefaultRsp, u8 direction, u8 seqNo, zclCfgReportCmd_t *cfgReportCmd);
+#define zcl_sendCfgReportCmd(a,b,c,d,e,f)	(zcl_configReport((a), (b), (c), 0, (d), (e), ZCL_SEQ_NUM, (f)))
 
-status_t zcl_configReportRsp(u8 srcEp, epInfo_t *pDstEpInfo, u16 clusterId, u8 disableDefaultRsp, u8 direction, u8 seqNo, zclCfgReportRspCmd_t *cfgReportRspCmd);
-#define zcl_sendCfgReportRspCmd(a,b,c,d,e,f)	(zcl_configReportRsp((a), (b), (c), (d), (e), ZCL_SEQ_NUM, (f)))
+status_t zcl_readReportConfig(u8 srcEp, epInfo_t *pDstEpInfo, u16 clusterId, u16 manuCode, u8 disableDefaultRsp, u8 direction, u8 seqNo, zclReadReportCfgCmd_t *readReportCfgCmd);
+#define zcl_sendReadReportCfgCmd(a,b,c,d,e,f)	(zcl_readReportConfig((a), (b), (c), 0, (d), (e), ZCL_SEQ_NUM, (f)))
 
-status_t zcl_readReportConfig(u8 srcEp, epInfo_t *pDstEpInfo, u16 clusterId, u8 disableDefaultRsp, u8 direction, u8 seqNo, zclReadReportCfgCmd_t *readReportCfgCmd);
-#define zcl_sendReadReportCfgCmd(a,b,c,d,e,f)	(zcl_readReportConfig((a), (b), (c), (d), (e), ZCL_SEQ_NUM, (f)))
-
-status_t zcl_readReportConfigRsp(u8 srcEp, epInfo_t *pDstEpInfo, u16 clusterId, u8 disableDefaultRsp, u8 direction, u8 seqNo, zclReadReportCfgRspCmd_t *readReportCfgRspCmd);
-#define zcl_sendReadReportCfgRspCmd(a,b,c,d,e,f)	(zcl_readReportConfigRsp((a), (b), (c), (d), (e), ZCL_SEQ_NUM, (f)))
-
-status_t zcl_report(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 direction, u8 seqNo, u16 clusterId, u16 attrID, u8 dataType, u8 *pData);
-#define zcl_sendReportCmd(a,b,c,d,e,f,g,h) 	(zcl_report((a), (b), (c), (d), ZCL_SEQ_NUM, (e), (f), (g), (h)))
+status_t zcl_report(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 direction, u8 seqNo, u16 manuCode, u16 clusterId, u16 attrID, u8 dataType, u8 *pData);
+#define zcl_sendReportCmd(a,b,c,d,e,f,g,h) 	(zcl_report((a), (b), (c), (d), ZCL_SEQ_NUM, 0, (e), (f), (g), (h)))
 
 //for internal
 void zcl_reportingTabInit(void);
@@ -802,6 +795,7 @@ void reportAttrTimerStop(void);
  * @param[in]   srcEp - source endpoint
  * @param[in]   pDstEpInfo - destination endpoint information
  * @param[in]   clusterId - cluster ID
+ * @param[in]   manuCode - manufacturer code for proprietary extensions to a profile
  * @param[in]   disableDefaultRsp - disable Default Response command
  * @param[in]   direction - specified the command direction
  * @param[in]   seqNo - identification number for the transaction
@@ -809,17 +803,11 @@ void reportAttrTimerStop(void);
  *
  * @return      status_t
  */
-status_t zcl_discAttrs(u8 srcEp, epInfo_t *pDstEpInfo, u16 clusterId, u8 disableDefaultRsp, u8 direction, u8 seqNo, zclDiscoverAttrCmd_t *discAttrCmd);
-#define zcl_sendDiscAttrsCmd(a,b,c,d,e,f)	(zcl_discAttrs((a), (b), (c), (d), (e), ZCL_SEQ_NUM, (f)))
+status_t zcl_discAttrs(u8 srcEp, epInfo_t *pDstEpInfo, u16 clusterId, u16 manuCode, u8 disableDefaultRsp, u8 direction, u8 seqNo, zclDiscoverAttrCmd_t *discAttrCmd);
+#define zcl_sendDiscAttrsCmd(a,b,c,d,e,f)	(zcl_discAttrs((a), (b), (c), 0, (d), (e), ZCL_SEQ_NUM, (f)))
 
-status_t zcl_discAttrsRsp(u8 srcEp, epInfo_t *pDstEpInfo, u16 clusterId, u8 disableDefaultRsp, u8 direction, u8 seqNo, zclDiscoverAttrRspCmd_t *discAttrRspCmd);
-#define zcl_sendDiscAttrsRspCmd(a,b,c,d,e,f)	(zcl_discAttrsRsp((a), (b), (c), (d), (e), ZCL_SEQ_NUM, (f)))
-
-status_t zcl_discAttrsExtended(u8 srcEp, epInfo_t *pDstEpInfo, u16 clusterId, u8 disableDefaultRsp, u8 direction, u8 seqNo, zclDiscoverAttrCmd_t *discAttrCmd);
-#define zcl_sendDiscAttrsExtendedCmd(a,b,c,d,e,f)	(zcl_discAttrsExtended((a), (b), (c), (d), (e), ZCL_SEQ_NUM, (f)))
-
-status_t zcl_discAttrsExtendedRsp(u8 srcEp, epInfo_t *pDstEpInfo, u16 clusterId, u8 disableDefaultRsp, u8 direction, u8 seqNo, zclDiscoverAttrExtRspCmd_t *discAttrExtRspCmd);
-#define zcl_sendDiscAttrsExtendedRspCmd(a,b,c,d,e,f)	(zcl_discAttrsExtendedRsp((a), (b), (c), (d), (e), ZCL_SEQ_NUM, (f)))
+status_t zcl_discAttrsExtended(u8 srcEp, epInfo_t *pDstEpInfo, u16 clusterId, u16 manuCode, u8 disableDefaultRsp, u8 direction, u8 seqNo, zclDiscoverAttrCmd_t *discAttrCmd);
+#define zcl_sendDiscAttrsExtendedCmd(a,b,c,d,e,f)	(zcl_discAttrsExtended((a), (b), (c), 0, (d), (e), ZCL_SEQ_NUM, (f)))
 
 #endif /* ZCL_DISCOVER */
 

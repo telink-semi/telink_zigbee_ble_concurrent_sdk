@@ -54,7 +54,11 @@ typedef struct{
 
 #ifndef  ZB_BUF_POOL_NUM
 	#if defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
-		#define ZB_BUF_POOL_NUM			36
+		#if ZB_ROUTER_ROLE
+			#define ZB_BUF_POOL_NUM			36
+		#else
+			#define ZB_BUF_POOL_NUM			18
+		#endif
 	#else
 		#ifdef CHIP_8269
 			#define ZB_BUF_POOL_NUM		36

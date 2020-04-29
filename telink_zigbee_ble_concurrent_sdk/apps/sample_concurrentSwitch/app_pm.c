@@ -71,6 +71,7 @@ s32 app_pollRateHold(void *arg){
 
 void app_zigbeePollRateRecovery(void){
 	zb_setPollRate(RESPONSE_POLL_RATE);
+	extern void secondClockRun(void);
 	secondClockRun();
 
 	if(g_switchAppCtx.timerPollHold){
@@ -87,6 +88,7 @@ void app_pm_init(void){
 }
 
 volatile u8 T_app_pm_taskCnt[4] = {0};
+extern u32 blt_pm_proc(void);
 void app_pm_task(void){
 	T_app_pm_taskCnt[0]++;
 
@@ -105,7 +107,7 @@ void app_pm_task(void){
 	}
 
 	if(T_bleAllowSleep && T_zbAllowSleep){
-		pm_deepSleepEnter(PLATFORM_WAKEUP_PAD, 0);
+		pm_deepSleepEnter(PLATFORM_MODE_DEEPSLEEP, PLATFORM_WAKEUP_PAD, 0);
 	}
 }
 #endif

@@ -539,8 +539,20 @@ _CODE_ZCL_ static status_t zcl_ota_imageNotifyPrc(zclIncoming_t *pInMsg)
 	u8 *pData = pInMsg->pData;
     apsdeDataInd_t *pApsdeInd = (apsdeDataInd_t*)pInMsg->msg;
 
+#ifdef ZCL_WWAH
+	bool disable = FALSE;
+	u16 len;
+
+	if(zcl_getAttrVal(pApsdeInd->indInfo.dst_ep, ZCL_CLUSTER_WWAH, ZCL_ATTRID_WWAH_DISABLE_OTA_DOWNGRADES, &len, (u8 *)&disable) == ZCL_STA_SUCCESS){
+		if(disable){
+			return ZCL_STA_ACTION_DENIED;
+		}
+	}
+#endif
+
 	if(pInMsg->clusterAppCb){
 		zclIncomingAddrInfo_t addrInfo;
+		addrInfo.apsSec = pInMsg->msg->indInfo.security_status & SECURITY_IN_APSLAYER ? TRUE : FALSE;
 		addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
 		addrInfo.profileId = pApsdeInd->indInfo.profile_id;
 		addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;

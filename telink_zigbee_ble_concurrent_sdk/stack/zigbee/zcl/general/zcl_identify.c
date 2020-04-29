@@ -123,6 +123,10 @@ _CODE_ZCL_ static status_t zcl_identifyQueryPrc(zclIncoming_t *pInMsg)
 		    dstEp.dstAddr.shortAddr = pApsdeInd->indInfo.src_short_addr;
 		    dstEp.dstEp = pApsdeInd->indInfo.src_ep;
 		    dstEp.profileId = pApsdeInd->indInfo.profile_id;
+			dstEp.txOptions |= APS_TX_OPT_ACK_TX;
+			if(pInMsg->msg->indInfo.security_status & SECURITY_IN_APSLAYER){
+				dstEp.txOptions |= APS_TX_OPT_SECURITY_ENABLED;
+			}
 
 		    zcl_identify_identifyQueryRsp(endpoint, &dstEp, TRUE, pInMsg->hdr.seqNum, identifyTime);
 

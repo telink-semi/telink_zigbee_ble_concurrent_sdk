@@ -41,9 +41,11 @@
 volatile u8 T_bleCmdDbg[64] = {0};
 int zb_ble_ci_cmd_handler(u16 cmdId, u8 len, u8 * payload){
 	T_bleCmdDbg[0] = len;
-	memcpy(&T_bleCmdDbg[1], &cmdId, 2);
-	memcpy(&T_bleCmdDbg[3], payload, len);
+	memcpy((u8*)&T_bleCmdDbg[1], (u8*)&cmdId, 2);
+	memcpy((u8*)&T_bleCmdDbg[3], payload, len);
 	zbhciCmdHandler(cmdId, (u16)len, payload);
+
+	return 0;
 }
 
 #endif  /* __PROJECT_TL_CONCURRENT_GW__ */
