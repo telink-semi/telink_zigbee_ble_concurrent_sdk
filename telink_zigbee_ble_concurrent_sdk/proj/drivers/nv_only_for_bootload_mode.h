@@ -119,6 +119,8 @@ enum{
 	NV_ADDR_FOR_ZB_INFO			=	0x26000,
 	NV_ADDR_FOR_BLE_INFO		=	0x3C000,
 
+	NV_ADDR_FOR_OTA             =   0x40000,
+
 #if DUAL_MODE
 	NV_ADDR_FOR_SDK_TYPE		=	0x24000,
 	/* the following setting not be used in boot load mode*/

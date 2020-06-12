@@ -52,6 +52,8 @@ enum{
  */
 #if FLASH_SIZE_1M
 enum{
+	NV_ADDR_FOR_OTA             =   0x40000,
+
 	NV_ADDR_FACTORY_RST_CNT	   	=	0xF6000,
 	NV_ADDR_FOR_BLE_INFO		=	0xF7000,
 	NV_ADDR_FOR_ZB_INSTALL_CODE	=	0xFC000,
@@ -66,6 +68,8 @@ enum{
 };
 #else
 enum{
+	NV_ADDR_FOR_OTA             =   0x40000,
+
 	NV_ADDR_FOR_BLE_INFO		=	0x74000,
 	NV_ADDR_FOR_ZB_INSTALL_CODE	=	0x78000,
 	NV_ADDR_FACTORY_RST_CNT	   	=	0x79000,

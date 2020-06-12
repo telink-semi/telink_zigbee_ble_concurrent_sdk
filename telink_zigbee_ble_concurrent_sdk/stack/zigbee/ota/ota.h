@@ -26,12 +26,7 @@
 #include "../zdo/zb_af.h"
 #include "../zcl/zcl.h"
 
-//OTA: define for 8267/8269
-#if DUAL_MODE_SW_BOOT
-#define	FLASH_OTA_NEWIMAGE_ADDR						0x40000//256K
-#else
-#define	FLASH_OTA_NEWIMAGE_ADDR						0x40000//256K
-#endif
+#define	FLASH_OTA_NEWIMAGE_ADDR						NV_ADDR_FOR_OTA
 
 #define	OTA_TLNK_KEYWORD_ADDROFFSET					8
 #define	OTA_IMAGESECTORHDR_SIZE						6

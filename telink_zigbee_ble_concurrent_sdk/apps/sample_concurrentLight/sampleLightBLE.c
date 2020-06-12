@@ -475,7 +475,7 @@ const attribute_t my_Attributes[] = {
 	// 002e - 0031
 	{4,ATT_PERMISSIONS_READ, 2,16,(u8*)(&my_primaryServiceUUID), 	(u8*)(&my_OtaServiceUUID), 0},
 	{0,ATT_PERMISSIONS_READ, 2, 1,(u8*)(&my_characterUUID), 		(u8*)(&PROP_READ_WRITE_NORSP), 0},				//prop
-	{0,ATT_PERMISSIONS_RDWR,16,sizeof(my_OtaData),(u8*)(&my_OtaUUID),	(u8 *)(&my_OtaData), &app_bleOtaWrite, &app_bleOtaRead},			//value
+	{0,ATT_PERMISSIONS_RDWR,16,sizeof(my_OtaData),(u8*)(&my_OtaUUID),	(u8 *)(&my_OtaData), &otaWrite/*&app_bleOtaWrite*/, &app_bleOtaRead},			//value
 	{0,ATT_PERMISSIONS_READ, 2,sizeof (my_OtaName),(u8*)(&userdesc_UUID), (u8*)(my_OtaName), 0},
 
 };
@@ -791,6 +791,16 @@ void	app_bleAdvIntervalSwitch(u16 minInterval, u16 maxInterval){
 	bls_ll_setAdvEnable(1);  //must: set adv enable
 }
 
+static void app_enter_ota_mode(void){
+	//ota_is_working = 1;
+	light_blink_start(0, 200, 200);
+
+	//bls_l2cap_requestConnParamUpdate (8, 8, 0, 400);  // 1 S
+
+	bls_ota_setTimeout(260 * 1000 * 1000); //set OTA timeout  120 seconds
+}
+
+
 void user_ble_init(void)
 {
 	//random number generator must be initiated here( in the beginning of user_init_nromal)
@@ -915,6 +925,18 @@ void user_ble_init(void)
 	bls_app_registerEventCallback (BLT_EV_FLAG_CONN_PARA_UPDATE, &task_conn_update_done);
 
 
+#if (BLE_REMOTE_OTA_ENABLE)
+	//bls_ota_set_fwSize_and_fwBootAddr(64, 0x40000);
+	extern u8 mcuBootAddrGet(void);
+	u8 bootAddr = mcuBootAddrGet();
+	u32 baseAddr = (bootAddr) ? 0 : NV_ADDR_FOR_OTA;
+	bls_ota_set_fwBootAddr(baseAddr);
+
+	////////////////// OTA relative ////////////////////////
+	bls_ota_clearNewFwDataArea(); //must
+	bls_ota_registerStartCmdCb(app_enter_ota_mode);
+	//bls_ota_registerResultIndicateCb(app_debug_ota_result);  //debug
+#endif
 
 	///////////////////// Power Management initialization///////////////////
 #if(BLE_APP_PM_ENABLE)

@@ -114,6 +114,8 @@ extern "C" {
 #endif
 #define ZCL_WWAH_SUPPORT							1
 
+#define	BLE_REMOTE_OTA_ENABLE						1
+
 #define AF_TEST_ENABLE			1
 
 ///////////////////  Zigbee Profile Configuration /////////////////////////////////
