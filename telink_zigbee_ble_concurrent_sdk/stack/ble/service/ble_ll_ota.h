@@ -104,8 +104,6 @@ extern int otaRead(void * p);
 //firmware_size_k  must be 4k aligned
 void bls_ota_set_fwSize_and_fwBootAddr(int firmware_size_k, int boot_addr);
 
-#define bls_ota_set_fwBootAddr(addr)  do{ota_program_offset = addr;}while(0)
-
 
 
 void bls_ota_clearNewFwDataArea(void);

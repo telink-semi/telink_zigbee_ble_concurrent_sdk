@@ -791,6 +791,11 @@ s32 zbhci_nodeManageCmdHandler(void *arg){
 		zcl_ota_imageNotifyCmdSend(srcEp, &dstEpInfo, FALSE, &in);
 #endif
 	}
+	else if(cmdID == ZBHCI_CMD_NWK_KEY_UPDATE){
+		zb_nwkKeyUpdate(g_zero_addr, &p);
+	}else if(cmdID == ZBHCI_CMD_NWK_KEY_SWITCH){
+		zb_nwkKeySwitch(g_zero_addr);
+	}
 
 	ev_buf_free(arg);
 
@@ -851,6 +856,8 @@ void zbhciCmdHandler(u16 msgType, u16 msgLen, u8 *p){
 			case ZBHCI_CMD_TXRX_PERFORMANCE_TEST_REQ:
 			case ZBHCI_CMD_AF_DATA_SEND_TEST_REQ:
 			case ZBHCI_CMD_OTA_NOTIFICATION_REQ:
+			case ZBHCI_CMD_NWK_KEY_UPDATE:
+			case ZBHCI_CMD_NWK_KEY_SWITCH:
 				TL_ZB_TIMER_SCHEDULE(zbhci_nodeManageCmdHandler, cmdInfo, 100 * 1000);
 				break;
 

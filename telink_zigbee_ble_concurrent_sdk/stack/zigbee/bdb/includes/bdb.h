@@ -180,6 +180,7 @@ enum{
 	BDB_COMMISSION_STA_TCLK_EX_FAILURE,		//<! The Trust Center link key exchange procedure has failed attempting to join a centralized security network.
 
 	BDB_COMMISSION_STA_PARENT_LOST,
+	BDB_COMMISSION_STA_REJOIN_FAILURE,
 	BDB_COMMISSION_STA_FORMATION_DONE,
 };
 /** @} end of group CommissioningStatus */
@@ -557,6 +558,16 @@ void bdb_zdoStartDevCnf(void *arg);   //zdo_start_device_confirm_t* startDevCnf)
 void tl_bdbAttrInit(void);
 
 /**
+ * @brief      bdb use install code
+ *
+ * @param[in]   pInstallCode
+ * @param[out]  pKey
+ *
+ * @return      None
+ */
+void tl_bdbUseInstallCode(u8 *pInstallCode, u8 *pKey);
+
+/**
  * @brief      bdb re-start
  *
  * @param[in]   none
@@ -583,10 +594,8 @@ void tl_bdbReset2FN(void);
  */
 void bdb_retrieveTcLinkKeyDone(u8 status);
 
-/*********************************************************************
- * @fn      check the bdb state
- *
- * @brief
+/**
+ * @brief	check the bdb state
  *
  * @param   1: idle, 0: busy
  *
@@ -595,14 +604,14 @@ void bdb_retrieveTcLinkKeyDone(u8 status);
 bool bdb_isIdle(void);
 
 /**
- * @brief      bdb use install code
+ * @brief      bdb_linkKeyCfg
  *
- * @param[in]   pInstallCode
- * @param[out]  pKey
+ * @param[in]   setting
+ * @param[in]   isFactoryNew
  *
  * @return      None
  */
-void tl_bdbUseInstallCode(u8 *pInstallCode, u8 *pKey);
+void bdb_linkKeyCfg(bdb_commissionSetting_t *setting, u8 isFactoryNew);
 
 /** @} end of group zb_bdb_attr */
 

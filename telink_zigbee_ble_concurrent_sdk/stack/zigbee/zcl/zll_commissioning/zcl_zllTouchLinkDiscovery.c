@@ -36,6 +36,7 @@
 _CODE_ZCL_  void zcl_zllTouchLinkDiscoveyStop(void);
 _CODE_ZCL_  void zcl_zllTouchLinkDiscoveyStart(void);
 extern zcl_zllCommission_t g_zllCommission;
+extern bool scanReqProfileInterop;
 
 s32 zcl_touchLinkIdentifyRequestDone(void *arg){
 	u32 sta = (u32)arg;
@@ -186,7 +187,11 @@ _CODE_ZCL_ void zcl_zllTouchLinkDeviceInformationRequestHandler(epInfo_t *dstEp,
 					rec->deviceId = aed[i].correspond_simple_desc->app_dev_id;
 					rec->epId = aed[i].ep;
 					rec->groupIdCnt = 0;
-					rec->profileId = aed[i].correspond_simple_desc->app_profile_id;
+					if(scanReqProfileInterop){
+						rec->profileId = aed[i].correspond_simple_desc->app_profile_id;
+					}else{
+						rec->profileId = LL_PROFILE_ID;
+					}
 					rec->sort = 0;
 					rec->version = aed[i].correspond_simple_desc->app_dev_ver;
 					memcpy(rec->ieeeAddr, MAC_IB().extAddress, 8);
@@ -310,7 +315,11 @@ _CODE_ZCL_  void zcl_zllTouchLinkScanRequestHandler(epInfo_t *srcEp, u8 seqNo){
 		for(u8 i = 0; i < af_availableEpNumGet(); i++){
 			if(af_clsuterIdMatched(ZCL_CLUSTER_TOUCHLINK_COMMISSIONING, aed[i].correspond_simple_desc)){
 				resp.subDevInfo.epId = aed[i].ep;
-				resp.subDevInfo.profileId = aed[i].correspond_simple_desc->app_profile_id;
+				if(scanReqProfileInterop){
+					resp.subDevInfo.profileId = aed[i].correspond_simple_desc->app_profile_id;
+				}else{
+					resp.subDevInfo.profileId = LL_PROFILE_ID;
+				}
 				resp.subDevInfo.deviceId = aed[i].correspond_simple_desc->app_dev_id;
 				resp.subDevInfo.version = aed[i].correspond_simple_desc->app_dev_ver;
 				resp.subDevInfo.groupIdCnt  = 0; //TODO - find group identifier count needed  for this end device.

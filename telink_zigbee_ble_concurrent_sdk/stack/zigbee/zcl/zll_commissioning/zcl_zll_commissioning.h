@@ -170,7 +170,8 @@ typedef struct{
 			u8 resv0:2;				/*!< reserved */
 			u8 linkInitiator:1;		/*!< touch link initiator */
 			u8 priorityReq:1;		/*!< priority request */
-			u8 resv1:2;				/*!< reserved */
+			u8 resv1:1;				/*!< reserved */
+			u8 profileInterop:1;		/*!< 1:zigbee3.0,0:ZLL profile*/
 		}bf;
 		u8 byte;
 	};
@@ -536,7 +537,7 @@ status_t zcl_touchlink_register(u8 endpoint, const zcl_touchlinkAppCallbacks_t *
  *
  * @return
  */
-void zcl_touchLinkDevStartIndicate(void);
+s32 zcl_touchLinkDevStartIndicate(void *arg);
 
 /**
  * @brief       start touck link.

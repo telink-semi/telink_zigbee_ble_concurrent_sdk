@@ -714,3 +714,24 @@ void zb_preConfigNwkKey(u8 *nwkKey, bool enTransKey);
  **************************************************************************/
 u32 zb_getPollRate(void);
 
+
+/* @brief       update network key
+ *
+ * @param       dstAddr destination ieee address; 0: broadcast: others: unicate
+ *
+ * @param       key new network key
+ *
+ * @return      SUCCESS or FAILURE
+ *
+ **************************************************************************/
+u8 zb_nwkKeyUpdate(addrExt_t dstIeeeAddr, u8 *key);
+
+
+/* @brief       switch network key
+ *
+ * @ dstAddr    dstAddr destination ieee address; 0: broadcast: others: unicate
+ *
+ * @return       SUCCESS or FAILURE
+ *
+ **************************************************************************/
+u8 zb_nwkKeySwitch(addrExt_t dstIeeeAddr);

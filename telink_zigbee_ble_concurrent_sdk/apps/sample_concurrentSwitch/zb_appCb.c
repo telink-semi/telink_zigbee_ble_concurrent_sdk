@@ -51,7 +51,9 @@ void zbdemo_bdbCommissioningCb(u8 status, void *arg);
 void zbdemo_bdbIdentifyCb(u8 endpoint, u16 srcAddr, u16 identifyTime);
 void zbdemo_bdbFindBindSuccessCb(findBindDst_t *pDstInfo);
 
+#if PM_ENABLE
 extern void app_zigbeePollRateRecovery(void);
+#endif
 /**********************************************************************
  * LOCAL VARIABLES
  */
@@ -125,7 +127,9 @@ void zbdemo_bdbInitCb(u8 status, u8 joinedNetwork){
 		 *
 		 * */
 		if(joinedNetwork){
+#if PM_ENABLE
 			app_zigbeePollRateRecovery();
+#endif
 
 #ifdef ZCL_OTA
 			ota_queryStart(OTA_CHECK_PERIOD_MIN);
@@ -169,8 +173,9 @@ void zbdemo_bdbCommissioningCb(u8 status, void *arg){
 
 	if(status == BDB_COMMISSION_STA_SUCCESS){
 		T_zbdemoBdbInfo[5]++;
-
+#if PM_ENABLE
 		app_zigbeePollRateRecovery();
+#endif
 
 #ifdef ZCL_POLL_CTRL
 		sampleSwitch_zclCheckInStart();

@@ -930,7 +930,7 @@ void user_ble_init(void)
 	extern u8 mcuBootAddrGet(void);
 	u8 bootAddr = mcuBootAddrGet();
 	u32 baseAddr = (bootAddr) ? 0 : NV_ADDR_FOR_OTA;
-	bls_ota_set_fwBootAddr(baseAddr);
+	bls_ota_set_fwSize_and_fwBootAddr(256, baseAddr);
 
 	////////////////// OTA relative ////////////////////////
 	bls_ota_clearNewFwDataArea(); //must

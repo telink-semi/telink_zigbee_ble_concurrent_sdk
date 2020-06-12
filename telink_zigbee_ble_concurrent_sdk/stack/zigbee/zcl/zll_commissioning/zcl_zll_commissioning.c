@@ -52,6 +52,8 @@ zcl_zllTouckLink_t g_zllTouchLink = {
 		.keyType = MASTER_KEY,
 };
 
+bool scanReqProfileInterop = 0;
+
 zcl_zllCommission_t g_zllCommission;
 
 touchlink_attr_t g_touchlinkAttrDft = { 0x0001, 0xfff7, 0x0001, 0xfeff };
@@ -61,6 +63,7 @@ zdo_touchLinkCb_t touchLinkCb = {zcl_zllTouchLinkLeaveCnfCb};
 #define TOUCHLIK_INITIATOR_SET(mode) 		g_zllTouchLink.zllInfo.bf.linkInitiator = mode
 #define TOUCHLIK_ADDR_ASSIGN_SET(mode) 		g_zllTouchLink.zllInfo.bf.addrAssign = mode
 #define TOUCHLIK_FACTORY_NEW_SET(mode) 		g_zllTouchLink.zllInfo.bf.factoryNew = mode
+#define TOUCHLIK_PROFILE_INTEROP_SET(mode) 	g_zllTouchLink.zllInfo.bf.profileInterop = mode
 
 /*
  * @fn      zcl_zllGetGroupIdentifiersRequest
@@ -383,6 +386,7 @@ _CODE_ZCL_ static u8 zcl_touchLinkClientCmdHandler(zclIncoming_t *pInMsg){
 			g_zllTouchLink.respId += ZB_RANDOM();
 			g_zllTouchLink.transId = scanReq.transId;
 			g_zllTouchLink.state = ZCL_ZLL_COMMISSION_STATE_TOUCHLINK_DISCOVERY;
+			scanReqProfileInterop = scanReq.zllInfo.bf.profileInterop;
 
 			zcl_zllTouchLinkScanRequestHandler(&srcEpInfo, pInMsg->hdr.seqNum);
 			break;
@@ -410,7 +414,7 @@ _CODE_ZCL_ static u8 zcl_touchLinkClientCmdHandler(zclIncoming_t *pInMsg){
 					g_zllTouchLink.networkStartInfo->seqNo = pInMsg->hdr.seqNum;
 					memcpy(&g_zllTouchLink.networkStartInfo->initiatorEpInfo, &srcEpInfo, sizeof(epInfo_t));
 					g_zllTouchLink.networkStartInfo->joinNetworkMode = ZCL_ZLL_COMMISSIONING_TOUCH_LICK_MODE_START;
-					zcl_zllTouchLinkNetworkStartRequstHandler();
+					zcl_zllTouchLinkNetworkStartRequstHandler(pReq->logicalChannel);
 				}else{
 					ev_buf_free((u8 *)g_zllTouchLink.networkStartInfo);
 					g_zllTouchLink.networkStartInfo = NULL;
@@ -702,7 +706,7 @@ _CODE_ZCL_ static u8 zcl_zllCommissionServerCmdHandler(zclIncoming_t *pInMsg){
 		case ZCL_CMD_ZLL_COMMISSIONING_GET_ENDPOINT_LIST_RSP:
 		{
 			zcl_zllUtilityGetEpListResp_t epListResp;
-			memcpy((u8 *)&epListResp, pInMsg->pData, sizeof(zcl_zllUtilityEndpointInfo_t));
+			memcpy((u8 *)&epListResp, pInMsg->pData, sizeof(zcl_zllUtilityGetEpListResp_t));
 			epListResp.epInfoRecord = NULL;
 
 			u16 pldLen = epListResp.count * sizeof(zcl_zllEndpointInfo_t);
@@ -820,6 +824,7 @@ _CODE_ZCL_ void zcl_touchLinkStart(void){
 
 	g_zllTouchLink.zllInfo.bf.linkInitiator = 1;
 	g_zllTouchLink.zllInfo.bf.addrAssign = 1;
+	g_zllTouchLink.zllInfo.bf.profileInterop = 1;
 
 	/* restore the setting */
 	g_zllTouchLink.networkStartInfo = NULL;

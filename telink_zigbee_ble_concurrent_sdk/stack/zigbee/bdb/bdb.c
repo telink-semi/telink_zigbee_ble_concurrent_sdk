@@ -26,7 +26,6 @@
 #include "../zcl/zcl_include.h"
 #include "../zcl/zll_commissioning/zcl_zll_commissioning_internal.h"
 
-#define POLY						0x8408
 
 /**********************************************************************
  * GLOBAL VARIABLES
@@ -39,6 +38,8 @@ bdb_ctx_t g_bdbCtx = {0};
 #define	BDB_COMMISSION_TIME_INTV				5   //second
 
 #define	BDB_TOUCHLINK_CAP_EN()		(g_bdbAttrs.nodeCommissioningCapability & BDB_NODE_COMMISSION_CAP_TOUCHLINK)
+
+#define POLY						0x8408
 
 /**********************************************************************
  * LOCAL FUNCTIONS
@@ -57,7 +58,6 @@ static void bdb_retrieveTcLinkKeyTimerStop(void);
 static void bdb_touchLinkCallback(u8 status, void *arg);
 static void bdb_commssionUtilityCallback(u8 cmd, void *arg);
 
-extern void bdb_linkKeyCfg( bdb_commissionSetting_t *setting, u8 fn);
 extern void bdb_touchLinkPreCfg(u8 endpoint, bdb_commissionSetting_t *setting, const zcl_touchlinkAppCallbacks_t *tlCb);
 extern void bdb_coordinatorStart(void);
 extern void bdb_routerStart(void);
@@ -379,6 +379,7 @@ _CODE_BDB_ static void bdb_findingAndBinding(findBindDst_t *pDstInfo)
 	zdo_bind_dstAddr_t bindDstAddr;
 	memset((u8 *)&bindDstAddr, 0, sizeof(zdo_bind_dstAddr_t));
 
+#ifdef ZCL_GROUP
 	if(g_bdbAttrs.commissioningGroupId != 0xFFFF){
 		epInfo_t dstEpInfo;
 		TL_SETSTRUCTCONTENT(dstEpInfo, 0);
@@ -397,7 +398,9 @@ _CODE_BDB_ static void bdb_findingAndBinding(findBindDst_t *pDstInfo)
 		bindDstAddr.dstAddr.dstGroupId = g_bdbAttrs.commissioningGroupId;
 
 		bdb_binding(&bindDstAddr, g_bdbCtx.matchClusterNum, g_bdbCtx.matchClusterList);
-	}else{
+	}else
+#endif
+	{
 		addrExt_t dstExtAddr;
 		ZB_IEEE_ADDR_ZERO(dstExtAddr);
 
@@ -593,7 +596,9 @@ _CODE_BDB_ static s32 bdb_findBindIdentifyTimeout(void *arg)
 	u16 identifyTime = 0;
 	u16 attrLen = 0;
 
-	zcl_getAttrVal(g_bdbCtx.simpleDesc->endpoint, ZCL_CLUSTER_GEN_IDENTIFY, ZCL_ATTRID_IDENTIFY_TIME, &attrLen, (u8 *)&identifyTime);
+	if(zcl_getAttrVal(g_bdbCtx.simpleDesc->endpoint, ZCL_CLUSTER_GEN_IDENTIFY, ZCL_ATTRID_IDENTIFY_TIME, &attrLen, (u8 *)&identifyTime) != ZCL_STA_SUCCESS){
+		return -1;
+	}
 
 	if(identifyTime == 0 || timerIdentifyCnt++ >= BDBC_MIN_COMMISSIONING_TIME / BDB_COMMISSION_TIME_INTV){
 		timerIdentifyCnt = 0;
@@ -780,7 +785,6 @@ _CODE_BDB_ void bdb_retrieveTcLinkKeyDone(u8 status)
 	bdb_retrieveTcLinkKeyTimerStop();
 	if(status == BDB_COMMISSION_STA_SUCCESS){
 		g_bdbAttrs.nodeIsOnANetwork = 1;
-		g_zbNwkCtx.joinAccept = 1;
 		evt = BDB_EVT_COMMISSIONING_NETWORK_STEER_PERMITJOIN;
 	}else{
 		g_bdbAttrs.nodeIsOnANetwork = 0;
@@ -1048,7 +1052,9 @@ static void bdb_task(void *arg)
 				 * if no scan response received, start network steer
 				 * */
 				g_bdbAttrs.commissioningMode.touchlink = 0;
-				BDB_STATE_SET(BDB_STATE_IDLE);
+				BDB_STATE_SET(BDB_STATE_IDLE); //ststus = BDB_COMMISSION_STA_NO_SCAN_RESPONSE
+				g_bdbAttrs.commissioningStatus = BDB_STATUS_GET();
+
 #if ZB_ED_ROLE
 				bdb_topLevelCommissioning(BDB_COMMISSIONING_ROLE_INITIATOR);
 #else
@@ -1068,6 +1074,9 @@ static void bdb_task(void *arg)
 			if(evt == BDB_EVT_COMMISSIONING_NETWORK_STEER_RETRIEVE_TCLINK_KEY){
 				TL_ZB_TIMER_SCHEDULE(bdb_retrieveTcLinkKeyStart, NULL, 1*1000*1000);
 			}else if(evt == BDB_EVT_COMMISSIONING_NETWORK_STEER_PERMITJOIN){
+#if ZB_ROUTER_ROLE
+				g_zbNwkCtx.joinAccept = 1;
+#endif
 				u8 sn = 0;
 				zb_mgmtPermitJoinReqTx(0xffff, BDBC_MIN_COMMISSIONING_TIME, 0x01, &sn, NULL);
 				TL_SCHEDULE_TASK(bdb_mgmtPermitJoiningConfirm,NULL);
@@ -1152,8 +1161,12 @@ _CODE_BDB_ void bdb_zdoStartDevCnf(void *arg){
 					TL_SCHEDULE_TASK(bdb_commissioningInfoSave, NULL);
 				}
 			}else{
-				BDB_STATUS_SET(BDB_COMMISSION_STA_PARENT_LOST);
-				//g_bdbAttrs.commissioningStatus = BDB_COMMISSION_STA_TARGET_FAILURE;
+				if(startDevCnf->status == ZDO_NETWORK_LOST){
+					BDB_STATUS_SET(BDB_COMMISSION_STA_PARENT_LOST);
+				}else{
+					/* rejoin failed */
+					BDB_STATUS_SET(BDB_COMMISSION_STA_REJOIN_FAILURE);
+				}
 			}
 			evt = BDB_STATE_REJOIN_DONE;
 			TL_SCHEDULE_TASK(bdb_task, (void *)evt);
@@ -1172,7 +1185,8 @@ _CODE_BDB_ void bdb_zdoStartDevCnf(void *arg){
 			if(startDevCnf->status == SUCCESS){
 				g_bdbAttrs.nodeIsOnANetwork = 1;
 				g_zbNwkCtx.joinAccept = 1;
-				zcl_touchLinkDevStartIndicate();
+//				zcl_touchLinkDevStartIndicate();
+				TL_ZB_TIMER_SCHEDULE(zcl_touchLinkDevStartIndicate, NULL, 500*1000);
 			}else{
 				//g_bdbAttrs.commissioningStatus = BDB_COMMISSION_STA_NO_NETWORK;
 				BDB_STATUS_SET(BDB_COMMISSION_STA_NO_NETWORK);
@@ -1191,13 +1205,7 @@ _CODE_BDB_ void bdb_zdoStartDevCnf(void *arg){
 				}else{
 					evt = BDB_EVT_COMMISSIONING_NETWORK_STEER_PERMITJOIN;
 				}
-
-	#if ZB_ED_ROLE
-				u32 nwkStartDelay = 3*1000*1000;
-	#else
-				u32 nwkStartDelay = 200*1000;
-	#endif
-				TL_ZB_TIMER_SCHEDULE(bdb_task_delay, (void *)evt, nwkStartDelay);
+				TL_ZB_TIMER_SCHEDULE(bdb_task_delay, (void *)evt, 200 * 1000);
 			}else{
 				//g_bdbAttrs.commissioningStatus = BDB_COMMISSION_STA_NO_NETWORK;
 				BDB_STATUS_SET(BDB_COMMISSION_STA_NO_NETWORK);
@@ -1387,7 +1395,9 @@ _CODE_BDB_ u8 bdb_networkFormationStart(void)
 #if ZB_COORDINATOR_ROLE
 	ss_securityModeSet(SS_SEMODE_CENTRALIZED);
 #else
-	ss_securityModeSet(SS_SEMODE_DISTRIBUTED);
+	if((!g_bdbAttrs.nodeIsOnANetwork)||(ZB_IEEE_ADDR_IS_INVAILD(ss_ib.trust_center_address))){
+		ss_securityModeSet(SS_SEMODE_DISTRIBUTED);
+	}
 #endif
 
 	return bdb_topLevelCommissioning(BDB_COMMISSIONING_ROLE_TARGET);
@@ -1742,3 +1752,4 @@ _CODE_BDB_ void tl_bdbUseInstallCode(u8 *pInstallCode, u8 *pKey)
 
 	ss_mmoHash(tmpBuf, SEC_KEY_LEN + 2, pKey);
 }
+

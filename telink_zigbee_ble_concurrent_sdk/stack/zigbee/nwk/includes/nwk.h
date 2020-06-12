@@ -83,6 +83,18 @@
 #define NWK_BROADCAST_DELIVERY_TIME	 	5000//ms
 #endif
 
+/***************************************************************************
+* @brief	The number of times the first broadcast route request command
+*/
+#define NWK_INITIAL_RREQ_RETRIES 		3
+
+/***************************************************************************
+* @brief	The number of times the broadcast transmission of a route request
+* 			command frame is retries on relay by an intermediate ZigBee router
+* 			or ZigBee coordinator
+*/
+#define NWK_RREQ_RETRIES				2
+
 /****************************************************************************
 * @brief	Network layer debug flag
 */
@@ -1245,6 +1257,8 @@ typedef struct
   	bool 		used;
 }nlmeLeaveReqInfo_ctx_t;
 
+extern u8 NWKC_INITIAL_RREQ_RETRIES;
+extern u8 NWKC_RREQ_RETRIES;
 extern u16 ROUTING_TABLE_SIZE;
 extern u8 NWK_BRC_TRANSTBL_SIZE;
 extern bool NWK_BRC_PASSIVE_ACK_ENABLE;
@@ -1302,9 +1316,7 @@ u8 *nwkHdrBuilder(u8 *buf, nwk_hdr_t *pNwkHdr);
 
 void tl_zbNwkLinkStatusStart(void *arg);
 void tl_zbNwkLinkStatusStop(void);
-
-
-void tl_zbNwkRouteDiscStart(void *arg);
+void tl_zbNwkSendLinkStatus(void);
 
 void nwkEndDevTimeoutReqSend(reqTimeoutEnum_t reqTimeoutEnum, u8 endDevCfg);
 void keepaliveMsgSendStop(void);

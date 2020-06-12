@@ -71,7 +71,7 @@ void zcl_zllTouchLinkScanResponseHandler(zcl_zllTouchLinkScanResp_t *resp, epInf
 
 void zcl_zllTouchLinkNetworkStartOrJoin(void *arg);
 
-void zcl_zllTouchLinkNetworkStartRequstHandler(void);
+void zcl_zllTouchLinkNetworkStartRequstHandler(u8 logicChannel);
 
 s32 zcl_zllTouchLinkNetworkStartResponseHandler(void *arg);
 
