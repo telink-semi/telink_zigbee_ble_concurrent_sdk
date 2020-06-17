@@ -137,6 +137,8 @@ void zbdemo_bdbInitCb(u8 status, u8 joinedNetwork){
 				jitter &= 0xfff;
 			}while(jitter==0);
 			TL_ZB_TIMER_SCHEDULE(sampleLight_bdbNetworkSteerStart, NULL, jitter * 1000);
+
+			gLightCtx.steerTriesNum = 0;
 #endif
 		}
 	}else{
@@ -214,7 +216,10 @@ void zbdemo_bdbCommissioningCb(u8 status, void *arg){
 			bdb_linkKeyCfg(&g_bdbCommissionSetting, TRUE);
 			gLightCtx.useInstallCodeFlg = !gLightCtx.useInstallCodeFlg;
 		}
-		TL_ZB_TIMER_SCHEDULE(sampleLight_bdbNetworkSteerStart, NULL, 100 * 1000);
+
+		gLightCtx.steerTriesNum++;
+		u32 interval = 100 * (1 << (gLightCtx.steerTriesNum >> 1));
+		TL_ZB_TIMER_SCHEDULE(sampleLight_bdbNetworkSteerStart, NULL, interval * 1000);
 
 #if DUAL_MODE
 		/* start a pairing timeout timer */
@@ -393,7 +398,7 @@ void sampleLight_mgmtNwkUpdateIndHandler(void *p){
 		/* update channel */
 	}else if(pReq->scan_duration == ZDO_NWK_MANAGER_ATTRIBUTES_CHANGE){
 		/* update network management node */
-		memcpy(T_mgmtNwkUpdateIndInfo, p, 16);
+		memcpy((u8 *)T_mgmtNwkUpdateIndInfo, (u8 *)p, 16);
 	}else if(pReq->scan_duration < ZDO_NWK_MANAGER_MAX_SCAN_DURATION){
 		/* do energy scan */
 	}else{

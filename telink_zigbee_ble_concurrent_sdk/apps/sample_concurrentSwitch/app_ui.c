@@ -30,6 +30,8 @@
 #include "sampleSwitch.h"
 #include "app_ui.h"
 
+#define TOUCHLINK_TEST			0
+
 /**********************************************************************
  * LOCAL CONSTANTS
  */
@@ -178,37 +180,31 @@ void brc_toggle(void)
 
 volatile u8 T_appOnOffHandler = 0xff;
 void buttonShortPressed(u8 btNum){
-	if(!zb_isDeviceJoinedNwk()){
-		return;
-	}
-
-#if PM_ENABLE
 	extern void app_zigbeePollRateRecovery(void);
 	app_zigbeePollRateRecovery();
-#endif
 
 	if(btNum == VK_SW1){
+		if(!zb_isDeviceJoinedNwk()){
+			return;
+		}
 		epInfo_t dstEpInfo;
 		TL_SETSTRUCTCONTENT(dstEpInfo, 0);
 
 		dstEpInfo.profileId = HA_PROFILE_ID;
 		dstEpInfo.dstEp = SAMPLE_SWITCH_ENDPOINT;
+		dstEpInfo.dstAddr.shortAddr = 0xfffd;
+		dstEpInfo.dstAddrMode = APS_SHORT_DSTADDR_WITHEP;
 
-
-		static u8 addrFlag = 0;
-		if(addrFlag){
-			dstEpInfo.dstAddr.shortAddr = 0x0000;   //to TC
-			dstEpInfo.dstAddrMode = APS_SHORT_DSTADDR_WITHEP;
-		}else{
-//			addrExt_t *extAddr = tl_zbExtAddrPtrByShortAddr(0);
-			u8 extAddr[] = {0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb};
-			ZB_IEEE_ADDR_COPY(dstEpInfo.dstAddr.extAddr, extAddr);
-			dstEpInfo.dstAddrMode = APS_LONG_DSTADDR_WITHEP;
-		}
 		//addrFlag ^= 1;
 		zcl_onOff_toggleCmd(SAMPLE_SWITCH_ENDPOINT, &dstEpInfo, FALSE);
 
 	}else if(btNum == VK_SW2){
+#if TOUCHLINK_TEST
+		bdb_networkTouchLinkStart(BDB_COMMISSIONING_ROLE_INITIATOR);
+#else
+		if(!zb_isDeviceJoinedNwk()){
+			return;
+		}
 
 		static u8 lvl = 1;
 		static bool dir = 1;
@@ -240,8 +236,8 @@ void buttonShortPressed(u8 btNum){
 				dir = 1;
 			}
 		}
+#endif
 	}
-
 }
 
 

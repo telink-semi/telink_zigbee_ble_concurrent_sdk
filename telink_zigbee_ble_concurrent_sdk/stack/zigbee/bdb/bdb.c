@@ -933,7 +933,7 @@ _CODE_BDB_ static void bdb_networkSteerFactoryNew(void)
 	req.scanChannels = scanChannels;
 	req.scanDuration = g_bdbAttrs.scanDuration;
 
-	zdo_nwk_discovery_Start(&req, NULL);
+	zdo_nwk_discovery_Start(&req, NLME_STATE_DISC, NULL);
 }
 
 /*********************************************************************
@@ -1061,7 +1061,10 @@ static void bdb_task(void *arg)
 				bdb_topLevelCommissioning(BDB_COMMISSIONING_ROLE_TARGET);
 #endif
 			}else if(evt == BDB_EVT_COMMISSIONING_TOUCHLINK_FINISH){
-				if(BDB_STATUS_GET() == BDB_COMMISSION_STA_SUCCESS){
+//				if(BDB_STATUS_GET() == BDB_COMMISSION_STA_SUCCESS){
+//					bdb_commissioningInfoSave(NULL);
+//				}
+				if(!zb_isDeviceFactoryNew()){
 					bdb_commissioningInfoSave(NULL);
 				}
 				/* confirm to application */
@@ -1081,6 +1084,13 @@ static void bdb_task(void *arg)
 				zb_mgmtPermitJoinReqTx(0xffff, BDBC_MIN_COMMISSIONING_TIME, 0x01, &sn, NULL);
 				TL_SCHEDULE_TASK(bdb_mgmtPermitJoiningConfirm,NULL);
 			}else if(evt == BDB_EVT_COMMISSIONING_NETWORK_STEER_FINISH){
+#if ZB_COORDINATOR_ROLE
+					ss_securityModeSet(SS_SEMODE_CENTRALIZED);
+#else
+					if((!g_bdbAttrs.nodeIsOnANetwork)||(ZB_IEEE_ADDR_IS_INVAILD(ss_ib.trust_center_address))){
+						ss_securityModeSet(SS_SEMODE_DISTRIBUTED);
+					}
+#endif
 				status = bdb_commissioningNetworkFormation();
 				if(status == BDB_STATE_IDLE){
 					/* confirm to application */
@@ -1155,6 +1165,10 @@ _CODE_BDB_ void bdb_zdoStartDevCnf(void *arg){
 			/* for rejoin indication by the stack */
 			if(startDevCnf->status == SUCCESS){
 				//g_bdbAttrs.commissioningStatus = BDB_COMMISSION_STA_SUCCESS;
+				g_bdbAttrs.nodeIsOnANetwork = 1;
+#if ZB_ROUTER_ROLE
+				g_zbNwkCtx.joinAccept = 1;
+#endif
 				BDB_STATUS_SET(BDB_COMMISSION_STA_SUCCESS);
 				if((zdo_ssInfoKeyGet() != ss_ib.activeSecureMaterialIndex) || g_zbNwkCtx.parentIsChanged){
 					g_zbNwkCtx.parentIsChanged = 0;
@@ -1184,14 +1198,15 @@ _CODE_BDB_ void bdb_zdoStartDevCnf(void *arg){
 		case BDB_STATE_COMMISSIONING_TOUCHLINK:
 			if(startDevCnf->status == SUCCESS){
 				g_bdbAttrs.nodeIsOnANetwork = 1;
+#if ZB_ROUTER_ROLE
 				g_zbNwkCtx.joinAccept = 1;
-//				zcl_touchLinkDevStartIndicate();
-				TL_ZB_TIMER_SCHEDULE(zcl_touchLinkDevStartIndicate, NULL, 500*1000);
+#endif
+				TL_ZB_TIMER_SCHEDULE(zcl_touchLinkDevStartIndicate, (void *)(startDevCnf->status), 400*1000);
 			}else{
 				//g_bdbAttrs.commissioningStatus = BDB_COMMISSION_STA_NO_NETWORK;
-				BDB_STATUS_SET(BDB_COMMISSION_STA_NO_NETWORK);
-				evt = BDB_EVT_COMMISSIONING_NETWORK_STEER_FINISH;
-				TL_SCHEDULE_TASK(bdb_task, (void *)evt);
+				if(startDevCnf->status != ZDO_NETWORK_LEFT){
+					zcl_touchLinkDevStartIndicate((void *)(startDevCnf->status));
+				}
 			}
 			break;
 

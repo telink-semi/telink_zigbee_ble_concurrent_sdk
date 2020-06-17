@@ -27,6 +27,8 @@
 //RF power configure for touch link
 #define RF_POWER_FOR_COMMISSION				RF_POWER_m0P6dBm//RF_POWER_7dBm//RF_POWER_m9P5dBm//
 
+#define TOUCHLINK_SCANLIST_NUM				2
+
 
 /** @addtogroup  TELINK_ZIGBEE_STACK TELINK ZigBee Stack
  *  @{
@@ -232,7 +234,7 @@ typedef struct{
 	bool					primaryChannelScanComplete; /*!< primary channel scan complete */
 	u8						currentScannChannel;		/*!< current scan channel */
 	u8						scanCnt;					/*!< scan count */
-	zll_touchLinkScanInfo	scanList[1];				/*!< pointer to the target information by touch link discovery */
+	zll_touchLinkScanInfo	scanList[TOUCHLINK_SCANLIST_NUM];				/*!< pointer to the target information by touch link discovery */
 } zcl_zllTouckLinkDisc_t;
 
 
@@ -393,6 +395,13 @@ typedef struct {
 	u16  identifyDuration;			/*!< identify duration */
 } zcl_zllTouchLinkIdentifyReq_t;
 
+/*
+ * @brief  Definition for zll Touch Link reset to factory request command format
+ *
+ * */
+typedef struct {
+	u32  transId;					/*!< Inter-PAN transaction identifier */
+} zcl_zllTouchLinkResetFactoryReq_t;
 
 /*
  * @brief  Definition for zll Touch Link network update Request command format

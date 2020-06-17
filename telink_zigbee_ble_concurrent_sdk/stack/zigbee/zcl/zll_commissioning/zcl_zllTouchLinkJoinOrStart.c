@@ -282,6 +282,7 @@ _CODE_ZCL_ static void zcl_zllTouchLinkNetworkJoinRealjoin(void){
 	/* Update logical channel */
 	MAC_IB().phyChannelCur = pReq->logicalChannel;
 	ZB_TRANSCEIVER_SET_CHANNEL(MAC_IB().phyChannelCur);
+	g_zllTouchLink.workingChannelBackUp = pReq->logicalChannel;
 
 	/* Update extended PAN ID */
 	ZB_EXTPANID_COPY(NWK_NIB().extPANId, pReq->epanId);
@@ -306,6 +307,7 @@ _CODE_ZCL_ static void zcl_zllTouchLinkNetworkJoinRealjoin(void){
 	g_touchlinkAttr.freeGroupAddressRangeEnd = pReq->freeGroupIdRangeEnd;
 
 	if(af_nodeDevTypeGet() == DEVICE_TYPE_END_DEVICE){
+		aps_ib.aps_authenticated = 1;
 		MAC_IB().rxOnWhenIdle = g_zllTouchLink.zbInfo.bf.rxOnWihleIdle;
 		zb_rejoin_mode_set(REJOIN_SECURITY);
 		zdo_nwk_rejoin_req(NLME_REJOIN_METHOD_REJOIN, (1 << MAC_IB().phyChannelCur));
@@ -322,15 +324,10 @@ _CODE_ZCL_ bool zcl_zllTouchLinkLeaveCnfCb(void *arg){
 		return FALSE;
 	}
 
-
-	
-	//if(pCnf->status == SUCCESS)
-	{
-		if(g_zllTouchLink.networkStartInfo->joinNetworkMode == ZCL_ZLL_COMMISSIONING_TOUCH_LICK_MODE_START){
-			zcl_zllTouchLinkStartRouteRequest();
-		}else if(g_zllTouchLink.networkStartInfo->joinNetworkMode == ZCL_ZLL_COMMISSIONING_TOUCH_LICK_MODE_JOIN){
-			zcl_zllTouchLinkNetworkJoinRealjoin();
-		}
+	if(g_zllTouchLink.networkStartInfo->joinNetworkMode == ZCL_ZLL_COMMISSIONING_TOUCH_LICK_MODE_START){
+		zcl_zllTouchLinkStartRouteRequest();
+	}else if(g_zllTouchLink.networkStartInfo->joinNetworkMode == ZCL_ZLL_COMMISSIONING_TOUCH_LICK_MODE_JOIN){
+		zcl_zllTouchLinkNetworkJoinRealjoin();
 	}
 
 	return TRUE;
@@ -722,14 +719,36 @@ _CODE_ZCL_ void zcl_zllTouchLinkNetworkStartOrJoin(void *arg){
 
 s32 zcl_touchLinkDevStartIndicate(void *arg){
 	/* start router confirm or rejoin confirm */
-	if(g_zllTouchLink.zbInfo.bf.logicDevType == DEVICE_TYPE_END_DEVICE){
-		zcl_zllTouchLinkFinish(ZCL_ZLL_TOUCH_LINK_STA_SUCC);
-	}else{
-		if(g_bdbCtx.role == BDB_COMMISSIONING_ROLE_INITIATOR){
-			TL_SCHEDULE_TASK(zcl_zllTouchLinkNetworkStartOrJoin, NULL);
+
+	u32 startStatus = (u32)arg;
+	
+	if(startStatus == SUCCESS){
+		if(g_zllTouchLink.zbInfo.bf.logicDevType == DEVICE_TYPE_END_DEVICE){
+			zcl_zllTouchLinkFinish(ZCL_ZLL_TOUCH_LINK_STA_SUCC);
 		}else{
-			TL_SCHEDULE_TASK(zcl_zllTouchLinkNetworkStartDirectJoin, NULL);
+			if(g_bdbCtx.role == BDB_COMMISSIONING_ROLE_INITIATOR){
+				TL_SCHEDULE_TASK(zcl_zllTouchLinkNetworkStartOrJoin, NULL);
+			}else{
+				TL_SCHEDULE_TASK(zcl_zllTouchLinkNetworkStartDirectJoin, NULL);
+			}
 		}
+	}else{
+		zcl_zllTouchLinkFinish(ZCL_ZLL_TOUCH_LINK_FAIL);
 	}
 	return -1;
+}
+
+_CODE_ZCL_ void zcl_zllTouchLinkResetFactoryReq(void *arg){
+	zll_touchLinkScanInfo *peerInfo = &g_zllTouchLink.disc->scanList[g_zllTouchLink.opIdx];
+	epInfo_t dstEp;
+	TL_SETSTRUCTCONTENT(dstEp, 0);
+
+	memcpy((u8 *)&dstEp,(u8 *)&peerInfo->dstEp, sizeof(dstEp));
+
+	zcl_zllTouchLinkResetFactoryReq_t req;
+	req.transId = g_zllTouchLink.transId;
+
+	g_zllTouchLink.state = ZCL_ZLL_COMMISSION_STATE_TOUCHLINK_IDENTIFY;
+	zcl_sendInterPANCmd(g_zllTouchLink.devInfo.epId, &dstEp, ZCL_CLUSTER_TOUCHLINK_COMMISSIONING, ZCL_CMD_ZLL_COMMISSIONING_RESET_TO_FACTORY_NEW, TRUE,
+						ZCL_FRAME_CLIENT_SERVER_DIR, TRUE, 0, g_zllTouchLink.seqNo++, sizeof(zcl_zllTouchLinkResetFactoryReq_t), (u8 *)&req);
 }

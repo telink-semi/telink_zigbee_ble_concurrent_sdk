@@ -127,9 +127,7 @@ void zbdemo_bdbInitCb(u8 status, u8 joinedNetwork){
 		 *
 		 * */
 		if(joinedNetwork){
-#if PM_ENABLE
 			app_zigbeePollRateRecovery();
-#endif
 
 #ifdef ZCL_OTA
 			ota_queryStart(OTA_CHECK_PERIOD_MIN);
@@ -139,11 +137,10 @@ void zbdemo_bdbInitCb(u8 status, u8 joinedNetwork){
 			sampleSwitch_zclCheckInStart();
 #endif
 		}else{
-#if 0
+			g_switchAppCtx.steerTriesNum = SAMPLE_SWITCH_STEER_TRIESNUM;
 			u16 jitter = zb_random();
 			jitter &= 0xfff;
 			TL_ZB_TIMER_SCHEDULE(sampleSwitch_bdbNetworkSteerStart, NULL, jitter * 1000);
-#endif
 		}
 	}else{
 		T_zbdemoBdbInfo[1]++;
@@ -173,9 +170,8 @@ void zbdemo_bdbCommissioningCb(u8 status, void *arg){
 
 	if(status == BDB_COMMISSION_STA_SUCCESS){
 		T_zbdemoBdbInfo[5]++;
-#if PM_ENABLE
 		app_zigbeePollRateRecovery();
-#endif
+
 
 #ifdef ZCL_POLL_CTRL
 		sampleSwitch_zclCheckInStart();
@@ -198,6 +194,9 @@ void zbdemo_bdbCommissioningCb(u8 status, void *arg){
 	}else if(status == BDB_COMMISSION_STA_NOT_AA_CAPABLE){
 
 	}else if((status == BDB_COMMISSION_STA_NO_NETWORK)||(status == BDB_COMMISSION_STA_TCLK_EX_FAILURE)){
+		if(g_switchAppCtx.steerTriesNum-- <= 0){
+			return;
+		}
 		if(g_switchAppCtx.installCodeAvailable){
 			/* Switch the two kinds of link keys to attempt join network. */
 			if(g_switchAppCtx.useInstallCodeFlg){

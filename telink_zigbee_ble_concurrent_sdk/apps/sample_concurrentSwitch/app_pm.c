@@ -28,6 +28,28 @@
 #include "app_ui.h"
 #include "stack/ble/ll/ll_pm.h"
 
+
+s32 app_pollRateHold(void *arg){
+	if(!tl_stackBusy()){
+		zb_setPollRate(0);
+		g_switchAppCtx.timerPollHold = NULL;
+		return -1;
+	}
+
+	return 0;
+}
+
+void app_zigbeePollRateRecovery(void){
+	zb_setPollRate(RESPONSE_POLL_RATE);
+	extern void secondClockRun(void);
+	secondClockRun();
+
+	if(g_switchAppCtx.timerPollHold){
+		TL_ZB_TIMER_CANCEL(&g_switchAppCtx.timerPollHold);
+	}
+	g_switchAppCtx.timerPollHold = TL_ZB_TIMER_SCHEDULE(app_pollRateHold, NULL, 500 * 1000);
+}
+
 #if PM_ENABLE
 #include "pm_interface.h"
 
@@ -56,28 +78,6 @@ bool app_zigbeeIdle(void){
 		secondClockStop();
 	}
 	return ret;
-}
-
-
-s32 app_pollRateHold(void *arg){
-	if(!tl_stackBusy()){
-		zb_setPollRate(0);
-		g_switchAppCtx.timerPollHold = NULL;
-		return -1;
-	}
-
-	return 0;
-}
-
-void app_zigbeePollRateRecovery(void){
-	zb_setPollRate(RESPONSE_POLL_RATE);
-	extern void secondClockRun(void);
-	secondClockRun();
-
-	if(g_switchAppCtx.timerPollHold){
-		TL_ZB_TIMER_CANCEL(&g_switchAppCtx.timerPollHold);
-	}
-	g_switchAppCtx.timerPollHold = TL_ZB_TIMER_SCHEDULE(app_pollRateHold, NULL, 500 * 1000);
 }
 
 void app_pm_init(void){

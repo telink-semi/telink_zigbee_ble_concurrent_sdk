@@ -174,8 +174,6 @@ void user_app_init(void)
     ota_init(OTA_TYPE_CLIENT, (af_simple_descriptor_t *)&sampleSwitch_simpleDesc, &sampleSwitch_otaInfo, &sampleSwitch_otaCb);
 #endif
 
-    zdo_af_set_scan_attempts(0);   //set scan time as 0
-    zdo_af_set_rejoin_interval(0); //set rejoin retry times as 0
 }
 
 

@@ -29,6 +29,8 @@
  */
 #define SAMPLE_SWITCH_ENDPOINT  0x01
 
+#define SAMPLE_SWITCH_STEER_TRIESNUM		3
+
 /**********************************************************************
  * TYPEDEFS
  */
@@ -59,6 +61,7 @@ typedef struct{
 	u8  state;
 	u8  keyPressed;
 	u8  restartLoopTimes;
+	s8  steerTriesNum;
 
 	app_linkkey_info_t linkKey;
 

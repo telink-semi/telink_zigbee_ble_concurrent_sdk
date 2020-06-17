@@ -258,9 +258,9 @@ _CODE_ZCL_ void	zcl_zllTouchLinkFinish(u8 status){
 
 	rf_setTxPower(g_zb_txPowerSet);
 #ifdef ZB_ED_ROLE
-	if(status == ZCL_ZLL_TOUCH_LINK_STA_SUCC || status == ZCL_ZLL_TOUCH_LINK_STA_EXIST){
+//	if(status == ZCL_ZLL_TOUCH_LINK_STA_SUCC || status == ZCL_ZLL_TOUCH_LINK_STA_EXIST){
 		zb_setPollRate(POLL_RATE);
-	}
+//	}
 #endif
 	g_zllTouchLink.transId = 0;
 	epInfo_t peerEpInfo;
@@ -310,7 +310,7 @@ _CODE_ZCL_ void	zcl_zllTouchLinkFinish(u8 status){
 		}
 	}
 	TOUCHLIK_INITIATOR_SET(0);
-	//TOUCHLIK_ADDR_ASSIGN_SET(0);
+	TOUCHLIK_ADDR_ASSIGN_SET(0);
 	TOUCHLIK_FACTORY_NEW_SET(is_device_factory_new());
 }
 
@@ -498,7 +498,7 @@ _CODE_ZCL_ static u8 zcl_touchLinkClientCmdHandler(zclIncoming_t *pInMsg){
 
 				if(req.identifyDuration == 0){
 					identifyTime = 0;
-				}else if (req.identifyDuration >= 0x0001 && req.identifyDuration <= NWK_BROADCAST_RESERVED){
+				}else if (req.identifyDuration >= 0x0001 && req.identifyDuration <= 0xfffe){
 					identifyTime = req.identifyDuration;
 				}else if(req.identifyDuration == 0xffff ){
 					identifyTime = DEFAULT_IDENTIFY_DURATION;
@@ -629,7 +629,7 @@ _CODE_ZCL_ static u8 zcl_zllCommissionServerCmdHandler(zclIncoming_t *pInMsg){
 					g_zllTouchLink.workingChannelBackUp = nscr->logicalChannel;
 				}
 				zcl_zllTouchLinkStartNetworkStartOrJoinTimerStop();
-				TL_ZB_TIMER_SCHEDULE(zcl_zllTouchLinkNetworkStartResponseHandler, nscr, ZB_MIN_STARTUP_DELAY_TIME + 200 * 1000);
+				TL_ZB_TIMER_SCHEDULE(zcl_zllTouchLinkNetworkStartResponseHandler, nscr, ZB_MIN_STARTUP_DELAY_TIME + 1000 * 1000);
 			}else{
 				ev_buf_free((u8 *)nscr);
 			}
@@ -742,13 +742,8 @@ _CODE_ZCL_ u8 zcl_touchLinkInit(void){
 	g_zllTouchLink.zbInfo.bf.logicDevType = af_nodeDevTypeGet();
 	g_zllTouchLink.startNetworkAllowed = 1;
 	g_zllTouchLink.zllInfo.byte = 0;
-//	g_zllTouchLink.zllInfo.bf.addrAssign = 1;
-//
-//	if(zb_isDeviceFactoryNew()){  //new device, set priority as 1
-//		g_zllTouchLink.zllInfo.bf.priorityReq = 1;
-//		g_zllTouchLink.zllInfo.bf.factoryNew = 1;
-//	}
-	g_zllTouchLink.scanListNum = (ZB_BUF_SIZE - OFFSETOF(zcl_zllTouckLinkDisc_t, scanList))/sizeof(zll_touchLinkScanInfo);
+
+	g_zllTouchLink.scanListNum = TOUCHLINK_SCANLIST_NUM;
 
 	af_endpoint_descriptor_t *aed = af_epDescriptorGet();
 
@@ -803,6 +798,7 @@ _CODE_ZCL_ void zcl_touchLinkStart(void){
 
 	if(g_zllTouchLink.disc){
 		ev_buf_free((u8 *)g_zllTouchLink.disc);
+		g_zllTouchLink.disc = NULL;
 	}
 	g_zllTouchLink.disc = (zcl_zllTouckLinkDisc_t *)ev_buf_allocate(sizeof(zcl_zllTouckLinkDisc_t));
 	if(!g_zllTouchLink.disc){

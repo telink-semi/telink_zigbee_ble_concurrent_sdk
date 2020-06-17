@@ -916,7 +916,7 @@ void zdo_nlmeChannelShift(u8 ch);
  *
  * @return	none
  */
-void zdo_nwk_discovery_Start(nlme_nwkDisc_req_t *pReq, nwkDiscoveryUserCb_t cb);
+void zdo_nwk_discovery_Start(nlme_nwkDisc_req_t *pReq, u8 state, nwkDiscoveryUserCb_t cb);
 
 
 void zdo_zdpCbTblRegister(zdo_appIndCb_t *cbTbl);

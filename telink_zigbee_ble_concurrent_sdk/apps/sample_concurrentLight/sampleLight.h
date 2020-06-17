@@ -63,6 +63,8 @@ typedef struct{
 	u8	powerCntFacRst:1;
 	u8  powerCntFacRst2SigMesh:7;
 
+	u8  steerTriesNum;
+
 	app_linkkey_info_t linkKey;
 
 	bool installCodeAvailable:1;	//flag indicates if support install code
