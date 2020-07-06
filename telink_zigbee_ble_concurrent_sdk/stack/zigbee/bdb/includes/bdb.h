@@ -414,6 +414,7 @@ typedef struct{
 	u16	*matchClusterList;
 	findBindDst_t findDstInfo;
 	findBindDst_t bindDstInfo;
+	u16 targetAddr;   //target address for touch link
 	u8 clusterNum;
 	u8 matchClusterNum;
 
@@ -450,6 +451,9 @@ extern bdb_ctx_t  g_bdbCtx;
 
 #define BDB_STATUS_SET(v)						g_bdbCtx.status = v
 #define BDB_STATUS_GET()						g_bdbCtx.status
+
+#define BDB_TOUCH_LINK_TARGET_SET(v)			g_bdbCtx.targetAddr = v
+#define BDB_TOUCH_LINK_TARGET_GET()				g_bdbCtx.targetAddr
 
 #define BDB_ATTR_GROUP_ID_SET(v)				g_bdbAttrs.commissioningGroupId = v
 

@@ -165,6 +165,7 @@ void zbdemo_bdbInitCb(u8 status, u8 joinedNetwork){
   *
   * @return  None
   */
+volatile u16 T_touchLinkTargetAddr = 0xffff;
 void zbdemo_bdbCommissioningCb(u8 status, void *arg){
 	T_zbdemoBdbInfo[3]++;
 	T_zbdemoBdbInfo[4] = status;
@@ -173,6 +174,11 @@ void zbdemo_bdbCommissioningCb(u8 status, void *arg){
 
 	if(status == BDB_COMMISSION_STA_SUCCESS){
 		T_zbdemoBdbInfo[5]++;
+		if(BDB_STATE_GET() == BDB_STATE_COMMISSIONING_TOUCHLINK && g_bdbCtx.role == BDB_COMMISSIONING_ROLE_INITIATOR){
+			/* TODO: target address is g_bdbCtx.targetAddr */
+			T_touchLinkTargetAddr = BDB_TOUCH_LINK_TARGET_GET();
+		}
+
 		app_zigbeePollRateRecovery();
 
 

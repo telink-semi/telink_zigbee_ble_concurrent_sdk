@@ -1201,6 +1201,13 @@ _CODE_BDB_ void bdb_zdoStartDevCnf(void *arg){
 			break;
 
 		case BDB_STATE_COMMISSIONING_TOUCHLINK:
+#if ZB_ED_ROLE
+			/* if ZED is not factory-new node, it might start rejoin once lose its parent node,
+			 * return directly, indicate application when touch link is done */
+			if(g_bdbAttrs.nodeIsOnANetwork){
+				return;
+			}
+#endif
 			if(startDevCnf->status == SUCCESS){
 				g_bdbAttrs.nodeIsOnANetwork = 1;
 #if ZB_ROUTER_ROLE
@@ -1300,6 +1307,11 @@ _CODE_BDB_ static void bdb_touchLinkCallback(u8 status, void *arg)
     	evt = BDB_EVT_COMMISSIONING_TOUCHLINK_FINISH;
     	if(status == ZCL_ZLL_TOUCH_LINK_STA_SUCC || status == ZCL_ZLL_TOUCH_LINK_STA_EXIST){
     		ss_securityModeSet(SS_SEMODE_DISTRIBUTED);/* AIB */
+
+    		epInfo_t *peerEpInfo = (epInfo_t *)arg;
+    		if(peerEpInfo){
+    			BDB_TOUCH_LINK_TARGET_SET(peerEpInfo->dstAddr.shortAddr);
+    		}
 
 			//g_bdbAttrs.commissioningStatus = BDB_COMMISSION_STA_SUCCESS;
     		BDB_STATUS_SET(BDB_COMMISSION_STA_SUCCESS);
@@ -1456,6 +1468,8 @@ _CODE_BDB_ u8 bdb_networkTouchLinkStart(u8 role)
 	g_bdbAttrs.commissioningMode.networkFormation = 0;
 	g_bdbAttrs.commissioningMode.findOrBind = 0;
 	g_bdbAttrs.commissioningMode.touchlink = 1;
+
+	BDB_TOUCH_LINK_TARGET_SET(0xffff);
 	return bdb_topLevelCommissioning(role);
 }
 
