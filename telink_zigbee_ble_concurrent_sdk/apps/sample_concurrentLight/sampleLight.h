@@ -48,6 +48,7 @@ typedef struct{
 
 typedef struct{
 	ev_time_event_t *timerLedEvt;
+	ev_time_event_t *timerSteering;
 	u32 keyPressedTime;
 
 	u16 ledOnTime;

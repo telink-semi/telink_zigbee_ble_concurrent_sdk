@@ -116,7 +116,8 @@ void concurrent_mode_main_loop (void){
 		 DBG_ZIGBEE_STATUS(0x30);
 
 		 r = irq_disable();
-		 if(get_ble_event_state() && is_switch_to_zigbee()){
+
+		 if((get_ble_event_state() && is_switch_to_zigbee()) || blt_state == BLS_LINK_STATE_IDLE){
 			 /*
 			  * ready to switch to ZIGBEE mode
 			  *
@@ -143,7 +144,7 @@ void concurrent_mode_main_loop (void){
 
 		 r = irq_disable();
 
-		 if(!zb_rfTxDoing() && is_switch_to_ble()){
+		 if(!zb_rfTxDoing() && is_switch_to_ble() && blt_state != BLS_LINK_STATE_IDLE){
 			 /*
 			  * ready to switch to BLE mode
 			  *
@@ -161,6 +162,18 @@ void concurrent_mode_main_loop (void){
 		 DBG_ZIGBEE_STATUS(0x35);
 		 zb_task();
 	 }
+}
+
+
+void ble_task_stop(void){
+	if(blt_state == BLS_LINK_STATE_CONN){
+		bls_ll_terminateConnection(HCI_ERR_REMOTE_USER_TERM_CONN);//cut any ble connections
+	}
+	bls_ll_setAdvEnable(0);
+}
+
+void ble_task_restart(void){
+	bls_ll_setAdvEnable(1);
 }
 
 #endif

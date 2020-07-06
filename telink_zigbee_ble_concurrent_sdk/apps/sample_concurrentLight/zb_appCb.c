@@ -91,6 +91,7 @@ otaDbgInfo_t  T_otaDbgInfo;
 s32 sampleLight_bdbNetworkSteerStart(void *arg){
 	bdb_networkSteerStart();
 
+	gLightCtx.timerSteering = NULL;
 	return -1;
 }
 
@@ -136,7 +137,11 @@ void zbdemo_bdbInitCb(u8 status, u8 joinedNetwork){
 				jitter = zb_random();
 				jitter &= 0xfff;
 			}while(jitter==0);
-			TL_ZB_TIMER_SCHEDULE(sampleLight_bdbNetworkSteerStart, NULL, jitter * 1000);
+
+			if(gLightCtx.timerSteering){
+				TL_ZB_TIMER_CANCEL(&gLightCtx.timerSteering);
+			}
+			gLightCtx.timerSteering = TL_ZB_TIMER_SCHEDULE(sampleLight_bdbNetworkSteerStart, NULL, jitter * 1000);
 
 			gLightCtx.steerTriesNum = 0;
 #endif
@@ -217,15 +222,19 @@ void zbdemo_bdbCommissioningCb(u8 status, void *arg){
 			gLightCtx.useInstallCodeFlg = !gLightCtx.useInstallCodeFlg;
 		}
 
-		gLightCtx.steerTriesNum++;
-		u32 interval = 100 * (1 << (gLightCtx.steerTriesNum >> 1));
-		TL_ZB_TIMER_SCHEDULE(sampleLight_bdbNetworkSteerStart, NULL, interval * 1000);
-
 #if DUAL_MODE
 		/* start a pairing timeout timer */
 		if(!pairingTimeoutEvt){
 			pairingTimeoutEvt = TL_ZB_TIMER_SCHEDULE(sampleLight_pairingTimeoutTimerStart, NULL, 5 * 1000 * 1000);
 		}
+#else
+		gLightCtx.steerTriesNum++;
+		u32 interval = 100 * (1 << (gLightCtx.steerTriesNum >> 1));
+
+		if(gLightCtx.timerSteering){
+			TL_ZB_TIMER_CANCEL(&gLightCtx.timerSteering);
+		}
+		gLightCtx.timerSteering = TL_ZB_TIMER_SCHEDULE(sampleLight_bdbNetworkSteerStart, NULL, interval * 1000);
 #endif
 	}else if(status == BDB_COMMISSION_STA_TARGET_FAILURE){
 

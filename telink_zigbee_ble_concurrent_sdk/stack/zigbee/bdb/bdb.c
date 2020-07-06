@@ -299,6 +299,7 @@ _CODE_BDB_ static void bdb_binding(zdo_bind_dstAddr_t *pDstAddr, u8 clusterNum, 
 {
 	zdo_bind_req_t req;
 	memset(&req, 0, sizeof(zdo_bind_req_t));
+	u8 bindStatus = ZDO_SUCCESS;
 
 	ZB_IEEE_ADDR_COPY(req.src_addr, NIB_IEEE_ADDRESS());
 	req.src_endpoint = g_bdbCtx.simpleDesc->endpoint;
@@ -314,15 +315,13 @@ _CODE_BDB_ static void bdb_binding(zdo_bind_dstAddr_t *pDstAddr, u8 clusterNum, 
 		req.cid16_l = clusterList[i];
 		req.cid16_h = clusterList[i]>>8;
 
-		if((aps_me_find_dst_ref((aps_me_bind_req_t *)&req) == TL_RETURN_INVALID) && (aps_me_free_src_table_find() == TL_RETURN_INVALID)){
-			//g_bdbAttrs.commissioningStatus = BDB_COMMISSION_STA_BINDING_TABLE_FULL;
+		u8 sn = 0;
+		bindStatus = zb_zdoBindUnbindReq(TRUE, &req, &sn, NULL);
+		if(bindStatus ==  ZDO_TABLE_FULL){
 			BDB_STATUS_SET(BDB_COMMISSION_STA_BINDING_TABLE_FULL);
 			u32 evt = BDB_EVT_COMMISSIONING_FINDORBIND_FINISH;
 			TL_SCHEDULE_TASK(bdb_task, (void *)evt);
 			break;
-		}else{
-			u8 sn = 0;
-			zb_zdoBindUnbindReq(TRUE, &req, &sn, NULL);
 		}
 	}
 
@@ -330,11 +329,13 @@ _CODE_BDB_ static void bdb_binding(zdo_bind_dstAddr_t *pDstAddr, u8 clusterNum, 
 	g_bdbCtx.matchClusterNum = 0;
 	g_bdbCtx.matchClusterList = NULL;
 
-	if(BDB_STATUS_GET() != BDB_COMMISSION_STA_BINDING_TABLE_FULL){
+	if(bindStatus ==  ZDO_SUCCESS){
 		if(g_bdbCtx.bdbAppCb && g_bdbCtx.bdbAppCb->bdbFindBindSuccessCb){
 			g_bdbCtx.bdbAppCb->bdbFindBindSuccessCb(&g_bdbCtx.bindDstInfo);
 		}
+	}
 
+	if(bindStatus !=  ZDO_TABLE_FULL){
 		TL_SCHEDULE_TASK(bdb_simpleDescReqSend, NULL);
 	}
 }
@@ -539,10 +540,11 @@ _CODE_BDB_ static void bdb_simpleDescReqSend(void *arg)
 		u32 evt = BDB_EVT_COMMISSIONING_FINDORBIND_SIMPLE_DESC_REQ;
 		TL_SCHEDULE_TASK(bdb_task, (void *)evt);
 
-#ifdef ZB_ED_ROLE
-		u32 simpleDescReqTimeout = zb_getPollRate() * 3;
-#else
 		u32 simpleDescReqTimeout = 5000;
+#ifdef ZB_ED_ROLE
+		if(zb_getPollRate()){
+			simpleDescReqTimeout = zb_getPollRate() * 3;
+		}
 #endif
 
 		g_bdbCtx.identifyTimer = TL_ZB_TIMER_SCHEDULE(bdb_simpleDescReqTimeoutCb, NULL, simpleDescReqTimeout * 1000);
@@ -652,10 +654,11 @@ _CODE_BDB_ static u8 bdb_commissioningFindBind(void)
 
 				zcl_identify_identifyQueryCmd(g_bdbCtx.simpleDesc->endpoint, &dstEpInfo, TRUE);
 
-#ifdef ZB_ED_ROLE
-				u32 identifyQueryRcvTimeout = zb_getPollRate() * 3;;
-#else
 				u32 identifyQueryRcvTimeout = 5000;
+#ifdef ZB_ED_ROLE
+				if(zb_getPollRate()){
+					identifyQueryRcvTimeout = zb_getPollRate() * 3;
+				}
 #endif
 
 				/* Start a timer to check if identify query response are received. */
@@ -993,7 +996,7 @@ static void bdb_task(void *arg)
 					nv_nwkFrameCountSaveToFlash(ss_ib.outgoingFrameCounter);
 
 					if(g_bdbCtx.initResult == BDB_INIT_STATUS_SUCCESS){
-						if((zdo_ssInfoKeyGet() != ss_ib.activeSecureMaterialIndex) || g_zbNwkCtx.parentIsChanged){
+						if((zdo_ssInfoKeyGet() != ss_ib.activeSecureMaterialIndex) || g_zbNwkCtx.parentIsChanged || g_bdbCtx.forceJoin){
 							g_zbNwkCtx.parentIsChanged = 0;
 							TL_SCHEDULE_TASK(bdb_commissioningInfoSave, NULL);  //for tcRejoin when the network key is changed
 						}
@@ -1008,6 +1011,7 @@ static void bdb_task(void *arg)
 				}
 
 				g_bdbCtx.inited = 0;
+				g_bdbCtx.forceJoin = 0;
 			}
 			break;
 
@@ -1170,7 +1174,7 @@ _CODE_BDB_ void bdb_zdoStartDevCnf(void *arg){
 				g_zbNwkCtx.joinAccept = 1;
 #endif
 				BDB_STATUS_SET(BDB_COMMISSION_STA_SUCCESS);
-				if((zdo_ssInfoKeyGet() != ss_ib.activeSecureMaterialIndex) || g_zbNwkCtx.parentIsChanged){
+				if((zdo_ssInfoKeyGet() != ss_ib.activeSecureMaterialIndex) || g_zbNwkCtx.parentIsChanged || g_bdbCtx.forceJoin){
 					g_zbNwkCtx.parentIsChanged = 0;
 					TL_SCHEDULE_TASK(bdb_commissioningInfoSave, NULL);
 				}
@@ -1182,6 +1186,7 @@ _CODE_BDB_ void bdb_zdoStartDevCnf(void *arg){
 					BDB_STATUS_SET(BDB_COMMISSION_STA_REJOIN_FAILURE);
 				}
 			}
+			g_bdbCtx.forceJoin = 0;
 			evt = BDB_STATE_REJOIN_DONE;
 			TL_SCHEDULE_TASK(bdb_task, (void *)evt);
 			break;
@@ -1525,7 +1530,7 @@ _CODE_BDB_ u8 bdb_init(af_simple_descriptor_t *simple_desc, bdb_commissionSettin
 
 	bdb_scanCfg(g_bdbAttrs.primaryChannelSet | g_bdbAttrs.secondaryChannelSet, g_bdbAttrs.scanDuration);
 
-	g_bdbAttrs.commissioningStatus = BDB_COMMISSION_STA_SUCCESS,
+	g_bdbAttrs.commissioningStatus = BDB_COMMISSION_STA_SUCCESS;
 	g_bdbAttrs.nodeIsOnANetwork = g_bdbCtx.factoryNew ? 0 : 1;
 	if(g_bdbAttrs.nodeIsOnANetwork){
 		/* update outgoing frame count */
@@ -1552,6 +1557,46 @@ _CODE_BDB_ u8 bdb_init(af_simple_descriptor_t *simple_desc, bdb_commissionSettin
 	return 1;
 }
 
+
+/*********************************************************************
+ * @fn      bdb_join_direct()
+ *
+ * @brief   join/establish a network directly
+ *
+ * @param   channel
+ * 			panId
+ * 			shortAddr
+ * 			extPanId
+ * 		    nwkKey
+ * 		    inited
+ *
+ * @return  None
+ */
+u8 bdb_join_direct(u8 channel,  u16 panId, u16 shortAddr, u8 *extPanId, u8 *nwkKey, u8 type, u8 inited){
+	u8 ret = FAILURE;
+
+	if(BDB_STATE_GET() == BDB_STATE_IDLE){
+		g_bdbCtx.forceJoin = 1;
+		zb_joinAFixedNetwork(channel,  panId, shortAddr, extPanId, nwkKey);
+
+		if(inited){
+			aps_ib.aps_authenticated = 1;
+			aps_ib.aps_use_insecure_join = FALSE; /* AIB */
+			ss_securityModeSet(type);
+
+#if ZB_COORDINATOR_ROLE
+			bdb_coordinatorStart();
+#elif ZB_ROUTER_ROLE
+			bdb_routerStart();
+#elif ZB_ED_ROLE
+			bdb_endDeviceStart(1);
+#endif
+		}
+		ret = SUCCESS;
+	}
+
+	return ret;
+}
 
 /*********************************************************************
  * @fn      bdb_findBindMatchClusterSet

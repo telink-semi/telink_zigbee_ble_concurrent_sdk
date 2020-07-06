@@ -28,6 +28,8 @@
 
 #if BLE_CONCURRENT_MODE
 
+extern volatile u8 zigbee_process;
+
 _attribute_ram_code_ void switch_to_zb_context(void);
 
 _attribute_ram_code_ void switch_to_ble_context(void);
@@ -35,6 +37,10 @@ _attribute_ram_code_ void switch_to_ble_context(void);
 int is_switch_to_ble(void);
 
 int is_switch_to_zigbee(void);
+
+void ble_task_stop(void);
+
+void ble_task_restart(void);
 
 void concurrent_mode_main_loop (void);
 

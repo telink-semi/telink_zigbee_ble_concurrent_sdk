@@ -31,7 +31,7 @@ extern "C" {
 #define	__LOG_RT_ENABLE__		0
 
 //////////// product  Information  //////////////////////////////
-#define TOUCHLINK_SUPPORT		0
+#define TOUCHLINK_SUPPORT		1
 #define FIND_AND_BIND_SUPPORT	0
 
 #define COLOR_RGB_SUPPORT		0

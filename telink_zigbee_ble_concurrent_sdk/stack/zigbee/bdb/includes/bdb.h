@@ -425,7 +425,8 @@ typedef struct{
 	u8 inited:1;
 	u8 factoryNew:1;
 	u8 leaveDoing:1;
-	u8 resv:5;
+	u8 forceJoin:1;
+	u8 resv:4;
 	u8 initResult;
 }bdb_ctx_t;
 /** @} end of group zb_bdb_ctx */
@@ -612,6 +613,29 @@ bool bdb_isIdle(void);
  * @return      None
  */
 void bdb_linkKeyCfg(bdb_commissionSetting_t *setting, u8 isFactoryNew);
+
+
+/***********************************************************************//**
+ * @brief       node is forced to join a fixed network, it can been called anytime
+ *
+ * @param       channel: operation channel
+ *
+ ** @param       panId:  the network panID
+ *
+ ** @param       shortAddr: network address allocated by itself
+ *
+ ** @param       extPanId: external panID of the network
+ *
+ ** @param       nwkKey:   the network key of the network
+ **
+ ** @param       type:     SS_SEMODE_CENTRALIZED or SS_SEMODE_DISTRIBUTED
+ **
+ ** @param       inited:   1: bdb_init() is called before, 0: bdb_init() isn't called before
+ *
+ * @return       Status:   0: success, other: failure
+ *
+ **************************************************************************/
+u8 bdb_join_direct(u8 channel,  u16 panId, u16 shortAddr, u8 *extPanId, u8 *nwkKey, u8 type, u8 inited);
 
 /** @} end of group zb_bdb_attr */
 

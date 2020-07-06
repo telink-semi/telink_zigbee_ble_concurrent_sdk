@@ -88,7 +88,7 @@ void sampleSwitch_bdbRejoinStart(void *arg){
 
 s32 sampleSwitch_bdbNetworkSteerStart(void *arg){
 	bdb_networkSteerStart();
-
+	g_switchAppCtx.timerSteering = NULL;
 	return -1;
 }
 
@@ -140,7 +140,10 @@ void zbdemo_bdbInitCb(u8 status, u8 joinedNetwork){
 			g_switchAppCtx.steerTriesNum = SAMPLE_SWITCH_STEER_TRIESNUM;
 			u16 jitter = zb_random();
 			jitter &= 0xfff;
-			TL_ZB_TIMER_SCHEDULE(sampleSwitch_bdbNetworkSteerStart, NULL, jitter * 1000);
+			if(g_switchAppCtx.timerSteering){
+				TL_ZB_TIMER_CANCEL(&g_switchAppCtx.timerSteering);
+			}
+			g_switchAppCtx.timerSteering = TL_ZB_TIMER_SCHEDULE(sampleSwitch_bdbNetworkSteerStart, NULL, jitter * 1000);
 		}
 	}else{
 		T_zbdemoBdbInfo[1]++;
@@ -210,7 +213,11 @@ void zbdemo_bdbCommissioningCb(u8 status, void *arg){
 			bdb_linkKeyCfg(&g_bdbCommissionSetting, TRUE);
 			g_switchAppCtx.useInstallCodeFlg = !g_switchAppCtx.useInstallCodeFlg;
 		}
-		TL_ZB_TIMER_SCHEDULE(sampleSwitch_bdbNetworkSteerStart, NULL, 100 * 1000);
+
+		if(g_switchAppCtx.timerSteering){
+			TL_ZB_TIMER_CANCEL(&g_switchAppCtx.timerSteering);
+		}
+		g_switchAppCtx.timerSteering = TL_ZB_TIMER_SCHEDULE(sampleSwitch_bdbNetworkSteerStart, NULL, 100 * 1000);
 	}else if(status == BDB_COMMISSION_STA_TARGET_FAILURE){
 
 	}else if(status == BDB_COMMISSION_STA_FORMATION_FAILURE){

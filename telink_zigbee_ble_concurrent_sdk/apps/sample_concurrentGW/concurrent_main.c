@@ -86,7 +86,7 @@ static u8 platform_init(void){
 
 	cpu_wakeup_init();
 
-	clock_init(/*SYS_CLK_16M_Crystal*/SYS_CLK_32M_Crystal);
+	clock_init(g_sysClk);
 
 #if defined(MCU_CORE_8258)
 	internalFlashSizeCheck();

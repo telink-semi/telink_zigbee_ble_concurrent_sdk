@@ -88,7 +88,7 @@ static u8 platform_init(void){
 
 	cpu_wakeup_init();
 
-	clock_init(/*SYS_CLK_16M_Crystal*/SYS_CLK_32M_Crystal);//BLE 16M
+	clock_init(g_sysClk);
 
 #if defined(MCU_CORE_8258)
 	internalFlashSizeCheck();
@@ -114,11 +114,14 @@ int main (void) {
 #endif
 
 	user_zb_init();
-	//backup the registers
-	backup_zigbee_rf_context();
 
-    ble_rf_drv_init(RF_MODE_BLE_1M);
-	user_ble_init();
+	if(!pmParam.is_deepretn_back || !zigbee_process){
+		//backup the registers
+		backup_zigbee_rf_context();
+
+		ble_rf_drv_init(RF_MODE_BLE_1M);
+		user_ble_init();
+	}
 
 #if PM_ENABLE
 	app_pm_init();
