@@ -87,32 +87,6 @@ _attribute_ram_code_ void irq_handler(void){
 		irq_blt_sdk_handler();
 	}
 
-#if 0
-    u32 src = reg_irq_src;
-	if(src & FLD_IRQ_SYSTEM_TIMER){
-		if(zigbee_process){
-			/* need switch to ble mode */
-			switch_to_ble_context();
-			zigbee_process = 0;
-			T_irqExceptCnt[0]++;
-		}
-		T_irqExceptCnt[1]++;
-		irq_blt_sdk_handler();
-	}
-
-    u16  src_rf = rf_irq_src_get();
-	if((src_rf & FLD_RF_IRQ_TX) && (zb_rf802154_tx_flag == 1)){
-        zb_rf802154_tx_flag = 0;
-		rf_tx_irq_handler();
-	}
-
-    if(zigbee_process && rfMode == RF_STATE_RX && (src_rf & FLD_RF_IRQ_RX) && get_ble_event_state()){
-       rf_rx_irq_handler();
-    }else{
-       irq_blt_sdk_handler();
-    }
-#endif
-
 #if (MODULE_UART_ENABLE)
     u16  dma_irq_source = dma_chn_irq_status_get();
 	if(dma_irq_source & FLD_DMA_CHN_UART_RX){

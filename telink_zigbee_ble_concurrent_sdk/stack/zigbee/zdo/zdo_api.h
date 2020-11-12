@@ -233,6 +233,8 @@ typedef struct{
 
 extern zdo_attrCfg_t zdo_cfg_attributes;
 
+extern u32 TRANSPORT_NETWORK_KEY_WAIT_TIME;
+
 typedef struct{
 	extPANId_t	nwkExtendedPANID;
 	u8			apsDesignatedCoordinator;

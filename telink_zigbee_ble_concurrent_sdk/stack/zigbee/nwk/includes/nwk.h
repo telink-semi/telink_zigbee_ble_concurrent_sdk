@@ -1271,6 +1271,7 @@ extern nwk_routeRecordTabEntry_t g_routeRecTab[];
 
 extern u8  NWK_COST_THRESHOLD_ONEHOP;
 extern u16 TL_ZB_ASSOCJOIN_FILTER_PANID;
+extern u16 TL_ZB_ASSOCJOIN_PERMIT_PANID;
 
 #define	NWK_LEAVEDEVICEADDRESS_LOCATION			40 //sizeof(zb_mscp_data_req_t)
 #define	NWK_GET_LEAVEDEVICEADDR(p)				(*((u16 *)(((u8 *)p)+NWK_LEAVEDEVICEADDRESS_LOCATION)))

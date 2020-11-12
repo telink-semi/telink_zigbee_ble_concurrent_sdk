@@ -33,6 +33,7 @@
  * Routers and end devices to join PAN with this ID
  */
 #define DEFAULT_PANID		MAC_INVALID_PANID
+u16 TL_ZB_ASSOCJOIN_PERMIT_PANID = DEFAULT_PANID;
 /*
  * Setting this to a value other than MAC_INVALID_PANID (0xFFFF) causes
  * Routers and end devices to filter the PAN ID when associate join a network
@@ -61,6 +62,9 @@ u8 NWK_NEIGHBORTBL_ADD_LQITHRESHOLD = 0x5F;
 
 /* the life time for unauthorized child table */
 u32 NWK_UNAUTH_CHILD_TABLE_LIFE_TIME = (5 * 1000 * 1000);
+
+/* the life time for the joined node to wait for the network key */
+u32 TRANSPORT_NETWORK_KEY_WAIT_TIME = (5 * 1000 * 1000);//TL_SUPERFRAMETIME_TO_US(1000);
 
 /* the cost threshold for one hop */
 u8 NWK_COST_THRESHOLD_ONEHOP = 3;
@@ -110,6 +114,7 @@ aps_binding_table_t aps_binding_tbl;
 /* group table */
 u8 APS_GROUP_TABLE_SIZE = APS_GROUP_TABLE_NUM;
 aps_group_tbl_ent_t aps_group_tbl[APS_GROUP_TABLE_NUM];
+u16 GROUP_MESSAGE_SEND_ADDRESS = NWK_BROADCAST_RX_ON_WHEN_IDLE;
 
 /* the offset of the rx buffer to the zb-buffer*/
 u8 RX_ZBBUF_OFFSET = TL_RXPRIMITIVEHDR;

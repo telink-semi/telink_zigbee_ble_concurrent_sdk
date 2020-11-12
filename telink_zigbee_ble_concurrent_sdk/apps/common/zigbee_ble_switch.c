@@ -39,7 +39,7 @@ extern signed char ble_current_channel;
 
 _attribute_ram_code_ void switch_to_zb_context(void){
 	rf_baseband_reset();
-	dma_reset();
+	//dma_reset();    //!!!remove it, or it will cause uart-tx-irq miss if uart_tx is started
 	backup_ble_rf_context();
 	ZB_RADIO_RX_BUF_CLEAR(rf_rxBuf);
 	restore_zigbee_rf_context(rf_rxBuf);
@@ -50,7 +50,7 @@ _attribute_ram_code_ void switch_to_zb_context(void){
 	rf_setChannel(rf_getChannel());
 	rf_setTrxState(RF_STATE_RX);
 
-	sleep_us(150);//delete
+	//sleep_us(150);//remove it, it isn't necessary for rx mode
 
 	reg_rf_irq_status = 0xffff;
 	reg_irq_mask |= FLD_IRQ_ZB_RT_EN;
@@ -64,7 +64,7 @@ _attribute_ram_code_ void switch_to_ble_context(void){
 	ZB_RADIO_RX_BUF_CLEAR(rf_rxBuf);
 	backup_zigbee_rf_context();
 	rf_baseband_reset();
-	dma_reset();
+	//dma_reset();   //!!! remove it, or it will cause uart-tx-irq miss if uart_tx is started
 
 	restore_ble_rf_context();
 	reg_irq_mask &= ~FLD_IRQ_ZB_RT_EN;

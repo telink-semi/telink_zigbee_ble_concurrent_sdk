@@ -70,6 +70,22 @@ u32 rf_pa_txen_pin;
 u32 rf_pa_rxen_pin;
 
 
+#define ZB_SWTICH_TO_TXMODE()    do{ \
+	if(fPaEn) {	\
+		gpio_write(rf_pa_txen_pin, 1); 		\
+		gpio_write(rf_pa_rxen_pin, 0); 		\
+	}										\
+	ZB_RADIO_TRX_SWITCH(RF_MODE_TX, LOGICCHANNEL_TO_PHYSICAL(rf_getChannel()));	\
+}while(0)
+
+#define ZB_SWTICH_TO_RXMODE()    do{ \
+	if(fPaEn) {	\
+		gpio_write(rf_pa_txen_pin, 0); 		\
+		gpio_write(rf_pa_rxen_pin, 1); 		\
+	}										\
+	ZB_RADIO_TRX_SWITCH(RF_MODE_RX, LOGICCHANNEL_TO_PHYSICAL(rf_getChannel()));	\
+}while(0)
+
 /**********************************************************************
  * LOCAL FUNCTIONS
  */
@@ -225,22 +241,6 @@ void mac_phyReconfig(void){
     fPaEn = 1;
 }
 
-_attribute_ram_code_ void rf_paTX(void)
-{
-    if(fPaEn) {
-        gpio_write(rf_pa_txen_pin, 1); // PA TX_EN
-        gpio_write(rf_pa_rxen_pin, 0); // PA RX_DIS
-    }
-}
-
-_attribute_ram_code_ void rf_paRX(void)
-{
-    if(fPaEn) {
-        gpio_write(rf_pa_txen_pin, 0); // PA TX_DIS
-        gpio_write(rf_pa_rxen_pin, 1); // PA RX_EN
-    }
-}
-
 _attribute_ram_code_ void rf_paShutDown(void)
 {
     if(fPaEn) {
@@ -288,18 +288,17 @@ _attribute_ram_code_ void rf_setTrxState(u8 state)
     		ZB_RADIO_MODE_MAX_GAIN();
     	}
 
-    	rf_paRX();
-        ZB_RADIO_TRX_SWITCH(RF_MODE_RX,LOGICCHANNEL_TO_PHYSICAL(rf_getChannel()));
+    	ZB_SWTICH_TO_RXMODE();
         rfMode = RF_STATE_RX;
     } else if (RF_STATE_TX == state) {
-    	rf_paTX();
-        ZB_RADIO_TRX_SWITCH(RF_MODE_TX,LOGICCHANNEL_TO_PHYSICAL(rf_getChannel()));
+    	ZB_SWTICH_TO_TXMODE();
+        WaitUs(ZB_TX_WAIT_US);
         rfMode = RF_STATE_TX;
     } else {
         /* Close RF */
     	rf_paShutDown();
         ZB_RADIO_TRX_SWITCH(RF_MODE_OFF,LOGICCHANNEL_TO_PHYSICAL(rf_getChannel()));
-        rfMode = RF_MODE_OFF;
+        rfMode = RF_STATE_OFF;
     }
 #endif  /* WIN32 */
 }
@@ -554,6 +553,8 @@ _attribute_ram_code_ __attribute__((optimize("-Os"))) void rf_rx_irq_handler(voi
     u8 *p = rf_rxBuf;
     u8 fAck = 0;
     u8 fDrop = 0;
+    s32 txTime = 0;
+    s32 txDelayUs = 0;
 
     ZB_RADIO_RX_DISABLE;
 	/* Set 1 to clear the interrupt flag */
@@ -609,9 +610,19 @@ _attribute_ram_code_ __attribute__((optimize("-Os"))) void rf_rx_irq_handler(voi
 		return;
     }
 
+    /* switch to tx in advance to let the pll stable */
+ 	if (macPld[0] & MAC_FCF_ACK_REQ_BIT){
+ 		ZB_SWTICH_TO_TXMODE();
+ 		txTime = clock_time();
+ 	}
+
 	/* if don't have enough buffer, use current rxBuf, and drop it */
 	u8 *rxNextBuf = tl_getRxBuf();
 	if(!rxNextBuf){
+		if (macPld[0] & MAC_FCF_ACK_REQ_BIT){
+			ZB_SWTICH_TO_RXMODE();
+		}
+
     	/* diagnostics PHY to MAC queue limit */
     	g_sysDiags.phytoMACqueuelimitreached++;
 
@@ -620,17 +631,10 @@ _attribute_ram_code_ __attribute__((optimize("-Os"))) void rf_rx_irq_handler(voi
 		return;
 	}
 
-	/* Use the backup buffer to receive next packet */
-	rf_rxBuf = rxNextBuf;
-	ZB_RADIO_RX_BUF_CLEAR(rf_rxBuf);
-	ZB_RADIO_RX_BUF_SET((u16)(u32)(rf_rxBuf));
-	ZB_RADIO_RX_ENABLE;
-
     /*----------------------------------------------------------
 	 *  Send ACK
 	 */
 	if (macPld[0] & MAC_FCF_ACK_REQ_BIT) {
-		rf_setTrxState(RF_STATE_TX);
 
 		rf_ack_buf[ZB_RADIO_TX_HDR_LEN+2] = macPld[2];  //seqnno
 		rf_ack_buf[ZB_RADIO_TX_HDR_LEN] = 0x02;
@@ -661,6 +665,11 @@ _attribute_ram_code_ __attribute__((optimize("-Os"))) void rf_rx_irq_handler(voi
 
 		DBG_ZIGBEE_STATUS(0x11);
 
+		txDelayUs = (clock_time() - txTime) / CLOCK_SYS_CLOCK_1US;
+		if(txDelayUs < ZB_TX_WAIT_US){
+			WaitUs(ZB_TX_WAIT_US - txDelayUs);
+		}
+
 		ZB_RADIO_TX_START(rf_ack_buf);//Manual Mode
 		rf_busyFlag |= (TX_ACKPACKET|TX_BUSY);
 
@@ -669,6 +678,12 @@ _attribute_ram_code_ __attribute__((optimize("-Os"))) void rf_rx_irq_handler(voi
 
 		DBG_ZIGBEE_STATUS(0x13);
 	}
+
+	/* Use the backup buffer to receive next packet */
+	rf_rxBuf = rxNextBuf;
+	ZB_RADIO_RX_BUF_CLEAR(rf_rxBuf);
+	ZB_RADIO_RX_BUF_SET((u16)(u32)(rf_rxBuf));
+	ZB_RADIO_RX_ENABLE;
 
 	/* zb_mac_receive_data handler */
 	zb_macDataRecvHander(p, macPld, len, fAck, ZB_RADIO_TIMESTAMP_GET(p), ZB_RADION_PKT_RSSI_GET(p));
@@ -692,14 +707,10 @@ _attribute_ram_code_ __attribute__((optimize("-Os"))) void rf_tx_irq_handler(voi
 
 	DBG_ZIGBEE_STATUS(0x15);
 
-    if(fPaEn) {
-        gpio_write(rf_pa_txen_pin, 0); // PA TX_EN
-        gpio_write(rf_pa_rxen_pin, 1); // PA RX_EN
-    }
     g_sysDiags.macTxIrqCnt++;
 
     if(zigbee_process){
-    	ZB_RADIO_TRX_SWITCH(RF_MODE_RX,LOGICCHANNEL_TO_PHYSICAL(rf_getChannel()));
+    	ZB_SWTICH_TO_RXMODE();
     }
 
     rf_busyFlag &= ~TX_BUSY;//Clear TX busy flag after receive TX done signal

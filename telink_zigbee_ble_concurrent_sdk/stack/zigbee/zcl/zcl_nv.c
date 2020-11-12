@@ -111,7 +111,7 @@ nv_sts_t zcl_sceneTable_save(void)
 
 #ifdef ZCL_SCENE
 #if NV_ENABLE
-	st = nv_flashWriteNew(1, NV_MODULE_ZCL, NV_ITEM_ZCL_SCENE_TABLE, sizeof(zcl_sceneTable_t), (u8*)&g_zcl_sceneTab);
+	st = nv_flashWriteNew(1, NV_MODULE_ZCL, NV_ITEM_ZCL_SCENE_TABLE, ZCL_SCENE_TABLE_NUM * sizeof(zcl_sceneTable_t), (u8*)&g_zcl_sceneTab);
 #else
 	st = NV_ENABLE_PROTECT_ERROR;
 #endif
@@ -135,7 +135,7 @@ nv_sts_t zcl_sceneTable_restore(void)
 
 #ifdef ZCL_SCENE
 #if NV_ENABLE
-	st = nv_flashReadNew(1, NV_MODULE_ZCL,  NV_ITEM_ZCL_SCENE_TABLE, sizeof(zcl_sceneTable_t), (u8*)&g_zcl_sceneTab);
+	st = nv_flashReadNew(1, NV_MODULE_ZCL,  NV_ITEM_ZCL_SCENE_TABLE, ZCL_SCENE_TABLE_NUM * sizeof(zcl_sceneTable_t), (u8*)&g_zcl_sceneTab);
 #else
 	st = NV_ENABLE_PROTECT_ERROR;
 #endif

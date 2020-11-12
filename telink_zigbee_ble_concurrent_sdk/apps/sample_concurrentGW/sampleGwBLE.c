@@ -179,19 +179,19 @@ const u8 PROP_READ_WRITE_NORSP_NOTIFY = CHAR_PROP_READ | CHAR_PROP_WRITE_WITHOUT
 
 
 
- u8	my_devName[] = {'t','l','_','0','g','w'};
+ u8	my_devName[] = {'t','l','-','-','g','w'};
 //////////////////////////////////////////////////////////////////////////////
 //	 Adv Packet, Response Packet
 //////////////////////////////////////////////////////////////////////////////
  u8	tbl_advData[] = {
-	 0x07, 0x09, 't', 'l', '_', '0', 'g', 'w',
+	 0x07, 0x09, 't', 'l', '-', '-', 'g', 'w',
 	 0x02, 0x01, 0x05, 							// BLE limited discoverable mode and BR/EDR not supported
 	 0x03, 0x19, 0x80, 0x01, 					// 384, Generic Remote Control, Generic category
 	 0x05, 0x02, 0x12, 0x18, 0x0F, 0x18,		// incomplete list of service class UUIDs (0x1812, 0x180F)
 };
 
  u8	tbl_scanRsp [] = {
-		 0x07, 0x09, 't', 'l', '_', '0', 'g', 'w',
+		 0x07, 0x09, 't', 'l', '-', '-', 'g', 'w',
 	};
 
 const u8	my_PnPtrs [] = {0x02, 0x8a, 0x24, 0x66, 0x82, 0x01, 0x00};

@@ -109,3 +109,13 @@ u8 uart_tx_start(u8 *data, u32 len){
 	return 0;
 }
 
+void uart_exceptionProcess(void){
+#if	defined (MCU_CORE_826x)
+	uart_ErrorCLR();
+#elif defined(MCU_CORE_8258)
+	if(uart_is_parity_error()){
+		uart_clear_parity_error();
+	}
+#endif
+}
+

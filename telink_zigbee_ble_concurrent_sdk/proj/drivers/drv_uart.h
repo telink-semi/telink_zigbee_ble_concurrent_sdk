@@ -85,3 +85,13 @@ u8 uart_tx_done(void);
 
 
 u8 uart_tx_start(u8 *data, u32 len);
+
+
+/****************************************************************************************
+*
+*	@brief	check if exception occurs
+*
+*	@param
+*
+*/
+void uart_exceptionProcess(void );

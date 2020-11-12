@@ -752,7 +752,7 @@ _CODE_BDB_ static void bdb_mgmtPermitJoiningConfirm(void *arg)
 _CODE_BDB_ static void bdb_mgmtPermitJoiningTrig(void *arg)
 {
 	u8 sn = 0;
-	zb_mgmtPermitJoinReqTx(0xffff, BDBC_MIN_COMMISSIONING_TIME, 0x01, &sn, NULL);
+	zb_mgmtPermitJoinReqTx(0xfffc, BDBC_MIN_COMMISSIONING_TIME, 0x01, &sn, NULL);
 	TL_SCHEDULE_TASK(bdb_mgmtPermitJoiningConfirm, NULL);
 }
 
@@ -1085,7 +1085,7 @@ static void bdb_task(void *arg)
 				g_zbNwkCtx.joinAccept = 1;
 #endif
 				u8 sn = 0;
-				zb_mgmtPermitJoinReqTx(0xffff, BDBC_MIN_COMMISSIONING_TIME, 0x01, &sn, NULL);
+				zb_mgmtPermitJoinReqTx(0xfffc, BDBC_MIN_COMMISSIONING_TIME, 0x01, &sn, NULL);
 				TL_SCHEDULE_TASK(bdb_mgmtPermitJoiningConfirm,NULL);
 			}else if(evt == BDB_EVT_COMMISSIONING_NETWORK_STEER_FINISH){
 #if ZB_COORDINATOR_ROLE
@@ -1108,7 +1108,7 @@ static void bdb_task(void *arg)
 			if( evt == BDB_EVT_COMMISSIONING_NETWORK_FORMATION_PERMITJOIN){
 				u8 sn = 0;
 				g_bdbAttrs.commissioningMode.networkSteer = 1;
-				zb_mgmtPermitJoinReqTx(0xffff, BDBC_MIN_COMMISSIONING_TIME, 0x01, &sn, NULL);
+				zb_mgmtPermitJoinReqTx(0xfffc, BDBC_MIN_COMMISSIONING_TIME, 0x01, &sn, NULL);
 				TL_SCHEDULE_TASK(bdb_mgmtPermitJoiningConfirm,NULL);
 			}else if(evt == BDB_EVT_COMMISSIONING_NETWORK_FORMATION_FINISH){
 				status = bdb_commissioningFindBind();
@@ -1248,7 +1248,7 @@ _CODE_BDB_ void bdb_zdoStartDevCnf(void *arg){
 
 				//g_bdbAttrs.commissioningStatus = BDB_COMMISSION_STA_SUCCESS;
 				BDB_STATUS_SET(BDB_COMMISSION_STA_SUCCESS);
-				evt = BDB_EVT_COMMISSIONING_NETWORK_FORMATION_PERMITJOIN;
+				evt = BDB_EVT_COMMISSIONING_NETWORK_FORMATION_FINISH; //BDB_EVT_COMMISSIONING_NETWORK_FORMATION_PERMITJOIN;
 
 				if(g_bdbCtx.bdbAppCb->bdbcommissioningCb){
 					g_bdbCtx.bdbAppCb->bdbcommissioningCb(BDB_COMMISSION_STA_FORMATION_DONE, NULL);

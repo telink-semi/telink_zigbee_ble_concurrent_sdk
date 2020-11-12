@@ -40,51 +40,31 @@ extern "C" {
 
 #define PA_ENABLE					0
 
-#define FLASH_SIZE_1M			1
-
 /* board ID */
-#define BOARD_826x_EVK				0
-#define BOARD_826x_DONGLE			1
-#define BOARD_826x_DONGLE_PA		2
-#define BOARD_8258_EVK				3
-#define BOARD_8258_DONGLE			4
-#define BOARD_8258_DONGLE_1M		5
-#define BOARD_8278_EVK				6
-#define BOARD_8278_DONGLE			7
+#define BOARD_8258_EVK				1
+#define BOARD_8258_EVK_V1P2			2
+#define BOARD_8258_DONGLE			3
+#define BOARD_8258_DONGLE_1M		4
 
-#ifdef MCU_CORE_8258
-	#define BOARD					BOARD_8258_DONGLE//BOARD_8258_EVK
-	/* system clock config */
-	#define CLOCK_SYS_CLOCK_HZ  	48000000
-#elif defined(MCU_CORE_8278)
-	#define BOARD					BOARD_8278_DONGLE//BOARD_8278_EVK
-	/* system clock config */
-	#define CLOCK_SYS_CLOCK_HZ  	48000000
-#else
-	/* board define */
-	#if !PA_ENABLE
-	#define BOARD					BOARD_826x_DONGLE
-	#else
-	#define BOARD					BOARD_826x_DONGLE_PA
-	#endif
-	/* system clock config */
-	#define CLOCK_SYS_CLOCK_HZ  	32000000
+/* board define */
+#define BOARD					BOARD_8258_DONGLE_1M  //BOARD_8258_EVK
+
+/* system clock config */
+#define CLOCK_SYS_CLOCK_HZ  	48000000
+
+#if (DUAL_MODE_SW_BOOT || DUAL_MODE_HW_BOOT)
+	#define DUAL_MODE				1
+    // must use 1M flash, like  #define BOARD		BOARD_8258_DONGLE_1M
 #endif
 
-#if	(BOARD == BOARD_826x_DONGLE)
-	#include "board_826x_dongle.h"
-#elif(BOARD == BOARD_826x_DONGLE_PA)
-	#include "board_826x_dongle_pa.h"
-#elif((BOARD == BOARD_8258_DONGLE) || (BOARD == BOARD_8258_DONGLE_1M))
+#if(BOARD == BOARD_8258_DONGLE || BOARD == BOARD_8258_DONGLE_1M)
 	#include "board_8258_dongle.h"
-#elif(BOARD	== BOARD_8258_EVK)
+#elif(BOARD == BOARD_8258_EVK)
 	#include "board_8258_evk.h"
-#elif(BOARD == BOARD_8278_EVK)
-	#include "board_8278_evk.h"
-#elif(BOARD == BOARD_8278_DONGLE)
-	#include "board_8278_dongle.h"
+#elif(BOARD == BOARD_8258_EVK_V1P2)
+	#include "board_8258_evk_v1p2.h"
 #else
-	#include "board_826x_evk.h"
+	#include "board_8258_dongle.h"
 #endif
 
 

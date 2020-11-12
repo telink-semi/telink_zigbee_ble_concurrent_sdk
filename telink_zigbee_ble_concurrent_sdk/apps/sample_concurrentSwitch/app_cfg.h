@@ -42,25 +42,26 @@ extern "C" {
 #define BLE_APP_PM_ENABLE		1
 #define PA_ENABLE				0
 
-
 /* board ID */
-#define BOARD_8258_DONGLE		0
 #define BOARD_8258_EVK			1
 #define BOARD_8258_EVK_V1P2		2
+#define BOARD_8258_DONGLE		3
+#define BOARD_8258_DONGLE_1M	4
 
-#ifdef MCU_CORE_8258
-	#define BOARD					BOARD_8258_DONGLE//BOARD_8258_EVK
-	#define CLOCK_SYS_CLOCK_HZ  	32000000
-#endif
+/* board define */
+#define BOARD					BOARD_8258_DONGLE_1M  //BOARD_8258_EVK
+/* system clock config */
+#define CLOCK_SYS_CLOCK_HZ  	48000000
 
-#if (BOARD == BOARD_8258_DONGLE)
+
+#if(BOARD == BOARD_8258_DONGLE || BOARD == BOARD_8258_DONGLE_1M)
 	#include "board_8258_dongle.h"
-#elif (BOARD == BOARD_8258_EVK)
+#elif(BOARD == BOARD_8258_EVK)
 	#include "board_8258_evk.h"
-#elif (BOARD == BOARD_8258_EVK_V1P2)
+#elif(BOARD == BOARD_8258_EVK_V1P2)
 	#include "board_8258_evk_v1p2.h"
 #else
-	#error
+	#include "board_8258_dongle.h"
 #endif
 
 

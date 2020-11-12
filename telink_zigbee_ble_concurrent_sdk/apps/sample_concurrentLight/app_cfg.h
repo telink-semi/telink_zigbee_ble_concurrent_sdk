@@ -43,43 +43,31 @@ extern "C" {
 #define USB_PRINTF_MODE         0
 
 
-#define FLASH_SIZE_1M			1
-/* Running chip flash size select. If '1' - 1M, otherwise (or undefined) - 512K. */
-#if (DUAL_MODE_SW_BOOT || DUAL_MODE_HW_BOOT)
-#define FLASH_SIZE_1M			1
-#define DUAL_MODE				1
-#endif
-
 /* board ID */
-#define BOARD_826x_EVK			0
-#define BOARD_826x_DONGLE		1
-#define BOARD_8258_EVK			2
-#define BOARD_8258_EVK_V1P2		3
-#define BOARD_8258_DONGLE		4
-
+#define BOARD_8258_EVK			1
+#define BOARD_8258_EVK_V1P2		2
+#define BOARD_8258_DONGLE		3
+#define BOARD_8258_DONGLE_1M	4
 
 /* board define */
-#ifdef MCU_CORE_8258
-	#define BOARD					BOARD_8258_DONGLE//BOARD_8258_EVK
-	/* system clock config */
-	#define CLOCK_SYS_CLOCK_HZ  	32000000
-#else
-	#define BOARD					BOARD_826x_DONGLE
-	/* system clock config */
-	#define CLOCK_SYS_CLOCK_HZ  	32000000
+#define BOARD					BOARD_8258_DONGLE_1M  //BOARD_8258_EVK
+
+/* system clock config */
+#define CLOCK_SYS_CLOCK_HZ  	48000000
+
+#if (DUAL_MODE_SW_BOOT || DUAL_MODE_HW_BOOT)
+	#define DUAL_MODE				1
+    // must use 1M flash, like  #define BOARD		BOARD_8258_DONGLE_1M
 #endif
 
-
-#if	(BOARD == BOARD_826x_DONGLE)
-	#include "board_826x_dongle.h"
-#elif(BOARD == BOARD_8258_DONGLE)
+#if(BOARD == BOARD_8258_DONGLE || BOARD == BOARD_8258_DONGLE_1M)
 	#include "board_8258_dongle.h"
 #elif(BOARD == BOARD_8258_EVK)
 	#include "board_8258_evk.h"
 #elif(BOARD == BOARD_8258_EVK_V1P2)
 	#include "board_8258_evk_v1p2.h"
 #else
-	#include "board_826x_evk.h"
+	#include "board_8258_dongle.h"
 #endif
 
 

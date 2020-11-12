@@ -426,6 +426,7 @@ typedef struct{
 	u8		aps_flags;//Flag used in APS layers, see the enum of aps_flag_e
 }aps_pib_attributes_t;
 
+extern u16 GROUP_MESSAGE_SEND_ADDRESS;
 extern u8 APS_INTERFRAME_DELAY;
 extern u8 APS_MAX_WINDOW_SIZE;
 extern u8 APS_FRAGMEMT_PAYLOAD_SIZE;
@@ -486,6 +487,16 @@ void aps_bindingTab_clear(void);
  *
  **************************************************************************/
 u8 aps_bindingTblNum(void);
+
+/***********************************************************************//**
+ * @brief   delete bind information searched by destional address
+ *
+ * @param dst_addr_ref:idx in address map
+ *
+ * @return
+ *
+ **************************************************************************/
+void aps_delete_bind_by_dst(u16 dst_addr_ref);
 
 
 /***********************************************************************//**

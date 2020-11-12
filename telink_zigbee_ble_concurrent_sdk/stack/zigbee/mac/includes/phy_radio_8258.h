@@ -93,6 +93,9 @@
 /* rx packet header */
 #define ZB_RADIO_RX_HDR_LEN				5
 
+/* delay after switch to Tx mode, and then start sending */
+#define ZB_TX_WAIT_US					120
+
 /* get real payload length */
 #define ZB_RADIO_ACTUAL_PAYLOAD_LEN(p)	RF_ZIGBEE_PACKET_PAYLOAD_LENGTH_GET(p)
 
@@ -127,28 +130,11 @@ static inline u8 ZB_RADIO_RSSI_TO_LQI(rf_rxGainMode_t mode, u8 inRssi){
 	s16 minEd = -110;
 	s16 maxEd = -15;  //AGC
 
-	if(rssi < minEd){
-		lqi = 20;
-	}else if(rssi > maxEd){
-		lqi = 255;
-	}else{
-		if(rssi > -40){
-			lqi = 230;
-		}else if(rssi > -60){
-			lqi = 200;
-		}else if(rssi > -75){
-			lqi = 170;
-		}else if(rssi > -85){
-			lqi = 140;
-		}else if(rssi > -90){
-			lqi = 110;
-		}else if(rssi > -95){
-			lqi = 80;
-		}else if(rssi > -100){
-			lqi = 50;
-		}
-	}
-	 return lqi;
+	if(rssi > maxEd){rssi = maxEd;}
+	if(rssi < minEd){rssi = minEd;}
+
+	lqi = 255*(rssi - minEd)/(maxEd - minEd);
+	return lqi;
 }
 
 #endif  /* __RF_H__ */

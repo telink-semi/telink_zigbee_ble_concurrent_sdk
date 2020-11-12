@@ -213,18 +213,22 @@ typedef struct{
  * NV_MAX_MODULS
  */
 typedef enum {
-	NV_MODULE_ZB_INFO 			= 0,
-	NV_MODULE_ADDRESS_TABLE 	= 1,
-    NV_MODULE_APS 				= 2,
-    NV_MODULE_ZCL 				= 3,
-	NV_MODULE_NWK_FRAME_COUNT 	= 4,
-	NV_MODULE_OTA 				= 5,
-	NV_MODULE_APP 				= 6,
-	NV_MODULE_KEYPAIR 			= 7,
+	NV_MODULE_ZB_INFO 				= 0,  /* must not be modified, it's used in stack(.a files) */
+	NV_MODULE_ADDRESS_TABLE 		= 1,  /* must not be modified, it's used in stack(.a files) */
+	NV_MODULE_APS 					= 2,  /* must not be modified, it's used in stack(.a files) */
+	NV_MODULE_ZCL 					= 3,  /* must not be modified, it's used in stack(.a files) */
+	NV_MODULE_NWK_FRAME_COUNT 		= 4,  /* must not be modified, it's used in stack(.a files) */
+	NV_MODULE_OTA 					= 5,  /* ota previous block information(can be modified, it's used in the file of ota.c) */
+	NV_MODULE_APP 					= 6,  /* now doesn't used, application can use it */
+	NV_MODULE_KEYPAIR 				= 7,  /* mustn't be modified, it's used in stack(.a files) */
     NV_MAX_MODULS
 }nv_module_t;
 
 typedef enum {
+	NV_ITEM_ID_INVALID				= 0,/* Item id 0 must not be used. */
+
+	/* the following item id mustn't be modified, they are used in stack(.a files),
+	 * if new item is needed, add another item id */
 	NV_ITEM_ZB_INFO 				= 1,
 	NV_ITEM_ADDRESS_FOR_NEIGHBOR,
 	NV_ITEM_ADDRESS_FOR_BIND,
@@ -253,6 +257,8 @@ typedef enum {
 	NV_ITEM_APP_SIMPLE_DESC,
 
 	NV_ITEM_APP_TEST1,
+
+	NV_ITEM_ID_MAX					= 0xFF,/* Item id 0xFF must not be used. */
 }nv_item_t;
 
 typedef enum nv_sts_e {

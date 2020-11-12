@@ -27,8 +27,13 @@
 extern "C" {
 #endif
 
-#define DONGLE_8258_32		0
-#define	DONGLE_8258_48		1
+#if (BOARD == BOARD_8258_DONGLE_1M)
+	/* Running chip flash size select. If '1' - 1M, otherwise (or undefined) - 512K. */
+	#define FLASH_SIZE_1M			1
+#endif
+
+#define DONGLE_8258_32				0
+#define	DONGLE_8258_48				1
 
 #if defined DONGLE_8258_32 && (DONGLE_8258_32 == 1)
 /*******************************************************************************************************
@@ -253,22 +258,30 @@ extern "C" {
 
 #endif
 
+
 #if ZBHCI_UART
-	#error please configurate uart PIN!!!!!!
+#define UART_TX_PIN         		GPIO_PD7
+#define PD7_FUNC                	AS_UART
+#define PD7_INPUT_ENABLE        	0
+#define PD7_OUTPUT_ENABLE       	1
+#define PD7_DATA_STRENGTH       	0
+
+#define UART_RX_PIN         		GPIO_PA0
+#define PA0_FUNC                	AS_UART
+#define PA0_INPUT_ENABLE        	1
+#define PA0_OUTPUT_ENABLE       	0
+#define PA0_DATA_STRENGTH       	0
+#define PULL_WAKEUP_SRC_PA0     	PM_PIN_PULLUP_10K
+
+#define UART_PIN_CFG				uart_gpio_set(UART_TX_PD7, UART_RX_PA0);// uart tx/rx pin set
 #endif
 
 
 //DEBUG
 #if UART_PRINTF_MODE
-	#define PD7_FUNC				AS_GPIO
-	#define	DEBUG_INFO_TX_PIN	    GPIO_PD7//print
-	#define PD7_OUTPUT_ENABLE		1
-	#define PD7_INPUT_ENABLE		0
-/*
 	#define	DEBUG_INFO_TX_PIN	    GPIO_PC6//print
 	#define PC6_OUTPUT_ENABLE		1
 	#define PC6_INPUT_ENABLE		0
-*/
 #endif
 /*******************************************************************************************************
 *********************8258Dongle with 48 Pins: End*****************************************************
