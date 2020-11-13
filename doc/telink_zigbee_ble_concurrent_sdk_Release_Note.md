@@ -12,13 +12,19 @@
 * Fix mac ack timeout issue
 * Scene table store/restore issue
 
+### BREAKING CHANGES
+* None
 
 ### Features
 * 设备离网，bindList清除
 * 对于Route/Coordinator，使能Green Power
 * 更新rssi转化到Lqi的折算公式
 * 入网时tranport key超时时间可由用户层控制
+
 ### Bug Fixes
 * 修复终端节点orphan join回连时父节点的neighbor table没有有效更新的问题。
 * mac ack回复慢的问题
 * scene table保存、恢复的问题
+
+### BREAKING CHANGES
+* 无
