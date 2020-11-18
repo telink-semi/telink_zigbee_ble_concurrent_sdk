@@ -498,10 +498,6 @@ void	my_att_init ()
 #define 	MY_ADV_INTERVAL_MIN					ADV_INTERVAL_300MS
 #define 	MY_ADV_INTERVAL_MAX					ADV_INTERVAL_305MS
 
-
-#define		MY_RF_POWER_INDEX					RF_POWER_P3p01dBm
-
-
 #define		BLE_DEVICE_ADDRESS_TYPE 			BLE_DEVICE_ADDRESS_PUBLIC
 
 _attribute_data_retention_	own_addr_type_t 	app_own_address_type = OWN_ADDRESS_PUBLIC;
@@ -543,7 +539,7 @@ _attribute_data_retention_	my_fifo_t	blt_rxfifo = {
 
 
 
-
+u8	g_ble_txPowerSet = RF_POWER_P3p01dBm;
 
 _attribute_data_retention_	int device_in_connection_state;
 
@@ -627,7 +623,7 @@ void 	ble_exception_data_abandom(u8 e,u8 *p, int n){
 
 _attribute_ram_code_ void	user_set_rf_power (u8 e, u8 *p, int n)
 {
-	rf_set_power_level_index (MY_RF_POWER_INDEX);
+	rf_set_power_level_index (g_ble_txPowerSet);
 	//rf_set_power_level_index (0);
 }
 

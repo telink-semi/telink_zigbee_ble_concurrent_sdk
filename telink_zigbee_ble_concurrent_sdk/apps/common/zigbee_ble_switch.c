@@ -36,6 +36,7 @@ volatile u8 zigbee_process = 0;
 
 extern u8	*rf_rxBuf;
 extern signed char ble_current_channel;
+extern u8 g_ble_txPowerSet;
 
 _attribute_ram_code_ void switch_to_zb_context(void){
 	rf_baseband_reset();
@@ -46,6 +47,8 @@ _attribute_ram_code_ void switch_to_zb_context(void){
 
 	ZB_RADIO_INIT();
 	ZB_RADIO_TRX_CFG((RF_PKT_BUFF_LEN));
+	ZB_RADIO_TX_POWER_SET(g_zb_txPowerSet);    //switch tx power for to zb mode
+
 	ble_channel = ble_current_channel;
 	rf_setChannel(rf_getChannel());
 	rf_setTrxState(RF_STATE_RX);
@@ -72,6 +75,7 @@ _attribute_ram_code_ void switch_to_ble_context(void){
 	reg_irq_mask |= FLD_IRQ_ZB_RT_EN;
 
 	ble_rf_drv_init(RF_MODE_BLE_1M);
+	ZB_RADIO_TX_POWER_SET(g_ble_txPowerSet);    //switch tx power for ble mode
 	rf_set_ble_channel (ble_channel);
 }
 
