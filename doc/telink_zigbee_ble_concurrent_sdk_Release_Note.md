@@ -1,13 +1,13 @@
 ## V1.5.1
 
-### Features
-* Ble/Zigbee use different RF Tx Power(zb: 10dBm, ble: 3dBm)
+### Bugs
+* Ble/Zigbee use different RF Tx Power(zb: 10dBm, ble: 3dBm),  the Tx Power should be set back while doing mode switch
 
 ### BREAKING CHANGES
 * None
 
-### Features
-* Ble/Zigbee使用不同的Rf Tx power(zb: 10dBm, ble: 3dBm)
+### Bugs
+* Ble/Zigbee使用不同的Rf Tx power(zb: 10dBm, ble: 3dBm); 模式切换时，tx power应该设回相应的值
 
 ### BREAKING CHANGES
 * 无
