@@ -41,7 +41,7 @@
 #define 		BLMS_FLG_RF_CONN_DONE 		 					(FLD_RF_IRQ_CMD_DONE  | FLD_RF_IRQ_FIRST_TIMEOUT | FLD_RF_IRQ_RX_TIMEOUT | FLD_RF_IRQ_RX_CRC_2)
 
 //TODO: delete all debug codes after functions are tested OK
-#define 		BLMS_ERR_DEBUG(x)								do{irq_disable();write_reg32(0x40000, (x));while(1);}while(0)
+#define 		BLMS_ERR_DEBUG(x)								//do{irq_disable();write_reg32(0x40000, (x));while(1);}while(0)
 
 
 
