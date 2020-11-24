@@ -432,6 +432,8 @@ extern u8 APS_MAX_WINDOW_SIZE;
 extern u8 APS_FRAGMEMT_PAYLOAD_SIZE;
 extern u8 APS_BINDING_TABLE_SIZE;
 extern u8 APS_GROUP_TABLE_SIZE;
+extern u8 APS_MAX_FRAME_RETRIES;
+extern u8 APS_ACK_EXPIRY;
 extern aps_binding_table_t aps_binding_tbl;
 extern aps_group_tbl_ent_t aps_group_tbl[];
 

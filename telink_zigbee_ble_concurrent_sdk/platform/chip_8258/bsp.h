@@ -143,12 +143,12 @@ typedef struct TBLCMDSET {
 int LoadTblCmdSet (	const TBLCMDSET * pt, int size);
 
 
-
 void sub_wr_ana(unsigned int addr, unsigned char value, unsigned char e, unsigned char s);
 void sub_wr(unsigned int addr, unsigned char value, unsigned char e, unsigned char s);
 
 void mcu_reset(void);
 #define SYSTEM_RESET	mcu_reset
 
+void usb_dp_pullup_en (int en);
 
 #endif /* BSP_H_ */

@@ -115,7 +115,6 @@ typedef enum {
     MAC_TX_DONE,
 } mac_txState_t;
 
-#define		MAX_RETRY_NUM				3
 typedef enum {
     MAC_TX_EV_NEW_DATA,
     MAC_TX_EV_CSMA_IDLE,
