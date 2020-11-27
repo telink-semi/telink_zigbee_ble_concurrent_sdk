@@ -343,6 +343,20 @@ typedef struct
 #define APS_BIND_DST_ADDR_GROUP 0
 #define APS_BIND_DST_ADDR_LONG  1
 
+
+typedef struct{
+	aps_address_t 		aps_addr;
+	aps_dst_addr_mode	dst_addr_mode;
+}bind_dst_list;
+
+typedef struct{
+	u8 *txData;
+	u8 txCnt;
+	u8 totalCnt;
+	u8 resv[2];
+	bind_dst_list list[APS_BINDING_TABLE_NUM];
+}bind_dst_list_tbl;
+
 //APS bind source table struct
 typedef struct
 {
@@ -476,7 +490,7 @@ zdo_status_t aps_me_bind_req(aps_me_bind_req_t *amr);
 
 zdo_status_t aps_me_unbind_req(aps_me_unbind_req_t *amr);
 
-void aps_bindingTab_clear(void);
+aps_status_t aps_search_dst_from_bind_tbl(aps_data_req_t *apsreq, bind_dst_list_tbl *bindList);
 
 /***********************************************************************//**
  * @brief   get binding table number
