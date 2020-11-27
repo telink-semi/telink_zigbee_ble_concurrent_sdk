@@ -340,8 +340,6 @@ typedef struct
   u8	 rsv;
 }aps_group_tbl_ent_t;
 
-extern u8	aps_group_entry_num;
-
 #define APS_BIND_DST_ADDR_GROUP 0
 #define APS_BIND_DST_ADDR_LONG  1
 
@@ -500,6 +498,26 @@ u8 aps_bindingTblNum(void);
  **************************************************************************/
 void aps_delete_bind_by_dst(u16 dst_addr_ref);
 
+/***********************************************************************//**
+ * @brief   group table initialization(restore th table from NV)
+ *
+ * @param	none
+ *
+ * @return	none
+ *
+ **************************************************************************/
+u8 aps_groupTblNvInit(void );
+
+/***********************************************************************//**
+ * @brief   clear group table
+ *
+ * @param	none
+ *
+ * @return	none
+ *
+ **************************************************************************/
+void aps_groupTblReset(void);
+
 
 /***********************************************************************//**
  * @brief   send a group add request command
@@ -572,6 +590,17 @@ u8 aps_group_entry_num_get(void);
 
 
 /***********************************************************************//**
+ * @brief   set global group count according to the group table
+ *
+ * @param	None
+ *
+ * @return	none
+ *
+ **************************************************************************/
+void aps_init_group_num_set(void);
+
+
+/***********************************************************************//**
  * @brief   get the group entry depend on the group_addr
  *
  * @param	group_addr the group address
@@ -580,6 +609,19 @@ u8 aps_group_entry_num_get(void);
  *
  **************************************************************************/
 aps_group_tbl_ent_t *aps_group_search_by_addr(u16 group_addr);
+
+
+/***********************************************************************//**
+ * @brief   get the endpoint infomation according to the group address
+ *
+ * @param	group_addr the group address
+ *
+ * @epNum   endpoint number in this group address
+ *
+ * @return	the list to the endpoint information
+ *
+ **************************************************************************/
+u8 *aps_group_ep_info_get(u16 group_addr, u8 *epNum);
 
 
 /***********************************************************************//**
