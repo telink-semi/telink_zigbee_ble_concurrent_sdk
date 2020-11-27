@@ -1,8 +1,4 @@
 #include "../include/zb_common.h"
-#include "aps_internal.h"
-#include "aps_stackUse.h"
-#include "../zdo/zdo_internal.h"
-#include "../zdo/zdo_stackUse.h"
 
 #define 		APS_GROUP_EP_INVALID          0xff
 #define			APS_INVALID_GRP_ADDR           0xffff
@@ -290,9 +286,8 @@ _CODE_APS_ void aps_group_list_get(u8 *counter, u16 *group_list)
 	}
 }
 
-_CODE_APS_ void aps_init_group_num_set(void){
-	u8 i = 0;
 
+_CODE_APS_ void aps_init_group_num_set(void){
 	for(u8 i=0; i<APS_GROUP_TABLE_SIZE; i++){
 		if(aps_group_tbl[i].group_addr != APS_INVALID_GRP_ADDR){
 			aps_group_entry_num++;
