@@ -260,6 +260,25 @@ boundTblMapList_t *bindTblMapListGet(void){
 	return &aps_binding_tbl.BoudList[0];
 }
 
+/*
+ * @brief:		get the size of zigbee buffer
+ *
+ * @idx:
+ *
+ * */
+u32 zbBufferSizeGet(void){
+	return (sizeof(g_mPool));
+}
+
+/*
+ * @brief:		get the size of the binding table
+ *
+ * @idx:
+ *
+ * */
+u32 bindTblSizeGet(void){
+	return (sizeof(aps_binding_table_t));
+}
 
 /*
  * @brief:		get the size of the neighbor table

@@ -391,7 +391,38 @@ void zb_rejoin_mode_set(u8 mode);
 u32 brcTransRecordTblSizeGet(void);
 nwk_brcTransRecordEntry_t *brcTransRecordEntryGet(u8 idx);
 boundTblMapList_t *bindTblMapListGet(void);
+
+/*
+ * @brief:		get the size of zigbee buffer
+ *
+ * @idx:
+ *
+ * */
+u32 zbBufferSizeGet(void);
+
+/*
+ * @brief:		get the size of the binding table
+ *
+ * @idx:
+ *
+ * */
+u32 bindTblSizeGet(void);
+
+/*
+ * @brief:		get the size of the neighbor table
+ *
+ * @idx:
+ *
+ * */
 u32 neighborTblSizeGet(void);
+
+/*
+ * @brief:		get the size of the address mapping table
+ *
+ * @idx:
+ *
+ * */
 u32 addrMapTblSizeGet(void);
+
 
 #endif /* ZB_COMMON_H */
