@@ -46,6 +46,10 @@ u8 APS_INTERFRAME_DELAY = 100;
 u8 APS_MAX_WINDOW_SIZE = 1;
 u8 APS_FRAGMEMT_PAYLOAD_SIZE = 64;
 
+//The maximum number of retries allowed after a transmission failure.
+u8 APS_MAX_FRAME_RETRIES = 3;
+u8 APS_ACK_EXPIRY = 2;//seconds
+
 /* queue size of the software timer event */
 u8 TIMER_EVENT_SIZE = TIMER_EVENT_NUM;
 
@@ -69,6 +73,9 @@ u32 TRANSPORT_NETWORK_KEY_WAIT_TIME = (5 * 1000 * 1000);//TL_SUPERFRAMETIME_TO_U
 /* the cost threshold for one hop */
 u8 NWK_COST_THRESHOLD_ONEHOP = 3;
 
+/* the cost threshold to choose next hop from neighbor table */
+u8 NWK_NEIGHBOR_SEND_OUTGOING_THRESHOLD = 4;
+
 /* address mapping table */
 u16 TL_ZB_NWK_ADDR_MAP_SIZE = TL_ZB_NWK_ADDR_MAP_NUM;
 tl_zb_addr_map_t g_nwkAddrMap;
@@ -80,6 +87,7 @@ tl_zb_neighbor_entry_t g_zb_neighborTbl;
 
 /* routing table */
 #if ZB_ROUTER_ROLE
+u8 NWKC_TRANSFAILURE_CNT_THRESHOLD = TRANSFAILURE_CNT_MAX;
 u8 NWKC_INITIAL_RREQ_RETRIES = NWK_INITIAL_RREQ_RETRIES;
 u8 NWKC_RREQ_RETRIES = NWK_RREQ_RETRIES;
 u16 ROUTING_TABLE_SIZE = ROUTING_TABLE_NUM;
@@ -162,7 +170,7 @@ const tl_zb_mac_pib_t macPibDefault = {
 	.minBe = 5,
 #endif
 	.maxBe = 8,
-	.frameRetryNum = 3,
+	//.frameRetryNum = 3,
 	.beaconOrder = 15,
 	.superframeOrder = 0,
 	.maxCsmaBackoffs = 4,
@@ -252,6 +260,25 @@ boundTblMapList_t *bindTblMapListGet(void){
 	return &aps_binding_tbl.BoudList[0];
 }
 
+/*
+ * @brief:		get the size of zigbee buffer
+ *
+ * @idx:
+ *
+ * */
+u32 zbBufferSizeGet(void){
+	return (sizeof(g_mPool));
+}
+
+/*
+ * @brief:		get the size of the binding table
+ *
+ * @idx:
+ *
+ * */
+u32 bindTblSizeGet(void){
+	return (sizeof(aps_binding_table_t));
+}
 
 /*
  * @brief:		get the size of the neighbor table

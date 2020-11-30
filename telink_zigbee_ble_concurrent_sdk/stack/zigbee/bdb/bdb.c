@@ -96,7 +96,7 @@ const bdb_attr_t g_bdbAttrsDft = {
 		.commissioningStatus = BDB_COMMISSION_STA_SUCCESS,
 		.commissioningMode.networkSteer = 1,
 		.nodeJoinLinkKeyType = LINKKEY_TYPE_TC,
-		.tcRequireKeyExchange = 1,		//tcRequireKeyExchange: true
+		.tcRequireKeyExchange = 0,		//tcRequireKeyExchange: true
 		.scanDuration = 3,
 		.tcLinkKeyExchangeAttemptsMax = BDBC_REC_SAME_NETWROK_RETRY_ATTEMPTS,
 		.tcLinkKeyExchangeMethod = TCKEY_EXCHANGE_METHOD_APSRK,
@@ -1535,6 +1535,12 @@ _CODE_BDB_ u8 bdb_init(af_simple_descriptor_t *simple_desc, bdb_commissionSettin
 
 	/* security configure */
 	ss_zdoInit(TRUE, SS_PRECONFIGURED_NOKEY);
+
+#if ZB_COORDINATOR_ROLE
+	/* You can modify the tc policy here */
+	//AIB_TCPOLICY_ALLOW_RMT_CHANGE_SET(0);
+	//AIB_TCPOLICY_ALLOW_JOINS_SET(0);
+#endif
 
 	/* link configure */
 	bdb_linkKeyCfg(setting, g_bdbCtx.factoryNew);

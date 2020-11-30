@@ -1,3 +1,36 @@
+## V1.5.2
+
+### Bugs
+*  add usb_dp_pullup_en in lib/libdrivers_8258.a, or compile error while enable "ZBHCI_USB_CDC"， now usb cdc works
+*  system ram exception will occur if the "ZB_BUF_POOL_NUM" or“APS_BINDING_TABLE_NUM”is modified in sdk
+*  nib.ieeeAddress didn't set after touch link，so that the address information is wrong when doing binding
+*  binding address table shouldn't be updated after group binding 
+
+###Feautures
+* mac retry number controlled by mac-pib.frameRetryNum
+* update for following tc policy for ZC
+* use "various" instead of "define" for some settings
+* add aps_group.c ro open source code
+
+### BREAKING CHANGES
+* None
+
+### Bugs
+* 在lib/libdrivers_8258.a里，添加“usb_dp_pullup_en“函数，否则打开”ZBHCI_USB_CDC"编译出错，CDC可工作
+* SDK里修改"ZB_BUF_POOL_NUM" or“APS_BINDING_TABLE_NUM”会导致内存异常
+* touchlink结束后，nib.ieeeAddress没有正确赋值，导致绑定时地址出现异常。
+* 组绑定后，绑定地址表不应该更新
+
+###Feautures
+* mac重传由mac-pib.frameRetryNum控制
+* ZC 遵循tc policy
+* 宏改为变量，可有用户配置
+* 开源 aps_group.c
+
+### BREAKING CHANGES
+* 无
+
+
 ## V1.5.1
 
 ### Bugs

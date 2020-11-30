@@ -340,10 +340,22 @@ typedef struct
   u8	 rsv;
 }aps_group_tbl_ent_t;
 
-extern u8	aps_group_entry_num;
-
 #define APS_BIND_DST_ADDR_GROUP 0
 #define APS_BIND_DST_ADDR_LONG  1
+
+
+typedef struct{
+	aps_address_t 		aps_addr;
+	aps_dst_addr_mode	dst_addr_mode;
+}bind_dst_list;
+
+typedef struct{
+	u8 *txData;
+	u8 txCnt;
+	u8 totalCnt;
+	u8 resv[2];
+	bind_dst_list list[APS_BINDING_TABLE_NUM];
+}bind_dst_list_tbl;
 
 //APS bind source table struct
 typedef struct
@@ -432,6 +444,8 @@ extern u8 APS_MAX_WINDOW_SIZE;
 extern u8 APS_FRAGMEMT_PAYLOAD_SIZE;
 extern u8 APS_BINDING_TABLE_SIZE;
 extern u8 APS_GROUP_TABLE_SIZE;
+extern u8 APS_MAX_FRAME_RETRIES;
+extern u8 APS_ACK_EXPIRY;
 extern aps_binding_table_t aps_binding_tbl;
 extern aps_group_tbl_ent_t aps_group_tbl[];
 
@@ -476,7 +490,7 @@ zdo_status_t aps_me_bind_req(aps_me_bind_req_t *amr);
 
 zdo_status_t aps_me_unbind_req(aps_me_unbind_req_t *amr);
 
-void aps_bindingTab_clear(void);
+aps_status_t aps_search_dst_from_bind_tbl(aps_data_req_t *apsreq, bind_dst_list_tbl *bindList);
 
 /***********************************************************************//**
  * @brief   get binding table number
@@ -497,6 +511,26 @@ u8 aps_bindingTblNum(void);
  *
  **************************************************************************/
 void aps_delete_bind_by_dst(u16 dst_addr_ref);
+
+/***********************************************************************//**
+ * @brief   group table initialization(restore th table from NV)
+ *
+ * @param	none
+ *
+ * @return	none
+ *
+ **************************************************************************/
+u8 aps_groupTblNvInit(void );
+
+/***********************************************************************//**
+ * @brief   clear group table
+ *
+ * @param	none
+ *
+ * @return	none
+ *
+ **************************************************************************/
+void aps_groupTblReset(void);
 
 
 /***********************************************************************//**
@@ -570,6 +604,17 @@ u8 aps_group_entry_num_get(void);
 
 
 /***********************************************************************//**
+ * @brief   set global group count according to the group table
+ *
+ * @param	None
+ *
+ * @return	none
+ *
+ **************************************************************************/
+void aps_init_group_num_set(void);
+
+
+/***********************************************************************//**
  * @brief   get the group entry depend on the group_addr
  *
  * @param	group_addr the group address
@@ -578,6 +623,19 @@ u8 aps_group_entry_num_get(void);
  *
  **************************************************************************/
 aps_group_tbl_ent_t *aps_group_search_by_addr(u16 group_addr);
+
+
+/***********************************************************************//**
+ * @brief   get the endpoint infomation according to the group address
+ *
+ * @param	group_addr the group address
+ *
+ * @epNum   endpoint number in this group address
+ *
+ * @return	the list to the endpoint information
+ *
+ **************************************************************************/
+u8 *aps_group_ep_info_get(u16 group_addr, u8 *epNum);
 
 
 /***********************************************************************//**

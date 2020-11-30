@@ -117,7 +117,9 @@ typedef struct{
 	//Set to 0 in network with higher level protocols for establishing link keys. Set to 1/2 in centralized security networks
 	u8		allowTCLKrequest;
 
-	u8		allowAppLKrequest;
+	u8		allowAppLKrequest:1;
+	u8      allowRemoteTcPolicyChange:1;  /* local tc policy will be chnaged by hte mgmt_permit_join with tc=1*/
+	u8      resv:6;
 #endif
 
 }ss_tcPolicy_t;
@@ -234,7 +236,15 @@ enum AES_OPT {
 };
 
 extern ss_info_base_t ss_ib;
-#define SS_IB()							ss_ib
+#define SS_IB()	ss_ib
+
+#ifdef ZB_COORDINATOR_ROLE
+#define AIB_TCPOLICY_ALLOW_RMT_CHANGE_SET(v) 	ss_ib.tcPolicy.allowRemoteTcPolicyChange = v
+#define AIB_TCPOLICY_ALLOW_JOINS_SET(v)       	ss_ib.tcPolicy.allowJoins = v
+#define AIB_TCPOLICY_ALLOW_REJOINS_SET(v)       ss_ib.tcPolicy.allowRejoins = v
+#define AIB_TCPOLICY_USE_WHITELIST_SET(v)       ss_ib.tcPolicy.useWhiteList = v
+#define AIB_TCPOLICY_ALLOW_INSTALLCODE_SET(v)   ss_ib.tcPolicy.allowInstallCode = v
+#endif
 
 // for CCM
 u8 aes_ccmAuthTran(u8 M, u8 *key, u8 *iv, u8 *mStr, u16 mStrLen, u8 *aStr, u8 aStrLen, u8 *result);
