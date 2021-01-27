@@ -138,12 +138,6 @@ typedef enum{
 
 #define	IRQ_USB_PWDN_ENABLE  	0
 
-//////////// product  Information  //////////////////////////////
-#define ID_VENDOR				0x248a			// for report
-#define ID_PRODUCT_BASE			0x880C
-#define STRING_VENDOR			L"Telink"
-#define STRING_PRODUCT			L"BLE Remote KMA Dongle"
-#define STRING_SERIAL			L"TLSR8258"
 
 #define		BLE_REMOTE_SECURITY_ENABLE		1
 

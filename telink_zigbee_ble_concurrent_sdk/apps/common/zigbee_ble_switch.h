@@ -55,6 +55,8 @@ ble_sts_t ble_task_restart(void);
 
 void zb_ble_switch_proc(void);
 
+void concurrent_mode_main_loop(void);
+
 #if BLE_MASTER_ROLE_ENABLE
 void ble_master_serviceCbRegister(master_service_t cb);
 void ble_master_updateIndCbRegister(master_update_t cb);

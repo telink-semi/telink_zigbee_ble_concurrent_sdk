@@ -37,8 +37,8 @@
 
 
 #define STRING_VENDOR        L"Telink"
-//#define STRING_PRODUCT       L"TelinkUSBDongle"
-//#define STRING_SERIAL        L"TLSR8269"
+#define STRING_PRODUCT       L"TelinkUSBDongle"
+#define STRING_SERIAL        L"TLSR8269"
 
 /** Endpoint number of the CDC device-to-host notification IN endpoint. */
 #define CDC_NOTIFICATION_EPNUM         2
