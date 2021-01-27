@@ -135,6 +135,7 @@ extern "C" {
 	#define	DEBUG_INFO_TX_PIN	    GPIO_PC5//print
 	#define PC5_OUTPUT_ENABLE		1
 	#define PC5_INPUT_ENABLE		0
+	#define PC5_DATA_OUT			1
 #endif
 
 

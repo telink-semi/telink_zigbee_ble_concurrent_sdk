@@ -148,6 +148,7 @@ extern "C" {
 	#define	DEBUG_INFO_TX_PIN	    GPIO_PC4//print
 	#define PC4_OUTPUT_ENABLE		1
 	#define PC4_INPUT_ENABLE		0
+	#define PC4_DATA_OUT			1
 #endif
 /*******************************************************************************************************
 *********************8258Dongle with 32 Pins: End*****************************************************

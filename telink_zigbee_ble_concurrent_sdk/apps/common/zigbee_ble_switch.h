@@ -28,6 +28,17 @@
 
 #if BLE_CONCURRENT_MODE
 
+#define  ZIGBEE_AFTER_TIME    (16 * 1000 * 5)	//4ms
+#define  BLE_IDLE_TIME   	  (16 * 1000 * 5)	//5ms
+
+
+typedef void (*master_service_t) (void);
+typedef void (*master_update_t) (void);
+typedef struct{
+	master_service_t serviceCb;
+	master_update_t  updateCb;
+}ble_master_cb_t;
+
 extern volatile u8 zigbee_process;
 
 _attribute_ram_code_ void switch_to_zb_context(void);
@@ -38,10 +49,15 @@ int is_switch_to_ble(void);
 
 int is_switch_to_zigbee(void);
 
-void ble_task_stop(void);
+ble_sts_t ble_task_stop(void);
 
-void ble_task_restart(void);
+ble_sts_t ble_task_restart(void);
 
-void concurrent_mode_main_loop (void);
+void zb_ble_switch_proc(void);
+
+#if BLE_MASTER_ROLE_ENABLE
+void ble_master_serviceCbRegister(master_service_t cb);
+void ble_master_updateIndCbRegister(master_update_t cb);
+#endif
 
 #endif

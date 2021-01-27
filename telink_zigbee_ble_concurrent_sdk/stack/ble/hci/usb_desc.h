@@ -21,7 +21,7 @@
  *******************************************************************************************************/
 #pragma once
 
-#include <application/usbstd/CDCClassCommon.h>
+//#include <application/usbstd/CDCClassCommon.h>
 
 enum {
 	BTUSB_USB_STRING_LANGUAGE = 0,

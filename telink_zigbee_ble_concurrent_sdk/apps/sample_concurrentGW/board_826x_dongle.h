@@ -133,6 +133,7 @@ extern "C" {
 	#define	DEBUG_INFO_TX_PIN	    GPIO_PB5//print
 	#define PB5_OUTPUT_ENABLE		1
 	#define PB5_INPUT_ENABLE		0
+	#define PB5_DATA_OUT			1
 #endif
 
 

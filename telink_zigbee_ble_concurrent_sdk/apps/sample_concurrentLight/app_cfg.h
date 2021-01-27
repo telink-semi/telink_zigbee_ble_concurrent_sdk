@@ -37,6 +37,17 @@ extern "C" {
 #define COLOR_RGB_SUPPORT		0
 #define COLOR_CCT_SUPPORT		1
 
+/* ble mode config: act as master or slave */
+#define BLE_MASTER_ROLE_ENABLE 	0
+#define BLE_SLAVE_ROLE_ENABLE	1
+
+#if BLE_MASTER_ROLE_ENABLE
+	#define BLE_HOST_SMP_ENABLE					0  //1 for standard security management,  0 for telink referenced paring&bonding(no security)
+	#define BLE_HOST_SIMPLE_SDP_ENABLE			1  //simple service discovery
+#else
+	#define SCAN_IN_ADV_STATE					0  //only for slave, add time slot for scan after ADV
+#endif
+
 
 /* debug mode config */
 #define	UART_PRINTF_MODE		1
@@ -69,7 +80,6 @@ extern "C" {
 #else
 	#include "board_8258_dongle.h"
 #endif
-
 
 #define 	MODULE_BUFM_ENABLE        1
 #define 	MODULE_PRIQ_ENABLE        1
@@ -104,7 +114,7 @@ extern "C" {
 
 #define	BLE_REMOTE_OTA_ENABLE						1
 
-#define AF_TEST_ENABLE			1
+#define AF_TEST_ENABLE								1
 
 ///////////////////  Zigbee Profile Configuration /////////////////////////////////
 #include "stack_cfg.h"

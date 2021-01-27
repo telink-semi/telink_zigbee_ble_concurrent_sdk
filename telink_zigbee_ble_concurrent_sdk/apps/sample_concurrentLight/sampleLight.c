@@ -42,6 +42,13 @@
 #include "../../zigbee/testcase/test_profile.h"
 #endif
 
+
+#define TEST_BLE_STOP_RESTART		0   //for testing ble stop/restart
+#if TEST_BLE_STOP_RESTART
+volatile u8 T_bleCtrl = 0;
+#include "zigbee_ble_switch.h"
+#endif
+
 /**********************************************************************
  * LOCAL CONSTANTS
  */
@@ -105,7 +112,7 @@ bdb_commissionSetting_t g_bdbCommissionSetting = {
 	.touchlinkEnable = 0,												/* disable touch-link */
 #endif
 	.touchlinkChannel = DEFAULT_CHANNEL, 								/* touch-link default operation channel for target */
-	.touchlinkLqiThreshold = 0xf0,			   							/* threshold for touch-link scan req/resp command */
+	.touchlinkLqiThreshold = 0xA0,			   							/* threshold for touch-link scan req/resp command */
 };
 
 /**********************************************************************
@@ -274,7 +281,7 @@ void user_app_init(void)
     zcl_init(sampleLight_zclProcessIncomingMsg);
 
 	/* Register endPoint */
-	af_endpointRegister(SAMPLE_LIGHT_ENDPOINT, (af_simple_descriptor_t *)&sampleLight_simpleDesc, zcl_rx_handler, NULL);
+	af_endpointRegister(SAMPLE_LIGHT_ENDPOINT, (af_simple_descriptor_t *)&sampleLight_simpleDesc, zcl_rx_handler, sampleLight_dataSendConfirm);
 
 #if AF_TEST_ENABLE
 	/* A sample of AF data handler. */
@@ -358,6 +365,16 @@ void app_task(void)
 		sampleLightAttrsChk();
 #endif
 	}
+
+#if TEST_BLE_STOP_RESTART
+	if(T_bleCtrl == 1){
+		ble_task_stop();
+		T_bleCtrl = 0;
+	}else if(T_bleCtrl == 2){
+		ble_task_restart();
+		T_bleCtrl = 0;
+	}
+#endif
 }
 
 static void sampleLightSysException(void)

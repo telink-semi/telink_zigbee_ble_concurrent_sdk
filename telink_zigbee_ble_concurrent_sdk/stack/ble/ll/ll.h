@@ -293,6 +293,7 @@ extern st_ll_scan_t  blts;
 extern u32			 blc_tlkEvent_pending;
 
 
+void blc_ll_setScanWin(u32 winSizeUs);
 
 
 

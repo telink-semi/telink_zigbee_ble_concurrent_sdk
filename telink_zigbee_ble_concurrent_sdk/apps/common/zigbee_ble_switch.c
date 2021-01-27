@@ -19,6 +19,7 @@
  *			 file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
  *
  *******************************************************************************************************/
+#include "zigbee_ble_switch.h"
 #include "user_config.h"
 #include "zb_common.h"
 #include "stack/ble/blt_config.h"
@@ -28,15 +29,26 @@
 
 #if BLE_CONCURRENT_MODE
 
-#define  ZIGBEE_AFTER_TIME    (16 * 1000 * 5)	//4ms
-#define  BLE_IDLE_TIME   	  (16 * 1000 * 5)	//5ms
+#if BLE_MASTER_ROLE_ENABLE
+ble_master_cb_t  g_bleMasterHandler = {
+	.serviceCb = NULL,
+	.updateCb = NULL
+};
+extern int blm_disconnect;
+#endif
 
 signed char ble_channel = 0;
 volatile u8 zigbee_process = 0;
+static u32 g_bleTaskTick = 0;
 
 extern u8	*rf_rxBuf;
 extern signed char ble_current_channel;
 extern u8 g_ble_txPowerSet;
+
+#define ZB_RF_ISR_RECOVERY		do{  \
+									if(zigbee_process == 1)	reg_rf_irq_mask |= (FLD_RF_IRQ_TX | FLD_RF_IRQ_RX);  \
+								}while(0)
+
 
 _attribute_ram_code_ void switch_to_zb_context(void){
 	rf_baseband_reset();
@@ -76,9 +88,27 @@ _attribute_ram_code_ void switch_to_ble_context(void){
 
 	ble_rf_drv_init(RF_MODE_BLE_1M);
 	ZB_RADIO_TX_POWER_SET(g_ble_txPowerSet);    //switch tx power for ble mode
-	rf_set_ble_channel (ble_channel);
+	//rf_set_ble_channel (ble_channel);
+	rf_set_tx_rx_off();//GaoQiu add
 }
 
+#if SCAN_IN_ADV_STATE
+/*
+ * ble is doing scan in the state of ADV
+ *
+ * @param ref_tick  beginning time the ADV
+ *
+ * @param index     is to control the scan interval, scan interval is (ADV-interval * index/16)
+ *
+ * */
+static u32	blc_scan_busy_in_adv(u32 ref_tick, u8 index){
+	unsigned int ret = 0;
+	if(blts.scan_extension_mask & BLS_FLAG_SCAN_IN_ADV_MODE){
+		ret = ((unsigned int)((ref_tick + (blta.adv_interval >> 4) * (index & 0x0f)) - reg_system_tick)) < BIT(30);
+	}
+	return ret;
+}
+#endif
 
 
 int is_switch_to_ble(void){
@@ -108,20 +138,53 @@ void zb_task(void){
 	ev_main(1);
 }
 
-void concurrent_mode_main_loop (void){
+
+void zb_ble_switch_proc(void){
 	u8 r = 0;
 
 	 if(zigbee_process == 0){
+		 g_bleTaskTick = clock_time();
+
 		 /*
 		  * ble task
 		  *
 		  * */
+#if SCAN_IN_ADV_STATE
+		 /* add scan functionality after advertising during ADV state, just for slave mode */
+		 do{
+			 /* disable pm during scan */
+	#if PM_ENABLE
+			 if(blt_state == BLS_LINK_STATE_ADV){
+				 bls_pm_setSuspendMask (SUSPEND_DISABLE);
+			 }
+	#endif
+
+			 blt_sdk_main_loop();
+		 }while((blt_state == BLS_LINK_STATE_ADV) && blc_scan_busy_in_adv(g_bleTaskTick,2));//MY_ADV_INTERVAL*3/4
+
+		 /* enable pm after scan */
+	#if PM_ENABLE
+		 bls_pm_setSuspendMask (SUSPEND_ADV | SUSPEND_CONN);
+	#endif
+
+#else
 		 blt_sdk_main_loop();
+#endif
 		 DBG_ZIGBEE_STATUS(0x30);
+
+#if BLE_MASTER_ROLE_ENABLE
+		 if(g_bleMasterHandler.updateCb){
+			 g_bleMasterHandler.updateCb();
+		 }
+#endif
 
 		 r = irq_disable();
 
-		 if((get_ble_event_state() && is_switch_to_zigbee()) || blt_state == BLS_LINK_STATE_IDLE){
+		 if(((get_ble_event_state() && is_switch_to_zigbee()) || blt_state == BLS_LINK_STATE_IDLE)
+#if BLE_MASTER_ROLE_ENABLE
+			 && !blm_disconnect
+#endif
+			 ){
 			 /*
 			  * ready to switch to ZIGBEE mode
 			  *
@@ -168,16 +231,63 @@ void concurrent_mode_main_loop (void){
 	 }
 }
 
+void concurrent_mode_main_loop(void){
+	zb_ble_switch_proc();
 
-void ble_task_stop(void){
-	if(blt_state == BLS_LINK_STATE_CONN){
-		bls_ll_terminateConnection(HCI_ERR_REMOTE_USER_TERM_CONN);//cut any ble connections
+#if BLE_MASTER_ROLE_ENABLE
+	u8 bleMode = !zigbee_process;
+	if(bleMode && g_bleMasterHandler.serviceCb){
+		g_bleMasterHandler.serviceCb();
+		g_bleMasterHandler.serviceCb = NULL;
 	}
-	bls_ll_setAdvEnable(0);
+#endif
 }
 
-void ble_task_restart(void){
-	bls_ll_setAdvEnable(1);
+ble_sts_t ble_task_stop(void){
+	ble_sts_t ret = BLE_SUCCESS;
+
+	u8 r = irq_disable();
+
+	if(blt_state == BLS_LINK_STATE_CONN){
+		ret = bls_ll_terminateConnection(HCI_ERR_OP_CANCELLED_BY_HOST);//cut any ble connections
+	}else{
+		ret = bls_ll_setAdvEnable(0);
+
+		/* rf irq is cleared in the "bls_ll_setAdvEnable",
+		 * so that the rf tx/rx interrupt will be missed if the "bls_ll_setAdvEnable" is called in Zigbee mode
+		 */
+		if(ret == BLE_SUCCESS){
+			ZB_RF_ISR_RECOVERY;
+		}
+	}
+
+	irq_restore(r);
+	return ret;
 }
+
+ble_sts_t ble_task_restart(void){
+	u8 r = irq_disable();
+
+	ble_sts_t ret = bls_ll_setAdvEnable(1);
+	/* rf irq is cleared in the "bls_ll_setAdvEnable",
+	 * so that the rf tx/rx interrupt will be missed if the "bls_ll_setAdvEnable" is called in Zigbee mode
+	 */
+	if(ret == BLE_SUCCESS){
+		ZB_RF_ISR_RECOVERY;
+	}
+
+	irq_restore(r);
+	return ret;
+}
+
+#if BLE_MASTER_ROLE_ENABLE
+void ble_master_serviceCbRegister(master_service_t cb){
+	g_bleMasterHandler.serviceCb = cb;
+};
+
+void ble_master_updateIndCbRegister(master_update_t cb){
+	g_bleMasterHandler.updateCb = cb;
+};
+#endif
 
 #endif

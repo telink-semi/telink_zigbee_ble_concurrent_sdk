@@ -122,6 +122,7 @@ ble_sts_t    blc_ll_removeScanningFromAdvState(void);
 ble_sts_t    blc_ll_addScanningInConnSlaveRole(void);
 ble_sts_t    blc_ll_removeScanningFromConnSLaveRole(void);
 
+u8 blc_scan_busy(u8 index);
 
 
 /************************* Stack Interface, user can not use!!! ***************************/

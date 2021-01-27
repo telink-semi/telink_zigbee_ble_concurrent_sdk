@@ -41,6 +41,7 @@ static u8 *uartDrvTxBuf = NULL;
 
 void drv_uart_init(u32 baudrate, u8 *rxBuf, u16 rxBufLen, uart_irq_callback uart_recvCb){
 #if	defined (MCU_CORE_826x)
+	uart_Reset();
 	uart_Init(baudrate, 1, 1, NOCONTROL);
 
 	uart_RecBuffInit(rxBuf, rxBufLen);	/* configure receive buffer */
@@ -59,6 +60,11 @@ void drv_uart_init(u32 baudrate, u8 *rxBuf, u16 rxBufLen, uart_irq_callback uart
 	uart_irq_enable(0, 0);  	//uart Rx/Tx irq no need, disable them
 #endif
 
+	if(uartDrvTxBuf){
+		ev_buf_free(uartDrvTxBuf);
+		uartDrvTxBuf = NULL;
+	}
+	myUartDriver.status = UART_STA_IDLE;
 	myUartDriver.recvCb = uart_recvCb;
 }
 

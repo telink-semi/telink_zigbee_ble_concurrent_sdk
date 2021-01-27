@@ -69,6 +69,7 @@ static ev_time_event_t *pairingTimeoutEvt = NULL;
 #endif
 
 volatile u8 T_zbdemoBdbInfo[6] = {0};
+volatile u32 T_zclDataSendError[2] = {0};
 
 
 #define OTA_INFO_DBG		0
@@ -413,7 +414,16 @@ void sampleLight_mgmtNwkUpdateIndHandler(void *p){
 	}else{
 		/* invalid command */
 	}
+}
 
+void sampleLight_dataSendConfirm(void *arg){
+	apsdeDataConf_t *pApsDataCnf = (apsdeDataConf_t *)arg;
+	if(pApsDataCnf->status != SUCCESS){
+		T_zclDataSendError[0]++;
+		printf("light_send err: status = %x\n", pApsDataCnf->status);
+	}else{
+		T_zclDataSendError[1]++;
+	}
 }
 
 #endif  /* __PROJECT_TL_DIMMABLE_LIGHT__ */

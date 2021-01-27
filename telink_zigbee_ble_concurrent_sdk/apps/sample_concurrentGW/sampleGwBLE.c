@@ -613,7 +613,9 @@ void 	ble_remote_terminate(u8 e,u8 *p, int n) //*p is terminate reason
 
 	advertise_begin_tick = clock_time();
 
-    bls_ll_setAdvEnable(1);  //adv enable
+	if(*p != HCI_ERR_OP_CANCELLED_BY_HOST){
+		bls_ll_setAdvEnable(1);  //adv enable
+	}
 }
 
 volatile u8 T_bleDataAbandom;

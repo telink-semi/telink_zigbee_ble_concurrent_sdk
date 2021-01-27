@@ -65,6 +65,7 @@ extern "C" {
 	#define	DEBUG_INFO_TX_PIN	    GPIO_PC7//print
 	#define PC7_OUTPUT_ENABLE		1
 	#define PC7_INPUT_ENABLE		0
+	#define PC7_DATA_OUT			1
 #endif
 
 

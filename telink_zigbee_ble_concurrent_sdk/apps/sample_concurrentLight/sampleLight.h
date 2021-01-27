@@ -255,6 +255,8 @@ void sampleLight_leaveIndHandler(void *p);
 void sampleLight_otaProcessMsgHandler(u8 evt, u8 status);
 void sampleLight_mgmtNwkUpdateIndHandler(void *p);
 
+void sampleLight_dataSendConfirm(void *arg);
+
 void sampleLight_onoff(u8 cmd);
 
 void zcl_sampleLightAttrsInit(void);

@@ -123,6 +123,7 @@ extern "C" {
 	#define	DEBUG_INFO_TX_PIN	    GPIO_PC6//print
 	#define PC6_OUTPUT_ENABLE		1
 	#define PC6_INPUT_ENABLE		0
+	#define PC6_DATA_OUT			1
 #endif
 /*******************************************************************************************************
 *********************8258Dongle with 48 Pins: End*****************************************************

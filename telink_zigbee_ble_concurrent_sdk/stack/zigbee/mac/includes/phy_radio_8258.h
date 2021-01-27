@@ -126,7 +126,7 @@
 										}while(0)
 
 /* sys timer initialization for mac-csma */
-#define ZB_TIMER_INIT()					hwTmr_init(TIMER_IDX_3, TIMER_MODE_SCLK)
+#define ZB_TIMER_INIT()					hwTmr_init(TIMER_IDX_1, TIMER_MODE_SCLK)
 
 static inline u8 ZB_RADIO_RSSI_TO_LQI(rf_rxGainMode_t mode, u8 inRssi){
 	u8 lqi = 0;

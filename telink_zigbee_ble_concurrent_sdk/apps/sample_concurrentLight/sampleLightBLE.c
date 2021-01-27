@@ -4,7 +4,7 @@
 #include "tl_common.h"
 #include "zb_api.h"
 #include "zcl_include.h"
-#include "sampleLight.h"
+#include "sampleLightCtrl.h"
 
 
 #if (__PROJECT_TL_CONCURRENT_LIGHT__)
@@ -620,7 +620,9 @@ void 	ble_remote_terminate(u8 e,u8 *p, int n) //*p is terminate reason
 
 	advertise_begin_tick = clock_time();
 
-    bls_ll_setAdvEnable(1);  //adv enable
+	if(*p != HCI_ERR_OP_CANCELLED_BY_HOST){
+		bls_ll_setAdvEnable(1);  //adv enable
+	}
 }
 
 volatile u8 T_bleDataAbandom;
@@ -798,6 +800,44 @@ static void app_enter_ota_mode(void){
 	bls_ota_setTimeout(260 * 1000 * 1000); //set OTA timeout  120 seconds
 }
 
+#define DBG_ADV_REPORT_ON_RAM 				0     //just debug
+#if (DBG_ADV_REPORT_ON_RAM)  //debug adv report on ram
+	#define  RAM_ADV_MAX		64
+	u8 AA_advRpt[RAM_ADV_MAX][48];
+	u8 AA_advRpt_index = 0;
+#endif
+
+int controller_event_callback (u32 h, u8 *p, int n)
+{
+	if (h &HCI_FLAG_EVENT_BT_STD)		//ble controller hci event
+	{
+		u8 evtCode = h & 0xff;
+
+		if(evtCode == HCI_EVT_LE_META)
+		{
+			u8 subEvt_code = p[0];
+			if (subEvt_code == HCI_SUB_EVT_LE_ADVERTISING_REPORT)	// ADV packet
+			{
+				//after controller is set to scan state, it will report all the adv packet it received by this event
+
+				//event_adv_report_t *pa = (event_adv_report_t *)p;
+				//s8 rssi = (s8)pa->data[pa->len];//rssi has already plus 110.
+
+				#if (DBG_ADV_REPORT_ON_RAM)
+					if(pa->len > 31){
+						pa->len = 31;
+					}
+					memcpy( (u8 *)AA_advRpt[AA_advRpt_index++],  p, pa->len + 11);
+					if(AA_advRpt_index >= RAM_ADV_MAX){
+						AA_advRpt_index = 0;
+					}
+				#endif
+			}
+		}
+	}
+	return 0;
+}
+
 
 void user_ble_init(void)
 {
@@ -906,6 +946,25 @@ void user_ble_init(void)
 
 	bls_ll_setAdvEnable(1);  //adv enable
 
+#if SCAN_IN_ADV_STATE
+	//scan setting
+	blc_ll_initScanning_module(mac_public);
+	blc_hci_le_setEventMask_cmd(HCI_LE_EVT_MASK_ADVERTISING_REPORT);
+	blc_hci_registerControllerEventHandler(controller_event_callback);
+
+#if 1  //report all adv
+	blc_ll_setScanParameter(SCAN_TYPE_PASSIVE, SCAN_INTERVAL_100MS, SCAN_INTERVAL_100MS,
+							  OWN_ADDRESS_PUBLIC, SCAN_FP_ALLOW_ADV_ANY);
+#else //report adv only in whitelist
+	ll_whiteList_reset();
+	u8 test_adv[6] = {0x33, 0x33, 0x33, 0x33, 0x33, 0x33};
+	ll_whiteList_add(BLE_ADDR_PUBLIC, test_adv);
+	blc_ll_setScanParameter(SCAN_TYPE_PASSIVE, SCAN_INTERVAL_100MS, SCAN_INTERVAL_100MS,
+							  OWN_ADDRESS_PUBLIC, SCAN_FP_ALLOW_ADV_WL);
+
+#endif
+	blc_ll_addScanningInAdvState();  //add scan in adv state
+#endif
 
 	//set rf power index, user must set it after every suspend wakeup, cause relative setting will be reset in suspend
 	user_set_rf_power(0, 0, 0);
