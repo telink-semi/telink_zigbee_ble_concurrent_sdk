@@ -1,3 +1,49 @@
+## V1.5.4
+
+### Bugs
+*  buffer free issue while doing join(data request confirmation occurs after associate confirmation)
+
+### Feautures
+* add ble master demo
+
+### BREAKING CHANGES
+* None
+
+### Bugs
+* 入网过程中buffer释放异常(当data request confirm在associate confirmation之后产生)
+
+### Feautures
+* 添加ble master用例
+
+### BREAKING CHANGES
+* 无
+
+## V1.5.3
+
+### Bugs
+*  system timer interrupt has still run even if ble is idle.
+*  call ble_task_restart/ble_task_stop in zigbee mode, the interupt mask will be cleared
+*  buffer free issue while doing join
+
+### Feautures
+* add ble master functoinality
+* add ble scan during ADV 
+
+### BREAKING CHANGES
+* None
+
+### Bugs
+* ble处于idle时，system timer中断仍然工作
+* zigbee模式下调用task_restart/ble_task_stop， 导致rf中断mask位被清除
+* 入网过程中buffer释放异常
+
+### Feautures
+* 添加ble master功能
+* ble ADV状态添加scan功能
+
+### BREAKING CHANGES
+* 无
+
 ## V1.5.2
 
 ### Bugs
