@@ -4,10 +4,10 @@
 #include "tl_common.h"
 #include "zb_api.h"
 #include "zcl_include.h"
-#include "sampleLightCtrl.h"
+#include "sampleLight.h"
 
 
-#if (__PROJECT_TL_CONCURRENT_LIGHT__)
+#if (__PROJECT_TL_CONCURRENT_LIGHT__ && BLE_SLAVE_ROLE_ENABLE)
 
 
 typedef enum
@@ -820,8 +820,8 @@ int controller_event_callback (u32 h, u8 *p, int n)
 			{
 				//after controller is set to scan state, it will report all the adv packet it received by this event
 
-				//event_adv_report_t *pa = (event_adv_report_t *)p;
-				//s8 rssi = (s8)pa->data[pa->len];//rssi has already plus 110.
+				event_adv_report_t *pa = (event_adv_report_t *)p;
+				s8 rssi = (s8)pa->data[pa->len];//rssi has already plus 110.
 
 				#if (DBG_ADV_REPORT_ON_RAM)
 					if(pa->len > 31){
@@ -835,7 +835,7 @@ int controller_event_callback (u32 h, u8 *p, int n)
 			}
 		}
 	}
-	return 0;
+
 }
 
 
