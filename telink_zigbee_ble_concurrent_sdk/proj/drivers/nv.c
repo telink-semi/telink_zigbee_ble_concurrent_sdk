@@ -46,16 +46,18 @@ u32 g_u32CfgFlashAddr = CFG_ADDR_512K_FLASH;
  */
 void internalFlashSizeCheck(void){
 #if defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
-	u8 mid[4] = {0};
-	flash_read_mid(mid);
+	u32 mid = 0;
+	u8 *pMid = (u8 *)&mid;
 
-	if( ((mid[2] != FLASH_CAP_SIZE_512K) && (mid[2] != FLASH_CAP_SIZE_1M)) ||
-		((g_u32MacFlashAddr == MAC_ADDR_1M_FLASH) && (mid[2] != FLASH_CAP_SIZE_1M)) ){
+	mid = flash_read_mid();
+
+	if( ((pMid[2] != FLASH_CAP_SIZE_512K) && (pMid[2] != FLASH_CAP_SIZE_1M)) ||
+		((g_u32MacFlashAddr == MAC_ADDR_1M_FLASH) && (pMid[2] != FLASH_CAP_SIZE_1M)) ){
 		/* Flash space not matched. */
 		while(1);
 	}
 
-	if( (g_u32MacFlashAddr == MAC_ADDR_512K_FLASH) && (mid[2] == FLASH_CAP_SIZE_1M) ){
+	if( (g_u32MacFlashAddr == MAC_ADDR_512K_FLASH) && (pMid[2] == FLASH_CAP_SIZE_1M) ){
 		g_u32MacFlashAddr = MAC_ADDR_1M_FLASH;
 		g_u32CfgFlashAddr = CFG_ADDR_1M_FLASH;
 	}

@@ -1353,6 +1353,7 @@ _CODE_ZCL_ status_t zcl_writeHandler(zclIncoming_t *pCmd)
 	u8 endpoint = pCmd->msg->indInfo.dst_ep;
 	zclWriteRspCmd_t *pWriteRspCmd = NULL;
 	u8 succWriteAttrCnt = 0;
+	u8 failWriteAttrCnt = 0;
 	bool rspSend = FALSE;
 
 	/* Parse In Write Command */
@@ -1380,20 +1381,22 @@ _CODE_ZCL_ status_t zcl_writeHandler(zclIncoming_t *pCmd)
 		status = zcl_attrWrite(endpoint, clusterId, pWriteRec, TRUE);
 
 		if(rspSend){
-			pWriteRspCmd->attrList[i].status = status;
-			pWriteRspCmd->attrList[i].attrID = pWriteRec->attrID;
-
 			if(status == ZCL_STA_SUCCESS){
 				succWriteAttrCnt++;
+			}else{
+				pWriteRspCmd->attrList[failWriteAttrCnt].status = status;
+				pWriteRspCmd->attrList[failWriteAttrCnt].attrID = pWriteRec->attrID;
+				failWriteAttrCnt++;
 			}
 		}
 	}
 	
 	if(rspSend){
-		pWriteRspCmd->numAttr = pWriteCmd->numAttr;
 		if(pWriteCmd->numAttr == succWriteAttrCnt){
 			pWriteRspCmd->numAttr = 1;
 			pWriteRspCmd->attrList[0].status = ZCL_STA_SUCCESS;
+		}else{
+			pWriteRspCmd->numAttr = failWriteAttrCnt;
 		}
 
 		epInfo_t dstEp;

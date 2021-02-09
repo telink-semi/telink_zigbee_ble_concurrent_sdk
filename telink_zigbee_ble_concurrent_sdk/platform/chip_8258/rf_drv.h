@@ -367,12 +367,12 @@ static inline unsigned char rf_tx_finish(void)
 }
 static inline void rf_tx_finish_clear_flag(void)
 {
-    WRITE_REG8(0xf20, READ_REG8(0xf20) | 0x02);
+    WRITE_REG8(0xf20, 0x02);
 }
 
 static inline void rf_rx_finish_clear_flag(void)
 {
-    WRITE_REG8(0xf20, READ_REG8(0xf20) | 0x01);
+    WRITE_REG8(0xf20, 0x01);
 }
 
 static inline void rf_rx_buffer_reconfig(unsigned short RF_RxAddr)

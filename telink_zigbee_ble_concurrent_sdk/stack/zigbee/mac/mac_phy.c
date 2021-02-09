@@ -91,6 +91,10 @@ u32 rf_pa_rxen_pin;
  */
  void rf_edDetect(void);
 
+ _attribute_ram_code_ u32 mac_currentTickGet(void){
+	 return clock_time();
+ }
+
 /*********************************************************************
  * @fn      rf_regProtocolSpecific
  *
@@ -556,6 +560,7 @@ _attribute_ram_code_ __attribute__((optimize("-Os"))) void rf_rx_irq_handler(voi
     s32 txTime = 0;
     s32 txDelayUs = 0;
 
+    /* disable RF rx dma */
     ZB_RADIO_RX_DISABLE;
 	/* Set 1 to clear the interrupt flag */
     ZB_RADIO_RX_DONE_CLR;
@@ -631,6 +636,12 @@ _attribute_ram_code_ __attribute__((optimize("-Os"))) void rf_rx_irq_handler(voi
 		return;
 	}
 
+
+	/* Use the backup buffer to receive next packet */
+	rf_rxBuf = rxNextBuf;
+	ZB_RADIO_RX_BUF_CLEAR(rf_rxBuf);
+	ZB_RADIO_RX_BUF_SET((u16)(u32)(rf_rxBuf));
+
     /*----------------------------------------------------------
 	 *  Send ACK
 	 */
@@ -670,19 +681,30 @@ _attribute_ram_code_ __attribute__((optimize("-Os"))) void rf_rx_irq_handler(voi
 			WaitUs(ZB_TX_WAIT_US - txDelayUs);
 		}
 
+		/* wait until tx done,
+		 *  disable tx irq here, rfMode still is RF_STATE_RX;
+		 *  */
+		/* clear rf interrupt mask bit*/
+		ZB_RADIO_IRQ_MASK_CLR;
+		/* start to send ack */
 		ZB_RADIO_TX_START(rf_ack_buf);//Manual Mode
-		rf_busyFlag |= (TX_ACKPACKET|TX_BUSY);
 
-		DBG_ZIGBEE_STATUS(0x12);
+		DBG_ZIGBEE_STATUS(0x12);  //for debug
+
+		/* wait until tx done */
 		while(!ZB_RADIO_TX_DONE);
 
-		DBG_ZIGBEE_STATUS(0x13);
+		/* clear the tx done status */
+		ZB_RADIO_TX_DONE_CLR;
+		/* set interrupt mask bit again */
+		ZB_RADIO_IRQ_MASK_SET;
+		/* rf is set to rx mode again */
+		ZB_SWTICH_TO_RXMODE();
+
+		DBG_ZIGBEE_STATUS(0x13);   //for debug
 	}
 
-	/* Use the backup buffer to receive next packet */
-	rf_rxBuf = rxNextBuf;
-	ZB_RADIO_RX_BUF_CLEAR(rf_rxBuf);
-	ZB_RADIO_RX_BUF_SET((u16)(u32)(rf_rxBuf));
+	/* enable rf rx dma again */
 	ZB_RADIO_RX_ENABLE;
 
 	/* zb_mac_receive_data handler */
@@ -704,25 +726,19 @@ _attribute_ram_code_ __attribute__((optimize("-Os"))) void rf_rx_irq_handler(voi
 _attribute_ram_code_ __attribute__((optimize("-Os"))) void rf_tx_irq_handler(void){
 
 	ZB_RADIO_TX_DONE_CLR;
+	rf_busyFlag &= ~TX_BUSY;//Clear TX busy flag after receive TX done signal
 
 	DBG_ZIGBEE_STATUS(0x15);
-
     g_sysDiags.macTxIrqCnt++;
 
     if(zigbee_process){
+    	extern u8 rfMode;
     	ZB_SWTICH_TO_RXMODE();
+    	rfMode = RF_STATE_RX;
+    	DBG_ZIGBEE_STATUS(0x16);
     }
 
-    rf_busyFlag &= ~TX_BUSY;//Clear TX busy flag after receive TX done signal
-	extern u8 rfMode;
-	rfMode = RF_STATE_RX;
-    if(rf_busyFlag & TX_ACKPACKET){
-    	DBG_ZIGBEE_STATUS(0x16);
-    	rf_busyFlag &= ~TX_ACKPACKET;//Clear ACK TX done
-    }else{
-		zb_macDataSendHander();
-		DBG_ZIGBEE_STATUS(0x17);
-	}
+	zb_macDataSendHander();
 }
 
 inline bool zb_rfSwitchAllow(void){

@@ -86,6 +86,11 @@
 												irq_set_mask(FLD_IRQ_ZB_RT_EN); \
 											}while(0)
 
+/* clear mask bit to disable tx irq */
+#define ZB_RADIO_IRQ_MASK_CLR				irq_clr_mask(FLD_IRQ_ZB_RT_EN)
+
+/* clear mask bit to disable tx irq */
+#define ZB_RADIO_IRQ_MASK_SET				irq_set_mask(FLD_IRQ_ZB_RT_EN)
 
 /* tx packet header */
 #define ZB_RADIO_TX_HDR_LEN				5
