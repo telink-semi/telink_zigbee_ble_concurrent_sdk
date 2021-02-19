@@ -1,3 +1,32 @@
+## V1.5.5
+
+### Bugs
+*  the field in the writeAttrResp should only include the info of the attribute which status isn't successful.  
+*  should free the buffer when manyToOne routing table is full(just for coordinator).
+
+### Feautures
+* improve the mac tx/rx performance
+  1. simplify sending the ack packet,
+  2. the incomming packets don't be discarded while it's waiting the ack
+* timer event number can be configured by user, and limit the broadcast timer event number(by TIMER_EVENT_SIZE_BRC) to avoid system exception
+* update driver for supporting different flash(open source for flash.c)
+
+### BREAKING CHANGES
+* None
+
+### Bugs
+* writeAttrResp数据中仅包含状态为错误的attr的信息
+* manyToOne routing table满，存在buffer未被释放的问题（仅对 coordinator）
+
+### Feautures
+* 提高mac tx/rx的性能（简化了ack数据包的发送过程； 等待ack时不再丢弃收到的数据）
+* 更新驱动用以支持不同型号的flash(flash.c开源)
+* timer事件table大小可由用户配置，另外限制广播timer事件避免系统异常
+
+### BREAKING CHANGES
+* 无
+
+
 ## V1.5.4
 
 ### Bugs

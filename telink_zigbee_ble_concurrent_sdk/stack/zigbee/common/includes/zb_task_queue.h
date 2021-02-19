@@ -83,6 +83,8 @@ extern u8 TIMER_EVENT_SIZE;
 
 extern u8 TIMER_EVENT_SIZE_BRC;
 
+extern ev_time_event_pool_t 	g_timerEventPool;
+
 /**
    Initialize scheduler subsystem.
  */

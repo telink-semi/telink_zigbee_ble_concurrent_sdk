@@ -45,9 +45,9 @@ typedef void (*ev_zb_callback_t)(u8 param) ;
 /**
  *  @brief Definition for timer event
  */
-#define TIMER_EVENT_NUM			18
+#define TIMER_EVENT_NUM			32
 
-#define TIMER_EVENT_NUM_BRC		(TIMER_EVENT_NUM-6)
+#define TIMER_EVENT_NUM_BRC		(TIMER_EVENT_NUM-16)
 
 typedef struct ev_time_event_t {
     ev_timer_callback_t     cb;            //!< Callback function when expire, this must be specified
@@ -66,10 +66,10 @@ typedef struct ev_time_event_t {
 } ev_time_event_t;
 
 typedef struct ev_time_event_pool_s {
-   ev_time_event_t evt[TIMER_EVENT_NUM];
-   s16 used_num;
-   s16 brc_used_num;
-} ev_time_event_pool_t;
+	s16 used_num;
+	s16 brc_used_num;
+	ev_time_event_t evt[TIMER_EVENT_NUM];
+} ev_time_event_pool_t __attribute__((aligned(4)));
 
 
 /** @} end of group EV_TIMER_TYPE */
