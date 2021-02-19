@@ -53,6 +53,9 @@ u8 APS_ACK_EXPIRY = 2;//seconds
 /* queue size of the software timer event */
 u8 TIMER_EVENT_SIZE = TIMER_EVENT_NUM;
 
+/* queue size of the software timer event for brc, must less than TIMER_EVENT_SIZE */
+u8 TIMER_EVENT_SIZE_BRC = TIMER_EVENT_NUM_BRC;
+
 /* buffer pool size for zigbee pro */
 u8 ZB_BUF_POOL_SIZE = ZB_BUF_POOL_NUM;
 zb_buf_pool_t g_mPool;

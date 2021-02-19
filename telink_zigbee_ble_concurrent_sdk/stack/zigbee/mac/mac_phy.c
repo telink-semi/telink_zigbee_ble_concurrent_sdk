@@ -453,6 +453,16 @@ _attribute_ram_code_ u8 rf_performCCA(void){
 	s32 cnt = 1;
 	u8 ret = PHY_CCA_IDLE;
 
+	if (zigbee_process == 0){
+		ret = PHY_CCA_BUSY;
+		return ret;
+	}
+
+	if(rf_TrxStateGet() != RF_STATE_RX){
+		rf_setTrxState(RF_STATE_RX);
+		WaitUs(100);
+	}
+
 	rssi_cur = ZB_RADIO_RSSI_GET();
 	rssiSum += rssi_cur;
 	
@@ -466,7 +476,7 @@ _attribute_ram_code_ u8 rf_performCCA(void){
 	DBG_ZIGBEE_STATUS(0x03);
 
 
-	if (zigbee_process == 0 || rssi_peak > -50 || (rf_busyFlag & TX_BUSY)) {//Return if currently in TX state
+	if (rssi_peak > -50 || (rf_busyFlag & TX_BUSY)) {//Return if currently in TX state
 		ret = PHY_CCA_BUSY;
 	} else {
 		ret = PHY_CCA_IDLE;
@@ -681,6 +691,8 @@ _attribute_ram_code_ __attribute__((optimize("-Os"))) void rf_rx_irq_handler(voi
 			WaitUs(ZB_TX_WAIT_US - txDelayUs);
 		}
 
+		DBG_ZIGBEE_STATUS(0x12);  //for debug
+
 		/* wait until tx done,
 		 *  disable tx irq here, rfMode still is RF_STATE_RX;
 		 *  */
@@ -689,17 +701,19 @@ _attribute_ram_code_ __attribute__((optimize("-Os"))) void rf_rx_irq_handler(voi
 		/* start to send ack */
 		ZB_RADIO_TX_START(rf_ack_buf);//Manual Mode
 
-		DBG_ZIGBEE_STATUS(0x12);  //for debug
-
 		/* wait until tx done */
-		while(!ZB_RADIO_TX_DONE);
+		u32 cur_tick = clock_time();
+		while(!ZB_RADIO_TX_DONE && !clock_time_exceed(cur_tick, 1000));
 
-		/* clear the tx done status */
+		/* clear the rx/tx done status */
 		ZB_RADIO_TX_DONE_CLR;
-		/* set interrupt mask bit again */
-		ZB_RADIO_IRQ_MASK_SET;
+		ZB_RADIO_RX_DONE_CLR;
+
 		/* rf is set to rx mode again */
 		ZB_SWTICH_TO_RXMODE();
+
+		/* set interrupt mask bit again */
+		ZB_RADIO_IRQ_MASK_SET;
 
 		DBG_ZIGBEE_STATUS(0x13);   //for debug
 	}

@@ -49,7 +49,6 @@ extern u8 g_ble_txPowerSet;
 									if(zigbee_process == 1)	reg_rf_irq_mask |= (FLD_RF_IRQ_TX | FLD_RF_IRQ_RX);  \
 								}while(0)
 
-
 _attribute_ram_code_ void switch_to_zb_context(void){
 	rf_baseband_reset();
 	//dma_reset();    //!!!remove it, or it will cause uart-tx-irq miss if uart_tx is started

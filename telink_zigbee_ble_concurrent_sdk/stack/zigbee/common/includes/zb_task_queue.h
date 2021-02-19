@@ -81,6 +81,8 @@ typedef struct{
 
 extern u8 TIMER_EVENT_SIZE;
 
+extern u8 TIMER_EVENT_SIZE_BRC;
+
 /**
    Initialize scheduler subsystem.
  */
@@ -123,8 +125,9 @@ u8 tl_zbTaskQPush(u8 idx, tl_zb_task_t *task);
   *
   * @return      the status
   */
-extern ev_time_event_t *tl_zbTimerTaskPost(ev_timer_callback_t func, void *arg, u32 t_us);
-#define TL_ZB_TIMER_SCHEDULE 	tl_zbTimerTaskPost
+extern ev_time_event_t *tl_zbTimerTaskPost(u8 brc, ev_timer_callback_t func, void *arg, u32 t_us);
+#define TL_ZB_TIMER_SCHEDULE(a, b, c) 			tl_zbTimerTaskPost(0, a, b , c)
+#define TL_ZB_TIMER_SCHEDULE_BRC(a, b, c) 		tl_zbTimerTaskPost(1, a, b , c)
 
 #define		TL_SUPERFRAMETIME_TO_US(n)				(n*15360)
 #define		TL_TIMEUS_TO_SUPEFRAMETIME(t)			(t/15360)
