@@ -8,6 +8,7 @@
 * improve the mac tx/rx performance
   1. simplify sending the ack packet,
   2. the incomming packets don't be discarded while it's waiting the ack
+* do rf rx switch in rf_performCCA() to avoid changing the rf setting again after ble sync interrupt has occured.
 * timer event number can be configured by user, and limit the broadcast timer event number(by TIMER_EVENT_SIZE_BRC) to avoid system exception
 * update driver for supporting different flash(open source for flash.c)
 
@@ -20,8 +21,9 @@
 
 ### Feautures
 * 提高mac tx/rx的性能（简化了ack数据包的发送过程； 等待ack时不再丢弃收到的数据）
-* 更新驱动用以支持不同型号的flash(flash.c开源)
+* csam-cca时的模式切换放到rf_performCCA() ，避免ble同步中断到来后异常操作rf模块 
 * timer事件table大小可由用户配置，另外限制广播timer事件避免系统异常
+* 更新驱动用以支持不同型号的flash(flash.c开源)
 
 ### BREAKING CHANGES
 * 无
