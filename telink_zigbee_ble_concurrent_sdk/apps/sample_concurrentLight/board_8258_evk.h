@@ -112,6 +112,10 @@ extern "C" {
 	#define PC7_DATA_OUT			1
 #endif
 
+#if VOLTAGE_PROTECT_EN
+	#define  VOLTAGE_DETECT_PIN		GPIO_PC5
+#endif
+
 enum{
 	VK_SW1 = 0x01,
 	VK_SW2 = 0x02

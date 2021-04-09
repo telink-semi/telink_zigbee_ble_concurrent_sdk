@@ -103,6 +103,9 @@ extern "C" {
 	#define PC7_INPUT_ENABLE		0
 #endif
 
+#if VOLTAGE_PROTECT_EN
+	#define  VOLTAGE_DETECT_PIN		GPIO_PC5
+#endif
 
 #define PULL_WAKEUP_SRC_PA7           PM_PIN_PULLUP_1M  //SWS, should be pulled up, otherwise single wire would be triggered
 #define PULL_WAKEUP_SRC_PA5           PM_PIN_PULLUP_1M  //DM

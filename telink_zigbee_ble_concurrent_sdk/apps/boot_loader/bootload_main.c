@@ -90,6 +90,11 @@ void irq_handler(void){
 int main (void) {
 	platform_init();
 
+#if VOLTAGE_PROTECT_EN
+	voltage_detectInit();
+	voltage_protect(1);
+#endif
+
 	boot_load_with_ota_check(FW_RUN_ADDR, FW_OTA_ADDR);
 
 	while (1) {

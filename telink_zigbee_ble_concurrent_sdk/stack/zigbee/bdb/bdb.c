@@ -718,20 +718,13 @@ _CODE_BDB_ static void bdb_mgmtPermitJoiningConfirm(void *arg)
 {
 #if ZB_ROUTER_ROLE
 	/* Enable permit join for ¡ÝbdbcMinCommissioningTime	seconds */
-#if ZB_COORDINATOR_ROLE
 	zb_nlmePermitJoiningRequest(BDBC_MIN_COMMISSIONING_TIME);
-#else
-	zb_nlmePermitJoiningRequest(BDBC_MIN_COMMISSIONING_TIME);
-#endif
 #endif
 
 	//g_bdbAttrs.commissioningStatus = BDB_COMMISSION_STA_SUCCESS;
 	BDB_STATUS_SET(BDB_COMMISSION_STA_SUCCESS);
 	if(BDB_STATE_GET() == BDB_STATE_COMMISSIONING_NETWORK_STEER){
 		u32 evt = BDB_EVT_COMMISSIONING_NETWORK_STEER_FINISH;
-		TL_SCHEDULE_TASK(bdb_task, (void *)evt);
-	}else if(BDB_STATE_GET() == BDB_STATE_COMMISSIONING_NETWORK_FORMATION){
-		u32 evt = BDB_EVT_COMMISSIONING_NETWORK_FORMATION_FINISH;
 		TL_SCHEDULE_TASK(bdb_task, (void *)evt);
 	}
 
@@ -1105,12 +1098,11 @@ static void bdb_task(void *arg)
 			break;
 
 		case BDB_STATE_COMMISSIONING_NETWORK_FORMATION:
-			if( evt == BDB_EVT_COMMISSIONING_NETWORK_FORMATION_PERMITJOIN){
-				u8 sn = 0;
-				g_bdbAttrs.commissioningMode.networkSteer = 1;
-				zb_mgmtPermitJoinReqTx(0xfffc, BDBC_MIN_COMMISSIONING_TIME, 0x01, &sn, NULL);
-				TL_SCHEDULE_TASK(bdb_mgmtPermitJoiningConfirm,NULL);
-			}else if(evt == BDB_EVT_COMMISSIONING_NETWORK_FORMATION_FINISH){
+			g_bdbAttrs.commissioningMode.networkSteer = 1;
+			if(evt == BDB_EVT_COMMISSIONING_NETWORK_FORMATION_FINISH){
+				if(g_bdbAttrs.nodeIsOnANetwork){
+					bdb_commissioningInfoSave(NULL);
+				}
 				status = bdb_commissioningFindBind();
 				if(status == BDB_STATE_IDLE){
 					/* confirm to application */
@@ -1362,12 +1354,6 @@ _CODE_BDB_ static u8 bdb_topLevelCommissiongConfirm(void){
 	if(g_bdbAttrs.commissioningStatus == BDB_COMMISSION_STA_SUCCESS){
 		u8 len = 0;
 		tl_zbMacAttrGet(MAC_PHY_ATTR_CURRENT_CHANNEL, &g_bdbCtx.channel, &len);
-#if ZB_COORDINATOR_ROLE
-		if(g_bdbCtx.factoryNew == 1){
-			bdb_commissioningInfoSave(NULL);
-			g_bdbCtx.factoryNew = 0;
-		}
-#endif
 	}else{
 #if ZB_ROUTER_ROLE
 		if(BDB_TOUCHLINK_CAP_EN() && is_device_factory_new()){

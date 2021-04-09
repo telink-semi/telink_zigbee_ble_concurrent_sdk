@@ -109,6 +109,11 @@ int main (void) {
 		os_init(0);
 	}
 
+#if VOLTAGE_PROTECT_EN
+	voltage_detectInit();
+	voltage_protect(1);
+#endif
+
 #if(TX_POWER_CAL_ENABLE)
 	app_txPowerCal();
 #endif
@@ -129,6 +134,14 @@ int main (void) {
 
     irq_enable();
 	while (1) {
+#if VOLTAGE_PROTECT_EN
+		static u32 batCheckTick = 0;
+		if(clock_time_exceed(batCheckTick, 200*1000)){
+			batCheckTick = clock_time();
+			voltage_protect(0);
+		}
+#endif
+
     	concurrent_mode_main_loop ();
 
     	app_key_handler();

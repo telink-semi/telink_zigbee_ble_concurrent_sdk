@@ -348,41 +348,23 @@ void moduleTest_ccm(void){
 
 #if MODULE_TEST_ADC
 
-#define ADC_SAMPLE_TIME		16
-s16 BUFF_ADC_SAMPLE[ADC_SAMPLE_TIME] = {0};
 volatile s32 Cvoltage_value = 0;
 volatile s32 Ctemp_value = 0;
 
 void moduleTest_adc(u8 mode){
-	s32 sum = 0;
-
 	drv_adc_init();
 
-#ifdef MCU_CORE_8258
-	drv_adc_mode_pin_set(Drv_ADC_VBAT_MODE, GPIO_PC5);
+#if defined(MCU_CORE_826x)
+	drv_adc_mode_pin_set(DRV_ADC_VBAT_MODE, NOINPUT);
+#elif defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
+	drv_adc_mode_pin_set(DRV_ADC_BASE_MODE, GPIO_PB3);
+#endif
+
 	drv_adc_enable(1);
-#elif MCU_CORE_826x
-	drv_ADC_ParamSetting(Drv_ADC_MISC_CHN,Drv_SINGLE_ENDED_MODE,B4,B4,S_3,RV_AVDD,RES14);
-#else
 
-#endif
-
-	while(1)
-	{
-#ifdef MCU_CORE_8258
+	while(1){
 		Cvoltage_value = drv_get_adc_data();
-#elif MCU_CORE_826x
-		for(s32 i=0;i<ADC_SAMPLE_TIME;i++){
-			BUFF_ADC_SAMPLE[i] = drv_get_adc_data();
-		}
-		for(s32 i=0;i<ADC_SAMPLE_TIME;i++){ //-2; remove max value and min value.
-			sum += BUFF_ADC_SAMPLE[i];
-		}
-		sum /= (ADC_SAMPLE_TIME);//get the average value
-
-		Cvoltage_value = 3300*(sum - 128)/(16384 - 256);//ref_vol=RV_AVDD=3300mv,(mv) = Vref*(x-128)/(2^14-2^8)
-#else
-#endif
+		WaitUs(100);
 	}
 }
 #endif
