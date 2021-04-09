@@ -1,3 +1,28 @@
+## V1.5.6
+
+### Bugs
+* nwk update command should be ignored when the attribute of the "PendingNetworkUpdatePANID" of the wwah  isn't 0xff
+* fix the buffer issue while receiving group-casting packet
+
+### Feautures
+* the permitJoin command shouldn't be sent out after network formation
+* add battery detection to avoid to operate flash in low voltage.
+
+### BREAKING CHANGES
+* None
+
+### Bugs
+* 当Wwah 的PendingNetworkUpdatePANID不为0xff时,  nwk update命令应被忽略
+* 收到组播数据时，buffer访问出错
+
+### Feautures
+* 组网设备成功后，不发送permit join
+* 添加电池检测，避免低压下操作flash
+
+### BREAKING CHANGES
+* 无
+
+
 ## V1.5.5
 
 ### Bugs
