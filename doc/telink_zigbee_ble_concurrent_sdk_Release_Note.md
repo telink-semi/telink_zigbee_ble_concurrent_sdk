@@ -1,3 +1,25 @@
+## V1.5.7
+
+### Feautures
+* update flash driver(based on the driver sdk "telink_b85m_driver_sdk V1.1.0")
+* add voltage calibration for flash 
+* optimize the radom generator
+* update the inforamtion in NV when the operation channel is changed
+* optimize the message processing in ZCL layer(use task schedule directly)
+
+### BREAKING CHANGES
+* None
+
+### Feautures
+* 更新flash驱动(基于驱动sdk telink_b85m_driver_sdk V1.1.0)
+* 添加flash 的电压校准
+*  优化随机数产生器的性能
+*  工作channel发生改变后，将信息更新到NV
+* 优化ZCL层消息处理（直接采用任务调度）
+
+### BREAKING CHANGES
+* 无
+
 ## V1.5.6
 
 ### Bugs

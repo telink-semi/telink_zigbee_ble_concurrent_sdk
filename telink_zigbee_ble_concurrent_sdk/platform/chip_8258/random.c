@@ -1,22 +1,28 @@
 /********************************************************************************************************
- * @file     random.c
+ * @file	random.c
  *
- * @brief    This is the source file for TLSR8258
+ * @brief	This is the source file for b85
  *
- * @author	 Driver Group
- * @date     May 8, 2018
+ * @author	Driver Group
+ * @date	2018
  *
- * @par      Copyright (c) 2018, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par		Copyright (c) 2018, Telink Semiconductor (Shanghai) Co., Ltd.
+ *			All rights reserved.
  *
- *           The information contained herein is confidential property of Telink
- *           Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *           of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *           Co., Ltd. and the licensee or the terms described here-in. This heading
- *           MUST NOT be removed from this file.
+ *          The information contained herein is confidential property of Telink
+ *          Semiconductor (Shanghai) Co., Ltd. and is available under the terms
+ *          of Commercial License Agreement between Telink Semiconductor (Shanghai)
+ *          Co., Ltd. and the licensee or the terms described here-in. This heading
+ *          MUST NOT be removed from this file.
  *
- *           Licensees are granted free, non-transferable use of the information in this
- *           file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
+ *          Licensee shall not delete, modify or alter (or permit any third party to delete, modify, or
+ *          alter) any information contained herein in whole or in part except as expressly authorized
+ *          by Telink semiconductor (shanghai) Co., Ltd. Otherwise, licensee shall be solely responsible
+ *          for any claim to the extent arising out of or relating to such deletion(s), modification(s)
+ *          or alteration(s).
+ *
+ *          Licensees are granted free, non-transferable use of the information in this
+ *          file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
  *
  *******************************************************************************************************/
 #include "adc.h"
@@ -90,7 +96,7 @@ unsigned short adc_rng_result(void)
 	//unsigned int j;
 	unsigned int t0 = clock_time();
 	//dfifo setting will lose in suspend/deep, so we need config it every time
-	adc_config_misc_channel_buf((unsigned short *)adc_dat_buf,16);  //size: ADC_SAMPLE_NUM*4
+	adc_config_misc_channel_buf((unsigned short *)adc_dat_buf,16<<2);  //size: ADC_SAMPLE_NUM*4
 	dfifo_enable_dfifo2();
 
 	while(!clock_time_exceed(t0, 25));  //wait at least 2 sample cycle(f = 96K, T = 10.4us)
@@ -225,7 +231,7 @@ void random_generator_init(void)
  * @param[in] none.
  * @return    the value of one random number.
  */
-_attribute_ram_code_ unsigned int rand(void)  //16M clock, code in flash 23us, code in sram 4us
+_attribute_ram_code_sec_noinline_ unsigned int rand(void)  //16M clock, code in flash 23us, code in sram 4us
 {
 	rnd_m_w = 18000 * (rnd_m_w & 0xffff) + (rnd_m_w >> 16);
 	rnd_m_z = 36969 * (rnd_m_z & 0xffff) + (rnd_m_z >> 16);

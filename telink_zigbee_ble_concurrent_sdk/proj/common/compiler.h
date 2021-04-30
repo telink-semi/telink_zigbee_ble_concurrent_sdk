@@ -28,6 +28,7 @@
 #define _attribute_ram_code_  	_attribute_session_(".ram_code")
 #define _attribute_custom_code_  	_attribute_session_(".custom") volatile
 #define _attribute_no_inline_   __attribute__((noinline)) 
+#define _attribute_ram_code_sec_noinline_	__attribute__((section(".ram_code"))) __attribute__((noinline))
 // #define _inline_ 				extern __attribute__ ((gnu_inline)) inline
 
 #define _attribute_data_retention_

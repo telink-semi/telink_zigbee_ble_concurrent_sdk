@@ -47,6 +47,7 @@
 
 #include "compiler.h"
 
+#define PAGE_SIZE		256
 
 /**
  * @brief     flash command definition
@@ -97,6 +98,20 @@ typedef enum {
     FLASH_CAP_SIZE_8M      = 0x17,
 } Flash_CapacityDef;
 
+/**
+ * @brief	flash voltage definition
+ */
+typedef enum {
+    FLASH_VOLTAGE_1V95     = 0x07,
+    FLASH_VOLTAGE_1V9      = 0x06,
+    FLASH_VOLTAGE_1V85     = 0x05,
+    FLASH_VOLTAGE_1V8      = 0x04,
+    FLASH_VOLTAGE_1V75     = 0x03,
+    FLASH_VOLTAGE_1V7      = 0x02,
+    FLASH_VOLTAGE_1V65     = 0x01,
+    FLASH_VOLTAGE_1V6      = 0x00,
+} Flash_VoltageDef;
+
 
 /**
  * @brief     flash status type definition
@@ -133,7 +148,7 @@ typedef enum{
  * @param[in]   addr	- the start address of the sector needs to erase.
  * @return 		none.
  */
-_attribute_ram_code_ void flash_erase_sector(unsigned long addr);
+void flash_erase_sector(unsigned long addr);
 
 /**
  * @brief 		This function reads the content from a page to the buf.
@@ -142,7 +157,7 @@ _attribute_ram_code_ void flash_erase_sector(unsigned long addr);
  * @param[out]  buf		- the start address of the buffer.
  * @return 		none.
  */
-_attribute_ram_code_ void flash_read_page(unsigned long addr, unsigned long len, unsigned char *buf);
+void flash_read_page(unsigned long addr, unsigned long len, unsigned char *buf);
 
 /**
  * @brief 		This function writes the buffer's content to the flash.
@@ -152,7 +167,7 @@ _attribute_ram_code_ void flash_read_page(unsigned long addr, unsigned long len,
  * @return 		none.
  * @note        the funciton support cross-page writing,which means the len of buf can bigger than 256.
  */
-_attribute_ram_code_ void flash_write_page(unsigned long addr, unsigned long len, unsigned char *buf);
+void flash_write_page(unsigned long addr, unsigned long len, unsigned char *buf);
 
 /**
  * @brief	  	This function serves to read MID of flash(MAC id). Before reading UID of flash,
@@ -160,7 +175,7 @@ _attribute_ram_code_ void flash_write_page(unsigned long addr, unsigned long len
  * 				the idcmd and read UID of flash
  * @return    	MID of the flash.
  */
-_attribute_ram_code_ unsigned int flash_read_mid(void);
+unsigned int flash_read_mid(void);
 
 /**
  * @brief	  	This function serves to read UID of flash.Before reading UID of flash, you must read MID of flash.
@@ -170,7 +185,7 @@ _attribute_ram_code_ unsigned int flash_read_mid(void);
  * @param[in] 	uidtype	- the number of uid bytes.
  * @return    	none.
  */
-_attribute_ram_code_ void flash_read_uid(unsigned char idcmd,unsigned char *buf, flash_uid_typedef_e uidtype);
+void flash_read_uid(unsigned char idcmd, unsigned char *buf);
 
 /*******************************************************************************************************************
  *												Primary interface
@@ -182,5 +197,47 @@ _attribute_ram_code_ void flash_read_uid(unsigned char idcmd,unsigned char *buf,
  * @param[out]	flash_uid	- Flash Unique ID
  * @return		0: flash no uid or not a known flash model 	 1:the flash model is known and the uid is read.
  */
-_attribute_ram_code_ int flash_read_mid_uid_with_check( unsigned int *flash_mid ,unsigned char *flash_uid);
+int flash_read_mid_uid_with_check(unsigned int *flash_mid, unsigned char *flash_uid);
+
+
+/**
+ * @brief		This function serves to calibration the flash voltage(VDD_F),if the flash has the calib_value,we will use it,either will
+ * 				trim vdd_f to 1.95V(2b'111 the max) if the flash is zb.
+ * @param[in]	vol - the voltage which you want to set.
+ * @return		none.
+ */
+void flash_vdd_f_calib(void);
+
+/**
+ * @brief		This function serves to get the vdd_f calibration value.
+ * @param[in]	none.
+ * @return		none.
+ */
+static inline unsigned char flash_get_vdd_f_calib_value(void)
+{
+	unsigned int mid = flash_read_mid();
+	unsigned char dcdc_flash_volatage = 0;
+	switch((mid & 0xff0000) >> 16)
+	{
+	case(FLASH_CAP_SIZE_64K):
+		flash_read_page(0xe1c0, 1, &dcdc_flash_volatage);
+		break;
+	case(FLASH_CAP_SIZE_128K):
+		flash_read_page(0x1e1c0, 1, &dcdc_flash_volatage);
+		break;
+	case(FLASH_CAP_SIZE_512K):
+		flash_read_page(0x771c0, 1, &dcdc_flash_volatage);
+		break;
+	case(FLASH_CAP_SIZE_1M):
+		flash_read_page(0xfe1c0, 1, &dcdc_flash_volatage);
+		break;
+	case(FLASH_CAP_SIZE_2M):
+		flash_read_page(0x1fe1c0, 1, &dcdc_flash_volatage);
+		break;
+	default:
+		dcdc_flash_volatage = 0xff;
+		break;
+	}
+	return dcdc_flash_volatage;
+}
 

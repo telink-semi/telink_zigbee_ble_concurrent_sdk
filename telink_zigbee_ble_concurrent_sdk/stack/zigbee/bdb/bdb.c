@@ -989,7 +989,10 @@ static void bdb_task(void *arg)
 					nv_nwkFrameCountSaveToFlash(ss_ib.outgoingFrameCounter);
 
 					if(g_bdbCtx.initResult == BDB_INIT_STATUS_SUCCESS){
-						if((zdo_ssInfoKeyGet() != ss_ib.activeSecureMaterialIndex) || g_zbNwkCtx.parentIsChanged || g_bdbCtx.forceJoin){
+						if((zdo_ssInfoKeyGet() != ss_ib.activeSecureMaterialIndex) ||
+							(g_zbInfo.macPib.phyChannelCur != g_bdbCtx.channel) ||
+							g_zbNwkCtx.parentIsChanged ||
+							g_bdbCtx.forceJoin){
 							g_zbNwkCtx.parentIsChanged = 0;
 							TL_SCHEDULE_TASK(bdb_commissioningInfoSave, NULL);  //for tcRejoin when the network key is changed
 						}
