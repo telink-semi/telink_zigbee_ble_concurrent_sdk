@@ -81,7 +81,7 @@ typedef struct{
 
 extern u8 TIMER_EVENT_SIZE;
 
-extern u8 TIMER_EVENT_SIZE_BRC;
+extern u8 TIMER_EVENT_NUM_BRC_ENOUGH;
 
 extern ev_time_event_pool_t 	g_timerEventPool;
 
@@ -129,7 +129,6 @@ u8 tl_zbTaskQPush(u8 idx, tl_zb_task_t *task);
   */
 extern ev_time_event_t *tl_zbTimerTaskPost(u8 brc, ev_timer_callback_t func, void *arg, u32 t_us);
 #define TL_ZB_TIMER_SCHEDULE(a, b, c) 			tl_zbTimerTaskPost(0, a, b , c)
-#define TL_ZB_TIMER_SCHEDULE_BRC(a, b, c) 		tl_zbTimerTaskPost(1, a, b , c)
 
 #define		TL_SUPERFRAMETIME_TO_US(n)				(n*15360)
 #define		TL_TIMEUS_TO_SUPEFRAMETIME(t)			(t/15360)
@@ -165,8 +164,8 @@ u8 tl_zbPrimitivePost(u8 layerQ, u8 primitive, void *arg);
 u8 tl_zbTaskPost(tl_zb_callback_t func, void *arg);
 #define	TL_SCHEDULE_TASK	tl_zbTaskPost
 
-u8 zb_timerTaskIdle(void);
-u8 zb_isTimerTaskQEnough(void);
+bool zb_timerTaskIdle(void);
+bool zb_isTimerTaskQEnough(void);
 u8 zb_isTaskDone(void);
 bool tl_stackBusy(void);
 

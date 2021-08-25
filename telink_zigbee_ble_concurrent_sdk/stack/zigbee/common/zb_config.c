@@ -54,7 +54,7 @@ u8 APS_ACK_EXPIRY = 2;//seconds
 u8 TIMER_EVENT_SIZE = TIMER_EVENT_NUM;
 
 /* queue size of the software timer event for brc, must less than TIMER_EVENT_SIZE */
-u8 TIMER_EVENT_SIZE_BRC = TIMER_EVENT_NUM_BRC;
+u8 TIMER_EVENT_NUM_BRC_ENOUGH = TIMER_EVENT_NUM_BRC;
 
 ev_time_event_pool_t g_timerEventPool;   //timer event pool
 
@@ -67,7 +67,7 @@ u8 ZB_MAC_PENDING_TRANS_QUEUE_SIZE = ZB_MAC_PENDING_TRANS_QUEUE_NUM;
 u8 ZB_MAC_EXT_EXPEIRY_CNT = ZB_MAC_INTERNAL_EXPIRY_CNT;
 
 /* the lqi threshold for neighbor */
-u8 NWK_NEIGHBORTBL_ADD_LQITHRESHOLD = 0x5F;
+u8 NWK_NEIGHBORTBL_ADD_LQITHRESHOLD = 0x45;
 
 /* the life time for unauthorized child table */
 u32 NWK_UNAUTH_CHILD_TABLE_LIFE_TIME = (5 * 1000 * 1000);
@@ -76,10 +76,10 @@ u32 NWK_UNAUTH_CHILD_TABLE_LIFE_TIME = (5 * 1000 * 1000);
 u32 TRANSPORT_NETWORK_KEY_WAIT_TIME = (5 * 1000 * 1000);//TL_SUPERFRAMETIME_TO_US(1000);
 
 /* the cost threshold for one hop */
-u8 NWK_COST_THRESHOLD_ONEHOP = 3;
+u8 NWK_COST_THRESHOLD_ONEHOP = 7;
 
 /* the cost threshold to choose next hop from neighbor table */
-u8 NWK_NEIGHBOR_SEND_OUTGOING_THRESHOLD = 4;
+u8 NWK_NEIGHBOR_SEND_OUTGOING_THRESHOLD = 5;
 
 /* address mapping table */
 u16 TL_ZB_NWK_ADDR_MAP_SIZE = TL_ZB_NWK_ADDR_MAP_NUM;
@@ -120,6 +120,10 @@ u8 NWK_BRC_TRANSTBL_SIZE = NWK_BRC_TRANSTBL_NUM;
 nwk_brcTransRecordEntry_t g_brcTransTab[NWK_BRC_TRANSTBL_NUM];
 #endif
 
+#if ZB_ED_ROLE
+bool AUTO_QUICK_DATA_POLL_ENABLE = TRUE;
+#endif
+
 /* binding table */
 u8 APS_BINDING_TABLE_SIZE = APS_BINDING_TABLE_NUM;
 aps_binding_table_t aps_binding_tbl;
@@ -134,6 +138,7 @@ u8 RX_ZBBUF_OFFSET = TL_RXPRIMITIVEHDR;
 
 /* MAC layer TX Queue size */
 u8 MAC_TX_QUEUE_SIZE = TX_QUEUE_BN;
+tx_data_queue g_txQueue[TX_QUEUE_BN];
 
 //default network key
 /* If all zero, will generate 16-bytes network key randomly. */

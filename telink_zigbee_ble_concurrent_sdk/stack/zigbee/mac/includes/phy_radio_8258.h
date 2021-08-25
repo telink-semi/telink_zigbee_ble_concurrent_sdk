@@ -74,8 +74,8 @@
 #define ZB_RADIO_RX_BUF_SET(addr)			rf_rx_buffer_reconfig(addr)
 
 /* Rx buffer clear */
-#define ZB_RADIO_RX_BUF_CLEAR(p)			do{\
-											p[0] = 0;	\
+#define ZB_RADIO_RX_BUF_CLEAR(p)			do{  \
+												p[0] = 0;		\
 											}while(0)
 
 /* set Rx mode, maxium receiver buffer size, enable Rx/Tx interrupt */
@@ -91,6 +91,7 @@
 
 /* clear mask bit to disable tx irq */
 #define ZB_RADIO_IRQ_MASK_SET				irq_set_mask(FLD_IRQ_ZB_RT_EN)
+
 
 /* tx packet header */
 #define ZB_RADIO_TX_HDR_LEN				5
@@ -137,7 +138,7 @@ static inline u8 ZB_RADIO_RSSI_TO_LQI(rf_rxGainMode_t mode, u8 inRssi){
 	u8 lqi = 0;
 	s8 rssi = inRssi - 110;
 
-	s16 minEd = -110;
+	s16 minEd = -99;
 	s16 maxEd = -15;  //AGC
 
 	if(rssi > maxEd){rssi = maxEd;}

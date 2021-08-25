@@ -96,3 +96,4 @@ void zcl_zllTouchLinkDeviceInformationResponseHandler(zcl_zllTouchLinkDeviceInfo
 s32 zcl_zllTouchLinkStartNetworkStartOrJoinTimerStop(void);
 
 void ll_zllAttrClr(void);
+void tl_zbNwkZllCommissionScanConfirm(void *arg);

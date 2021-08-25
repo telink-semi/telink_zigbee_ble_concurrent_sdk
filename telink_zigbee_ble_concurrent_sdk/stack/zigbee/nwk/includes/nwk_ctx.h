@@ -96,8 +96,6 @@ typedef struct
 	u16 nwkFwdSrcAddr;
 }srcRoute_repair_t;
 
-typedef void (*nwkDiscoveryUserCb_t)(void);
-
 /**
    Place to store values between multiply operations
 */
@@ -125,8 +123,6 @@ typedef struct
 	/* For coordinator or router store current joining device info */
 	ev_time_event_t *curJoiningDevTimerEvt;
 
-	nwkDiscoveryUserCb_t nwkDiscConf;
-
     u32	scanChannels;
 
     u8	scanDuration;
@@ -138,13 +134,11 @@ typedef struct
 	u8  joined_pro:1;
 	u8	panIdConflict:1;	/*!< if we find panID conflict */
 	u8	joinAccept:1;
-
 	u8	known_panids_cnt:4;
 	u8	discoverRoute:1;	/*!< Always TRUE for NLDE data request! see 2.2.4.1.1.3 */
-	u8	unauthedTransportNwkKey:1;/*!< for wwah */
-	u8  resv:1;
+	u8  panidUpdateRecv:1;	/*receive network update for panid conflict*/
+	u8  unauthedTransportNwkKey:1;
 	u8	parentIsChanged:1;	/*!< A flag indicates that the device's parent is changed through rejoin */
-
 	u8 	user_state:4;		/*!< Current network user_state_t */
 	u8 	state:4; 			/*!< Current network subsystem state nlme_state_t */
 
@@ -165,11 +159,11 @@ typedef struct
 nwk_ctx_t g_zbNwkCtx;
 
 
-#define ZB_SET_DISCOVER_ROUTE(v)				(g_zbNwkCtx.discoverRoute = v)
-#define ZB_GET_DISCOVER_ROUTE					(g_zbNwkCtx.discoverRoute)
+#define ZB_SET_DISCOVER_ROUTE(v)		(g_zbNwkCtx.discoverRoute = v)
+#define ZB_GET_DISCOVER_ROUTE			(g_zbNwkCtx.discoverRoute)
 
-#define ZB_SET_USER_STATE(v)					(g_zbNwkCtx.user_state = v)
-#define ZB_GET_USER_STATE						(g_zbNwkCtx.user_state)
+#define ZB_SET_USER_STATE(v)			(g_zbNwkCtx.user_state = v)
+#define ZB_GET_USER_STATE				(g_zbNwkCtx.user_state)
 
 #define ZB_SET_ACCEPT_UPDATE_PANID(v)			(g_zbNwkCtx.accept_update_panid = v)
 #define ZB_GET_ACCEPT_UPDATE_PANID				(g_zbNwkCtx.accept_update_panid)

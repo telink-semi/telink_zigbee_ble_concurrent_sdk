@@ -421,6 +421,8 @@ typedef struct{
 	u8 		msduHandle;
 	u8 		status;
 	u16		macDstAddr;
+	s8		rssi;
+	u8		lqi;
 }zb_mscp_data_conf_t;
 
 /** @defgroup mac_mcsp_data_primitive MAC-MCSP:indication primitive Types
@@ -870,8 +872,16 @@ typedef struct mac_indirPendingList_t{
 	addr_t	dstAddr;
 	u8		expiry;
 	u8		extExpiryCnt;
-	u8		send;
+	u8      state;
+	u8		status;
 }mac_indirPendingList_t;
+
+enum{
+	MAC_PENDIND_READY = 0x1,
+	MAC_PENDIND_TX_READY = 0x2,
+	MAC_PENDIND_TXING = 0x3,
+	MAC_PENDIND_EXPIRY = 0x4,
+};
 
 extern u8 ZB_MAC_PENDING_TRANS_QUEUE_SIZE;
 

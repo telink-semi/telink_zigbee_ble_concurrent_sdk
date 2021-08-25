@@ -52,6 +52,11 @@ zcl_zllTouckLink_t g_zllTouchLink = {
 		.keyType = MASTER_KEY,
 };
 
+static nwkForTouchlinkCb_t  g_nwkTouchlinkCb = {
+	.scanConfCb = tl_zbNwkZllCommissionScanConfirm,
+	.attrClrCb = ll_zllAttrClr,
+};
+
 bool scanReqProfileInterop = 0;
 
 zcl_zllCommission_t g_zllCommission;
@@ -892,6 +897,7 @@ _CODE_ZCL_ u8 zcl_touchLinkCmdHandler(zclIncoming_t *pInMsg){
 _CODE_ZCL_ status_t zcl_touchlink_register(u8 endpoint, const zcl_touchlinkAppCallbacks_t *cb){
 	g_zllCommission.appCb = cb;
 	zcl_touchLinkInit();
+	tl_nwkTouchLinkCbRegister(&g_nwkTouchlinkCb);
 	return zcl_registerCluster(endpoint, ZCL_CLUSTER_TOUCHLINK_COMMISSIONING, 0, NULL, zcl_touchLinkCmdHandler, NULL);
 }
 

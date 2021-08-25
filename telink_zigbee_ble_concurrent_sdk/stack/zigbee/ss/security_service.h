@@ -161,7 +161,7 @@ typedef struct{
 	u16						devKeyPairNum;
 	addrExt_t				trust_center_address;
 	u8						securityLevel:4;
-	u8						secureAllFrames:1;
+	u8						secureAllFresh:1;
 	u8						activeSecureMaterialIndex:2;
 	u8						reserved:1;
 	u8						activeKeySeqNum;
@@ -359,5 +359,14 @@ bool ss_securityModeIsDistributed(void);
  * @param	result  pointer to output data
  * */
 void ss_mmoHash(u8 *data, u8 len, u8 *result);
+
+typedef void (*ss_nwkStatusCb)(nlme_nwkStatus_ind_t *pInd);
+typedef struct{
+	ss_nwkStatusCb ssNwkStatusIndCb;
+}ss_nwkStatusCb_t;
+
+extern ss_nwkStatusCb_t *ssNwkStatusIndCb;
+
+void ss_securityNwkStatusCbRegister(ss_nwkStatusCb_t *cb);
 
 #endif	/* SECURITY_SERVICE_H */

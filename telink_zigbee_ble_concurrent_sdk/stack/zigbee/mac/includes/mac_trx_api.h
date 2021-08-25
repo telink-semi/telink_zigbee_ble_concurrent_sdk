@@ -115,6 +115,7 @@ typedef enum {
     MAC_TX_DONE,
 } mac_txState_t;
 
+#define		MAX_RETRY_NUM				3
 typedef enum {
     MAC_TX_EV_NEW_DATA,
     MAC_TX_EV_CSMA_IDLE,
@@ -138,20 +139,22 @@ typedef enum {
  *  @brief Definition of MAC generic frame type, used in both TX and RX
  */
 typedef struct {
-	u8		fAck; //--                /*!< Used in TX  */
-	u8		fFramePending;//--        /*!< Used in Poll  */
+	u8		fAck:4; //--                /*!< Used in TX  */
+	u8		fFramePending:4;//--        /*!< Used in Poll  */
 	u8		psduLen;//--
 	u8		cnfStatus;//--
+	u8      seqNum;
+	u8		*buf;//--
     u8		*txData;//--
+    void	*pendingList;//--
 } mac_genFrame_t;
 
 typedef	mac_genFrame_t	tx_data_queue;
 
-#define	TX_QUEUE_BN		8
-
-tx_data_queue *tx_queue[TX_QUEUE_BN];
+#define	TX_QUEUE_BN		16      //need 2**n , and must be less than 256
 
 extern u8 MAC_TX_QUEUE_SIZE;
+extern tx_data_queue g_txQueue[];
 extern volatile u8 rf_busyFlag;
 
 u8 mac_getTrxState(void);
@@ -173,7 +176,7 @@ void mac_trigger_tx(void *arg);
  *
  * @param[in]   macPld        - mac payload
  *
- * @param[in]	len			  - the lenght of the mac payload
+ * @param[in]	len			  - the length of the mac payload
  *
  * @param[in]	needDrop	  - 1: this frame should be drop
  *

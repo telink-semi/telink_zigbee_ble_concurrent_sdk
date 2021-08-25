@@ -52,7 +52,7 @@
 #define NWK_MAX_BROADCAST_RETRIES 	3
 
 
-#define NWK_ENDDEV_TIMEOUT_DEFAULT	8
+#define NWK_ENDDEV_TIMEOUT_DEFAULT	8//REQTIMEOUTENUM_256_MINUTES
 
 /***************************************************************************
 * @brief	The maximum time duration in OctetDurations allowed for the parent and all
@@ -919,17 +919,15 @@ typedef struct
 
 
 
-#define		NWK_FILL_LINKST_OPTIONS(dst,cnt,ff,lf)						\
-do{																	\
-	*dst = 0;														\
-	*dst = (cnt & 0x1f) + (ff<<5) + (lf<<6);						\
-}while(0)															\
+#define	NWK_FILL_LINKST_OPTIONS(dst,cnt,ff,lf)	do{	\
+													*dst = 0;									\
+													*dst = (cnt & 0x1f) + (ff<<5) + (lf<<6); 	\
+												}while(0)
 
-#define		NWK_FILL_LINKST(dst,oc,oi)									\
-do{															\
-	*dst = 0;												\
-	*dst = (oi&0x07) + ((oc & 0x07)<<4);					\
-}while(0)													\
+#define	NWK_FILL_LINKST(dst,oc,oi)				do{	\
+													*dst = 0;									\
+													*dst = (oi&0x07) + ((oc & 0x07)<<4);		\
+												}while(0)
 
 /****************************************************************************
 * @brief	Network report command payload
@@ -1228,8 +1226,9 @@ typedef struct
 	u8	routeReqId;
 	u8	forwardCost;
 	u8	residCost;
-	u8	retries:7;
-	u8	used:1;
+	u8	lastCost;
+	u8	retries;
+	u8	used;
 }nwk_routeDiscEntry_t;
 
 /***************************************************************************
@@ -1257,6 +1256,27 @@ typedef struct
   	bool 		used;
 }nlmeLeaveReqInfo_ctx_t;
 
+
+typedef void (*nwkDiscoveryUserCb_t)(void);
+
+typedef void (*nwkScanConfirmTouchlinkCb_t)(void *arg);
+
+typedef void (*nwkTouchlinkAttrClear_t)(void);
+
+typedef struct{
+	nwkScanConfirmTouchlinkCb_t scanConfCb;
+	nwkTouchlinkAttrClear_t     attrClrCb;
+}nwkForTouchlinkCb_t;
+
+/*
+ * upper layer callback function
+ * */
+typedef struct{
+	nwkForTouchlinkCb_t   touchLinkCb;  /*!< callback for touch link */
+	nwkDiscoveryUserCb_t  nwkDiscConf;  /*!< callback for discovery  */
+}nwk_ulCallback_t;
+
+extern nwk_ulCallback_t g_nwkUlCb;
 extern u8 NWKC_TRANSFAILURE_CNT_THRESHOLD;
 extern u8 NWKC_INITIAL_RREQ_RETRIES;
 extern u8 NWKC_RREQ_RETRIES;
@@ -1269,6 +1289,7 @@ extern nwk_brcTransRecordEntry_t g_brcTransTab[];
 extern u16 NWK_ROUTE_RECORD_TABLE_SIZE;
 extern nwk_routeRecordTabEntry_t g_routeRecTab[];
 #endif
+extern bool AUTO_QUICK_DATA_POLL_ENABLE;
 
 extern u8  NWK_COST_THRESHOLD_ONEHOP;
 extern u8 NWK_NEIGHBOR_SEND_OUTGOING_THRESHOLD;
@@ -1386,6 +1407,9 @@ void tl_zbNwkNlmeSetRequestHandler(void *arg);
 
 typedef void (*nwkDataIndCb_t)(void *p);
 void tl_nwkDataIndRegister(nwkDataIndCb_t cb);
+void tl_nwkTouchLinkCbRegister(nwkForTouchlinkCb_t *cb);
+
+void tl_nwkDiscoveryCbRegister(nwkDiscoveryUserCb_t cb);
 
 u8 is_device_factory_new(void);
 

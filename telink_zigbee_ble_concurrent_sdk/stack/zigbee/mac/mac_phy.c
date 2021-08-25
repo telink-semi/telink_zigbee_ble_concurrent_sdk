@@ -186,6 +186,7 @@ u32 rf_pa_rxen_pin;
 
     ZB_RADIO_RX_ENABLE;
 	ZB_RADIO_TX_ENABLE;
+	ZB_TIMESTAMP_ENABLE;
 
     /* Register ED-Scan polling function, but disable it at begining. */
     ev_on_poll(EV_POLL_ED_DETECT, rf_edDetect);
@@ -722,7 +723,8 @@ _attribute_ram_code_ __attribute__((optimize("-Os"))) void rf_rx_irq_handler(voi
 	ZB_RADIO_RX_ENABLE;
 
 	/* zb_mac_receive_data handler */
-	zb_macDataRecvHander(p, macPld, len, fAck, ZB_RADIO_TIMESTAMP_GET(p), ZB_RADION_PKT_RSSI_GET(p));
+	s8 rssi = RF_ZIGBEE_PACKET_RSSI_GET(p) - 110;
+	zb_macDataRecvHander(p, macPld, len, fAck, ZB_RADIO_TIMESTAMP_GET(p), rssi);
 
 	DBG_ZIGBEE_STATUS(0x14);
 }
