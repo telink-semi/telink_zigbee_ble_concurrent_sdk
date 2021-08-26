@@ -723,8 +723,7 @@ _attribute_ram_code_ __attribute__((optimize("-Os"))) void rf_rx_irq_handler(voi
 	ZB_RADIO_RX_ENABLE;
 
 	/* zb_mac_receive_data handler */
-	s8 rssi = RF_ZIGBEE_PACKET_RSSI_GET(p) - 110;
-	zb_macDataRecvHander(p, macPld, len, fAck, ZB_RADIO_TIMESTAMP_GET(p), rssi);
+	zb_macDataRecvHander(p, macPld, len, fAck, ZB_RADIO_TIMESTAMP_GET(p), RF_ZIGBEE_PACKET_RSSI_GET(p));
 
 	DBG_ZIGBEE_STATUS(0x14);
 }
