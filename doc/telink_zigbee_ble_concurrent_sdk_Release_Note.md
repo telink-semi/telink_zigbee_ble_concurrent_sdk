@@ -1,3 +1,30 @@
+## V1.6.0.0-beta
+
+### Features
+* update drivers is to fix 8258 exceptional interruption caused by system ticker.
+* binding table searching issue
+* the rssi value is changed from RSSI to (RSSI - 110)
+* add callback for nwk layer is to decrease the code size
+* improve the performance for the mac pending data（pending data keeps valid till it's be transmitted successfully or expired）
+* improve routing performance
+* change configuration for performance
+
+### BREAKING CHANGES
+* None
+
+### Features
+* 更新驱动修正由system ticker引起的异常中断
+* binding table搜索问题
+* rssi值由RSSI修正为（RSSI-110）
+* 网络层添加回调函数以减小代码大小
+* 优化mac pending data处理(pending一直保持有效直到成功被发送或超时)
+* 优化路由
+* 修改网络配置参数，以提高网络性能
+
+### BREAKING CHANGES
+* 无
+
+
 ## V1.5.7
 
 ### Feautures
