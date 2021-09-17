@@ -1,4 +1,4 @@
-## V1.6.0.0-beta
+## V1.6.0.0
 
 ### Features
 * update drivers is to fix 8258 exceptional interruption caused by system ticker.
