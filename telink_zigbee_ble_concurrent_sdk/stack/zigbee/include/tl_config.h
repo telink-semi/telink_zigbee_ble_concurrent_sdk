@@ -136,6 +136,8 @@
 //SECUR: CCM M parameter. Fixed to 4 for security level 5
 #define	ZB_CCM_M									4
 
+#define ZB_SECURITY									1
+
 
 //if defined, enable APS security
 #define APS_FRAME_SECURITY

@@ -1523,7 +1523,11 @@ _CODE_BDB_ u8 bdb_init(af_simple_descriptor_t *simple_desc, bdb_commissionSettin
 	g_bdbCtx.factoryNew = zb_isDeviceFactoryNew();
 
 	/* security configure */
+#if ZB_SECURITY_ENABLE
 	ss_zdoInit(TRUE, SS_PRECONFIGURED_NOKEY);
+#else
+	ss_zdoInit(FALSE, SS_PRECONFIGURED_NOKEY);
+#endif
 
 #if ZB_COORDINATOR_ROLE
 	/* You can modify the tc policy here */

@@ -100,6 +100,11 @@ extern "C" {
 #define ZCL_ZLL_COMMISSIONING_SUPPORT				1
 #endif
 
+/**
+ *  @brief  Security
+ */
+#define ZB_SECURITY_ENABLE                          1
+
 ///////////////////  Zigbee Profile Configuration /////////////////////////////////
 #include "stack_cfg.h"
 

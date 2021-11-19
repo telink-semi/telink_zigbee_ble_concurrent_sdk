@@ -52,11 +52,6 @@ typedef enum{
 
 #define	IMAGE_TYPE								  TL_IMAGETYPE_LIGHT
 
-/**
- *  @brief  Security
- */
-#define SECURITY_ENABLE                           1
-
 
 /**
  *  @brief  NVRAM
@@ -130,10 +125,6 @@ typedef enum{
 
 #if ZB_ROUTER_ROLE
 	#define GP_SUPPORT_ENABLE					  1
-#endif
-
-#if (SECURITY_ENABLE)
-    #define ZB_SECURITY
 #endif
 
 #if (ZBHCI_USB_PRINT || ZBHCI_USB_CDC || ZBHCI_UART)

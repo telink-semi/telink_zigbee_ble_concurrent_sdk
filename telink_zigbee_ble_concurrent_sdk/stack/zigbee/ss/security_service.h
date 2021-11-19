@@ -27,7 +27,7 @@
 #include "../include/tl_config.h"
 
 
-#if SECURITY_ENABLE
+#ifdef ZB_SECURITY
 #define		SECURITY_MODE_STANDARD 			1
 #define		SECURITY_MODE_HIGH				(!SECURITY_MODE_STANDARD)
 #define		SS_UPDATE_FRAMECOUNT_THRES		1024

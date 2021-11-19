@@ -116,6 +116,11 @@ extern "C" {
 
 #define AF_TEST_ENABLE								1
 
+/**
+ *  @brief  Security
+ */
+#define ZB_SECURITY_ENABLE                          1
+
 ///////////////////  Zigbee Profile Configuration /////////////////////////////////
 #include "stack_cfg.h"
 
