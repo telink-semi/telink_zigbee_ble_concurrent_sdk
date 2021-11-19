@@ -1,3 +1,17 @@
+## V1.6.1.0
+
+### Features
+* add configuration to enable/disable zigbee security 
+
+### BREAKING CHANGES
+* None
+
+### Features
+* zigbee加密与否由应用层配置
+
+### BREAKING CHANGES
+* 无
+
 ## V1.6.0.0
 
 ### Features
