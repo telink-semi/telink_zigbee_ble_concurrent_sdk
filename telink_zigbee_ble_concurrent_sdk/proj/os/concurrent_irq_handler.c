@@ -102,6 +102,22 @@ _attribute_ram_code_ void irq_handler(void){
 		irq_blt_sdk_handler();
 	}
 
+#if (MODULE_GPIO_INTR_ENABLE)
+	if((src & FLD_IRQ_GPIO_EN)==FLD_IRQ_GPIO_EN){
+		reg_irq_src = FLD_IRQ_GPIO_EN;
+		gpio_irq_handler(GPIO_IRQ_MODE);
+	}
+	if((src & FLD_IRQ_GPIO_RISC0_EN)==FLD_IRQ_GPIO_RISC0_EN){
+		reg_irq_src = FLD_IRQ_GPIO_RISC0_EN;
+		gpio_irq_handler(GPIO_IRQ_RISC0_MODE);
+	}
+	if((src & FLD_IRQ_GPIO_RISC1_EN)==FLD_IRQ_GPIO_RISC1_EN){
+		reg_irq_src = FLD_IRQ_GPIO_RISC1_EN;
+		gpio_irq_handler(GPIO_IRQ_RISC1_MODE);
+	}
+#endif
+
+
 #if (MODULE_UART_ENABLE)
     u16  dma_irq_source = dma_chn_irq_status_get();
 	if(dma_irq_source & FLD_DMA_CHN_UART_RX){

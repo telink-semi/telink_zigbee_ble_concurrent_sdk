@@ -1222,7 +1222,7 @@ _CODE_BDB_ void bdb_zdoStartDevCnf(void *arg){
 				//g_bdbAttrs.commissioningStatus = BDB_COMMISSION_STA_SUCCESS;
 				g_bdbAttrs.nodeIsOnANetwork = 1;
 				BDB_STATUS_SET(BDB_COMMISSION_STA_SUCCESS);
-				if(!ZB_IEEE_ADDR_IS_INVAILD(ss_ib.trust_center_address)){
+				if(!ZB_IEEE_ADDR_IS_INVAILD(ss_ib.trust_center_address) && ss_ib.securityLevel){
 					evt = BDB_EVT_COMMISSIONING_NETWORK_STEER_RETRIEVE_TCLINK_KEY;
 				}else{
 					evt = BDB_EVT_COMMISSIONING_NETWORK_STEER_PERMITJOIN;

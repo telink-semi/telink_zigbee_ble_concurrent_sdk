@@ -662,6 +662,8 @@ void ota_saveUpdateInfo2NV(void *arg)
 
 u8 ota_imageDataProcess(u8 len, u8 *pData)
 {
+	bool validChecked = 0;
+
 	if(zcl_attr_imageUpgradeStatus != IMAGE_UPGRADE_STATUS_DOWNLOAD_IN_PROGRESS){
 		return ZCL_STA_ABORT;
 	}
@@ -873,6 +875,9 @@ u8 ota_imageDataProcess(u8 len, u8 *pData)
 							if(crcReceived != otaClientInfo.crcValue){
 								return ZCL_STA_INVALID_IMAGE;
 							}
+							validChecked = 1;
+						}else{
+							return ZCL_STA_INVALID_IMAGE;
 						}
 
 						otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_ELEM_TAG1;
@@ -896,9 +901,12 @@ u8 ota_imageDataProcess(u8 len, u8 *pData)
 
 		//check if the download is complete
 		if(zcl_attr_fileOffset >= g_otaCtx.downloadImageSize){
-			zcl_attr_imageUpgradeStatus = IMAGE_UPGRADE_STATUS_DOWNLOAD_COMPLETE;
-
-			return ZCL_STA_SUCCESS;
+			if(validChecked){
+				zcl_attr_imageUpgradeStatus = IMAGE_UPGRADE_STATUS_DOWNLOAD_COMPLETE;
+				return ZCL_STA_SUCCESS;
+			}else{
+				return ZCL_STA_INVALID_IMAGE;
+			}
 		}
 	}
 
@@ -952,7 +960,7 @@ void ota_imageBlockReq(u8 dstEp, u16 dstAddr, u16 profileId)
 	dstEpInfo.dstAddr.shortAddr = dstAddr;
 	dstEpInfo.dstEp = dstEp;
 	dstEpInfo.profileId = profileId;
-	dstEpInfo.txOptions |= APS_TX_OPT_ACK_TX;
+	dstEpInfo.txOptions |= 0;//APS_TX_OPT_ACK_TX;
 	dstEpInfo.txOptions |= g_otaCtx.otaServerEpInfo.txOptions;
 
 	zcl_ota_imageBlockReqCmdSend(g_otaCtx.simpleDesc->endpoint, &dstEpInfo, FALSE, &req);
@@ -1047,7 +1055,7 @@ static status_t ota_imageBlockReqHandler(zclIncomingAddrInfo_t *pAddrInfo, ota_i
 	dstEpInfo.dstAddr.shortAddr = pAddrInfo->srcAddr;
 	dstEpInfo.dstEp = pAddrInfo->srcEp;
 	dstEpInfo.profileId = pAddrInfo->profileId;
-	dstEpInfo.txOptions |= APS_TX_OPT_ACK_TX;   //enable aps ack
+	dstEpInfo.txOptions |= 0;  //APS_TX_OPT_ACK_TX;   //enable aps ack
 
 	zcl_ota_imageBlockRspCmdSend(g_otaCtx.simpleDesc->endpoint, &dstEpInfo, TRUE, &rsp);
 

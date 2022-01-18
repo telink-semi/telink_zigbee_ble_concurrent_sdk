@@ -311,9 +311,7 @@ void sampleSwitch_leaveCnfHandler(void *p)
 {
 	nlmeLeaveConf_t *pCnf = (nlmeLeaveConf_t *)p;
 	//printf("sampleSwitch_leaveCnfHandler, status = %x\n", pCnf->status);
-    if(pCnf->status == SUCCESS ){
-    	//SYSTEM_RESET();
-    }
+	SYSTEM_RESET();
 }
 
 /*********************************************************************
