@@ -1,3 +1,22 @@
+## V1.6.2.0
+
+### Bugs
+* ZED can't factory new reset successfully while disconnecting with the network. (this issue only exsits on sdk-v1.6.0.0， v1.6.1.0)
+* scene copy command issue
+* change ota check/validation condition
+
+### BREAKING CHANGES
+* None
+
+### Bugs
+* ZED设备断连时无法正常factory new reset(这一问题仅存在于sdk-v1.6.0.0， v1.6.1.0)
+* scene copy command处理问题
+* 加强ota image的校验条件
+
+### BREAKING CHANGES
+* 无
+
+
 ## V1.6.1.0
 
 ### Features
