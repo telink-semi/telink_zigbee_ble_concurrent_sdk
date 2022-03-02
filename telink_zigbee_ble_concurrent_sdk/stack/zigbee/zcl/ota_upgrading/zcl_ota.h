@@ -1,29 +1,30 @@
 /********************************************************************************************************
- * @file     zcl_ota.h
+ * @file    zcl_ota.h
  *
- * @brief	 APIs statement for ota cluster
+ * @brief   This is the header file for zcl_ota
  *
- * @author
- * @date     June. 10, 2017
+ * @author  Zigbee Group
+ * @date    2021
  *
- * @par      Copyright (c) 2016, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *			 The information contained herein is confidential and proprietary property of Telink
- * 		     Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *			 of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *			 Co., Ltd. and the licensee in separate contract or the terms described here-in.
- *           This heading MUST NOT be removed from this file.
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
  *
- * 			 Licensees are granted free, non-transferable use of the information in this
- *			 file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
+ *              http://www.apache.org/licenses/LICENSE-2.0
  *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *******************************************************************************************************/
-#pragma once
 
-#include "tl_common.h"
-#include "../../zdo/zb_af.h"
-#include "../zcl.h"
+#ifndef ZCL_OTA_H
+#define ZCL_OTA_H
+
+
 
 /**
  *  @brief	zcl_ota_cmdId OTA Command Ids
@@ -241,7 +242,7 @@ extern const zclAttrInfo_t ota_attrTbl[];
 extern const u8 zcl_ota_attrNum;
 #endif
 
-status_t zcl_ota_register(u8 endpoint, u8 arrtNum, const zclAttrInfo_t attrTbl[], cluster_forAppCb_t cb);
+status_t zcl_ota_register(u8 endpoint, u16 manuCode, u8 arrtNum, const zclAttrInfo_t attrTbl[], cluster_forAppCb_t cb);
 
 status_t zcl_ota_imageNotifySend(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, ota_imageNotify_t *pReq);
 #define zcl_ota_imageNotifyCmdSend(a,b,c,d)	(zcl_ota_imageNotifySend((a), (b), (c), ZCL_SEQ_NUM, (d)))
@@ -250,7 +251,7 @@ status_t zcl_ota_queryNextImageReqSend(u8 srcEp, epInfo_t *pDstEpInfo, u8 disabl
 #define zcl_ota_queryNextImageReqCmdSend(a,b,c,d)	(zcl_ota_queryNextImageReqSend((a), (b), (c), ZCL_SEQ_NUM, (d)))
 
 status_t zcl_ota_queryNextImageRspSend(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, ota_queryNextImageRsp_t *pRsp);
-#define zcl_ota_queryNextImageRspCmdSend(a,b,c,d)	(zcl_ota_queryNextImageRspSend((a), (b), (c), ZCL_SEQ_NUM, (d)))
+#define zcl_ota_queryNextImageRspCmdSend(a,b,c,d,e)	(zcl_ota_queryNextImageRspSend((a), (b), (c), (d), (e)))
 
 status_t zcl_ota_imageBlockReqSend(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, ota_imageBlockReq_t *pReq);
 #define zcl_ota_imageBlockReqCmdSend(a,b,c,d)	(zcl_ota_imageBlockReqSend((a), (b), (c), ZCL_SEQ_NUM, (d)))
@@ -258,14 +259,17 @@ status_t zcl_ota_imageBlockReqSend(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDef
 status_t zcl_ota_imagePageReqSend(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, ota_imagePageReq_t *pReq);
 
 status_t zcl_ota_imageBlockRspSend(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, ota_imageBlockRsp_t *pRsp);
-#define zcl_ota_imageBlockRspCmdSend(a,b,c,d)	(zcl_ota_imageBlockRspSend((a), (b), (c), ZCL_SEQ_NUM, (d)))
+#define zcl_ota_imageBlockRspCmdSend(a,b,c,d,e)	(zcl_ota_imageBlockRspSend((a), (b), (c), (d), (e)))
 
 status_t zcl_ota_upgradeEndReqSend(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, ota_upgradeEndReq_t *pReq);
 #define zcl_ota_upgradeEndReqCmdSend(a,b,c,d)	(zcl_ota_upgradeEndReqSend((a), (b), (c), ZCL_SEQ_NUM, (d)))
 
 status_t zcl_ota_upgradeEndRspSend(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, ota_upgradeEndRsp_t *pRsp);
-#define zcl_ota_upgradeEndRspCmdSend(a,b,c,d)	(zcl_ota_upgradeEndRspSend((a), (b), (c), ZCL_SEQ_NUM, (d)))
+#define zcl_ota_upgradeEndRspCmdSend(a,b,c,d,e)	(zcl_ota_upgradeEndRspSend((a), (b), (c), (d), (e)))
 
 status_t zcl_ota_queryDevSpecFileReqSend(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, ota_querySpecFileReq_t *pReq);
 
 status_t zcl_ota_queryDevSpecFileRspSend(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, ota_querySpecFileRsp_t *pRsp);
+
+
+#endif	/* ZCL_OTA_H */

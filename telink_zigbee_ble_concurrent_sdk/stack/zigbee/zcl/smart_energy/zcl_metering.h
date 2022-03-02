@@ -1,29 +1,30 @@
 /********************************************************************************************************
- * @file     zcl_metering.h
+ * @file    zcl_metering.h
  *
- * @brief	 APIs statement for metering cluster
+ * @brief   This is the header file for zcl_metering
  *
- * @author
- * @date     June. 10, 2017
+ * @author  Zigbee Group
+ * @date    2021
  *
- * @par      Copyright (c) 2016, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *			 The information contained herein is confidential and proprietary property of Telink
- * 		     Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *			 of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *			 Co., Ltd. and the licensee in separate contract or the terms described here-in.
- *           This heading MUST NOT be removed from this file.
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
  *
- * 			 Licensees are granted free, non-transferable use of the information in this
- *			 file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
+ *              http://www.apache.org/licenses/LICENSE-2.0
  *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *******************************************************************************************************/
-#pragma once
 
-#include "tl_common.h"
-#include "../../zdo/zb_af.h"
-#include "../zcl.h"
+#ifndef ZCL_METERING_H
+#define ZCL_METERING_H
+
+
 
 /*********************************************************************
  * CONSTANTS
@@ -284,29 +285,30 @@ extern const u8 zcl_metering_attrNum;
 #endif
 
 
-status_t zcl_metering_register(u8 endpoint, u8 attrNum, const zclAttrInfo_t attrTbl[], cluster_forAppCb_t cb);
+status_t zcl_metering_register(u8 endpoint, u16 manuCode, u8 attrNum, const zclAttrInfo_t attrTbl[], cluster_forAppCb_t cb);
 
 status_t zcl_metering_getProfile(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, zcl_metering_getProfileCmd_t *pReq);
 #define zcl_metering_getProfileCmd(a,b,c,d)	(zcl_metering_getProfile((a), (b), (c), ZCL_SEQ_NUM, (d)))
 
-void zcl_metering_requestMirrorRsp(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, zcl_metering_requestMirrorRspCmd_t *pRsp);
-#define zcl_metering_requestMirrorRspCmd(a,b,c,d)	(zcl_metering_requestMirrorRsp((a), (b), (c), ZCL_SEQ_NUM, (d)))
+status_t zcl_metering_requestMirrorRsp(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, zcl_metering_requestMirrorRspCmd_t *pRsp);
+#define zcl_metering_requestMirrorRspCmd(a,b,c,d,e)	(zcl_metering_requestMirrorRsp((a), (b), (c), (d), (e)))
 
-void zcl_metering_mirrorRemoved(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, zcl_metering_mirrorRemovedCmd_t *pRsp);
+status_t zcl_metering_mirrorRemoved(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, zcl_metering_mirrorRemovedCmd_t *pRsp);
 #define zcl_metering_mirrorRemovedCmd(a,b,c,d)	(zcl_metering_mirrorRemoved((a), (b), (c), ZCL_SEQ_NUM, (d)))
 
-void zcl_metering_requestFastPollMode(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, zcl_metering_requestFastPollModeCmd_t *pReq);
+status_t zcl_metering_requestFastPollMode(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, zcl_metering_requestFastPollModeCmd_t *pReq);
 #define zcl_metering_requestFastPollModeCmd(a,b,c,d)	(zcl_metering_requestFastPollMode((a), (b), (c), ZCL_SEQ_NUM, (d)))
 
-void zcl_metering_getProfileRsp(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, zcl_metering_getProfileRspCmd_t *pRsp);
-#define zcl_metering_getProfileRspCmd(a,b,c,d)	(zcl_metering_getProfileRsp((a), (b), (c), ZCL_SEQ_NUM, (d)))
+status_t zcl_metering_getProfileRsp(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, zcl_metering_getProfileRspCmd_t *pRsp);
+#define zcl_metering_getProfileRspCmd(a,b,c,d,e)	(zcl_metering_getProfileRsp((a), (b), (c), (d), (e)))
 
-void zcl_metering_requestMirror(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo);
+status_t zcl_metering_requestMirror(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo);
 #define zcl_metering_requestMirrorCmd(a,b,c)	(zcl_metering_requestMirror((a), (b), (c), ZCL_SEQ_NUM))
 
-void zcl_metering_removeMirror(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo);
+status_t zcl_metering_removeMirror(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo);
 #define zcl_metering_removeMirrorCmd(a,b,c)	(zcl_metering_removeMirror((a), (b), (c), ZCL_SEQ_NUM))
 
-void zcl_metering_requestFastPollModeRsp(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, zcl_metering_requestFastPollModeRspCmd_t *pRsp);
-#define zcl_metering_requestFastPollModeRspCmd(a,b,c,d)	(zcl_metering_requestFastPollModeRsp((a), (b), (c), ZCL_SEQ_NUM, (d)))
+status_t zcl_metering_requestFastPollModeRsp(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, zcl_metering_requestFastPollModeRspCmd_t *pRsp);
+#define zcl_metering_requestFastPollModeRspCmd(a,b,c,d,e)	(zcl_metering_requestFastPollModeRsp((a), (b), (c), (d), (e)))
 
+#endif	/* ZCL_METERING_H */

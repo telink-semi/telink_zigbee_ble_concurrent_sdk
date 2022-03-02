@@ -1,24 +1,26 @@
 /********************************************************************************************************
- * @file     zcl_level_attr.c
+ * @file    zcl_level_attr.c
  *
- * @brief	 attribute configuration for level cluster
+ * @brief   This is the source file for zcl_level_attr
  *
- * @author
- * @date     June. 10, 2017
+ * @author  Zigbee Group
+ * @date    2021
  *
- * @par      Copyright (c) 2016, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *			 The information contained herein is confidential and proprietary property of Telink
- * 		     Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *			 of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *			 Co., Ltd. and the licensee in separate contract or the terms described here-in.
- *           This heading MUST NOT be removed from this file.
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
  *
- * 			 Licensees are granted free, non-transferable use of the information in this
- *			 file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
+ *              http://www.apache.org/licenses/LICENSE-2.0
  *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *******************************************************************************************************/
+
 #if 0
 #include "tl_common.h"
 
@@ -105,11 +107,11 @@ const zclAttrInfo_t level_attrTbl[] =
 #endif
 
 #ifdef ZCL_ATTR_OPTIONS_ENABLE
-	{ ZCL_ATTRID_LEVLE_OPTIONS,       ZCL_DATA_TYPE_BITMAP8,   ACCESS_CONTROL_READ|ACCESS_CONTROL_WRITE,  (u8*)&zcl_attr_level.options },
+	{ ZCL_ATTRID_LEVEL_OPTIONS,       ZCL_DATA_TYPE_BITMAP8,   ACCESS_CONTROL_READ|ACCESS_CONTROL_WRITE,  (u8*)&zcl_attr_level.options },
 #endif
 
 #ifdef ZCL_ATTR_START_UP_CURRENT_LEVEL_ENABLE
-	{ ZCL_ATTRID_LEVLE_START_UP_CURRENT_LEVEL,  ZCL_DATA_TYPE_UINT8,   ACCESS_CONTROL_READ|ACCESS_CONTROL_WRITE,  (u8*)&zcl_attr_level.startUpCurrentLevel },
+	{ ZCL_ATTRID_LEVEL_START_UP_CURRENT_LEVEL,  ZCL_DATA_TYPE_UINT8,   ACCESS_CONTROL_READ|ACCESS_CONTROL_WRITE,  (u8*)&zcl_attr_level.startUpCurrentLevel },
 #endif
 
 	{ ZCL_ATTRID_GLOBAL_CLUSTER_REVISION, ZCL_DATA_TYPE_UINT16,  ACCESS_CONTROL_READ,  (u8*)&zcl_attr_global_clusterRevision},

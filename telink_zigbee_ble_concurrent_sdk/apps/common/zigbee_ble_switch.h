@@ -1,36 +1,43 @@
 /********************************************************************************************************
- * @file     zigbee_ble_switch.h
+ * @file    zigbee_ble_switch.h
  *
- * @brief    the function for ble/zigbee switch
+ * @brief   This is the header file for zigbee_ble_switch
  *
- * @author
- * @date     Feb. 1, 2017
+ * @author  Zigbee Group
+ * @date    2021
  *
- * @par      Copyright (c) 2016, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *			 The information contained herein is confidential and proprietary property of Telink
- * 		     Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *			 of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *			 Co., Ltd. and the licensee in separate contract or the terms described here-in.
- *           This heading MUST NOT be removed from this file.
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
  *
- * 			 Licensees are granted free, non-transferable use of the information in this
- *			 file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
+ *              http://www.apache.org/licenses/LICENSE-2.0
  *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *******************************************************************************************************/
-#include "user_config.h"
-#include "zb_common.h"
-#include "stack/ble/blt_config.h"
-#include "stack/ble/ll/ll.h"
 
-#include "tl_common.h"
 
-#if BLE_CONCURRENT_MODE
+#if 1
 
-#define  ZIGBEE_AFTER_TIME    (16 * 1000 * 5)	//4ms
-#define  BLE_IDLE_TIME   	  (16 * 1000 * 5)	//5ms
+#define  ZIGBEE_AFTER_TIME    (16 * 1000 * 4)	//4ms
+#define  BLE_IDLE_TIME   	  (16 * 1000 * 4)	//5ms
 
+typedef enum{
+	DUALMODE_SLOT_BLE = 0,
+	DUALMODE_SLOT_ZIGBEE,
+}app_currentSlot_e;
+
+
+typedef struct{
+	u32      bleTaskTick;
+	volatile app_currentSlot_e slot;
+	u8       bleState;
+}app_dualModeInfo_t;
 
 typedef void (*master_service_t) (void);
 typedef void (*master_update_t) (void);
@@ -39,7 +46,11 @@ typedef struct{
 	master_update_t  updateCb;
 }ble_master_cb_t;
 
-extern volatile u8 zigbee_process;
+extern app_dualModeInfo_t g_dualModeInfo;
+#define CURRENT_SLOT_GET()			 g_dualModeInfo.slot
+#define CURRENT_SLOT_SET(s)			 g_dualModeInfo.slot = s
+#define APP_BLE_STATE_SET(state)	 g_dualModeInfo.bleState = state
+#define APP_BLE_STATE_GET()			 g_dualModeInfo.bleState
 
 _attribute_ram_code_ void switch_to_zb_context(void);
 
@@ -49,9 +60,9 @@ int is_switch_to_ble(void);
 
 int is_switch_to_zigbee(void);
 
-ble_sts_t ble_task_stop(void);
+u8 ble_task_stop(void);
 
-ble_sts_t ble_task_restart(void);
+u8 ble_task_restart(void);
 
 void zb_ble_switch_proc(void);
 

@@ -1,30 +1,32 @@
 /********************************************************************************************************
- * @file     zb_config.c
+ * @file    zb_config.c
  *
- * @brief	 table/buffer size configuration for zigbee stack
+ * @brief   This is the source file for zb_config
  *
- * @author
- * @date     Match. 1, 2018
+ * @author  Zigbee Group
+ * @date    2021
  *
- * @par      Copyright (c) 2018, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *			 The information contained herein is confidential and proprietary property of Telink
- * 		     Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *			 of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *			 Co., Ltd. and the licensee in separate contract or the terms described here-in.
- *           This heading MUST NOT be removed from this file.
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
  *
- * 			 Licensees are granted free, non-transferable use of the information in this
- *			 file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
+ *              http://www.apache.org/licenses/LICENSE-2.0
  *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *******************************************************************************************************/
 
 /**********************************************************************
  * INCLUDES
  */
-#include "../include/zb_common.h"
+#include "includes/zb_common.h"
 
+sys_diagnostics_t g_sysDiags;
 
 /* PAN ID setting */
 /*
@@ -34,6 +36,7 @@
  */
 #define DEFAULT_PANID		MAC_INVALID_PANID
 u16 TL_ZB_ASSOCJOIN_PERMIT_PANID = DEFAULT_PANID;
+
 /*
  * Setting this to a value other than MAC_INVALID_PANID (0xFFFF) causes
  * Routers and end devices to filter the PAN ID when associate join a network
@@ -42,21 +45,13 @@ u16 TL_ZB_ASSOCJOIN_PERMIT_PANID = DEFAULT_PANID;
 u16 TL_ZB_ASSOCJOIN_FILTER_PANID = FILTER_PANID;
 
 /* APS data fragmentation setting */
-u8 APS_INTERFRAME_DELAY = 100;
+u8 APS_INTERFRAME_DELAY = 100;//ms
 u8 APS_MAX_WINDOW_SIZE = 1;
 u8 APS_FRAGMEMT_PAYLOAD_SIZE = 64;
 
 //The maximum number of retries allowed after a transmission failure.
 u8 APS_MAX_FRAME_RETRIES = 3;
 u8 APS_ACK_EXPIRY = 2;//seconds
-
-/* queue size of the software timer event */
-u8 TIMER_EVENT_SIZE = TIMER_EVENT_NUM;
-
-/* queue size of the software timer event for brc, must less than TIMER_EVENT_SIZE */
-u8 TIMER_EVENT_NUM_BRC_ENOUGH = TIMER_EVENT_NUM_BRC;
-
-ev_time_event_pool_t g_timerEventPool;   //timer event pool
 
 /* buffer pool size for zigbee pro */
 u8 ZB_BUF_POOL_SIZE = ZB_BUF_POOL_NUM;
@@ -69,11 +64,11 @@ u8 ZB_MAC_EXT_EXPEIRY_CNT = ZB_MAC_INTERNAL_EXPIRY_CNT;
 /* the lqi threshold for neighbor */
 u8 NWK_NEIGHBORTBL_ADD_LQITHRESHOLD = 0x45;
 
-/* the life time for unauthorized child table */
-u32 NWK_UNAUTH_CHILD_TABLE_LIFE_TIME = (5 * 1000 * 1000);
+/* the life time for unauthorized child table, 5 seconds */
+u32 NWK_UNAUTH_CHILD_TABLE_LIFE_TIME = (5 * 1000);
 
-/* the life time for the joined node to wait for the network key */
-u32 TRANSPORT_NETWORK_KEY_WAIT_TIME = (5 * 1000 * 1000);//TL_SUPERFRAMETIME_TO_US(1000);
+/* timeout waiting for transport nwk key during association join or security rejoin, 2 seconds */
+u32 TRANSPORT_NETWORK_KEY_WAIT_TIME = (2 * 1000);
 
 /* the cost threshold for one hop */
 u8 NWK_COST_THRESHOLD_ONEHOP = 7;
@@ -133,38 +128,41 @@ u8 APS_GROUP_TABLE_SIZE = APS_GROUP_TABLE_NUM;
 aps_group_tbl_ent_t aps_group_tbl[APS_GROUP_TABLE_NUM];
 u16 GROUP_MESSAGE_SEND_ADDRESS = NWK_BROADCAST_RX_ON_WHEN_IDLE;
 
-/* the offset of the rx buffer to the zb-buffer*/
+/* the offset of the rx buffer to the zb-buffer */
 u8 RX_ZBBUF_OFFSET = TL_RXPRIMITIVEHDR;
 
 /* MAC layer TX Queue size */
 u8 MAC_TX_QUEUE_SIZE = TX_QUEUE_BN;
 tx_data_queue g_txQueue[TX_QUEUE_BN];
 
+/* WWAH long up time threshold, (24 * 60 * 60) seconds. */
+u32 LONG_UPTIME_THRESHOLD = 86400;
+
 //default network key
 /* If all zero, will generate 16-bytes network key randomly. */
-
+#if 1
 const u8 nwkKeyDefault[] = {0, 0, 0, 0, 0, 0, 0, 0,
-							  0, 0, 0, 0, 0, 0, 0, 0};
-
-/*const u8 nwkKeyDefault[] = { 0x12, 0x23, 0x34, 0x45, 0x56, 0x67, 0x78, 0x89,
-			  	  	  	0x9a, 0xab, 0xbc, 0xcd, 0xde, 0xef, 0xf0, 0x01};
-*/
+							0, 0, 0, 0, 0, 0, 0, 0};
+#else
+const u8 nwkKeyDefault[] = {0x12, 0x23, 0x34, 0x45, 0x56, 0x67, 0x78, 0x89,
+			  	  	  	    0x9a, 0xab, 0xbc, 0xcd, 0xde, 0xef, 0xf0, 0x01};
+#endif
 
 
 //Global trust center link key which used in centralized security network
 const u8 tcLinkKeyCentralDefault[] = {0x5a, 0x69, 0x67, 0x42, 0x65, 0x65, 0x41, 0x6c,
-  	   	 	 	 	 	 	 	 	 	0x6c, 0x69, 0x61, 0x6e, 0x63, 0x65, 0x30, 0x39};
+  	   	 	 	 	 	 	 	 	  0x6c, 0x69, 0x61, 0x6e, 0x63, 0x65, 0x30, 0x39};
 
 
 //certification link key for distributed network
 const u8 linkKeyDistributedCertification[] = {0xd0, 0xd1, 0xd2, 0xd3, 0xd4, 0xd5, 0xd6, 0xd7,
-										0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf};
+										      0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf};
 
 /* touch-link link key */
 const u8 touchLinkKeyCertification[] = {0xc0, 0xc1, 0xc2, 0xc3, 0xc4, 0xc5, 0xc6, 0xc7,
         								0xc8, 0xc9, 0xca, 0xcb, 0xcc, 0xcd, 0xce, 0xcf};
 
-/* default mac PIB setting */
+/* Default PIB settings for MAC layer. */
 const tl_zb_mac_pib_t macPibDefault = {
 	.ackWaitDuration = (ZB_MAC_UNIT_BACKOFF_PERIOD + ZB_PHY_TURNROUNDTIME + ZB_PHY_SHR_DURATION + (u16)(6 * ZB_PHY_SYMBOLS_PER_OCTET)),
 	.frameRetryNum = ZB_MAC_FRAME_RETRIES_MAX,
@@ -180,7 +178,6 @@ const tl_zb_mac_pib_t macPibDefault = {
 	.minBe = 5,
 #endif
 	.maxBe = 8,
-	//.frameRetryNum = 3,
 	.beaconOrder = 15,
 	.superframeOrder = 0,
 	.maxCsmaBackoffs = 4,
@@ -193,68 +190,73 @@ const tl_zb_mac_pib_t macPibDefault = {
 #endif
 };
 
-
-/* default NIB setting for netwrok layer */
-const nwk_nib_t nib_default = {
+/* Default NIB settings for NWK layer. */
+const nwk_nib_t nwkNibDefault = {
 #if defined ZB_NWK_DISTRIBUTED_ADDRESS_ASSIGN && defined ZB_ROUTER_ROLE
-		.maxRouters = NWK_MAX_ROUTERS,
-		.addrAlloc = NWK_ADDRESS_ALLOC_METHOD_DISTRIBUTED,
+	.maxRouters = NWK_MAX_ROUTERS,
+	.addrAlloc = NWK_ADDRESS_ALLOC_METHOD_DISTRIBUTED,
 #else
-		.addrAlloc = NWK_ADDRESS_ALLOC_METHOD_STOCHASTIC,
+	.addrAlloc = NWK_ADDRESS_ALLOC_METHOD_STOCHASTIC,
 #endif
-		.maxDepth = NWK_MAX_DEPTH,
-		.stackProfile = ZB_STACK_PROFILE,
-
+	.maxDepth = NWK_MAX_DEPTH,
+	.stackProfile = ZB_STACK_PROFILE,
 #ifdef ZB_ROUTER_ROLE
-		.maxChildren = DEFAULT_MAX_CHILDREN,
-		.maxBroadcastRetries = NWK_MAX_BROADCAST_RETRIES,
-		.passiveAckTimeout = NWK_PASSIVE_ACK_TIMEOUT,
-		.nwkBroadcastDeliveryTime = NWK_BROADCAST_DELIVERY_TIME,
- 		.linkStatusPeriod = ZB_NWK_LINK_STATUS_PEROID_DEFAULT,
-		.routerAgeLimit = 20,
-		.maxSourceRoute = NWK_MAX_SOURCE_ROUTE,
-		.concentratorRadius = 0,
-		.concentratorDiscoveryTime = 120,//120s
-		.symLink = 1,
-		.reportConstantCost = 0,
+	.maxChildren = DEFAULT_MAX_CHILDREN,
+	.maxBroadcastRetries = NWK_MAX_BROADCAST_RETRIES,
+	.passiveAckTimeout = NWK_PASSIVE_ACK_TIMEOUT,
+	.nwkBroadcastDeliveryTime = NWK_BROADCAST_DELIVERY_TIME,
+ 	.linkStatusPeriod = ZB_NWK_LINK_STATUS_PEROID_DEFAULT,//45
+	.routerAgeLimit = 3,
+	.maxSourceRoute = NWK_MAX_SOURCE_ROUTE,
+	.concentratorRadius = 0,
+	.concentratorDiscoveryTime = 120,//120s
+	.symLink = 1,
+	.reportConstantCost = 0,
 #ifdef ZB_COORDINATOR_ROLE
-		.depth = 0,
-		.isConcentrator = 1,
+	.depth = 0,
+	.isConcentrator = 1,
 #else
-		.depth = 1,
-		.isConcentrator = 0,
+	.depth = 1,
+	.isConcentrator = 0,
 #endif
 #endif
-		.managerAddr = 0x0000,
-        .leaveReqAllowed = 1,
-        .useMulticast = 0,
-        .panId = DEFAULT_PANID,
-        .nwkAddr = NWK_BROADCAST_RESERVED,
-        .uniqueAddr = 0,
-
-        .parentInfo = 0,
-        .endDevTimeoutDefault = NWK_ENDDEV_TIMEOUT_DEFAULT,
-        .leaveReqWithoutRejoinAllowed = 1,
+	.managerAddr = 0x0000,
+    .leaveReqAllowed = 1,
+    .useMulticast = 0,
+    .panId = DEFAULT_PANID,
+    .nwkAddr = NWK_BROADCAST_RESERVED,
+    .uniqueAddr = 0,
+    .parentInfo = 0,
+    .endDevTimeoutDefault = NWK_ENDDEV_TIMEOUT_DEFAULT,
+    .leaveReqWithoutRejoinAllowed = 1,
 };
+
+/* ZDO default configuration attributes. */
+const zdo_attrCfg_t zdoCfgAttrDefault = {
+	.config_nwk_indirectPollRate 		= 0,
+	.config_parent_link_retry_threshold = ZDO_MAX_PARENT_THRESHOLD_RETRY,
+	.config_nwk_scan_attempts 			= ZDO_NWK_SCAN_ATTEMPTS,
+	.config_nwk_time_btwn_scans			= ZDO_NWK_TIME_BTWN_SCANS,
+	.config_permit_join_duration 		= ZDO_PERMIT_JOIN_DURATION,
+	.config_rejoin_times				= ZDO_REJOIN_TIMES,
+	.config_rejoin_duration 			= ZDO_REJOIN_DURATION,
+	.config_rejoin_backoff_time			= ZDO_REJOIN_BACKOFF_TIME,
+	.config_max_rejoin_backoff_time		= ZDO_MAX_REJOIN_BACKOFF_TIME,
+	.config_rejoin_backoff_iteration	= ZDO_REJOIN_BACKOFF_ITERATION,
+};
+
 
 #if ZB_ROUTER_ROLE
 /*
  * @brief:		get record entry for broadcasting record table
- *
- * @idx:		the index of the broadcasting record table
- *
- * */
+ */
 nwk_brcTransRecordEntry_t *brcTransRecordEntryGet(u8 idx){
 	return &g_brcTransTab[idx];
 }
 
-
 /*
  * @brief:		get the size of the broadcasting record table
- *
- * @idx:
- *
- * */
+ */
 u32 brcTransRecordTblSizeGet(void){
 	return (sizeof(g_brcTransTab));
 }
@@ -262,51 +264,35 @@ u32 brcTransRecordTblSizeGet(void){
 
 /*
  * @brief:		get the entry of the mapping table of the binding list
- *
- * @idx:
- *
- * */
+ */
 boundTblMapList_t *bindTblMapListGet(void){
 	return &aps_binding_tbl.BoudList[0];
 }
 
 /*
  * @brief:		get the size of zigbee buffer
- *
- * @idx:
- *
- * */
+ */
 u32 zbBufferSizeGet(void){
 	return (sizeof(g_mPool));
 }
 
 /*
  * @brief:		get the size of the binding table
- *
- * @idx:
- *
- * */
+ */
 u32 bindTblSizeGet(void){
 	return (sizeof(aps_binding_table_t));
 }
 
 /*
  * @brief:		get the size of the neighbor table
- *
- * @idx:
- *
- * */
+ */
 u32 neighborTblSizeGet(void){
 	return (sizeof(tl_zb_neighbor_entry_t));
 }
 
-
 /*
  * @brief:		get the size of the address mapping table
- *
- * @idx:
- *
- * */
+ */
 u32 addrMapTblSizeGet(void){
 	return (sizeof(tl_zb_addr_map_t));
 }

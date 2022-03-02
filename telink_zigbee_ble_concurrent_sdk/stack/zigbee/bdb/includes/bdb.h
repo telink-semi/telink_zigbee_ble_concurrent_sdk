@@ -1,30 +1,30 @@
 /********************************************************************************************************
- * @file     bdb.h
+ * @file    bdb.h
  *
- * @brief    header file for base device behavior
+ * @brief   This is the header file for bdb
  *
- * @author
- * @date     May. 27, 2017
+ * @author  Zigbee Group
+ * @date    2021
  *
- * @par      Copyright (c) 2017, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *			 The information contained herein is confidential and proprietary property of Telink
- * 		     Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *			 of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *			 Co., Ltd. and the licensee in separate contract or the terms described here-in.
- *           This heading MUST NOT be removed from this file.
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
  *
- * 			 Licensees are granted free, non-transferable use of the information in this
- *			 file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
+ *              http://www.apache.org/licenses/LICENSE-2.0
  *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *******************************************************************************************************/
+
 #ifndef BDB_H
 #define BDB_H
 
-#include "tl_common.h"
-#include "../../zdo/zb_af.h"
-#include "../../zdo/zdo_api.h"
+
 
 
 /** @addtogroup  TELINK_ZIGBEE_STACK TELINK ZigBee Stack
@@ -361,9 +361,9 @@ typedef struct{
 
 
 typedef struct{
-	u8 keyType; /* ERTIFICATION_KEY or MASTER_KEY key for touch-link or distribute network
-	 	 	 	 SS_UNIQUE_LINK_KEY or SS_GLOBAL_LINK_KEY for distribute network */
 	u8 *key;	/* the key used */
+	u8 keyType; /* ERTIFICATION_KEY or MASTER_KEY key for touch-link or distribute network
+	 	 	 	 SS_UNIQUE_LINK_KEY or SS_GLOBAL_LINK_KEY for central network */
 }bdb_linkKey_t;
 
 typedef struct{
@@ -372,7 +372,7 @@ typedef struct{
 											unique tc link key: only for ZR/ZED,
 											if ZC is using unique link key, need to access paieKeySet to set/get link key */
 	bdb_linkKey_t distributeLinkKey;	/* link key for distribute network, for distribute network  */
-	bdb_linkKey_t touchLinkKey;			/* touch link  key, for distribute network */
+	bdb_linkKey_t touchLinkKey;			/* touch link key, for distribute network */
 }bdb_linkKey_info_t;
 
 
@@ -381,14 +381,7 @@ typedef struct{
  * @{
  */
 typedef struct{
-	u8 usedInstallCode;						/* only for ZC  */
 	bdb_linkKey_info_t linkKey;
-
-#if 0
-	u8 distributeLinkKeyMode;  	/* distribute link key mode: MASTER_KEY or CERTIFICATION_KEY */
-	u8 linkKeyType;				/* linkKeyType: Default global Trust Center link key,
-								   used for the node which is ready to form a network  */
-#endif
 
 	u8 touchlinkEnable;			/* enable/disable touch-link */
 	u8 touchlinkChannel;		/* operation channel for touch-link target */
@@ -403,10 +396,10 @@ typedef struct{
  */
 typedef struct{
 	af_simple_descriptor_t *simpleDesc;
-	bdb_commissionSetting_t *commisionSettings;
+	bdb_commissionSetting_t *commissionSettings;
 	union{
-		ev_time_event_t *identifyTimer;
-		ev_time_event_t *retrieveTcLkKeyTimer;
+		ev_timer_event_t *identifyTimer;
+		ev_timer_event_t *retrieveTcLkKeyTimer;
 	};
 	bdb_appCb_t *bdbAppCb;
 	findBindQ_t	*pFindBindQ;
@@ -414,7 +407,6 @@ typedef struct{
 	u16	*matchClusterList;
 	findBindDst_t findDstInfo;
 	findBindDst_t bindDstInfo;
-	u16 targetAddr;   //target address for touch link
 	u8 clusterNum;
 	u8 matchClusterNum;
 
@@ -426,8 +418,9 @@ typedef struct{
 	u8 inited:1;
 	u8 factoryNew:1;
 	u8 leaveDoing:1;
-	u8 forceJoin:1;
-	u8 resv:4;
+    u8 forceJoin:1;
+	u8 securityDisable:1;
+	u8 resv:3;
 	u8 initResult;
 }bdb_ctx_t;
 /** @} end of group zb_bdb_ctx */
@@ -438,9 +431,15 @@ extern bdb_ctx_t  g_bdbCtx;
 
 #define	BDB_ATTR()		g_bdbAttrs
 
+#define	BDB_SECUIRY_DISABLE_SET(v)			do{ \
+												g_bdbCtx.securityDisable = v;       \
+												if(v){ss_ib.securityLevel = 0;}  	\
+												else{ss_ib.securityLevel = 5;}		\
+											}while(0)
+
 #define PRE_INSTALL_KEY_ENABLE(type)		do{ \
 												g_bdbAttrs.joinUsesInstallCodeKey = 1;  \
-												g_bdbAttrs.nodeJoinLinkKeyType = type; \
+												g_bdbAttrs.nodeJoinLinkKeyType = type;  \
 											}while(0)
 
 
@@ -451,9 +450,6 @@ extern bdb_ctx_t  g_bdbCtx;
 
 #define BDB_STATUS_SET(v)						g_bdbCtx.status = v
 #define BDB_STATUS_GET()						g_bdbCtx.status
-
-#define BDB_TOUCH_LINK_TARGET_SET(v)			g_bdbCtx.targetAddr = v
-#define BDB_TOUCH_LINK_TARGET_GET()				g_bdbCtx.targetAddr
 
 #define BDB_ATTR_GROUP_ID_SET(v)				g_bdbAttrs.commissioningGroupId = v
 
@@ -468,6 +464,22 @@ extern bdb_ctx_t  g_bdbCtx;
  * @return      None
  */
 u8 bdb_init(af_simple_descriptor_t *simple_desc, bdb_commissionSetting_t *setting, bdb_appCb_t *cb, u8 repower);
+
+/*********************************************************************
+ * @fn      bdb_join_direct()
+ *
+ * @brief   join/establish a network directly
+ *
+ * @param   channel
+ * 			panId
+ * 			shortAddr
+ * 			extPanId
+ * 		    nwkKey
+ * 		    inited
+ *
+ * @return  None
+ */
+u8 bdb_join_direct(u8 channel, u16 panId, u16 shortAddr, u8 *extPanId, u8 *nwkKey, u8 type, u8 inited);
 
 /**
  * @brief      commissioning: form a network
@@ -551,7 +563,7 @@ status_t bdb_defaultReportingCfg(u8 endpoint, u16 profileID, u16 clusterID, u16 
  * @param 	startDevCnf
  *
  */
-void bdb_zdoStartDevCnf(void *arg);   //zdo_start_device_confirm_t* startDevCnf);
+void bdb_zdoStartDevCnf(zdo_start_device_confirm_t *startDevCnf);
 
 /**
  * @brief      bdb attribute initialization
@@ -563,14 +575,25 @@ void bdb_zdoStartDevCnf(void *arg);   //zdo_start_device_confirm_t* startDevCnf)
 void tl_bdbAttrInit(void);
 
 /**
- * @brief      bdb use install code
+ * @brief      	Load install code from NV
  *
- * @param[in]   pInstallCode
- * @param[out]  pKey
+ * @param[out]  keyType
+ * @param[out]  derivedKey
+ *
+ * @return      RET_OK or RET_NOT_FOUND
+ */
+u8 bdb_preInstallCodeLoad(u8 *keyType, u8 derivedKey[]);
+
+/**
+ * @brief		Add pre-install code to NV
+ *
+ * @param[in]   ieeeAddr:  the ieee address of the device using unique link key join
+ *
+ * @param[in]   pInstallCode: the pointer of install code
  *
  * @return      None
  */
-void tl_bdbUseInstallCode(u8 *pInstallCode, u8 *pKey);
+void bdb_preInstallCodeAdd(addrExt_t ieeeAddr, u8 *pInstallCode);
 
 /**
  * @brief      bdb re-start
@@ -618,33 +641,10 @@ bool bdb_isIdle(void);
  */
 void bdb_linkKeyCfg(bdb_commissionSetting_t *setting, u8 isFactoryNew);
 
-
-/***********************************************************************//**
- * @brief       node is forced to join a fixed network, it can been called anytime
- *
- * @param       channel: operation channel
- *
- ** @param       panId:  the network panID
- *
- ** @param       shortAddr: network address allocated by itself
- *
- ** @param       extPanId: external panID of the network
- *
- ** @param       nwkKey:   the network key of the network
- **
- ** @param       type:     SS_SEMODE_CENTRALIZED or SS_SEMODE_DISTRIBUTED
- **
- ** @param       inited:   1: bdb_init() is called before, 0: bdb_init() isn't called before
- *
- * @return       Status:   0: success, other: failure
- *
- **************************************************************************/
-u8 bdb_join_direct(u8 channel,  u16 panId, u16 shortAddr, u8 *extPanId, u8 *nwkKey, u8 type, u8 inited);
-
 /** @} end of group zb_bdb_attr */
 
 /** @} end of group TELINK_ZIGBEE_INTERPAN */
 
 /** @} end of group TELINK_ZIGBEE_STACK */
 
-#endif
+#endif	/* BDB_H */

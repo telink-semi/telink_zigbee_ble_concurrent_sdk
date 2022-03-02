@@ -1,25 +1,25 @@
 /********************************************************************************************************
- * @file     zcl_scene.c
+ * @file    zcl_scene.c
  *
- * @brief	 APIs for scene cluster
+ * @brief   This is the source file for zcl_scene
  *
- * @author
- * @date     June. 10, 2017
+ * @author  Zigbee Group
+ * @date    2021
  *
- * @par      Copyright (c) 2016, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *			 The information contained herein is confidential and proprietary property of Telink
- * 		     Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *			 of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *			 Co., Ltd. and the licensee in separate contract or the terms described here-in.
- *           This heading MUST NOT be removed from this file.
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
  *
- * 			 Licensees are granted free, non-transferable use of the information in this
- *			 file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
+ *              http://www.apache.org/licenses/LICENSE-2.0
  *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *******************************************************************************************************/
-
 
 /**********************************************************************
  * INCLUDES
@@ -53,7 +53,7 @@ void zcl_scene_updateSceneCntAttr(u8 endpoint);
 static status_t zcl_scene_cmdHandler(zclIncoming_t *pInMsg);
 
 
-_CODE_ZCL_ status_t zcl_scene_register(u8 endpoint, u8 attrNum, const zclAttrInfo_t attrTbl[], cluster_forAppCb_t cb)
+_CODE_ZCL_ status_t zcl_scene_register(u8 endpoint, u16 manuCode, u8 attrNum, const zclAttrInfo_t attrTbl[], cluster_forAppCb_t cb)
 {
 	u8 status = ZCL_STA_SUCCESS;
 
@@ -61,7 +61,7 @@ _CODE_ZCL_ status_t zcl_scene_register(u8 endpoint, u8 attrNum, const zclAttrInf
     	zcl_scene_sceneTabClear();
     }
 
-    status = zcl_registerCluster(endpoint, ZCL_CLUSTER_GEN_SCENES, attrNum, attrTbl, zcl_scene_cmdHandler, cb);
+    status = zcl_registerCluster(endpoint, ZCL_CLUSTER_GEN_SCENES, manuCode, attrNum, attrTbl, zcl_scene_cmdHandler, cb);
 
     if(status == ZCL_STA_SUCCESS){
     	zcl_scene_updateSceneCntAttr(endpoint);
@@ -775,16 +775,8 @@ _CODE_ZCL_ static status_t zcl_storeScenePrc(zclIncoming_t *pInMsg)
 
 		if(status == ZCL_STA_SUCCESS){
 			if(pInMsg->clusterAppCb){
-				zclIncomingAddrInfo_t addrInfo;
-				addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-				addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-				addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-				addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-				addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-				addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
 				/* Notify APP to fill scenes' information */
-				pInMsg->clusterAppCb(&addrInfo, ZCL_CMD_SCENE_STORE_SCENE, &pSceneEntry->scene);
+				pInMsg->clusterAppCb(&(pInMsg->addrInfo), ZCL_CMD_SCENE_STORE_SCENE, &pSceneEntry->scene);
 
 				/* store scene */
 				pSceneEntry->used = 1;
@@ -854,15 +846,7 @@ _CODE_ZCL_ static status_t zcl_recallScenePrc(zclIncoming_t *pInMsg)
 	zcl_sceneTable_t *pSceneEntry = zcl_scene_findEntry(endpoint, recallScene.groupId, recallScene.sceneId);
 	if(pSceneEntry){
 		if(pInMsg->clusterAppCb){
-			zclIncomingAddrInfo_t addrInfo;
-			addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-			addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-			addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-			addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-			addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-			addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
-			pInMsg->clusterAppCb(&addrInfo, ZCL_CMD_SCENE_RECALL_SCENE, &pSceneEntry->scene);
+			pInMsg->clusterAppCb(&(pInMsg->addrInfo), ZCL_CMD_SCENE_RECALL_SCENE, &pSceneEntry->scene);
 
 			/* update scene attributes */
 			u16 attrLen = 0;
@@ -1014,7 +998,6 @@ _CODE_ZCL_ static status_t zcl_scene_clientCmdHandler(zclIncoming_t *pInMsg)
 _CODE_ZCL_ static status_t zcl_scene_serverCmdHandler(zclIncoming_t *pInMsg)
 {
 	u8 status = ZCL_STA_SUCCESS;
-	apsdeDataInd_t *pApsdeInd = (apsdeDataInd_t*)pInMsg->msg;
 	u8 *pData = pInMsg->pData;
 
 	zcl_scene_cmdPayload_t cmdPayload;
@@ -1073,15 +1056,7 @@ _CODE_ZCL_ static status_t zcl_scene_serverCmdHandler(zclIncoming_t *pInMsg)
 
 	if(status == ZCL_STA_SUCCESS){
 		if(pInMsg->clusterAppCb){
-			zclIncomingAddrInfo_t addrInfo;
-			addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-			addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-			addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-			addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-			addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-			addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
-			pInMsg->clusterAppCb(&addrInfo, pInMsg->hdr.cmd, &cmdPayload);
+			pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, &cmdPayload);
 		}
 	}
 

@@ -1,57 +1,95 @@
 /********************************************************************************************************
- * @file     drv_pm.h
+ * @file    drv_pm.h
  *
- * @brief    API for platform low power
+ * @brief   This is the header file for drv_pm
  *
- * @author
- * @date     June. 20, 2018
+ * @author  Zigbee Group
+ * @date    2021
  *
- * @par      Copyright (c) 2018, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *			 The information contained herein is confidential and proprietary property of Telink
- * 		     Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *			 of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *			 Co., Ltd. and the licensee in separate contract or the terms described here-in.
- *           This heading MUST NOT be removed from this file.
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
  *
- * 			 Licensees are granted free, non-transferable use of the information in this
- *			 file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
+ *              http://www.apache.org/licenses/LICENSE-2.0
  *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *******************************************************************************************************/
 
 #pragma once
 
-#include "../common/types.h"
-#include "../common/compiler.h"
+
+
 
 typedef enum{
-	PLATFORM_MODE_SUSPEND,
-	PLATFORM_MODE_DEEPSLEEP,
-	PLATFORM_MODE_DEEPSLEEP_RET_SRAM_LOW32K,
-	PLATFORM_MODE_MCU_STALL,
-}platform_mode_e;
+	PM_SLEEP_MODE_SUSPEND,
+	PM_SLEEP_MODE_DEEPSLEEP,
+	PM_SLEEP_MODE_DEEP_WITH_RETENTION,	//826x not support
+
+	PM_SLEEP_MODE_MCU_STALL,
+}drv_pm_sleep_mode_e;
 
 typedef enum{
-	PLATFORM_WAKEUP_PAD = (1 << 0),
-	PLATFORM_WAKEUP_TIMER = (1 << 1),
-}platform_wakeup_e;
+	PM_WAKEUP_SRC_PAD 	= BIT(0),
+	PM_WAKEUP_SRC_TIMER = BIT(1),
+}drv_pm_wakeup_src_e;
 
 typedef enum{
-	PLATFORM_WAKEUP_LEVEL_LOW,
-	PLATFORM_WAKEUP_LEVEL_HIGH,
-}platform_wakeup_level_e;
+	PM_WAKEUP_LEVEL_LOW,
+	PM_WAKEUP_LEVEL_HIGH,
+}drv_pm_wakeup_level_e;
 
-void platform_wakeup_init(void);
+typedef struct{
+	u32 wakeupPin;
+	drv_pm_wakeup_level_e wakeupLevel;
+}drv_pm_pinCfg_t;
 
-void platform_wakeup_pad_cfg(u32 pin, platform_wakeup_level_e pol, int en);
+#if defined(MCU_CORE_826x)
+	#define PM_CLOCK_INIT()					do{ rc_32k_cal(); }while(0)
 
-void platform_lowpower_enter(platform_mode_e mode, platform_wakeup_e src, u32 cycle_ms);
+	#define PM_NORMAL_SLEEP_MAX				(100 * 1000)//100s, (0xC0000000 / 32)
+#elif defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
+	#define PM_CLOCK_INIT()					do{ \
+												/* Initialize 32K for timer wakeup. */	\
+												clock_32k_init(CLK_32K_RC);				\
+												rc_32k_cal();							\
+												pm_select_internal_32k_rc();			\
+											}while(0)
 
-void platform_longLowpower_enter(platform_mode_e mode, platform_wakeup_e src, u32 durationUs);
+	#define PM_NORMAL_SLEEP_MAX				(230 * 1000)//230s, (0xE0000000 / 16)
+#elif defined(MCU_CORE_B91)
+	/* 24M RC is inaccurate, and it is greatly affected by temperature, so real-time calibration is required
+	 * The 24M RC needs to be calibrated before the pm_sleep_wakeup function,
+	 * because this clock will be used to kick 24m xtal start after wake up.
+	 * The more accurate this time, the faster the crystal will start. Calibration cycle depends on usage
+	 */
+	#define PM_CLOCK_INIT()					do{ \
+												clock_cal_24m_rc();						\
+												/* Initialize 32K for timer wakeup. */	\
+												clock_32k_init(CLK_32K_RC);				\
+												clock_cal_32k_rc();/*6.68ms*/			\
+											}while(0)
 
-void deep_sleep_flag_set(unsigned int a);
+	#define PM_NORMAL_SLEEP_MAX				(230 * 1000)//230s, (0xE0000000 / 16)
+#endif
 
-u8 deep_sleep_flag_get(void);
 
-u32 deep_sleep_framecount_get(void);
+void drv_pm_deepSleep_frameCnt_set(u32 frameCounter);
+u32 drv_pm_deepSleep_frameCnt_get(void);
+bool drv_pm_deepSleep_flag_get(void);
+
+void drv_pm_wakeupPinConfig(drv_pm_pinCfg_t *pinCfg, u32 pinNum);
+u8 drv_pm_wakeupPinValid(drv_pm_pinCfg_t *pinCfg, u32 pinNum);
+
+void drv_pm_sleep(drv_pm_sleep_mode_e mode, drv_pm_wakeup_src_e src, u32 durationMs);
+void drv_pm_longSleep(drv_pm_sleep_mode_e mode, drv_pm_wakeup_src_e src, u32 durationMs);
+
+void drv_pm_lowPowerEnter(void);
+void drv_pm_wakeupTimeUpdate(void);
+
+

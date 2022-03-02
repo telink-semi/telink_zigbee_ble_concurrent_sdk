@@ -1,39 +1,40 @@
 /********************************************************************************************************
- * @file     zcl_touchlink_attr.h
+ * @file    zcl_touchlink_attr.h
  *
- * @brief	 attribute configuration and APIs for zigbee light link touchlink
+ * @brief   This is the header file for zcl_touchlink_attr
  *
- * @author
- * @date     June. 10, 2017
+ * @author  Zigbee Group
+ * @date    2021
  *
- * @par      Copyright (c) 2016, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *			 The information contained herein is confidential and proprietary property of Telink
- * 		     Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *			 of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *			 Co., Ltd. and the licensee in separate contract or the terms described here-in.
- *           This heading MUST NOT be removed from this file.
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
  *
- * 			 Licensees are granted free, non-transferable use of the information in this
- *			 file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
+ *              http://www.apache.org/licenses/LICENSE-2.0
  *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *******************************************************************************************************/
-#pragma once
 
-#include "tl_common.h"
-#include "../../ss/security_service.h"
+#ifndef ZCL_TOUCHLINK_ATTR_H
+#define ZCL_TOUCHLINK_ATTR_H
+
 
 /*********************************************************************
  * CONSTANTS
  */
 
-#define ZB_INTER_PAN_TRANS_ID_LIFETIME 		(8 * 1000 * 1000)
-#define ZB_MAX_PERMIT_JOIN_DURATION			(60* 1000 * 1000)
-#define ZB_MAX_LOST_PARENT_RETRY_ATTEMPTS	10
-#define ZB_MIN_STARTUP_DELAY_TIME 			(2 * 1000 * 1000)  //2s
-#define ZB_RX_WINDOW_DURATION				(5 * 1000 * 1000)  //5s
-#define ZB_SCAN_TIME_BASE_DURATION 			(250 * 1000)     //250ms
+#define ZB_INTER_PAN_TRANS_ID_LIFETIME 		(8 * 1000)
+#define ZB_MAX_PERMIT_JOIN_DURATION			(60* 1000)
+#define ZB_MAX_LOST_PARENT_RETRY_ATTEMPTS	(10)
+#define ZB_MIN_STARTUP_DELAY_TIME 			(2 * 1000)  //2s
+#define ZB_RX_WINDOW_DURATION				(5 * 1000)  //5s
+#define ZB_SCAN_TIME_BASE_DURATION 			(250)     	//250ms
 
 /*********************************************************************
  * ENUMS
@@ -47,11 +48,10 @@ typedef enum {
 
 
 
-typedef enum
-{
-	 DEVELOPMENT_KEY = 0,
-	 MASTER_KEY = 4,
-	 CERTIFICATION_KEY = 15
+typedef enum {
+	DEVELOPMENT_KEY = 0,
+	MASTER_KEY = 4,
+	CERTIFICATION_KEY = 15
 }TOUCHLINK_KEY_TYPE; // zll_key_encryption_algorithms;
 
 /*********************************************************************
@@ -111,3 +111,6 @@ void ll_get_encrypted_network_key(u8 key_index, u32 transaction_ID,
 		u32 response_ID, u8 *encrypted_network_key);
 void ll_decrypt_network_key(u8 key_index, u8 *encrypted_network_key,
 		u32 transaction_ID,	u32 response_ID);
+
+
+#endif	/* ZCL_TOUCHLINK_ATTR_H */

@@ -1,40 +1,43 @@
 /********************************************************************************************************
- * @file     spi.h
+ * @file    spi.h
  *
- * @brief    SPI interface for tlsr8258
+ * @brief   This is the header file for B85
  *
- * @author   jian.zhang@telink-semi.com
- * @date     Oct. 8, 2016
+ * @author  Driver & Zigbee Group
+ * @date    2021
  *
- * @par      Copyright (c) 2016, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *           The information contained herein is confidential property of Telink
- *           Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *           of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *           Co., Ltd. and the licensee or the terms described here-in. This heading
- *           MUST NOT be removed from this file.
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
  *
- *           Licensees are granted free, non-transferable use of the information in this
- *           file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
+ *              http://www.apache.org/licenses/LICENSE-2.0
  *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *******************************************************************************************************/
-#pragma once
+
 #ifndef SPI_H
 #define SPI_H
 
-#include "bsp.h"
+#include "register.h"
 #include "gpio.h"
 
+/**
+ *  @brief  Define pin for SPI interface
+ *  		SDO  SDI  SCK  CN
+ *  		A2   A3   A4   D6
+ *  		B7   B6   D7   D2
+ */
 
-// SDO  SDI  SCK  CN
-// A2   A3   A4   D6
-// B7   B6   D7   D2
 typedef enum {
 	SPI_GPIO_GROUP_A2A3A4D6=0,
 	SPI_GPIO_GROUP_B6B7D2D7,
 }SPI_GPIO_GroupTypeDef;
-
 
 
 /**
@@ -46,6 +49,7 @@ typedef enum {
     SPI_MODE1,
     SPI_MODE3,
 } SPI_ModeTypeDef;
+
 /**
  *  @brief  Define the clk for SPI interface(system clock = 24M)
  */
@@ -163,6 +167,12 @@ extern void spi_write(unsigned char *Cmd, int CmdLen, unsigned char *Data, int D
  */
 extern void spi_read(unsigned char *Cmd, int CmdLen, unsigned char *Data, int DataLen, GPIO_PinTypeDef CSPin);
 
+/**
+ * @brief 		This function use to set the share mode of SPI.
+ * @param[in] 	none
+ * @return 		none
+ */
+extern void spi_set_share_mode_en(void);
 
 #endif
 

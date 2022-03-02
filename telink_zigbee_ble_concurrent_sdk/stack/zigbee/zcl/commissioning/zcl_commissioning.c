@@ -1,25 +1,25 @@
 /********************************************************************************************************
- * @file     zcl_commissioning.c
+ * @file    zcl_commissioning.c
  *
- * @brief	 APIs for commissioning cluster
+ * @brief   This is the source file for zcl_commissioning
  *
- * @author
- * @date     June. 10, 2017
+ * @author  Zigbee Group
+ * @date    2021
  *
- * @par      Copyright (c) 2016, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *			 The information contained herein is confidential and proprietary property of Telink
- * 		     Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *			 of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *			 Co., Ltd. and the licensee in separate contract or the terms described here-in.
- *           This heading MUST NOT be removed from this file.
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
  *
- * 			 Licensees are granted free, non-transferable use of the information in this
- *			 file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
+ *              http://www.apache.org/licenses/LICENSE-2.0
  *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *******************************************************************************************************/
-
 
 /**********************************************************************
  * INCLUDES
@@ -27,7 +27,6 @@
 #include "../zcl_include.h"
 
 #if 0
-#include "../../aps/aps_stackUse.h"
 #define ZB_RANDOM_X(x) (x) ? (zb_random() % x) : 0
 
 /**********************************************************************
@@ -111,7 +110,7 @@ _CODE_ZCL_ u8 zcl_commissioning_clientCmdHandler(zclIncoming_t *pInMsg)
 					u16 jitter_in_milliseconds = restartDevice->jitter ?
 							ZB_RANDOM_X(restartDevice->jitter * 80) : 0;
 					u32 max_delay = (restartDevice->delay +
-							(jitter_in_milliseconds / 1000)) * 1000000;/* in microseconds */
+							(jitter_in_milliseconds / 1000)) * 1000;/* in microseconds */
 
 					immediate = true;
 					TL_ZB_TIMER_SCHEDULE(zb_restart_device_func,(void *)TRUE,max_delay);
@@ -124,7 +123,7 @@ _CODE_ZCL_ u8 zcl_commissioning_clientCmdHandler(zclIncoming_t *pInMsg)
 						ZB_RANDOM_X(restartDevice->jitter * 80) : 0;
 				u32 max_delay = 0;
 				max_delay = (restartDevice->delay +
-						(jitter_in_milliseconds / 1000)) * 1000000;/* in microseconds */
+						(jitter_in_milliseconds / 1000)) * 1000;/* in microseconds */
 
 				immediate = false;
 				if(max_delay)

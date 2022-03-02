@@ -1,28 +1,28 @@
 /********************************************************************************************************
- * @file     nwk_neighbor.h
+ * @file    nwk_neighbor.h
  *
- * @brief	 Network layer neighbor table (base and additional)
+ * @brief   This is the header file for nwk_neighbor
  *
- * @author
- * @date     Dec. 1, 2016
+ * @author  Zigbee Group
+ * @date    2021
  *
- * @par      Copyright (c) 2016, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *			 The information contained herein is confidential and proprietary property of Telink
- * 		     Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *			 of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *			 Co., Ltd. and the licensee in separate contract or the terms described here-in.
- *           This heading MUST NOT be removed from this file.
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
  *
- * 			 Licensees are granted free, non-transferable use of the information in this
- *			 file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
+ *              http://www.apache.org/licenses/LICENSE-2.0
  *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *******************************************************************************************************/
-#ifndef ZB_NWK_NEIGHBOR_H
-#define ZB_NWK_NEIGHBOR_H 1
 
-#include "tl_common.h"
+#ifndef NWK_NEIGHBOR_H
+#define NWK_NEIGHBOR_H
 
 
 /**
@@ -47,47 +47,40 @@
 
 #define TL_ZB_ADDITION_NEIGHBOR_TABLE_SIZE  6
 
-#define	TRANSFAILURE_CNT_MAX		3
+#define	TRANSFAILURE_CNT_MAX				2
 
-extern u8 NWK_NEIGHBORTBL_ADD_LQITHRESHOLD;
-
-extern u32 NWK_UNAUTH_CHILD_TABLE_LIFE_TIME;
-
-/***************************************************************************
-* @brief	NWK static path cost
-*/
-#define NWK_STATIC_PATH_COST 7
 
 typedef struct nebTbl_t{
 	struct nebTbl_t *freeNext;
 	struct nebTbl_t *activeNext;
-	u32 incommingBeaconTimestamp;
-	u32 beaconTransOffset;
+	u32 authTimeout;
 	u32 timeoutCnt;			//this field indicates the current time remaining, in seconds, for the end device.
-
 	u32 devTimeout;			//this field indicates the timeout, in seconds, for the end device child.
-	u16 endDevCfg;			//Bitmask. the end device's cfg. the default value shall be 0.
+	u16 endDevCfg;			//bit mask of the end device's cfg. the default value shall be 0.
 	u16 addrmapIdx;
 #ifdef ZB_SECURITY
-	u32 incomingFrameCnt; /*!< incoming frame counter
-                                                     * for this device after
-                                                     * key change */
-	u8 keySeqNum; /*!< key number for which
-		                                            * incoming_frame_counter is valid  */
+	u32 incomingFrameCnt; 	//incoming frame counter for this device after key change.
+	u8 keySeqNum; 			//key number for which incoming_frame_counter is valid.
 #else
-	u8	 rsv;
+	u8 rsv;
 #endif
 	bool keepaliveRcvd;		//this value indicates at least one keepalive has been received from the end device since the router has rebooted.
-	u8 rxOnWhileIdle : 1;
-	u8 deviceType : 3;
-	u8 relationship : 3;
-	u8 used : 1;
+	u8 rxOnWhileIdle:1;
+	u8 deviceType:3;		//NWK_DEVICE_TYPE_COORDINATOR = 0,
+							//NWK_DEVICE_TYPE_ROUTER = 1,
+							//NWK_DEVICE_TYPE_ED = 2
+
+	u8 relationship:3;		//NEIGHBOR_IS_PARENT = 0,
+							//NEIGHBOR_IS_CHILD = 1,
+							//NEIGHBOR_IS_SIBLING = 2,
+							//NEIGHBOR_IS_UNAUTH_CHILD = 5
+	u8 used:1;
 	u8 age;
 	u8 depth;
 	u8 transFailure;
 	u8 lqi;
 	u8 outgoingCost;
-}tl_zb_normal_neighbor_entry_t;//size 32 or 28
+}tl_zb_normal_neighbor_entry_t;
 
 typedef struct{
 	extPANId_t 		extPanId;
@@ -118,10 +111,12 @@ typedef struct{
 	u8 additionNeighborNum;
 	u8 normalNeighborNum;
 	u8 childrenNum;
-	bool endDevTimeoutExpiryRun;
+	u8 resv;
 	tl_zb_normal_neighbor_entry_t  neighborTbl[TL_ZB_NEIGHBOR_TABLE_NUM]; //shall be allocated at the last field in the structure of the tl_zb_neighbor_entry_t
 }tl_zb_neighbor_entry_t _attribute_aligned_(4);
 
+extern u8 NWK_NEIGHBORTBL_ADD_LQITHRESHOLD;
+extern u32 NWK_UNAUTH_CHILD_TABLE_LIFE_TIME;
 
 extern u8 TL_ZB_NEIGHBOR_TABLE_SIZE;
 extern u8 TL_ZB_CHILD_TABLE_SIZE;
@@ -155,20 +150,13 @@ void tl_zbAdditionNeighborReset(void);
 
 u8 tl_zbAdditionNeighborTableUpdate(tl_zb_addition_neighbor_entry_t *entry);
 
-s32 tl_neighborTblSave2Flash(void *arg);
-
 u8 tl_zbNeighborTableNumGet(void);
 
 u8 tl_zbNeighborTableRouterValidNumGet(void);
 
 u8 tl_zbNeighborTableChildEDNumGet(void);
 
-bool tl_nwkChildrenExist(void );
-u8 tl_zbNeighborTableChildrenNumGet(void);
-
-bool tl_zbNeighborTableAccessAllowed(void);
-
 tl_zb_normal_neighbor_entry_t *nwk_neTblGetByExtAddr(addrExt_t extAddr);
 
 
-#endif /* ZB_NWK_NEIGHBOR_H */
+#endif /* NWK_NEIGHBOR_H */

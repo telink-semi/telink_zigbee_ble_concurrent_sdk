@@ -1,67 +1,42 @@
 /********************************************************************************************************
- * @file     firmwareEncryptChk.c
+ * @file    firmwareEncryptChk.c
  *
- * @brief
+ * @brief   This is the source file for firmwareEncryptChk
  *
- * @author
- * @date     Feb. 1, 2017
+ * @author  Zigbee Group
+ * @date    2021
  *
- * @par      Copyright (c) 2016, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *			 The information contained herein is confidential and proprietary property of Telink
- * 		     Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *			 of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *			 Co., Ltd. and the licensee in separate contract or the terms described here-in.
- *           This heading MUST NOT be removed from this file.
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
  *
- * 			 Licensees are granted free, non-transferable use of the information in this
- *			 file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
+ *              http://www.apache.org/licenses/LICENSE-2.0
  *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *******************************************************************************************************/
+
 #include "tl_common.h"
+#if UID_ENABLE
 #include "firmware_encrypt.h"
+#endif
 #include "firmwareEncryptChk.h"
 
 
-#if defined(MCU_CORE_826x)
-int flash_read_mid_uid_with_check( unsigned int *flash_mid ,unsigned char *flash_uid)
-{
-	unsigned char no_uid[16]={0x51,0x01,0x51,0x01,0x51,0x01,0x51,0x01,0x51,0x01,0x51,0x01,0x51,0x01,0x51,0x01};
-	int i,f_cnt=0;
-	unsigned int mid;
-	flash_read_mid((unsigned char*)&mid);
-	mid = mid & 0xffff;
-	*flash_mid  = mid;
-
-	if((mid == 0x4051) || (mid == 0x60C8)|| (mid == 0x6085) || (mid==0x40c8)){
-		flash_read_uid(0x4b,(unsigned char *)flash_uid);
-	}else{
-	  return 0;
-	}
-	for(i = 0; i < 16; i++){
-		if(flash_uid[i] == no_uid[i]){
-			f_cnt++;
-		}
-	}
-	if(f_cnt==16) {
-		return 0;
-	}else{
-		return 1;
-	}
-}
-#endif
-
-
 /**
- *  @brief Only support for 8258, if you want to this function, please contact to us.
+ *  @brief Only support for 8258/8278/b91, if you want to this function, please contact to us.
  */
 u8 firmwareCheckWithUID(void)
 {
 #if UID_ENABLE
-	u8 flash_mid[16] = {0};
+	u32 flash_mid = 0;
 	u8 flash_uid[16] = {0};
-	int flag = flash_read_mid_uid_with_check(flash_mid, flash_uid);
+	int flag = flash_read_mid_uid_with_check(&flash_mid, flash_uid);
 	if(flag == 0){
 		return 1;
 	}

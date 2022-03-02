@@ -1,31 +1,30 @@
 /********************************************************************************************************
- * @file     zcl_zllTouchLinkJoinOrStart.c
+ * @file    zcl_zllTouchLinkJoinOrStart.c
  *
- * @brief	 procedure for touch link network start, join router/ED
+ * @brief   This is the source file for zcl_zllTouchLinkDiscovery
  *
- * @author
- * @date     June. 12, 2017
+ * @author  Zigbee Group
+ * @date    2021
  *
- * @par      Copyright (c) 2016, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *			 The information contained herein is confidential and proprietary property of Telink
- * 		     Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *			 of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *			 Co., Ltd. and the licensee in separate contract or the terms described here-in.
- *           This heading MUST NOT be removed from this file.
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
  *
- * 			 Licensees are granted free, non-transferable use of the information in this
- *			 file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
+ *              http://www.apache.org/licenses/LICENSE-2.0
  *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *******************************************************************************************************/
-
 
 /**********************************************************************
  * INCLUDES
  */
 #include "../zcl_include.h"
-#include "zcl_touchlink_attr.h"
 #include "zcl_zll_commissioning_internal.h"
 
 _CODE_ZCL_ static void zcl_zllTouchLinNetworkStartRespCmdSend(void *arg);
@@ -317,9 +316,7 @@ _CODE_ZCL_ static void zcl_zllTouchLinkNetworkJoinRealjoin(void){
 	}
 }
 
-_CODE_ZCL_ bool zcl_zllTouchLinkLeaveCnfCb(void *arg){
-	//nlme_leave_cnf_t *pCnf = (nlme_leave_cnf_t *)arg;
-
+_CODE_ZCL_ bool zcl_zllTouchLinkLeaveCnfCb(nlme_leave_cnf_t *pLeaveCnf){
 	if(!g_zllTouchLink.networkStartInfo){
 		return FALSE;
 	}
@@ -416,7 +413,7 @@ _CODE_ZCL_ static void zcl_zllTouchLinNetworkStartRespCmdSend(void *arg){
 	 * */
 
 	if(status == SUCCESS){
-		TL_ZB_TIMER_SCHEDULE(zcl_zllTouchLinkNetworkStartOrJoinNwkLeave, NULL, 100 * 1000);
+		TL_ZB_TIMER_SCHEDULE(zcl_zllTouchLinkNetworkStartOrJoinNwkLeave, NULL, 100);
 	}else{
 		zcl_zllTouchLinkFinish(ZCL_ZLL_TOUCH_LINK_FAIL);
 	}
@@ -539,7 +536,7 @@ _CODE_ZCL_ void zcl_zllTouchLinkNetworkJoinRequestHandler(u8 cmd){
 		/*
 		 * leave network if it's a non-factory new device
 		 */
-		TL_ZB_TIMER_SCHEDULE(zcl_zllTouchLinkNetworkStartOrJoinNwkLeave, NULL, 100*1000);
+		TL_ZB_TIMER_SCHEDULE(zcl_zllTouchLinkNetworkStartOrJoinNwkLeave, NULL, 100);
 	}
 	return;
 }

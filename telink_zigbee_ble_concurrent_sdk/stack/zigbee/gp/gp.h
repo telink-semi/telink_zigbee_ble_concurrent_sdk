@@ -1,35 +1,33 @@
 /********************************************************************************************************
- * @file     gp.h
+ * @file    gp.h
  *
- * @brief    header file for Green Power
+ * @brief   This is the header file for gp
  *
- * @author
- * @date     May. 27, 2017
+ * @author  Zigbee Group
+ * @date    2021
  *
- * @par      Copyright (c) 2017, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *			 The information contained herein is confidential and proprietary property of Telink
- * 		     Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *			 of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *			 Co., Ltd. and the licensee in separate contract or the terms described here-in.
- *           This heading MUST NOT be removed from this file.
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
  *
- * 			 Licensees are granted free, non-transferable use of the information in this
- *			 file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
+ *              http://www.apache.org/licenses/LICENSE-2.0
  *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *******************************************************************************************************/
+
 #ifndef GP_H
 #define GP_H
 
-#include "dGP_stub.h"
-#include "../zdo/zb_af.h"
-#include "../zcl/zcl.h"
-#include "../zcl/general/zcl_greenPower.h"
+
 
 
 #define GREEN_POWER_ENDPOINT							0xF2//242
-#define GP_PROFILE_ID									0xA1E0
 
 //for Green Power device frame
 #define GP_ZB_PROTOCOL_VERSION							0x03
@@ -165,9 +163,9 @@ typedef struct
 */
 typedef struct
 {
-	ev_time_event_t *transmitChannelTimeoutEvt;
-	ev_time_event_t *aliasConflictTimeoutEvt;
-	ev_time_event_t *commissioningWindowTimeoutEvt;
+	ev_timer_event_t *transmitChannelTimeoutEvt;
+	ev_timer_event_t *aliasConflictTimeoutEvt;
+	ev_timer_event_t *commissioningWindowTimeoutEvt;
 	u16 gpAliasConflictAddr;
 	u16 gpCommissionerAddr; //addr to which send the notifications during commissioning mode
 	u16 gpCommissioningWindow;//default value 180 seconds

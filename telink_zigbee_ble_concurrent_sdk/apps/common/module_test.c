@@ -1,60 +1,79 @@
 /********************************************************************************************************
- * @file     module_test.c
+ * @file    module_test.c
  *
- * @brief    Modules function test
+ * @brief   This is the source file for module_test
  *
- * @author
- * @date     Feb. 1, 2017
+ * @author  Zigbee Group
+ * @date    2021
  *
- * @par      Copyright (c) 2016, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *			 The information contained herein is confidential and proprietary property of Telink
- * 		     Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *			 of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *			 Co., Ltd. and the licensee in separate contract or the terms described here-in.
- *           This heading MUST NOT be removed from this file.
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
  *
- * 			 Licensees are granted free, non-transferable use of the information in this
- *			 file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
+ *              http://www.apache.org/licenses/LICENSE-2.0
  *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *******************************************************************************************************/
+
 #include "zb_common.h"
 
 
-#define MODULE_TEST_ADC			0
 #define MODULE_TEST_UART		0
 
 #if MODULE_TEST_UART
 
-#if 0
-//8258 48 pin dongle
-#define UART_TX_PIN         		GPIO_PD7
-#define UART_RX_PIN         		GPIO_PA0
-#define UART_PIN_CFG				uart_gpio_set(UART_TX_PD7, UART_RX_PA0);// uart tx/rx pin set
+#define TEST_826x		0
+#define TEST_8258		1
+#define TEST_8278		2
+#define TEST_9518		3
+
+#define TEST_MODULE		TEST_8258
+
+#if (TEST_MODULE == TEST_826x)
+	#define UART_TX_PIN		GPIO_PC2
+	#define UART_RX_PIN		GPIO_PC3
+#elif (TEST_MODULE == TEST_8258)
+	#define UART_TX_PIN		GPIO_PD7
+	#define UART_RX_PIN		GPIO_PA0
+#elif (TEST_MODULE == TEST_8278)
+	#define UART_TX_PIN		GPIO_PD7
+	#define UART_RX_PIN		GPIO_PA0
+#elif (TEST_MODULE == TEST_9518)
+	#define UART_TX_PIN		GPIO_PB2
+	#define UART_RX_PIN		GPIO_PB3
 #else
-#define UART_PIN_CFG				do{											\
-										gpio_set_func(GPIO_PC2, AS_UART);		\
-										gpio_set_func(GPIO_PC3, AS_UART);		\
-										gpio_set_output_en(GPIO_PC2, 1);		\
-										gpio_set_input_en(GPIO_PC2, 0);			\
-										gpio_set_output_en(GPIO_PC2, 0);		\
-										gpio_set_input_en(GPIO_PC3, 1);			\
-										UART_GPIO_CFG_PC2_PC3();				\
-									}while(0);
+	#error	"undefined TEST_MODULE"
 #endif
+
+#if (TEST_MODULE == TEST_826x)
+	#define UART_PIN_INIT()		do{	\
+									drv_uart_pin_set(UART_TX_PIN, UART_RX_PIN);	\
+									UART_GPIO_CFG_PC2_PC3();					\
+								}while(0)
+#else
+	#define UART_PIN_INIT()		do{	\
+									drv_uart_pin_set(UART_TX_PIN, UART_RX_PIN);	\
+								}while(0)
+#endif
+
 
 typedef struct{
 	u32 dataLen;
 	u8 dataPayload[1];
 }uart_rxData_t;
+
 __attribute__((aligned(4))) u8 moduleTest_uartTxBuf[4] = {0};
 __attribute__((aligned(4))) u8 moduleTest_uartRxBuf[32] = {0};
 volatile u8  T_uartPktSentSeqNo = 0;
 volatile u32 T_uartPktRecvSeqNo = 0;
 volatile u32 T_uartPktRecvLen = 0;
 volatile u32 T_uartPktSentExcept = 0;
-#include "../../proj/drivers/drv_uart.h"
 
 void module_test_uartRcvHandler(void){
 	/*
@@ -65,7 +84,11 @@ void module_test_uartRcvHandler(void){
 	T_uartPktRecvLen = rxData->dataLen;
 	T_uartPktRecvSeqNo = rxData->dataPayload[0];
 
-#if 0//only for 8258
+	if(T_uartPktRecvSeqNo == 0){
+		drv_uart_tx_start(rxData->dataPayload, T_uartPktRecvLen);
+	}
+
+#if (TEST_MODULE == TEST_826x) || (TEST_MODULE == TEST_8258) || (TEST_MODULE == TEST_8278) || (TEST_MODULE == TEST_9518)
 	if(T_uartPktRecvSeqNo == 0xBB){
 		drv_adc_enable(1);
 	}else{
@@ -74,18 +97,25 @@ void module_test_uartRcvHandler(void){
 #endif
 }
 
-
 void moduleTest_forUart(void){
-	UART_PIN_CFG;
+	UART_PIN_INIT();
 
 	drv_uart_init(115200, moduleTest_uartRxBuf, sizeof(moduleTest_uartRxBuf)/sizeof(u8), module_test_uartRcvHandler);
 
 	drv_adc_init();
-#if 0//only for 8258
-	drv_adc_mode_pin_set(Drv_ADC_VBAT_MODE, GPIO_PC5);
+
+#if (TEST_MODULE == TEST_826x)
+	drv_adc_mode_pin_set(DRV_ADC_VBAT_MODE, NOINPUT);
+#elif (TEST_MODULE == TEST_8258)
+	drv_adc_mode_pin_set(DRV_ADC_VBAT_MODE, GPIO_PC5);
+#elif (TEST_MODULE == TEST_8278)
+	//drv_adc_mode_pin_set(DRV_ADC_BASE_MODE, GPIO_PB3);
+	drv_adc_mode_pin_set(DRV_ADC_VBAT_MODE, GPIO_PB3);
+#elif (TEST_MODULE == TEST_9518)
+	drv_adc_mode_pin_set(DRV_ADC_BASE_MODE, ADC_GPIO_PB0);
 #endif
 
-	irq_enable();
+	drv_enable_irq();
 
 	for(int i = 0; i < sizeof(moduleTest_uartTxBuf)/sizeof(u8); i++){
 		moduleTest_uartTxBuf[i] = i;
@@ -95,7 +125,7 @@ void moduleTest_forUart(void){
 	{
 		if(T_uartPktRecvSeqNo == 0xAA){
 			moduleTest_uartTxBuf[0] = T_uartPktSentSeqNo++;
-			if(uart_tx_start(moduleTest_uartTxBuf, sizeof(moduleTest_uartTxBuf)/sizeof(u8)) == 1){
+			if(drv_uart_tx_start(moduleTest_uartTxBuf, sizeof(moduleTest_uartTxBuf)/sizeof(u8)) == 1){
 				WaitMs(1000);
 			}else{
 				T_uartPktSentExcept++;
@@ -107,7 +137,7 @@ void moduleTest_forUart(void){
 			moduleTest_uartTxBuf[0] = HI_UINT16(vBat);
 			moduleTest_uartTxBuf[1] = LO_UINT16(vBat);
 
-			if(uart_tx_start(moduleTest_uartTxBuf, 2) == 1){
+			if(drv_uart_tx_start(moduleTest_uartTxBuf, 2) == 1){
 				WaitMs(1000);
 			}else{
 				T_uartPktSentExcept++;
@@ -119,7 +149,7 @@ void moduleTest_forUart(void){
 			moduleTest_uartTxBuf[0] = HI_UINT16(random);
 			moduleTest_uartTxBuf[1] = LO_UINT16(random);
 
-			if(uart_tx_start(moduleTest_uartTxBuf, 2) == 1){
+			if(drv_uart_tx_start(moduleTest_uartTxBuf, 2) == 1){
 				WaitMs(1000);
 			}else{
 				T_uartPktSentExcept++;
@@ -134,20 +164,18 @@ void moduleTest_forUart(void){
 #define MODULE_TEST_NV		0
 
 #if MODULE_TEST_NV
-#include "../../zigbee/zbapi/zb_api.h"
 volatile u8 T_nwkFrmCntError = 0;
 volatile u8 T_nwkFrmCntReadErr = 0;
 volatile u32 T_frameCnt = 0;
 volatile u32 T_readFrm = 0;
 volatile u8 T_bufCheck[256] = {0};
 void moduleTest_NV(void){
-	extern zb_info_t g_zbInfo;
-	u8 *pData = &g_zbInfo;
+	u8 *pData = (u8*)&g_zbInfo;
 
 	while(0){
 		T_readFrm = 0;
 		nv_nwkFrameCountSaveToFlash(T_frameCnt);
-		T_nwkFrmCntReadErr = nv_nwkFrameCountFromFlash(&T_readFrm);
+		T_nwkFrmCntReadErr = nv_nwkFrameCountFromFlash((u32*)&T_readFrm);
 
 		if(T_readFrm != T_frameCnt){
 			T_nwkFrmCntError = 1;
@@ -157,22 +185,22 @@ void moduleTest_NV(void){
 	}
 
 	while(1){
-		pData = &g_zbInfo;
+		pData = (u8*)&g_zbInfo;
 		for(s32 i = 0; i < sizeof(zb_info_t); i++){
 			pData[i] = (i + T_frameCnt);
 		}
 
-		nv_flashWriteNew(1, NV_MODULE_ZB_INFO, NV_ITEM_ZB_INFO, sizeof(zb_info_t), &g_zbInfo);
-		nv_flashReadNew(1, NV_MODULE_ZB_INFO, NV_ITEM_ZB_INFO, sizeof(zb_info_t), &T_bufCheck);
+		nv_flashWriteNew(1, NV_MODULE_ZB_INFO, NV_ITEM_ZB_INFO, sizeof(zb_info_t), (u8*)&g_zbInfo);
+		nv_flashReadNew(1, NV_MODULE_ZB_INFO, NV_ITEM_ZB_INFO, sizeof(zb_info_t), (u8*)&T_bufCheck);
 		for(s32 i = 0; i < sizeof(zb_info_t); i++){
 			if(pData[i] != T_bufCheck[i]){
 				while(1);
 			}
 		}
 
-		nv_flashWriteNew(1, NV_MODULE_ZB_INFO, 2, sizeof(nwk_nib_t), &g_zbInfo.nwkNib);
-		nv_flashReadNew(1, NV_MODULE_ZB_INFO, 2, sizeof(nwk_nib_t), &T_bufCheck);
-		pData = &g_zbInfo.nwkNib;
+		nv_flashWriteNew(1, NV_MODULE_ZB_INFO, 2, sizeof(nwk_nib_t), (u8*)&g_zbInfo.nwkNib);
+		nv_flashReadNew(1, NV_MODULE_ZB_INFO, 2, sizeof(nwk_nib_t), (u8*)&T_bufCheck);
+		pData = (u8*)&g_zbInfo.nwkNib;
 		for(s32 i = 0; i < sizeof(nwk_nib_t); i++){
 			if(pData[i] != T_bufCheck[i]){
 				while(1);
@@ -187,73 +215,66 @@ void moduleTest_NV(void){
 
 #if MODULE_TEST_PM
 
-#if (__PROJECT_TL_SWITCH__ || __PROJECT_TL_SWITCH_8258__)
+#if (__PROJECT_TL_SWITCH__)
 #define PAD_WAKUPUP_TEST		1
 #define TIMER_WAKUPUP_TEST		1
-#define DEEP_SLEEP_TEST			1
 
-#include "../../proj/drivers/drv_pm.h"
-#include "./pm_interface.h"
-extern pm_pinCfg_t g_switchPmCfg[];
+extern drv_pm_pinCfg_t g_switchPmCfg[];
 extern void light_on(void);
 extern void light_off(void);
 
-unsigned char  txPktForPm[48] __attribute__ ((aligned (4))) = {0x09, 0x00, 0x00, 0x00, 0x0a, 0x03, 0x08, 0xd0,  0xff, 0xff, 0xff, 0xff, 0x07, 0x00};//{0x14,0x00,0x00,0x00,0x15, 0x00, 0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,0xaa,0xbb,0xcc,0xdd,0xee,0xff, 0xee, 0xdd, 0xcc, 0xbb};
+unsigned char txPktForPm[48] __attribute__ ((aligned (4))) = {0x09, 0x00, 0x00, 0x00, 0x0a, 0x03, 0x08, 0xd0, 0xff, 0xff, 0xff, 0xff, 0x07};//{0x14,0x00,0x00,0x00,0x15, 0x00, 0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,0xaa,0xbb,0xcc,0xdd,0xee,0xff, 0xee, 0xdd, 0xcc, 0xbb};
 
 void moduleTest_PM(void){
-	platform_wakeup_e wakeupSrc = 0;
-	platform_mode_e mode = 0;
+	drv_pm_wakeup_src_e wakeupSrc = 0;
+	drv_pm_sleep_mode_e mode = 0;
 
-	irq_disable();
+	PM_CLOCK_INIT();
+
+	ZB_RADIO_TX_POWER_SET(0);
+	ZB_RADIO_TRX_CFG(144);
 
 	ZB_RADIO_TRX_SWITCH(RF_MODE_TX, 50);
 
+	ZB_RADIO_DMA_HDR_BUILD(txPktForPm, 8);
+
 #if PAD_WAKUPUP_TEST
-	s32 pinNum = 2;
-	for(s32 i = 0; i < pinNum; i++){
-		platform_wakeup_pad_cfg(g_switchPmCfg[i].wakeupPin, g_switchPmCfg[i].wakeLevel, 1);
-	}
-	wakeupSrc |= PLATFORM_WAKEUP_PAD;
+	drv_pm_wakeupPinConfig(g_switchPmCfg, 2);
+
+	wakeupSrc |= PM_WAKEUP_SRC_PAD;
 #endif
 
 	u32 interval = 0;
 #if TIMER_WAKUPUP_TEST
 	interval = 1000;
-	wakeupSrc |= PLATFORM_WAKEUP_TIMER;
+	wakeupSrc |= PM_WAKEUP_SRC_TIMER;
 #endif
 
-#if DEEP_SLEEP_TEST
-	mode = PLATFORM_MODE_DEEPSLEEP;
-#else
-	mode = PLATFORM_MODE_SUSPEND;
+#if defined(MCU_CORE_826x)
+	mode = PM_SLEEP_MODE_SUSPEND;
+#elif defined(MCU_CORE_8258) || defined(MCU_CORE_8278) || defined(MCU_CORE_B91)
+	mode = PM_SLEEP_MODE_DEEP_WITH_RETENTION;
 #endif
 
-	if(wakeupSrc == (PLATFORM_WAKEUP_PAD|PLATFORM_WAKEUP_TIMER)){
-		interval = 5000;
+	if(wakeupSrc == (PM_WAKEUP_SRC_PAD | PM_WAKEUP_SRC_TIMER)){
+		interval = 10000;
 	}
+
+	drv_enable_irq();
 
 	WaitUs(1000*1000);
 
 	while(1){
-#if DEEP_SLEEP_TEST
+		ZB_RADIO_TX_START(txPktForPm);
+
 		for(u32 i = 0; i < 2; i++){
 			light_on();
 			WaitUs(100*1000);
 			light_off();
 			WaitUs(100*1000);
 		}
-#endif
-		platform_lowpower_enter(mode, wakeupSrc, interval);
-		//tx_packet[8]++;
-		ZB_RADIO_INIT();
-		ZB_RADIO_TRX_SWITCH(RF_MODE_TX, 50);
-		ZB_RADIO_TX_START (txPktForPm);
-		for(u32 i = 0; i < 2; i++){
-			light_on();
-			WaitUs(100*1000);
-			light_off();
-			WaitUs(100*1000);
-		}
+
+		drv_pm_sleep(mode, wakeupSrc, interval);
 	}
 }
 #else
@@ -269,46 +290,50 @@ void moduleTest_PM(void){
 
 unsigned char  rx_packet[128]  __attribute__ ((aligned (4)));
 
-unsigned char  tx_packet[48] __attribute__ ((aligned (4))) = {0x09, 0x00, 0x00, 0x00, 0x0a, 0x03, 0x08, 0xd0,  0xff, 0xff, 0xff, 0xff, 0x07, 0x00};//{0x14,0x00,0x00,0x00,0x15, 0x00, 0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,0xaa,0xbb,0xcc,0xdd,0xee,0xff, 0xee, 0xdd, 0xcc, 0xbb};
+unsigned char  tx_packet[48] __attribute__ ((aligned (4))) = {0x09, 0x00, 0x00, 0x00, 0x0a, 0x03, 0x08, 0xd0, 0xff, 0xff, 0xff, 0xff, 0x07};//{0x14,0x00,0x00,0x00,0x15, 0x00, 0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,0xaa,0xbb,0xcc,0xdd,0xee,0xff, 0xee, 0xdd, 0xcc, 0xbb};
 
-unsigned int rx_cnt;
-void moduleTest_RF(){
-    
-	//RF_Init(RF_MODE_ZIGBEE_250K);///cystal is 12Mhz.
+void moduleTest_RF(void){
+	ZB_RADIO_TX_POWER_SET(0);
+	ZB_RADIO_TRX_CFG(144);
 
-	//RF_PowerLevelSet(RF_POWER_7P9dBm);
-	//RF_RxBufferSet(rx_packet,128,0);
+	ZB_RADIO_RX_BUF_SET(rx_packet);
 
-	//rf_set_power_level_index(0) ;//RF_POWER_P10p46dBm, RF_POWER_P5p65dBm, RF_POWER_P3p01dBm);
+	drv_enable_irq();
 
-    #if TX
-    	while(1)
-    	{
-    		ZB_RADIO_TRX_SWITCH(RF_MODE_TX, 50);
-			WaitUs(150);
-			//tx_packet[8]++;
-			ZB_RADIO_TX_START (tx_packet);
-			WaitMs(50);
-    	}
-	#else
-    	ZB_RADIO_TRX_SWITCH(RF_MODE_RX,50);
-    	while(0)
-    	{
-			if(RF_Is_RxFinish())
-			{
-				RF_ClearRxFlag();
-				
-				if((rx_packet[0] >= 15) && RF_ZIGBEE_PACKET_LENGTH_OK(rx_packet) && RF_ZIGBEE_PACKET_CRC_OK(rx_packet))
-				
-				{
-					rx_cnt++;
-				}
-			}
-    	}
-	#endif
+#if TX
+	ZB_RADIO_TRX_SWITCH(RF_MODE_TX, 50);
+
+	ZB_RADIO_DMA_HDR_BUILD(tx_packet, 8);
+
+	while(1)
+	{
+		WaitMs(100);
+		ZB_RADIO_TX_START(tx_packet);
+	}
+#else
+	ZB_RADIO_TRX_SWITCH(RF_MODE_RX, 50);
+	while(1);
+#endif
 }
 #endif
 
+#define MODULE_TEST_MMOHASH 	0
+#if MODULE_TEST_MMOHASH
+u8 T_DBG_installCode[18] = {0x83,0xfe,0xd3,0x40,0x7a,0x93,0x97,0x23,0xa5,0xc6,0x39,0xb2,0x69,0x16,0xd5,0x05};
+u16 T_DBG_insCodeCRC;
+/*
+ * expected: "66B6900981E1EE3CA4206B6B861C02BB"
+ */
+u8 T_DBG_hashOut[16] = {0};
+
+void moudleTest_hash(void){
+	T_DBG_insCodeCRC = tl_bdbInstallCodeCRC16(T_DBG_installCode, 16);
+	T_DBG_installCode[16] = (u8)(T_DBG_insCodeCRC & 0xff);
+	T_DBG_installCode[17] = (u8)(T_DBG_insCodeCRC >> 8);
+	ss_mmoHash(T_DBG_installCode, 18, T_DBG_hashOut);
+	while(1);
+}
+#endif
 
 #define MODULE_TEST_CCM	0
 #if MODULE_TEST_CCM
@@ -346,12 +371,13 @@ void moduleTest_ccm(void){
 }
 #endif
 
+#define MODULE_TEST_ADC			0
+
 #if MODULE_TEST_ADC
 
-volatile s32 Cvoltage_value = 0;
-volatile s32 Ctemp_value = 0;
+volatile u16 Cvoltage_value = 0;
 
-void moduleTest_adc(u8 mode){
+void moduleTest_adc(void){
 	drv_adc_init();
 
 #if defined(MCU_CORE_826x)
@@ -362,9 +388,10 @@ void moduleTest_adc(u8 mode){
 
 	drv_adc_enable(1);
 
-	while(1){
+	while(1)
+	{
 		Cvoltage_value = drv_get_adc_data();
-		WaitUs(100);
+		WaitMs(2000);
 	}
 }
 #endif
@@ -373,32 +400,73 @@ void moduleTest_adc(u8 mode){
 
 #if MODULE_TEST_TIMER
 
-volatile u8 T_timerCnt = 0;
-volatile u8 T_timerDone = 0;
-s32 moduleTestTimerCb(void *arg){
-	T_timerCnt++;
-	T_timerDone = 1;
+#define TEST_826x		0
+#define TEST_8258		1
+#define TEST_8278		2
+#define TEST_9518		3
 
-	gpio_toggle(GPIO_PA3);
+#define TEST_MODULE		TEST_8258
+
+#if (TEST_MODULE == TEST_826x)
+	#define TEST_GPIO_0		GPIO_PB6
+	#define TEST_GPIO_1		GPIO_PB4
+#elif (TEST_MODULE == TEST_8258)
+	#define TEST_GPIO_0		GPIO_PA3
+	#define TEST_GPIO_1		GPIO_PA2
+#elif (TEST_MODULE == TEST_8278)
+	#define TEST_GPIO_0		GPIO_PA3
+	#define TEST_GPIO_1		GPIO_PA2
+#elif (TEST_MODULE == TEST_9518)
+	#define TEST_GPIO_0		GPIO_PB7
+	#define TEST_GPIO_1		GPIO_PB6
+#else
+	#error	"undefined TEST_MODULE"
+#endif
+
+volatile u8 moduleTestTimerFlg = 0;
+s32 moduleTestTimer0Cb(void *arg){
+	static u8 cnt = 0;
+
+	gpio_toggle(TEST_GPIO_0);
+
+	if(++cnt >= 10){
+		cnt = 0;
+		moduleTestTimerFlg = 1;
+
+		return -1;
+	}
+
+	return 0;
+}
+
+s32 moduleTestTimer1Cb(void *arg){
+	gpio_toggle(TEST_GPIO_1);
+
+	if(moduleTestTimerFlg){
+		return 500*1000;
+	}
 
 	return 0;
 }
 
 void moduleTest_timer(void){
-	gpio_init();
+	drv_gpio_func_set(TEST_GPIO_0);
+	drv_gpio_output_en(TEST_GPIO_0, 1); 		//enable output
+	drv_gpio_input_en(TEST_GPIO_0, 0);			//disable input
+	drv_gpio_write(TEST_GPIO_0, 1);              	//LED On
 
-	WaitMs(2000);
+	drv_gpio_func_set(TEST_GPIO_1);
+	drv_gpio_output_en(TEST_GPIO_1, 1); 		//enable output
+	drv_gpio_input_en(TEST_GPIO_1, 0);			//disable input
+	drv_gpio_write(TEST_GPIO_1, 1);              	//LED On
 
-	gpio_set_func(GPIO_PA3 ,AS_GPIO);
-	gpio_set_output_en(GPIO_PA3, 1); 		//enable output
-	gpio_set_input_en(GPIO_PA3 ,0);			//disable input
-	gpio_write(GPIO_PA3, 1);              	//LED On
+	drv_hwTmr_init(TIMER_IDX_0, TIMER_MODE_SCLK);
+	drv_hwTmr_set(TIMER_IDX_0, 500*1000, moduleTestTimer0Cb, NULL);
 
-	hwTmr_init(TIMER_IDX_1, TIMER_MODE_SCLK);
+	drv_hwTmr_init(TIMER_IDX_1, TIMER_MODE_SCLK);
+	drv_hwTmr_set(TIMER_IDX_1, 100*1000, moduleTestTimer1Cb, NULL);
 
-	hwTmr_set(TIMER_IDX_1, 500*1000, moduleTestTimerCb, NULL);
-
-	T_timerDone = 0;
+	drv_enable_irq();
 
 	while(1){
 
@@ -410,22 +478,27 @@ void moduleTest_timer(void){
 #define MODULE_TEST_PWM		0
 #if MODULE_TEST_PWM
 
-#if __PROJECT_TL_DIMMABLE_LIGHT__
-#include "../../proj/drivers/drv_pwm.h"
+#if (__PROJECT_TL_DIMMABLE_LIGHT__)
 void moduleTest_pwm(void){
 	PWM_W_CHANNEL_SET();
 	drv_pwm_init();
 
-	u8 level = 1;
-	u32 max_tick = CLOCK_SYS_CLOCK_HZ/38000;
-	u32 cmp_tick = max_tick * level * level / (256 * 256);
-	u32 ch = PWM_W_CHANNEL;
+	u8 duty = 5;
+	u8 fullDuty = 100;
+	u32 max_tick = PWM_CLOCK_SOURCE / 1000;
+	u32 cmp_tick = (duty * max_tick) / fullDuty;
+
+	drv_pwm_cfg(PWM_W_CHANNEL, (u16)cmp_tick, (u16)max_tick);
+	drv_pwm_start(PWM_W_CHANNEL);
+
 	while(1){
-		cmp_tick = max_tick * level * level / (256 * 256);
-		drv_pwm_cfg(ch, (u16)cmp_tick, (u16)max_tick);
-		drv_pwm_start(ch);
-		level++;
-		WaitUs(20*1000);
+		if(cmp_tick <= max_tick){
+			drv_pwm_cfg(PWM_W_CHANNEL, (u16)cmp_tick, (u16)max_tick);
+			cmp_tick += 2400;
+			WaitMs(500);
+		}else{
+			cmp_tick = 0;
+		}
 	}
 }
 #else
@@ -434,95 +507,215 @@ void moduleTest_pwm(void){
 #endif
 
 #define MODULE_TEST_SPI 0
+
 #if MODULE_TEST_SPI
-#include "../../proj/drivers/drv_spi.h"
-#define SPI_MASTER_MODE	1   //spi use master mode
-#define SPI_SLAVE_MODE	2   //spi use slave mode
-#define SPI_MODE	1
-#define SLAVE_REGADDR1  0x04
-#define SLAVE_REGADDR2  0x80
-#define SLAVE_REGADDR3  0x00
-#define SPI_READ_CMD  	0x80// spi read command
-#define SPI_WRITE_CMD 	0x00// spi write command
-#define DBG_DATA_LEN    16
+/*********************************************
+ *  @brief  SPI interface
+ *  -----------------------------------
+ *   	 |	SDO  SDI  SCL  CS |
+ *  826x |	A2   A3   A4   A5 |
+ *  	 |	B5   B6   B7   B4 |
+ *  -----------------------------------
+ *  	 |	SDO  SDI  SCL  CS |
+ *  8258 |	A2   A3   A4   D6 |
+ *  	 |	B7   B6   D7   D2 |
+ *  -----------------------------------
+ *  	 |	SDO  SDI  SCL  CS |
+ *  8278 |	A2   A3   A4   D6 |
+ *  	 |	B7   B6   D7   D2 |
+ *  -----------------------------------
+ *  	 |	MOSI MISO SCL  CS |
+ *  9518 |	C7   C6   C5   C4 |
+ *  	 |	B7   B6   B5   C0 |
+ *  -----------------------------------
+ */
 
-#define     SLAVE_TELINK_825x_DMA_MODE      1 //slave  825x dma mode, master send 3 byte sram address(0x40000~0x4ffff)
-#define     SLAVE_TELINK_826x_DMA_MODE      2 //slave  826x dma mode, master send 2 byte sram address(0x8000~0xffff)
-#define		PEER_SLAVE_DEVICE				SLAVE_TELINK_825x_DMA_MODE
-//#define     SPI_CS_PIN				        GPIO_PD6//SPI CS pin 8258
-#define     SPI_CS_PIN				        GPIO_PB4//SPI CS pin 826x
-
-#if (PEER_SLAVE_DEVICE == SLAVE_TELINK_825x_DMA_MODE)
-    unsigned char slaveRegAddr_WriteCMD[] = {SLAVE_REGADDR1,SLAVE_REGADDR2,SLAVE_REGADDR3,SPI_WRITE_CMD};
-	unsigned char slaveRegAddr_ReadCMD[]  = {SLAVE_REGADDR1,SLAVE_REGADDR2,SLAVE_REGADDR3,SPI_READ_CMD};
-#elif(PEER_SLAVE_DEVICE == SLAVE_TELINK_826x_DMA_MODE)
-    unsigned char slaveRegAddr_WriteCMD[] = {SLAVE_REGADDR2,SLAVE_REGADDR3,SPI_WRITE_CMD};
-    unsigned char slaveRegAddr_ReadCMD[]  = {SLAVE_REGADDR2,SLAVE_REGADDR3,SPI_READ_CMD};
+#if defined(MCU_CORE_826x)
+	#define TEST_SPI_PIN_GROUP		SPI_PIN_GPIOA
+	#define TEST_SPI_PIN_CS			GPIO_PA5
+#elif defined(MCU_CORE_8258)
+	#define TEST_SPI_PIN_GROUP		SPI_GPIO_GROUP_A2A3A4D6
+	#define TEST_SPI_PIN_CS			GPIO_PD6
+#elif defined(MCU_CORE_8278)
+	#define TEST_SPI_PIN_SDO		GPIO_PA2
+	#define TEST_SPI_PIN_SDI		GPIO_PA3
+	#define TEST_SPI_PIN_SCL		GPIO_PA4
+	#define TEST_SPI_PIN_CS			GPIO_PD6
+#elif defined(MCU_CORE_B91)
+	#define TEST_SPI_PIN_MOSI		GPIO_PC7
+	#define TEST_SPI_PIN_MISO		GPIO_PC6
+	#define TEST_SPI_PIN_SCL		GPIO_PC5
+	#define TEST_SPI_PIN_CS			GPIO_PC4
+#else
+	#error	"undefined"
 #endif
 
+#define SPI_MASTER_MODE				0
+#define SPI_SLAVE_MODE				1
+
+/* Select test mode. */
+#define SPI_MODE					SPI_MASTER_MODE
+
+
+/* SPI Clock */
+#define SPI_CLOCK					400000//400K
+
+/* SPI slave address */
+#define SPI_SLAVE_ADDR				0x48000//0x8800
+#define SPI_SLAVE_ADDR_LEN			3//2
+
+/* SPI read/write command */
+#define SPI_READ_CMD  				0x80
+#define SPI_WRITE_CMD 				0x00
+
+#define CMD_BUF_LEN					6
+#define DBG_DATA_LEN    			16
+
+
+u8 cmd_buf[CMD_BUF_LEN] = {0};
 //write buff
-volatile unsigned char spi_master_tx_buff[DBG_DATA_LEN]={0x00,0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,0xaa,0xbb,0xcc,0xdd,0xee,0xff};
+u8 spi_master_tx_buff[DBG_DATA_LEN] = {0x00,0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,0xaa,0xbb,0xcc,0xdd,0xee,0xff};
 //read buff
-volatile unsigned char spi_master_rx_buff[DBG_DATA_LEN]={0x00};
+u8 spi_master_rx_buff[DBG_DATA_LEN] = {0x00};
 
-void spi_master_test_init(void)
-{
-	//spi clock 500K, only master need set i2c clock
-	drv_spi_master_init((unsigned char)(CLOCK_SYS_CLOCK_HZ/(2*500000)-1),SPI_MODE_0);          //div_clock. spi_clk = sys_clk/((div_clk+1)*2),mode select
-	drv_spi_master_pin_select(SPI_PIN_GPIO2);    //master mode £ºspi pin set
+
+
+
+void spi_master_test_init(void){
+	drv_spi_master_init(SPI_CLOCK, SPI_MODE_0);
+
+#if	defined(MCU_CORE_826x) || defined(MCU_CORE_8258)
+	drv_spi_master_pin_select(TEST_SPI_PIN_GROUP);
+#elif defined(MCU_CORE_8278)
+	drv_spi_master_pin_select(TEST_SPI_PIN_SCL, TEST_SPI_PIN_CS, TEST_SPI_PIN_SDO, TEST_SPI_PIN_SDI);
+#elif defined(MCU_CORE_B91)
+	drv_spi_master_pin_select(TEST_SPI_PIN_SCL, TEST_SPI_PIN_CS, TEST_SPI_PIN_MOSI, TEST_SPI_PIN_MISO);
+#endif
 }
 
-void spi_slave_test_init(void)
-{
-	drv_spi_slave_init((unsigned char)(CLOCK_SYS_CLOCK_HZ/(2*500000)-1),SPI_MODE_0);           //slave mode init
+void spi_slave_test_init(void){
+	drv_spi_slave_init(SPI_MODE_0);
 
-	drv_spi_slave_pin_select(SPI_PIN_GPIO1);      //slave mode £ºspi pin set
+#if	defined(MCU_CORE_826x) || defined(MCU_CORE_8258)
+	drv_spi_slave_pin_select(TEST_SPI_PIN_GROUP);
+#elif defined(MCU_CORE_8278)
+	drv_spi_slave_pin_select(TEST_SPI_PIN_SCL, TEST_SPI_PIN_CS, TEST_SPI_PIN_SDO, TEST_SPI_PIN_SDI);
+#elif defined(MCU_CORE_B91)
+	drv_spi_slave_pin_select(TEST_SPI_PIN_SCL, TEST_SPI_PIN_CS, TEST_SPI_PIN_MOSI, TEST_SPI_PIN_MISO);
+#endif
 }
 
-void spi_master_mainloop(void)
-{
+void spi_master_test(void){
 	WaitMs(1000);   //1S
+
 	spi_master_tx_buff[0] += 1;
 	spi_master_tx_buff[0] &= 0xff;
-#if (PEER_SLAVE_DEVICE == SLAVE_TELINK_825x_DMA_MODE)
-	drv_spi_write(slaveRegAddr_WriteCMD, 4,(unsigned char*)spi_master_tx_buff, DBG_DATA_LEN,SPI_CS_PIN);// pls refer to the datasheet for the write and read format of spi.
-    WaitMs(1000);
-    drv_spi_read( slaveRegAddr_ReadCMD , 4,(unsigned char*)spi_master_rx_buff,DBG_DATA_LEN,SPI_CS_PIN);
-#elif (PEER_SLAVE_DEVICE == SLAVE_TELINK_826x_DMA_MODE)
-	drv_spi_write(slaveRegAddr_WriteCMD, 3,(unsigned char*)spi_master_tx_buff, DBG_DATA_LEN,SPI_CS_PIN);// pls refer to the datasheet for the write and read format of spi.
-	WaitMs(1000);
-	drv_spi_read( slaveRegAddr_ReadCMD , 3,(unsigned char*)spi_master_rx_buff,DBG_DATA_LEN,SPI_CS_PIN);
-#endif
+
+	u8 idx = 0;
+	for(u8 i = 0; i < SPI_SLAVE_ADDR_LEN; i++){
+		cmd_buf[idx++] = (SPI_SLAVE_ADDR >> ((SPI_SLAVE_ADDR_LEN - 1 - i) << 3));
+	}
+
+	cmd_buf[idx] = SPI_WRITE_CMD;
+	drv_spi_write(cmd_buf, idx + 1, spi_master_tx_buff, DBG_DATA_LEN, TEST_SPI_PIN_CS);
+
+	WaitMs(1000);   //1S
+
+	cmd_buf[idx] = SPI_READ_CMD;
+	drv_spi_read(cmd_buf, idx + 1, spi_master_rx_buff, DBG_DATA_LEN, TEST_SPI_PIN_CS);
 }
 
-void main_loop (void)
-{
-	WaitMs(1000);
-#if (SPI_MODE==SPI_MASTER_MODE)
-{
-	spi_master_mainloop();
-}
+void main_loop(void){
+#if(SPI_MODE == SPI_MASTER_MODE)
+	spi_master_test();
 #else
-		WaitMs(50);
+	WaitMs(50);
 #endif
 }
 
-volatile u8 spi_clock = 0;
-_attribute_ram_code_ void moduleTest_spi() //must on ramcode
-{
-	WaitMs(2000);  //leave enough time for SWS_reset when power on
-#if (SPI_MODE==SPI_MASTER_MODE)
+void moduleTest_spi(void){
+	WaitMs(2000);//leave enough time for SWS_reset when power on
+
+#if(SPI_MODE == SPI_MASTER_MODE)
 	 spi_master_test_init();
 #else
 	 spi_slave_test_init();
 #endif
 
-//	irq_enable();
-	while (1) {
-#if (MODULE_WATCHDOG_ENABLE)
-		wd_clear(); //clear watch dog
+	while(1){
+		main_loop();
+	}
+}
 #endif
-		main_loop ();
+
+
+#define MODULE_TEST_I2C		0
+
+#if MODULE_TEST_I2C
+
+#if	defined(MCU_CORE_826x)
+	#define TEST_I2C_PIN_GROUP		I2C_PIN_GPIOA
+#elif defined(MCU_CORE_8258)
+	#define TEST_I2C_PIN_GROUP		I2C_GPIO_GROUP_A3A4
+#elif defined(MCU_CORE_8278)
+	#define TEST_I2C_PIN_SDA		I2C_GPIO_SDA_A3
+	#define TEST_I2C_PIN_SCL		I2C_GPIO_SCL_A4
+#elif defined(MCU_CORE_B91)
+	#define TEST_I2C_PIN_SDA		I2C_GPIO_SDA_B3
+	#define TEST_I2C_PIN_SCL		I2C_GPIO_SCL_B2
+#endif
+
+/* I2C Clock */
+#define I2C_CLOCK					200000//200K
+
+/* I2C slave ID */
+#define I2C_SLAVE_ID				0x5A
+#define I2C_SLAVE_ADDR				0x48000//0x8800
+#define I2C_SLAVE_ADDR_LEN			3//2
+
+#define DBG_DATA_LEN				16
+//write buff
+u8 i2c_master_tx_buff[DBG_DATA_LEN] = {0x00,0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,0xaa,0xbb,0xcc,0xdd,0xee,0xff};
+//read buff
+u8 i2c_master_rx_buff[DBG_DATA_LEN] = {0x00};
+
+void i2c_master_test_init(void){
+	drv_i2c_master_init(I2C_CLOCK);
+
+#if	defined(MCU_CORE_826x) || defined(MCU_CORE_8258)
+	drv_i2c_gpio_set(TEST_I2C_PIN_GROUP);
+#elif defined(MCU_CORE_8278) || defined(MCU_CORE_B91)
+	drv_i2c_gpio_set(TEST_I2C_PIN_SDA, TEST_I2C_PIN_SCL);
+#endif
+}
+
+void i2c_master_test(void){
+	WaitMs(1000);   //1S
+
+	gpio_toggle(GPIO_PB7);
+
+	i2c_master_tx_buff[0] += 1;
+	i2c_master_tx_buff[0] &= 0xff;
+
+	drv_i2c_write_series(I2C_SLAVE_ID, I2C_SLAVE_ADDR, I2C_SLAVE_ADDR_LEN, i2c_master_tx_buff, DBG_DATA_LEN);
+
+	WaitMs(1000);   //1S
+
+	drv_i2c_read_series(I2C_SLAVE_ID, I2C_SLAVE_ADDR, I2C_SLAVE_ADDR_LEN, i2c_master_rx_buff, DBG_DATA_LEN);
+}
+
+void moduleTest_i2c(void){
+	WaitMs(2000);//leave enough time for SWS_reset when power on
+
+	drv_gpio_func_set(GPIO_PB7);
+	drv_gpio_output_en(GPIO_PB7, 1); 		//enable output
+	drv_gpio_input_en(GPIO_PB7, 0);		//disable input
+	drv_gpio_write(GPIO_PB7, 1);              	//LED On
+
+	i2c_master_test_init();
+
+	while(1){
+		i2c_master_test();
 	}
 }
 #endif
@@ -532,82 +725,135 @@ _attribute_ram_code_ void moduleTest_spi() //must on ramcode
 
 #if MODULE_TEST_GPIO_IRQ
 
-#if 0
-//8258
-#define TEST_LED1		GPIO_PA4
-#define TEST_LED2		GPIO_PB1
-#define TEST_SW1		GPIO_PD5
-#define TEST_SW2		GPIO_PD6
+#define TEST_826x		0
+#define TEST_8258		1
+#define TEST_8278		2
+#define TEST_9518		3
+
+#define TEST_MODULE		TEST_8258
+
+#if (TEST_MODULE == TEST_826x)
+	#define TEST_LED1		GPIO_PC2
+	#define TEST_LED2		GPIO_PC3
+	#define TEST_SW1		GPIO_PD2
+	#define TEST_SW2		GPIO_PC5
+	#define TEST_GPIO		GPIO_PD3
+#elif (TEST_MODULE == TEST_8258)
+	#define TEST_LED1		GPIO_PA4
+	#define TEST_LED2		GPIO_PB1
+	#define TEST_SW1		GPIO_PD5
+	#define TEST_SW2		GPIO_PD6
+	#define TEST_GPIO		GPIO_PB2
+#elif (TEST_MODULE == TEST_8278)
+	#define TEST_LED1		GPIO_PA2
+	#define TEST_LED2		GPIO_PA3
+	#define TEST_SW1		GPIO_PD6
+	#define TEST_SW2		GPIO_PD5
+	#define TEST_GPIO		GPIO_PB2
+#elif (TEST_MODULE == TEST_9518)
+	#define TEST_LED1		GPIO_PB7
+	#define TEST_LED2		GPIO_PB6
+	#define TEST_SW1		GPIO_PC4
+	#define TEST_SW2		GPIO_PC5
+	#define TEST_GPIO		GPIO_PA0
 #else
-#define TEST_LED1		GPIO_PC2
-#define TEST_LED2		GPIO_PC3
-#define TEST_SW1		GPIO_PD2
-#define TEST_SW2		GPIO_PC5
+	#error	"undefined TEST_MODULE"
 #endif
 
+
 volatile u8 T_DBG_gpioIrqCb1 = 0;
-void moduleTest_gpioIrqCb1(void)
-{
+void moduleTest_gpioIrqCb1(void){
 	T_DBG_gpioIrqCb1++;
 	gpio_toggle(TEST_LED1);
 }
 
 volatile u8 T_DBG_gpioIrqCb2 = 0;
-void moduleTest_gpioIrqCb2(void)
-{
+void moduleTest_gpioIrqCb2(void){
 	T_DBG_gpioIrqCb2++;
 	gpio_toggle(TEST_LED2);
 }
 
+volatile u8 T_DBG_gpioIrqCb3 = 0;
+void moduleTest_gpioIrqCb3(void){
+	T_DBG_gpioIrqCb3++;
+	gpio_toggle(TEST_LED1);
+
+	if(gpio_read(TEST_GPIO)){
+		drv_gpio_up_down_resistor(TEST_GPIO, PM_PIN_PULLUP_10K);
+		drv_gpio_irq_config(GPIO_IRQ_MODE, TEST_GPIO, FALLING_EDGE, moduleTest_gpioIrqCb3);
+	}else{
+		drv_gpio_up_down_resistor(TEST_GPIO, PM_PIN_PULLDOWN_100K);
+		drv_gpio_irq_config(GPIO_IRQ_MODE, TEST_GPIO, RISING_EDGE, moduleTest_gpioIrqCb3);
+	}
+}
+
 volatile u8 T_DBG_mainCnt = 0;
-void moduleTest_gpioIrq(void)
+void moduleTest_gpioIrq(void)		//comment out user_init
 {
-	gpio_init();
-
-	WaitMs(2000);
 	//1.init the LED pin,for indication
-	gpio_set_func(TEST_LED1 ,AS_GPIO);
-	gpio_set_output_en(TEST_LED1, 1); 		//enable output
-	gpio_set_input_en(TEST_LED1 ,0);			//disable input
-	gpio_write(TEST_LED1, 1);              	//LED On
+	drv_gpio_func_set(TEST_LED1);
+	drv_gpio_output_en(TEST_LED1, 1); 		//enable output
+	drv_gpio_input_en(TEST_LED1, 0);		//disable input
+	//drv_gpio_write(TEST_LED1, 1);              	//LED On
 
-	gpio_set_func(TEST_LED2 ,AS_GPIO);
-	gpio_set_output_en(TEST_LED2, 1); 		//enable output
-	gpio_set_input_en(TEST_LED2 ,0);			//disable input
-	gpio_write(TEST_LED2, 1);              	//LED On
+	drv_gpio_func_set(TEST_LED2);
+	drv_gpio_output_en(TEST_LED2, 1); 		//enable output
+	drv_gpio_input_en(TEST_LED2, 0);		//disable input
+	drv_gpio_write(TEST_LED2, 1);              	//LED On
 
-#if 1
-	gpio_set_func(TEST_SW1 ,AS_GPIO);
-	gpio_set_output_en(TEST_SW1, 0); 			//enable output
-	gpio_set_input_en(TEST_SW1 ,1);				//disable input
-	gpio_setup_up_down_resistor(TEST_SW1, PM_PIN_PULLUP_10K);
-	drv_gpio_irq_conf(GPIO_IRQ_MODE, TEST_SW1, poll_falling, moduleTest_gpioIrqCb1);
+#if 0
+	drv_gpio_func_set(TEST_SW1);
+	drv_gpio_output_en(TEST_SW1, 0); 			//enable output
+	drv_gpio_input_en(TEST_SW1, 1);				//disable input
+	drv_gpio_up_down_resistor(TEST_SW1, PM_PIN_PULLUP_10K);
+	drv_gpio_irq_config(GPIO_IRQ_MODE, TEST_SW1, FALLING_EDGE, moduleTest_gpioIrqCb1);
 	drv_gpio_irq_en(TEST_SW1);
 #endif
 
-#if 1
-	gpio_set_func(TEST_SW2 ,AS_GPIO);
-	gpio_set_output_en(TEST_SW2, 0); 			//enable output
-	gpio_set_input_en(TEST_SW2 ,1);				//disable input
-	gpio_setup_up_down_resistor(TEST_SW2, PM_PIN_PULLUP_10K);
-	drv_gpio_irq_conf(GPIO_IRQ_RISC0_MODE, TEST_SW2, poll_falling, moduleTest_gpioIrqCb2);
+#if 0
+	drv_gpio_func_set(TEST_SW2);
+	drv_gpio_output_en(TEST_SW2, 0); 			//enable output
+	drv_gpio_input_en(TEST_SW2, 1);				//disable input
+	drv_gpio_up_down_resistor(TEST_SW2, PM_PIN_PULLUP_10K);
+	drv_gpio_irq_config(GPIO_IRQ_RISC0_MODE, TEST_SW2, FALLING_EDGE, moduleTest_gpioIrqCb2);
 	drv_gpio_irq_risc0_en(TEST_SW2);
 #endif
 
+	drv_gpio_func_set(TEST_GPIO);
+	drv_gpio_output_en(TEST_GPIO, 0); 			//enable output
+	drv_gpio_input_en(TEST_GPIO, 1);			//disable input
+	if(gpio_read(TEST_GPIO)){				//test edge trigger irq
+		drv_gpio_up_down_resistor(TEST_GPIO, PM_PIN_PULLUP_10K);
+		drv_gpio_irq_config(GPIO_IRQ_MODE, TEST_GPIO, FALLING_EDGE, moduleTest_gpioIrqCb3);
+		drv_gpio_write(TEST_LED1, 1);
+	}else{
+		drv_gpio_up_down_resistor(TEST_GPIO, PM_PIN_PULLDOWN_100K);
+		drv_gpio_irq_config(GPIO_IRQ_MODE, TEST_GPIO, RISING_EDGE, moduleTest_gpioIrqCb3);
+		drv_gpio_write(TEST_LED1, 0);
+	}
+	drv_gpio_irq_en(TEST_GPIO);
+
+	drv_enable_irq();
+
 	while(1){
 		T_DBG_mainCnt++;
+		gpio_toggle(TEST_LED2);
+		WaitMs(500);
 	};
 }
 #endif
 
 
 void moduleTest_start(void){
+#if MODULE_TEST_MMOHASH
+	moudleTest_hash();
+#endif
+
 #if MODULE_TEST_CCM
 	moduleTest_ccm();
 #endif
 
 #if MODULE_TEST_PM
-	//moduleTest_PM_pad_suspend();
 	moduleTest_PM();
 #endif
 
@@ -620,7 +866,7 @@ void moduleTest_start(void){
 #endif
 
 #if MODULE_TEST_ADC
-	moduleTest_adc(0);
+	moduleTest_adc();
 #endif
 
 #if MODULE_TEST_TIMER
@@ -633,6 +879,10 @@ void moduleTest_start(void){
 
 #if MODULE_TEST_SPI
 	moduleTest_spi();
+#endif
+
+#if MODULE_TEST_I2C
+	moduleTest_i2c();
 #endif
 
 #if MODULE_TEST_NV

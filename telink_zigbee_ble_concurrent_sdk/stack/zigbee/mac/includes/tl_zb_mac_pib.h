@@ -1,56 +1,47 @@
 /********************************************************************************************************
- * @file     tl_zb_mac_pib.h
+ * @file    tl_zb_mac_pib.h
  *
- * @brief    mac layer information base
+ * @brief   This is the header file for tl_zb_mac_pib
  *
- * @author
- * @date     Oct. 12, 2016
+ * @author  Zigbee Group
+ * @date    2021
  *
- * @par      Copyright (c) 2016, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *			 The information contained herein is confidential and proprietary property of Telink
- * 		     Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *			 of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *			 Co., Ltd. and the licensee in separate contract or the terms described here-in.
- *           This heading MUST NOT be removed from this file.
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
  *
- * 			 Licensees are granted free, non-transferable use of the information in this
- *			 file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
+ *              http://www.apache.org/licenses/LICENSE-2.0
  *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *******************************************************************************************************/
+
 #ifndef TL_ZB_MAC_PIB_H
-#define TL_ZB_MAC_PIB_H 1
-
-#include "tl_common.h"
-#include "tl_zb_mac.h"
+#define TL_ZB_MAC_PIB_H
 
 
-/** @addtogroup  TELINK_ZIGBEE_STACK TELINK ZigBee Stack
- *  @{
- */
+#define	MAC_INVALID_PANID						0xFFFF
 
-/** @addtogroup  TELINK_ZIGBEE_MAC telink mac
- *  @{
- */
-
-
-#define 	MAC_DEVICE_TABLE_SIZE 		4
-#define		MAC_INVALID_PANID			0xffff
+#define MAC_DEVICE_TABLE_SIZE 					4
 
 /*
  * PHY constants
  */
-#define ZB_PHY_MAX_PACKET_SIZE			127
-#define ZB_PHY_TURNROUNDTIME			12
-#define	ZB_US_PER_SYMBOL				16
+#define ZB_PHY_MAX_PACKET_SIZE					127
+#define ZB_PHY_TURNROUNDTIME					12
+#define	ZB_US_PER_SYMBOL						16
 
 /*
  * PHY PIB
  */
-#define ZB_PHY_SYMBOLS_PER_OCTET		2
-#define ZB_PHY_SHR_DURATION				40
-#define ZB_PHY_MAX_FRAME_DURATION		(ZB_PHY_SHR_DURATION + (ZB_PHY_MAX_PACKET_SIZE + 1) * ZB_PHY_SYMBOLS_PER_OCTET)
+#define ZB_PHY_SYMBOLS_PER_OCTET				2
+#define ZB_PHY_SHR_DURATION						40
+#define ZB_PHY_MAX_FRAME_DURATION				(ZB_PHY_SHR_DURATION + (ZB_PHY_MAX_PACKET_SIZE + 1) * ZB_PHY_SYMBOLS_PER_OCTET)
 
 
 /** @addtogroup zb_mac_constant Zigbee Mac Constants
@@ -96,8 +87,6 @@ typedef struct zb_mac_device_table_s{
 }tl_zb_mac_device_table_t;
 #endif
 
-
-
 /** @addtogroup zigbee_mac_pib_type Zigbee Mac PIB Types
  *  @{
  */
@@ -141,25 +130,47 @@ typedef struct{
 
 #ifdef ZB_MAC_SECURITY
     tl_zb_mac_device_table_t devTable[MAC_DEVICE_TABLE_SIZE];
-	u8            devTableEntry;
-	u32           frameCounter;
-	u8            secKey[16];
+	u8          devTableEntry;
+	u32         frameCounter;
+	u8          secKey[16];
 #endif
-
-} tl_zb_mac_pib_t;
+}tl_zb_mac_pib_t;
 /** @} end of group zigbee_mac_pib_type */
-
 
 
 #define MAC_IB()		g_zbMacPib
 
-/* PIB access and min/max table type */
-typedef struct
-{
-    u8     offset;
-    u8     len;
-    u8     min;
-    u8     max;
-} mac_pibTbl_t;
+
+
+
+void generateIEEEAddr(void);
+
+/*
+ * MLME-SET.request to set MAC pib attribute from upper layer to MAC layer
+ *
+ * @param attribute MAC PIB attribut MAC PIB attributee id(Table 86 ?a MAC PIB attributes)
+ *
+ * @param value the pointer value of the attribute
+ *
+ * @param len the length of the attribute vlaue
+ *
+ * @return MAC_SUCCESS if it's successful, or MAC_INVALID_PARAMETER
+ *
+ * */
+u8 tl_zbMacAttrSet(u8 attribute, u8 *value, u8 len);
+
+/*
+* MLME-GET.request to get MAC pib attribute from upper layer to MAC layer
+*
+* @param attribute MAC PIB attribut MAC PIB attributee id(Table 86 ?a MAC PIB attributes)
+*
+* @param value the pointer to the value of the attribute
+*
+* @param len the length of the attribute vlaue
+*
+* @return MAC_SUCCESS if it's successful, or MAC_INVALID_PARAMETER
+*
+* */
+u8 tl_zbMacAttrGet(u8 attribute, u8* value, u8* len);
 
 #endif /* TL_ZB_MAC_PIB_H */

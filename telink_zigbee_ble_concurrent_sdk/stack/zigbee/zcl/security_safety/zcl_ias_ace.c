@@ -1,25 +1,25 @@
 /********************************************************************************************************
- * @file     zcl_ias_ace.c
+ * @file    zcl_ias_ace.c
  *
- * @brief	 APIs for Ancillary Control Equipment of the IAS system.
+ * @brief   This is the source file for zcl_ias_ace
  *
- * @author
- * @date     June. 10, 2017
+ * @author  Zigbee Group
+ * @date    2021
  *
- * @par      Copyright (c) 2016, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *			 The information contained herein is confidential and proprietary property of Telink
- * 		     Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *			 of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *			 Co., Ltd. and the licensee in separate contract or the terms described here-in.
- *           This heading MUST NOT be removed from this file.
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
  *
- * 			 Licensees are granted free, non-transferable use of the information in this
- *			 file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
+ *              http://www.apache.org/licenses/LICENSE-2.0
  *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *******************************************************************************************************/
-
 
 /**********************************************************************
  * INCLUDES
@@ -47,9 +47,9 @@
  */
 static status_t zcl_iasAce_cmdHandler(zclIncoming_t *pInMsg);
 
-_CODE_ZCL_ status_t zcl_iasAce_register(u8 endpoint, u8 attrNum, const zclAttrInfo_t attrTbl[], cluster_forAppCb_t cb)
+_CODE_ZCL_ status_t zcl_iasAce_register(u8 endpoint, u16 manuCode, u8 attrNum, const zclAttrInfo_t attrTbl[], cluster_forAppCb_t cb)
 {
-	return zcl_registerCluster(endpoint, ZCL_CLUSTER_SS_IAS_ACE, attrNum, attrTbl, zcl_iasAce_cmdHandler, cb);
+	return zcl_registerCluster(endpoint, ZCL_CLUSTER_SS_IAS_ACE, manuCode, attrNum, attrTbl, zcl_iasAce_cmdHandler, cb);
 }
 
 
@@ -412,20 +412,12 @@ _CODE_ZCL_ static status_t zcl_iasAce_armPrc(zclIncoming_t *pInMsg)
 	if(pInMsg->clusterAppCb){
 		u8 armNotification = 0xff;
 
-		zclIncomingAddrInfo_t addrInfo;
-		addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-		addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-		addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-		addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-		addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-		addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
 		arm_t arm;
 		TL_SETSTRUCTCONTENT(arm, 0);
 
 		zcl_armParse(pInMsg->pData, &arm);
 
-		armNotification = pInMsg->clusterAppCb(&addrInfo, pInMsg->hdr.cmd, &arm);
+		armNotification = pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, &arm);
 
 		if(armNotification != 0xff){
 			epInfo_t dstEp;
@@ -452,23 +444,14 @@ _CODE_ZCL_ static status_t zcl_iasAce_armPrc(zclIncoming_t *pInMsg)
 _CODE_ZCL_ static status_t zcl_iasAce_bypassPrc(zclIncoming_t *pInMsg)
 {
 	u8 status = ZCL_STA_SUCCESS;
-	apsdeDataInd_t *pApsdeInd = (apsdeDataInd_t*)pInMsg->msg;
 
 	if(pInMsg->clusterAppCb){
-		zclIncomingAddrInfo_t addrInfo;
-		addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-		addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-		addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-		addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-		addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-		addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
 		bypass_t bypass;
 		TL_SETSTRUCTCONTENT(bypass, 0);
 
 		zcl_bypassParse(pInMsg->pData, &bypass);
 
-		pInMsg->clusterAppCb(&addrInfo, pInMsg->hdr.cmd, &bypass);
+		pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, &bypass);
 	}else{
 		status = ZCL_STA_FAILURE;
 	}
@@ -479,18 +462,9 @@ _CODE_ZCL_ static status_t zcl_iasAce_bypassPrc(zclIncoming_t *pInMsg)
 _CODE_ZCL_ static status_t zcl_iasAce_emergencyPrc(zclIncoming_t *pInMsg)
 {
 	u8 status = ZCL_STA_SUCCESS;
-	apsdeDataInd_t *pApsdeInd = (apsdeDataInd_t*)pInMsg->msg;
 
 	if(pInMsg->clusterAppCb){
-		zclIncomingAddrInfo_t addrInfo;
-		addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-		addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-		addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-		addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-		addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-		addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
-		pInMsg->clusterAppCb(&addrInfo, pInMsg->hdr.cmd, NULL);
+		pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, NULL);
 	}else{
 		status = ZCL_STA_FAILURE;
 	}
@@ -501,18 +475,9 @@ _CODE_ZCL_ static status_t zcl_iasAce_emergencyPrc(zclIncoming_t *pInMsg)
 _CODE_ZCL_ static status_t zcl_iasAce_firePrc(zclIncoming_t *pInMsg)
 {
 	u8 status = ZCL_STA_SUCCESS;
-	apsdeDataInd_t *pApsdeInd = (apsdeDataInd_t*)pInMsg->msg;
 
 	if(pInMsg->clusterAppCb){
-		zclIncomingAddrInfo_t addrInfo;
-		addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-		addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-		addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-		addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-		addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-		addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
-		pInMsg->clusterAppCb(&addrInfo, pInMsg->hdr.cmd, NULL);
+		pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, NULL);
 	}else{
 		status = ZCL_STA_FAILURE;
 	}
@@ -523,18 +488,9 @@ _CODE_ZCL_ static status_t zcl_iasAce_firePrc(zclIncoming_t *pInMsg)
 _CODE_ZCL_ static status_t zcl_iasAce_panicPrc(zclIncoming_t *pInMsg)
 {
 	u8 status = ZCL_STA_SUCCESS;
-	apsdeDataInd_t *pApsdeInd = (apsdeDataInd_t*)pInMsg->msg;
 
 	if(pInMsg->clusterAppCb){
-		zclIncomingAddrInfo_t addrInfo;
-		addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-		addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-		addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-		addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-		addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-		addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
-		pInMsg->clusterAppCb(&addrInfo, pInMsg->hdr.cmd, NULL);
+		pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, NULL);
 	}else{
 		status = ZCL_STA_FAILURE;
 	}
@@ -566,15 +522,7 @@ _CODE_ZCL_ static status_t zcl_iasAce_getZoneIdMapPrc(zclIncoming_t *pInMsg)
 			zoneIdMapSection[i] = section;
 		}
 
-		zclIncomingAddrInfo_t addrInfo;
-		addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-		addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-		addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-		addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-		addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-		addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
-		pInMsg->clusterAppCb(&addrInfo, pInMsg->hdr.cmd, NULL);
+		pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, NULL);
 
 		epInfo_t dstEp;
 		TL_SETSTRUCTCONTENT(dstEp, 0);
@@ -601,17 +549,9 @@ _CODE_ZCL_ static status_t zcl_iasAce_getZoneInformationPrc(zclIncoming_t *pInMs
 	u8 endpoint = pApsdeInd->indInfo.dst_ep;
 
 	if(pInMsg->clusterAppCb){
-		zclIncomingAddrInfo_t addrInfo;
-		addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-		addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-		addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-		addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-		addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-		addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
 		u8 zoneId = pInMsg->pData[0];
 
-		pInMsg->clusterAppCb(&addrInfo, pInMsg->hdr.cmd, &zoneId);
+		pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, &zoneId);
 
 		zcl_zoneTable_t *pZoneEntry = zcl_findZoneEntry(endpoint, zoneId);
 		if(pZoneEntry){
@@ -647,18 +587,9 @@ _CODE_ZCL_ static status_t zcl_iasAce_getZoneInformationPrc(zclIncoming_t *pInMs
 _CODE_ZCL_ static status_t zcl_iasAce_getPanelStatusPrc(zclIncoming_t *pInMsg)
 {
 	u8 status = ZCL_STA_SUCCESS;
-	apsdeDataInd_t *pApsdeInd = (apsdeDataInd_t*)pInMsg->msg;
 
 	if(pInMsg->clusterAppCb){
-		zclIncomingAddrInfo_t addrInfo;
-		addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-		addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-		addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-		addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-		addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-		addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
-		pInMsg->clusterAppCb(&addrInfo, pInMsg->hdr.cmd, NULL);
+		pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, NULL);
 	}else{
 		status = ZCL_STA_FAILURE;
 	}
@@ -669,18 +600,9 @@ _CODE_ZCL_ static status_t zcl_iasAce_getPanelStatusPrc(zclIncoming_t *pInMsg)
 _CODE_ZCL_ static status_t zcl_iasAce_getBypassedZoneListPrc(zclIncoming_t *pInMsg)
 {
 	u8 status = ZCL_STA_SUCCESS;
-	apsdeDataInd_t *pApsdeInd = (apsdeDataInd_t*)pInMsg->msg;
 
 	if(pInMsg->clusterAppCb){
-		zclIncomingAddrInfo_t addrInfo;
-		addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-		addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-		addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-		addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-		addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-		addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
-		pInMsg->clusterAppCb(&addrInfo, pInMsg->hdr.cmd, NULL);
+		pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, NULL);
 	}else{
 		status = ZCL_STA_FAILURE;
 	}
@@ -691,25 +613,16 @@ _CODE_ZCL_ static status_t zcl_iasAce_getBypassedZoneListPrc(zclIncoming_t *pInM
 _CODE_ZCL_ static status_t zcl_iasAce_getZoneStatusPrc(zclIncoming_t *pInMsg)
 {
 	u8 status = ZCL_STA_SUCCESS;
-	apsdeDataInd_t *pApsdeInd = (apsdeDataInd_t*)pInMsg->msg;
 	u8 *pData = pInMsg->pData;
 
 	if(pInMsg->clusterAppCb){
-		zclIncomingAddrInfo_t addrInfo;
-		addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-		addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-		addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-		addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-		addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-		addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
 		getZoneStatus_t getZoneStatus;
 		getZoneStatus.startingZoneId = *pData++;
 		getZoneStatus.maxNumOfZoneIds = *pData++;
 		getZoneStatus.zoneStatusMaskFlag = *pData++;
 		getZoneStatus.zoneStatusMask = BUILD_U16(pData[0], pData[1]);
 
-		pInMsg->clusterAppCb(&addrInfo, pInMsg->hdr.cmd, &getZoneStatus);
+		pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, &getZoneStatus);
 	}else{
 		status = ZCL_STA_FAILURE;
 	}
@@ -720,20 +633,11 @@ _CODE_ZCL_ static status_t zcl_iasAce_getZoneStatusPrc(zclIncoming_t *pInMsg)
 _CODE_ZCL_ static status_t zcl_iasAce_armRspPrc(zclIncoming_t *pInMsg)
 {
 	u8 status = ZCL_STA_SUCCESS;
-	apsdeDataInd_t *pApsdeInd = (apsdeDataInd_t*)pInMsg->msg;
 
 	if(pInMsg->clusterAppCb){
-		zclIncomingAddrInfo_t addrInfo;
-		addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-		addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-		addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-		addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-		addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-		addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
 		u8 armNotification = pInMsg->pData[0];
 
-		pInMsg->clusterAppCb(&addrInfo, pInMsg->hdr.cmd, &armNotification);
+		pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, &armNotification);
 	}else{
 		status = ZCL_STA_FAILURE;
 	}
@@ -744,18 +648,9 @@ _CODE_ZCL_ static status_t zcl_iasAce_armRspPrc(zclIncoming_t *pInMsg)
 _CODE_ZCL_ static status_t zcl_iasAce_getZoneIdMapRspPrc(zclIncoming_t *pInMsg)
 {
 	u8 status = ZCL_STA_SUCCESS;
-	apsdeDataInd_t *pApsdeInd = (apsdeDataInd_t*)pInMsg->msg;
 
 	if(pInMsg->clusterAppCb){
-		zclIncomingAddrInfo_t addrInfo;
-		addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-		addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-		addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-		addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-		addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-		addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
-		pInMsg->clusterAppCb(&addrInfo, pInMsg->hdr.cmd, pInMsg->pData);
+		pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, pInMsg->pData);
 	}else{
 		status = ZCL_STA_FAILURE;
 	}
@@ -766,23 +661,14 @@ _CODE_ZCL_ static status_t zcl_iasAce_getZoneIdMapRspPrc(zclIncoming_t *pInMsg)
 _CODE_ZCL_ static status_t zcl_iasAce_getZoneInfoRspPrc(zclIncoming_t *pInMsg)
 {
 	u8 status = ZCL_STA_SUCCESS;
-	apsdeDataInd_t *pApsdeInd = (apsdeDataInd_t*)pInMsg->msg;
 
 	if(pInMsg->clusterAppCb){
-		zclIncomingAddrInfo_t addrInfo;
-		addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-		addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-		addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-		addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-		addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-		addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
 		getZoneInfoRsp_t getZoneInfoRsp;
 		TL_SETSTRUCTCONTENT(getZoneInfoRsp, 0);
 
 		zcl_getZoneInfoRspParse(pInMsg->pData, &getZoneInfoRsp);
 
-		pInMsg->clusterAppCb(&addrInfo, pInMsg->hdr.cmd, &getZoneInfoRsp);
+		pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, &getZoneInfoRsp);
 	}else{
 		status = ZCL_STA_FAILURE;
 	}
@@ -793,23 +679,14 @@ _CODE_ZCL_ static status_t zcl_iasAce_getZoneInfoRspPrc(zclIncoming_t *pInMsg)
 _CODE_ZCL_ static status_t zcl_iasAce_zoneStatusChangedPrc(zclIncoming_t *pInMsg)
 {
 	u8 status = ZCL_STA_SUCCESS;
-	apsdeDataInd_t *pApsdeInd = (apsdeDataInd_t*)pInMsg->msg;
 
 	if(pInMsg->clusterAppCb){
-		zclIncomingAddrInfo_t addrInfo;
-		addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-		addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-		addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-		addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-		addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-		addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
 		zoneStatusChanged_t zoneStatusChanged;
 		TL_SETSTRUCTCONTENT(zoneStatusChanged, 0);
 
 		zcl_zoneStatusChangedParse(pInMsg->pData, &zoneStatusChanged);
 
-		pInMsg->clusterAppCb(&addrInfo, pInMsg->hdr.cmd, &zoneStatusChanged);
+		pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, &zoneStatusChanged);
 	}else{
 		status = ZCL_STA_FAILURE;
 	}
@@ -820,25 +697,16 @@ _CODE_ZCL_ static status_t zcl_iasAce_zoneStatusChangedPrc(zclIncoming_t *pInMsg
 _CODE_ZCL_ static status_t zcl_iasAce_panelStatusChangedPrc(zclIncoming_t *pInMsg)
 {
 	u8 status = ZCL_STA_SUCCESS;
-	apsdeDataInd_t *pApsdeInd = (apsdeDataInd_t*)pInMsg->msg;
 	u8 *pData = pInMsg->pData;
 
 	if(pInMsg->clusterAppCb){
-		zclIncomingAddrInfo_t addrInfo;
-		addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-		addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-		addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-		addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-		addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-		addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
 		panelStatusChanged_t panelStatusChanged;
 		panelStatusChanged.panelStatus = *pData++;
 		panelStatusChanged.secondsRemaining = *pData++;
 		panelStatusChanged.audibleNotification = *pData++;
 		panelStatusChanged.alarmStatus = *pData++;
 
-		pInMsg->clusterAppCb(&addrInfo, pInMsg->hdr.cmd, &panelStatusChanged);
+		pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, &panelStatusChanged);
 	}else{
 		status = ZCL_STA_FAILURE;
 	}
@@ -849,25 +717,16 @@ _CODE_ZCL_ static status_t zcl_iasAce_panelStatusChangedPrc(zclIncoming_t *pInMs
 _CODE_ZCL_ static status_t zcl_iasAce_getPanelStatusRspPrc(zclIncoming_t *pInMsg)
 {
 	u8 status = ZCL_STA_SUCCESS;
-	apsdeDataInd_t *pApsdeInd = (apsdeDataInd_t*)pInMsg->msg;
 	u8 *pData = pInMsg->pData;
 
 	if(pInMsg->clusterAppCb){
-		zclIncomingAddrInfo_t addrInfo;
-		addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-		addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-		addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-		addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-		addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-		addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
 		getPanelStatusRsp_t getPanelStatusRsp;
 		getPanelStatusRsp.panelStatus = *pData++;
 		getPanelStatusRsp.secondsRemaining = *pData++;
 		getPanelStatusRsp.audibleNotification = *pData++;
 		getPanelStatusRsp.alarmStatus = *pData++;
 
-		pInMsg->clusterAppCb(&addrInfo, pInMsg->hdr.cmd, &getPanelStatusRsp);
+		pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, &getPanelStatusRsp);
 	}else{
 		status = ZCL_STA_FAILURE;
 	}
@@ -878,23 +737,14 @@ _CODE_ZCL_ static status_t zcl_iasAce_getPanelStatusRspPrc(zclIncoming_t *pInMsg
 _CODE_ZCL_ static status_t zcl_iasAce_setBypassedZoneListPrc(zclIncoming_t *pInMsg)
 {
 	u8 status = ZCL_STA_SUCCESS;
-	apsdeDataInd_t *pApsdeInd = (apsdeDataInd_t*)pInMsg->msg;
 	u8 *pData = pInMsg->pData;
 
 	if(pInMsg->clusterAppCb){
-		zclIncomingAddrInfo_t addrInfo;
-		addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-		addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-		addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-		addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-		addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-		addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
 		setBypassedZoneList_t setBypassedZoneList;
 		setBypassedZoneList.numOfZones = *pData++;
 		setBypassedZoneList.zoneIds = setBypassedZoneList.numOfZones ? pData : NULL;
 
-		pInMsg->clusterAppCb(&addrInfo, pInMsg->hdr.cmd, &setBypassedZoneList);
+		pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, &setBypassedZoneList);
 	}else{
 		status = ZCL_STA_FAILURE;
 	}
@@ -905,23 +755,14 @@ _CODE_ZCL_ static status_t zcl_iasAce_setBypassedZoneListPrc(zclIncoming_t *pInM
 _CODE_ZCL_ static status_t zcl_iasAce_bypassRspPrc(zclIncoming_t *pInMsg)
 {
 	u8 status = ZCL_STA_SUCCESS;
-	apsdeDataInd_t *pApsdeInd = (apsdeDataInd_t*)pInMsg->msg;
 	u8 *pData = pInMsg->pData;
 
 	if(pInMsg->clusterAppCb){
-		zclIncomingAddrInfo_t addrInfo;
-		addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-		addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-		addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-		addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-		addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-		addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
 		bypassRsp_t bypassRsp;
 		bypassRsp.numOfZones = *pData++;
 		bypassRsp.zoneIds = bypassRsp.numOfZones ? pData : NULL;
 
-		pInMsg->clusterAppCb(&addrInfo, pInMsg->hdr.cmd, &bypassRsp);
+		pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, &bypassRsp);
 	}else{
 		status = ZCL_STA_FAILURE;
 	}
@@ -932,24 +773,15 @@ _CODE_ZCL_ static status_t zcl_iasAce_bypassRspPrc(zclIncoming_t *pInMsg)
 _CODE_ZCL_ static status_t zcl_iasAce_getZoneStatusRspPrc(zclIncoming_t *pInMsg)
 {
 	u8 status = ZCL_STA_SUCCESS;
-	apsdeDataInd_t *pApsdeInd = (apsdeDataInd_t*)pInMsg->msg;
 	u8 *pData = pInMsg->pData;
 
 	if(pInMsg->clusterAppCb){
-		zclIncomingAddrInfo_t addrInfo;
-		addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-		addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-		addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-		addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-		addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-		addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
 		getZoneStatusRsp_t getZoneStatusRsp;
 		getZoneStatusRsp.zoneStatusComplete = *pData++;
 		getZoneStatusRsp.numOfZones = *pData++;
 		getZoneStatusRsp.zoneStatusInfo = getZoneStatusRsp.numOfZones ? pData : NULL;
 
-		pInMsg->clusterAppCb(&addrInfo, pInMsg->hdr.cmd, &getZoneStatusRsp);
+		pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, &getZoneStatusRsp);
 	}else{
 		status = ZCL_STA_FAILURE;
 	}

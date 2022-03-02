@@ -1,29 +1,30 @@
 /********************************************************************************************************
- * @file     tl_zb_mac.h
+ * @file    tl_zb_mac.h
  *
- * @brief    mac layer header file
+ * @brief   This is the header file for tl_zb_mac
  *
- * @author
- * @date     Oct. 11, 2016
+ * @author  Zigbee Group
+ * @date    2021
  *
- * @par      Copyright (c) 2016, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *			 The information contained herein is confidential and proprietary property of Telink
- * 		     Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *			 of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *			 Co., Ltd. and the licensee in separate contract or the terms described here-in.
- *           This heading MUST NOT be removed from this file.
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
  *
- * 			 Licensees are granted free, non-transferable use of the information in this
- *			 file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
+ *              http://www.apache.org/licenses/LICENSE-2.0
  *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *******************************************************************************************************/
-#ifndef TL_ZB_MAC_H__
-#define TL_ZB_MAC_H__
 
-#include "tl_common.h"
-#include "../../common/includes/zb_buffer.h"
+#ifndef TL_ZB_MAC_H
+#define TL_ZB_MAC_H
+
+
 
 /** @addtogroup  TELINK_ZIGBEE_STACK TELINK ZigBee Stack
  *  @{
@@ -32,106 +33,163 @@
 /** @addtogroup  TELINK_ZIGBEE_MAC telink mac
  *  @{
  */
-
-#define MAX_PHY_FRM_SIZE   127
-
-#define ZB_TURN_OFF_ORDER  15
-
-#define ZB_MAC_SHORT_ADDR_NOT_ALLOCATED 0xFFFE
-
+#define MAX_PHY_FRM_SIZE   					127
 
 /**
  *  @brief Broadcast PAN ID
  */
-#define MAC_SHORT_ADDR_MAX 			0xFFF7
-#define MAC_PAN_ID_BROADCAST        0xFFFF
-#define MAC_ADDR_USE_EXT            0xFFFE  //!< Short address value indicating extended address is used
-#define MAC_SHORT_ADDR_BROADCAST    0xFFFF  //!< Broadcast short address
-#define MAC_SHORT_ADDR_NONE         0xFFFF  //!< Short address when there is no short address
-
-
-#define TL_ZB_MAC_CHANNEL_START			11
-
-#define TL_ZB_MAC_CHANNEL_NUM			16
-
-#define TL_ZB_MAC_CHANNEL_STOP			(TL_ZB_MAC_CHANNEL_START + TL_ZB_MAC_CHANNEL_NUM - 1)
+#define MAC_SHORT_ADDR_MAX 					0xFFF7
+#define MAC_PAN_ID_BROADCAST        		0xFFFF
+#define MAC_ADDR_USE_EXT            		0xFFFE  //!< Short address value indicating extended address is used
+#define MAC_SHORT_ADDR_BROADCAST    		0xFFFF  //!< Broadcast short address
+#define MAC_SHORT_ADDR_NONE         		0xFFFF  //!< Short address when there is no short address
 
 /**
  *  @brief Key source length definition in Mac security
  */
-#define MAC_KEY_SOURCE_MAX_LEN          8
+#define MAC_KEY_SOURCE_MAX_LEN          	8
 
 /**
  *  @brief Define the max number of ED scan results supported
  */
-#define MAX_ED_SCAN_RESULTS_SUPPORTED   16
+#define MAX_ED_SCAN_RESULTS_SUPPORTED   	16
 
 /**
  *  @brief Define the max number of PAN descriptors supported
  */
-#define MAX_PAN_DESC_SUPPORTED          6
+#define MAX_PAN_DESC_SUPPORTED          	6
+
+/* MAC security */
+#ifdef ZB_MAC_SECURITY
+#define MAC_SECUR_LEV5_KEYID1_AUX_HDR_SIZE  6
+#else
+#define MAC_SECUR_LEV5_KEYID1_AUX_HDR_SIZE  0
+#endif
+
+#define ZB_MAC_SECURITY_LEVEL 				5
+#define ZB_MAC_KEY_ID_MODE    				1
+
+#define ZB_TURN_OFF_ORDER  					15
+
+#define ZB_MAC_SHORT_ADDR_NOT_ALLOCATED 	0xFFFE
+
+/**
+   Defines scan duration
+ */
+#define ZB_MAX_SCAN_DURATION_VALUE 			200
+
+
+#define ZB_MAC_PENDING_TRANS_QUEUE_NUM		6
+/* According to 802.15.4, should be 0. */
+#define ZB_MAC_INTERNAL_EXPIRY_CNT			0
+
+
+#define TL_ZB_MAC_CHANNEL_START				11
+#define TL_ZB_MAC_CHANNEL_NUM				16
+#define TL_ZB_MAC_CHANNEL_STOP				(TL_ZB_MAC_CHANNEL_START + TL_ZB_MAC_CHANNEL_NUM - 1)
+
+#define MAGIC_ROUND_TO_4(a) 				(((a) + ((4)-1)) & -(4))
+
+
+/** @addtogroup mac_primitive_id MAC primitive ID
+ * Primitive ID of MAC request/response/indication/confirmation
+ * @{
+ */
+#define MAC_MCPS_DATA_REQ                   0x40      //!< MCPS Data Request
+#define MAC_MCPS_DATA_CNF                   0x41      //!< MCPS Data Confirm
+#define MAC_MCPS_DATA_IND                   0x42      //!< MCPS Data Indication
+#define MAC_MCPS_PURGE_REQ                  0x43      //!< MCPS Purge request
+#define MAC_MCPS_PURGE_CNF                  0x44      //!< MCPS Purge Confirm
+#define MAC_MLME_ASSOCIATE_REQ              0x45      //!< MLME Associate Request
+#define MAC_MLME_ASSOCIATE_CNF              0x46      //!< MLME Associate Confirm
+#define MAC_MLME_ASSOCIATE_IND              0x47      //!< MLME Associate Indication
+#define MAC_MLME_ASSOCIATE_RES              0x48      //!< MLME Associate Response
+#define MAC_MLME_DISASSOCIATE_REQ           0x49      //!< MLME Disassociate Request
+#define MAC_MLME_DISASSOCIATE_CNF           0x4a      //!< MLME Disassociate Confirm
+#define MAC_MLME_DISASSOCIATE_IND           0x4b      //!< MLME Disassociate Indication
+#define MAC_MLME_BEACON_NOTIFY_IND          0x4c      //!< MLME Beacon Notify Indication
+#define MAC_MLME_GET_REQ                    0x4d      //!< MLME Get Request
+#define MAC_MLME_GET_CNF                    0x4e      //!< MLME Get Confirm
+#define MAC_MLME_ORPHAN_IND                 0x4f      //!< MLME Orphan Indication
+#define MAC_MLME_ORPHAN_RES                 0x50      //!< MLME Orphan Response
+#define MAC_MLME_RESET_REQ                  0x51      //!< MLME Reset Request
+#define MAC_MLME_RESET_CNF                  0x52      //!< MLME Reset Confirm
+#define MAC_MLME_RX_ENABLE_REQ              0x53      //!< MLME RX Enable Request
+#define MAC_MLME_RX_ENABLE_CNF              0x54      //!< MLME RX Enable Confirm
+#define MAC_MLME_SCAN_REQ                   0x55      //!< MLME Scan Request
+#define MAC_MLME_SCAN_CNF                   0x56      //!< MLME Scan Confirm
+#define MAC_MLME_COMM_STATUS_IND            0x57      //!< MLME Comm Status Indication
+#define MAC_MLME_SET_REQ                    0x58      //!< MLME Set Request
+#define MAC_MLME_SET_CNF                    0x59      //!< MLME Set Confirm
+#define MAC_MLME_START_REQ                  0x5a      //!< MLME Start Request
+#define MAC_MLME_START_CNF                  0x5b      //!< MLME Start Confirm
+#define MAC_MLME_SYNC_LOSS_IND              0x5c      //!< MLME Sync Loss Indication
+#define MAC_MLME_POLL_REQ                   0x5d      //!< MLME Poll Request
+#define MAC_MLME_POLL_CNF                   0x5e      //!< MLME Poll Confirm
+#define MAC_MLME_SCAN_COMPLETE              0x5f      //!< internal use, MLME Scan Complete
+#define MAC_MLME_BEACON_REQ_CMD             0x60      //!< internal use, Receive Beacon Request Command
+#define MAC_MLME_DATA_REQ_CMD               0x61      //!< internal use, Receive Data Request Command
+#define MAC_MLME_ASSO_RSP_CNF               0x62      //!< internal use, Receive Associate Response Confirm
+#define MAC_MLME_POLL_IND					0x63	  //!< MLME Poll Indication for zigBee 3.0
+/** @} end of group mac_mcsp_data_primitive */
+
+
+/* MAC header frame control */
+#define MAC_FCF_ACK_REQ_BIT    				0x20
+#define MAC_FCF_INTRA_PAN_BIT  				0x40
+#define MAC_FCF_DST_ADDR_BIT   				0x0c
+#define MAC_FCF_SRC_ADDR_BIT   				0xc0
+#define MAC_FCF_FRAME_TYPE     				0x07
 
 enum mac_frame_version_e{
-	MAC_FRAME_IEEE_802_15_4_2003 = 0,
-	MAC_FRAME_IEEE_802_15_4      = 1
+	MAC_FRAME_IEEE_802_15_4_2003 	= 0,
+	MAC_FRAME_IEEE_802_15_4      	= 1
 };
 
-#define MAC_FCF_ACK_REQ_BIT    0x20
-#define MAC_FCF_INTRA_PAN_BIT  0x40
-#define MAC_FCF_DST_ADDR_BIT   0x0c
-#define MAC_FCF_SRC_ADDR_BIT   0xc0
-#define MAC_FCF_FRAME_TYPE     0x07
-
-
-typedef enum zb_addr_mode_e
-{
-  ZB_ADDR_NO_ADDR = 0,          /*!< 802.15: 0x00 = no address (addressing fields omitted, see 7.2.1.1.8). */
-  ZB_ADDR_16BIT_MULTICAST = 1,  /*!< 802.15: 0x1 = reserved.
-                                     NWK:    0x01 = 16-bit multicast group address
-                                     APS:    0x01 = 16-bit group address for DstAddress;
-                                 */
-#define ZB_ADDR_16BIT_GROUP  ZB_ADDR_16BIT_MULTICAST
-
-  ZB_ADDR_16BIT_DEV_OR_BROADCAST = 2, /*!< 802.15: 0x02 = 16-bit short address.
-                                           NWK:    0x02=16-bit network address of a device or a 16-bit broadcast address
-                                      */
-
-  ZB_ADDR_64BIT_DEV = 3         /*!< 802.15: 0x03 = 64-bit extended address.  */
+typedef enum zb_addr_mode_e{
+	ZB_ADDR_NO_ADDR 				= 0,/*!< 802.15: 0x00 = no address (addressing fields omitted, see 7.2.1.1.8). */
+	ZB_ADDR_16BIT_MULTICAST 		= 1,/*!< 802.15: 0x1 = reserved.
+                                   	     * NWK:    0x01 = 16-bit multicast group address
+                                   	     * APS:    0x01 = 16-bit group address for DstAddress;
+                                   	     */
+	ZB_ADDR_16BIT_GROUP  			= 1,
+	ZB_ADDR_16BIT_DEV_OR_BROADCAST 	= 2,/*!< 802.15: 0x02 = 16-bit short address.
+                                         * NWK:    0x02=16-bit network address of a device or a 16-bit broadcast address
+                                         */
+	ZB_ADDR_64BIT_DEV 				= 3 /*!< 802.15: 0x03 = 64-bit extended address.  */
 }zb_addr_mode_t;
 
 /**
    Device types
  */
 enum{
-  MAC_DEV_UNDEFINED,
-  MAC_DEV_FFD,
-  MAC_DEV_RFD
+	MAC_DEV_UNDEFINED,
+	MAC_DEV_FFD,
+	MAC_DEV_RFD
 };
 
 /**
    MAC options bits
  */
-enum mac_tx_options_bits_e
-{
-  MAC_TX_OPTION_ACKNOWLEDGED_BIT          = 1,
-  MAC_TX_OPTION_GTS_CAP_BIT               = 2,
-  MAC_TX_OPTION_INDIRECT_TRANSMISSION_BIT = 4,
-  MAC_TX_OPTION_USE_CSMA_BIT			  = 8,//add for green power
+enum mac_tx_options_bits_e{
+	MAC_TX_OPTION_ACKNOWLEDGED_BIT          = 1,
+	MAC_TX_OPTION_GTS_CAP_BIT               = 2,
+	MAC_TX_OPTION_INDIRECT_TRANSMISSION_BIT = 4,
+	MAC_TX_OPTION_USE_CSMA_BIT			  	= 8,//add for green power
 };
 
 /**
    MAC frame types
  */
-enum mac_frame_type_e
-{
-  MAC_FRAME_BEACON         = 0,
-  MAC_FRAME_DATA           = 1,
-  MAC_FRAME_ACKNOWLEDGMENT = 2,
-  MAC_FRAME_COMMAND        = 3,
-  MAC_FRAME_RESERVED1      = 4,
-  MAC_FRAME_RESERVED2      = 5,
-  MAC_FRAME_RESERVED3      = 6,
-  MAC_FRAME_RESERVED4      = 7
+enum mac_frame_type_e{
+	MAC_FRAME_BEACON         = 0,
+	MAC_FRAME_DATA           = 1,
+	MAC_FRAME_ACKNOWLEDGMENT = 2,
+	MAC_FRAME_COMMAND        = 3,
+	MAC_FRAME_RESERVED1      = 4,
+	MAC_FRAME_RESERVED2      = 5,
+	MAC_FRAME_RESERVED3      = 6,
+	MAC_FRAME_RESERVED4      = 7
 };
 
 
@@ -140,15 +198,15 @@ enum mac_frame_type_e
  *  @{
  */
 enum{
-	MAC_PHY_ATTR_CURRENT_CHANNEL			= 		 0x00,
-	MAC_PHY_ATTR_MODE_CCA				= 		 0x03,
-	MAC_PHY_ATTR_CURRENT_PAGE			=        0x04,
+	MAC_PHY_ATTR_CURRENT_CHANNEL	= 		0x00,
+	MAC_PHY_ATTR_MODE_CCA			= 		0x03,
+	MAC_PHY_ATTR_CURRENT_PAGE		=       0x04,
 
 	MAC_PIB_ATTRIBUTE_START			= 		0x40,	//!<
 	MAC_ATTR_ACK_WAIT_DURATION      =       0x40,	//!< attribute Identifier: macAckWaitDuration
 	MAC_ATTR_ASSOCIATION_PERMIT     =       0x41,	//!< attribute Identifier: macAssociationPermit
 	MAC_ATTR_AUTO_REQUEST           =       0x42,	//!< attribute Identifier: macAutoRequest
-	MAC_ATTR_BATTERY_LIFE_EXT          =    0x43,	//!< attribute Identifier: macBattLifeExt
+	MAC_ATTR_BATTERY_LIFE_EXT       =    	0x43,	//!< attribute Identifier: macBattLifeExt
 	MAC_ATTR_BATTERY_LIFE_EXT_PERIODS  =    0x44,	//!< attribute Identifier: macBattLifeExtPeriods
 	MAC_ATTR_BEACON_PAYLOAD         =       0x45,	//!< attribute Identifier: macBeaconPayload
 	MAC_ATTR_BEACON_PAYLOAD_LENGTH  =       0x46,	//!< attribute Identifier: macBeaconPayloadLength
@@ -167,55 +225,43 @@ enum{
 	MAC_ATTR_SHORT_ADDRESS          =       0x53,	//!< attribute Identifier: macShortAddress
 	MAC_ATTR_SUPERFRAME_ORDER       =       0x54,	//!< attribute Identifier: macSuperframeOrder
 	MAC_ATTR_TRANSACTION_PERSISTENCE_TIME = 0x55,	//!< attribute Identifier: macTransactionPersistenceTime
-	MAC_ATTR_PAN_COORDASSOCIATED   =        0x56,	//!< attribute Identifier: macAssociatedPANCoord
+	MAC_ATTR_PAN_COORDASSOCIATED    =       0x56,	//!< attribute Identifier: macAssociatedPANCoord
 	MAC_ATTR_MAX_BE                 =       0x57,	//!< attribute Identifier: macMaxBE
 	MAC_ATTR_MAX_FRAME_TOTAL_WAIT_TIME    = 0x58,	//!< attribute Identifier: macMaxFrameTotalWaitTime
 	MAC_ATTR_MAX_FRAME_RETRIES      =       0x59,	//!< attribute Identifier: macMaxFrameRetries
 	MAC_ATTR_RESPONSE_WAIT_TIME     =       0x5A,	//!< attribute Identifier: macMaxFrameRetries
 	MAC_ATTR_SYNC_SYMBOL_OFFSET     =       0x5B,	//!< attribute Identifier: macSyncSymbolOffset
 	MAC_ATTR_TIMESTAMP_SUPPORTED    =       0x5C,	//!< attribute Identifier: macTimestampSupported
-	MAC_ATTR_SECURITY_ENABLED       =        0x5D,	//!< attribute Identifier: macSecurityEnabled
+	MAC_ATTR_SECURITY_ENABLED       =       0x5D,	//!< attribute Identifier: macSecurityEnabled
 
-	MAC_CONST_EXT_ADDR			=       0x5E,		//!< attribute Identifier: mac ieee address, internal used only
-	MAC_TX_POWER				=		0x5F,		//!< attribute Identifier: tx power, internal used only
-	MAC_PIB_ATTRIBUTE_STOP		=       0x5F    ,	//!< attribute Identifier: autoRequest
+	MAC_CONST_EXT_ADDR				=       0x5E,	//!< attribute Identifier: mac ieee address, internal used only
+	MAC_TX_POWER					=		0x5F,	//!< attribute Identifier: tx power, internal used only
+	MAC_PIB_ATTRIBUTE_STOP			=       0x5F ,	//!< attribute Identifier: autoRequest
 };
 
 /** @} end of group zb_mac_attribute_id */
 
 
-
-/* MAC security */
-#ifdef ZB_MAC_SECURITY
-#define MAC_SECUR_LEV5_KEYID1_AUX_HDR_SIZE 6
-#else
-#define MAC_SECUR_LEV5_KEYID1_AUX_HDR_SIZE 0
-#endif
-
-#define ZB_MAC_SECURITY_LEVEL 5
-#define ZB_MAC_KEY_ID_MODE    1
-
 /**
    MAC command frame id
  */
-enum mac_command_frame_id
-{
-  MAC_CMD_ASSOCIATION_REQUEST = 1,
-  MAC_CMD_ASSOCIATION_RESPONSE,
-  MAC_CMD_DISASSOCIATION_NOTIFICATION,
-  MAC_CMD_DATA_REQUEST,
-  MAC_CMD_PAN_ID_CONFLICT_NOTIFICATION,
-  MAC_CMD_ORPHAN_NOTIFICATION,
-  MAC_CMD_BEACON_REQUEST,          /* 7 */
-  MAC_CMD_COORDINATOR_REALIGNMENT,
-  MAC_CMD_GTS_REQUEST,
+enum mac_command_frame_id{
+	MAC_CMD_ASSOCIATION_REQUEST = 1,
+	MAC_CMD_ASSOCIATION_RESPONSE,
+	MAC_CMD_DISASSOCIATION_NOTIFICATION,
+	MAC_CMD_DATA_REQUEST,
+	MAC_CMD_PAN_ID_CONFLICT_NOTIFICATION,
+	MAC_CMD_ORPHAN_NOTIFICATION,
+	MAC_CMD_BEACON_REQUEST,          /* 7 */
+	MAC_CMD_COORDINATOR_REALIGNMENT,
+	MAC_CMD_GTS_REQUEST,
 
-  MAC_CMD_TELINK_BASE = 0xA0,
-  MAC_CMD_TELINK_OTA,
+	MAC_CMD_TELINK_BASE 		= 0xA0,
+	MAC_CMD_TELINK_OTA,
 };
 
 enum{
-	ZB_MAC_STATE_NORMAL = 0,
+	ZB_MAC_STATE_NORMAL 		= 0,
 	ZB_MAC_STATE_ED_SCAN,
 	ZB_MAC_STATE_ACTIVE_SCAN,
 	ZB_MAC_STATE_ORPHAN_SCAN,
@@ -223,11 +269,10 @@ enum{
 	ZB_MAC_STATE_INDIRECT_DATA,
 };
 
-
-typedef enum {
-	MAC_SUCCESS                 = 0x00,                /**< Operation successful */
-    MAC_STA_PAN_AT_CAPACITY         = 0x1,
-    MAC_STA_PAN_ACCESS_DENIED       = 0x2,
+typedef enum{
+	MAC_SUCCESS                 	= 0x00,/**< Operation successful */
+    MAC_STA_PAN_AT_CAPACITY         = 0x01,
+    MAC_STA_PAN_ACCESS_DENIED       = 0x02,
 	MAC_STA_AUTOACK_PENDING_ALL_ON  = 0xFE,
     MAC_STA_AUTOACK_PENDING_ALL_OFF = 0xFF,
     MAC_STA_BEACON_LOSS             = 0xE0,
@@ -271,16 +316,8 @@ typedef enum {
 
     MAC_STA_FRAME_PENDING			= 0x20,
 
-    MAC_TX_ABORTED              = 0x1D,                /**< For internal use only */
-
-} mac_sts_t;
-
-/**
-   Defines scan duration
- */
-#define ZB_MAX_SCAN_DURATION_VALUE 200
-
-
+    MAC_TX_ABORTED              	= 0x1D,/**< For internal use only */
+}mac_sts_t;
 
 
 /**
@@ -291,64 +328,18 @@ typedef enum {
    @param PASSIVE_SCAN
    @param ORPHAN_SCAN
 */
-enum zb_mac_scan_type_e
-{
-  ED_SCAN      = 0,
-  ACTIVE_SCAN  = 1,
-  PASSIVE_SCAN = 2,
-  ORPHAN_SCAN  = 3
+enum zb_mac_scan_type_e{
+	ED_SCAN      = 0,
+	ACTIVE_SCAN  = 1,
+	PASSIVE_SCAN = 2,
+	ORPHAN_SCAN  = 3
 };
-
 
 enum{
-	ZB_MAC_DISASSOCIATE_REASON_RESV = 0,
-	ZB_MAC_DISASSOCIATE_REASON_COORD2DEV = 1,
-	ZB_MAC_DISASSOCIATE_REASON_DEV = 2,
+	ZB_MAC_DISASSOCIATE_REASON_RESV 		= 0,
+	ZB_MAC_DISASSOCIATE_REASON_COORD2DEV 	= 1,
+	ZB_MAC_DISASSOCIATE_REASON_DEV 			= 2,
 };
-
-/** @addtogroup mac_primitive_id MAC primitive ID
- * Primitive ID of MAC request/response/indication/confirmation
- * @{
- */
-#define MAC_MCPS_DATA_REQ                    0x40      //!< MCPS Data Request
-#define MAC_MCPS_DATA_CNF                    0x41      //!< MCPS Data Confirm
-#define MAC_MCPS_DATA_IND                    0x42      //!< MCPS Data Indication
-#define MAC_MCPS_PURGE_REQ                   0x43      //!< MCPS Purge request
-#define MAC_MCPS_PURGE_CNF                   0x44      //!< MCPS Purge Confirm
-#define MAC_MLME_ASSOCIATE_REQ               0x45      //!< MLME Associate Request
-#define MAC_MLME_ASSOCIATE_CNF               0x46      //!< MLME Associate Confirm
-#define MAC_MLME_ASSOCIATE_IND               0x47      //!< MLME Associate Indication
-#define MAC_MLME_ASSOCIATE_RES               0x48      //!< MLME Associate Response
-#define MAC_MLME_DISASSOCIATE_REQ            0x49      //!< MLME Disassociate Request
-#define MAC_MLME_DISASSOCIATE_CNF            0x4a      //!< MLME Disassociate Confirm
-#define MAC_MLME_DISASSOCIATE_IND            0x4b      //!< MLME Disassociate Indication
-#define MAC_MLME_BEACON_NOTIFY_IND           0x4c      //!< MLME Beacon Notify Indication
-#define MAC_MLME_GET_REQ                     0x4d      //!< MLME Get Request
-#define MAC_MLME_GET_CNF                     0x4e      //!< MLME Get Confirm
-#define MAC_MLME_ORPHAN_IND                  0x4f      //!< MLME Orphan Indication
-#define MAC_MLME_ORPHAN_RES                  0x50      //!< MLME Orphan Response
-#define MAC_MLME_RESET_REQ                   0x51      //!< MLME Reset Request
-#define MAC_MLME_RESET_CNF                   0x52      //!< MLME Reset Confirm
-#define MAC_MLME_RX_ENABLE_REQ               0x53      //!< MLME RX Enable Request
-#define MAC_MLME_RX_ENABLE_CNF               0x54      //!< MLME RX Enable Confirm
-#define MAC_MLME_SCAN_REQ                    0x55      //!< MLME Scan Request
-#define MAC_MLME_SCAN_CNF                    0x56      //!< MLME Scan Confirm
-#define MAC_MLME_COMM_STATUS_IND             0x57      //!< MLME Comm Status Indication
-#define MAC_MLME_SET_REQ                     0x58      //!< MLME Set Request
-#define MAC_MLME_SET_CNF                     0x59      //!< MLME Set Confirm
-#define MAC_MLME_START_REQ                   0x5a      //!< MLME Start Request
-#define MAC_MLME_START_CNF                   0x5b      //!< MLME Start Confirm
-#define MAC_MLME_SYNC_LOSS_IND               0x5c      //!< MLME Sync Loss Indication
-#define MAC_MLME_POLL_REQ                    0x5d      //!< MLME Poll Request
-#define MAC_MLME_POLL_CNF                    0x5e      //!< MLME Poll Confirm
-
-#define MAC_MLME_SCAN_COMPLETE               0x5f      //!< internal use, MLME Scan Complete
-#define MAC_MLME_BEACON_REQ_CMD              0x60      //!< internal use, Receive Beacon Request Command
-#define MAC_MLME_DATA_REQ_CMD                0x61      //!< internal use, Receive Data Request Command
-#define MAC_MLME_ASSO_RSP_CNF                0x62      //!< internal use, Receive Associate Response Confirm
-
-#define MAC_MLME_POLL_IND					 0x63	   //!< MLME Poll Indication for zigBee 3.0
-
 
 
 typedef struct{
@@ -361,12 +352,10 @@ typedef struct{
 	u8	allocAddr: 		1;
 }capability_info_t;
 
-
 /**
  *  @brief  Definition for Common security type
  */
-typedef struct
-{
+typedef struct{
 	u8   keySource[MAC_KEY_SOURCE_MAX_LEN];  //!< Key source
 	u8   securityLevel;                      //!< Security level
 	u8   keyIdMode;                          //!< Key identifier mode
@@ -376,8 +365,7 @@ typedef struct
 /**
  *  @brief  Definition of PAN descriptor type
  */
-typedef struct
-{
+typedef struct{
 	u32        timestamp;              //!< The time at which the beacon frame was received, in symbols
 
 	u16        coordPanId;             //!< PAN identifier of the coordinator
@@ -444,9 +432,6 @@ typedef struct{
 	u8		keyIndex;
 }zb_mscp_data_ind_t;
 
-/** @} end of group mac_mcsp_data_primitive */
-
-
 /** @defgroup mac_mcsp_purge_primitive MAC-MCSP:PURGE primitive Types
  *  @{
  */
@@ -465,24 +450,21 @@ typedef struct{
  *  @{
  */
 typedef struct{
-	u8			logicalChannel;
-	u8			channelPage;
-	u16			coordPanId;
+	u8		logicalChannel;
+	u8		channelPage;
+	u16		coordPanId;
 
-	addr_t      coordAddress;
+	addr_t  coordAddress;
 	capability_info_t capbilityInfo;
 	mac_sec_t sec;
 }zb_mlme_associate_req_t;
 
-
-
 typedef struct{
-	addrExt_t				devAddress;
-	capability_info_t 		capbilityInfo;
-	u8						lqi;
-	mac_sec_t sec;
+	addrExt_t			devAddress;
+	capability_info_t 	capbilityInfo;
+	u8					lqi;
+	mac_sec_t 			sec;
 }zb_mlme_associate_ind_t;
-
 
 typedef struct{
 	u16			shortAddress;
@@ -492,24 +474,20 @@ typedef struct{
 }zb_mlme_associate_resp_t;
 
 typedef struct{
-	addrExt_t		parentAddress;
-	u16				shortAddress;
-	u8 				status;
-	mac_sec_t 		sec;
+	addrExt_t	parentAddress;
+	u16			shortAddress;
+	u8 			status;
+	mac_sec_t 	sec;
 }zb_mlme_associate_conf_t;
-/** @} end of group mac_mcsp_purge_primitive */
+/** @} end of group mac_mlme_associate_primitive */
 
 
 /** @defgroup mac_mlme_disassociate_primitive MAC-MLME:DISASSOCIATE primitive Types
  *  @{
  */
-
-
 typedef struct{
 	u16		devPanId;
 	addr_t  devAddr;
-	//		devAddrMode;
-	//addrExt_t	devAddress;
 	u8		disassociateReason;
 	bool	txIndirect;
 	mac_sec_t sec;
@@ -524,11 +502,9 @@ typedef struct{
 typedef struct{
 	u16		devPanId;
 	addr_t  devAddr;
-	//u8		devAddrMode;
-	//addrExt_t	devAddress;
 	u8 		status;
 }zb_mlme_disassociate_conf_t;
-/** @} end of group mac_mcsp_purge_primitive */
+/** @} end of group mac_mlme_disassociate_primitive */
 
 
 
@@ -554,37 +530,35 @@ typedef struct{
    When will be used for MLME-ORPHAN.response, maybe, will add some fields.
  */
 typedef struct{
-	u16 panId;
-	addr_t srcAddr;
-	addr_t dstAddr;
-	u8  status;
+	u16 	panId;
+	addr_t 	srcAddr;
+	addr_t 	dstAddr;
+	u8  	status;
 	mac_sec_t sec;
 }zb_mlme_comm_status_ind_t;
-
 
 /**
  *  @brief  Define MLME Request type
  */
 typedef struct{
-	bool            setAsDefault;               //!< set as default: 0 or 1
+	bool setAsDefault;		//!< set as default: 0 or 1
 }mac_mlme_reset_req_t;
 
 /**
  *  @brief  Define MLME Confirm type
  */
 typedef struct{
-	u8            status;               //!< The status of the reset @ref mac_status_id
+	u8 status;				//!< The status of the reset @ref mac_status_id
 }mac_mlme_reset_conf_t;
-
 
 /**
  *  @brief  Define MLME Rx-On enable request type
  */
 typedef struct
 {
-	u8              primitive;           //!< Primitive id of MLME Rx-On Enable Request @ref mac_primitive_id
-	u32             rxOnTime;            //!< The Number of symbols measured before the receiver is to be enabled
-	mac_sec_t       sec;                 //!< The security parameters for this message
+	u8   primitive;         //!< Primitive id of MLME Rx-On Enable Request @ref mac_primitive_id
+	u32  rxOnTime;          //!< The Number of symbols measured before the receiver is to be enabled
+	mac_sec_t  sec;         //!< The security parameters for this message
 }mac_mlme_rxOnEnableReq_t;
 
 /**
@@ -592,8 +566,8 @@ typedef struct
  */
 typedef struct
 {
-	u8              primitive;            //!< Primitive id of MLME Rx-on Enable Confirm @ref mac_primitive_id
-	u8              status;               //!< The status of the data request @ref mac_status_id
+	u8 primitive;           //!< Primitive id of MLME Rx-on Enable Confirm @ref mac_primitive_id
+	u8 status;              //!< The status of the data request @ref mac_status_id
 }mac_mlme_rxOnEnableCnf_t;
 
 /**
@@ -601,11 +575,11 @@ typedef struct
  */
 typedef struct
 {
-    u32       scanChannels;            //!< Indicate which channels are to be scanned
-    u8        scanType;                //!< The type of scan to be performed @ref mac_scan_type
-    u8        scanDuration;            //!< The time spent on scanning each channel
-    u8        channelPage;             //!< Channel page on which to perform the scan
-    mac_sec_t sec;                     //!< The security parameters for orphan scan
+    u32 scanChannels;       //!< Indicate which channels are to be scanned
+    u8  scanType;           //!< The type of scan to be performed @ref mac_scan_type
+    u8  scanDuration;       //!< The time spent on scanning each channel
+    u8  channelPage;        //!< Channel page on which to perform the scan
+    mac_sec_t sec;          //!< The security parameters for orphan scan
 }zb_mac_mlme_scan_req_t;
 
 /**
@@ -613,44 +587,39 @@ typedef struct
  */
 typedef struct
 {
-    u8        status;                   //!< Status of the scan request @ref mac_status_id
-    u8        scanType;                 //!< The type of scan performed @ref mac_scan_type
-    u8        channelPage;              //!< Channel page on which the scan was performed
-    u8        resultListSize;           //!< Number of elements returned in the appropriate result lists
+    u8  status;                   //!< Status of the scan request @ref mac_status_id
+    u8  scanType;                 //!< The type of scan performed @ref mac_scan_type
+    u8  channelPage;              //!< Channel page on which the scan was performed
+    u8  resultListSize;           //!< Number of elements returned in the appropriate result lists
 
 
-    u32       unscannedChannels;        //!< Channels given in the request which were not scanned
+    u32 unscannedChannels;        //!< Channels given in the request which were not scanned
 
-    union                               //!< Define a union of energy measurements list and pan descriptor list
-    {
+    union{                        //!< Define a union of energy measurements list and pan descriptor list
         u8 energyDetectList[MAX_ED_SCAN_RESULTS_SUPPORTED]; //!< List of energy measurements
         mac_panDesc_t panDescList[MAX_PAN_DESC_SUPPORTED];  //!< List of PAN descriptors
-     } resultList;
-
+    }resultList;
 }zb_mac_mlme_scan_conf_t;
-
-
 
 /**
  *  @brief  Define MLME start request type
  */
-typedef struct
-{
-	u32             startTime;           //!< Time at which to begin transmitting beacons
+typedef struct{
+	u32 startTime;           //!< Time at which to begin transmitting beacons
 
-	u16             panId;  			 //!< PAN identifier to be used by the device
-	u8              logicalChannel;      //!< Logical channel on which to begin
-	u8              channelPage;         //!< Channel page on which to begin
+	u16 panId;  			 //!< PAN identifier to be used by the device
+	u8  logicalChannel;      //!< Logical channel on which to begin
+	u8  channelPage;         //!< Channel page on which to begin
 
-	u8              beaconOrder;         //!< Indicates how often the beacon is to be transmitted
-	u8              superframeOrder;     //!< Length of the active portion of the superframe
-	u8              panCoordinator;      //!< Length of the active portion of the superframe
-	u8              batteryLifeExt;      //!< Indicates if the receiver of the beaconing device is disabled or not
+	u8  beaconOrder;         //!< Indicates how often the beacon is to be transmitted
+	u8  superframeOrder;     //!< Length of the active portion of the superframe
+	u8  panCoordinator;      //!< Length of the active portion of the superframe
+	u8  batteryLifeExt;      //!< Indicates if the receiver of the beaconing device is disabled or not
 
-	mac_sec_t       coordRealignSec;     //!< Security parameters for the coordinator realignment frame
-	u8              coordRealignment;    //!< Indicates if the coordinator realignment command is to be transmitted
+	mac_sec_t coordRealignSec; //!< Security parameters for the coordinator realignment frame
+	u8  coordRealignment;    //!< Indicates if the coordinator realignment command is to be transmitted
 
-	mac_sec_t       beaconSec;           //!< Security parameters for the beacon frame
+	mac_sec_t beaconSec;     //!< Security parameters for the beacon frame
 }zb_mac_mlme_start_req_t;
 
 
@@ -658,9 +627,8 @@ typedef struct
  *  @brief  Define MLME start confirm type
  */
 typedef struct{
-	u8              status;              //!< Result of the attempt to start using an updated superframe configuration @ref mac_status_id
-} mac_mlme_startCnf_t;
-
+	u8  status;              //!< Result of the attempt to start using an updated superframe configuration @ref mac_status_id
+}mac_mlme_startCnf_t;
 
 /**
  *  @brief  Define MLME poll request type
@@ -669,22 +637,22 @@ typedef struct{
 	u16  coordPanId;
 	tl_zb_addr_t coordAddr;
 	u8   coordAddrMode;
-} mac_mlme_poll_req_t;
+}mac_mlme_poll_req_t;
 
 /**
  *  @brief  Define MLME poll confirm type
  */
 typedef struct{
-	u8              status;              //!< Result of the attempt to start using an updated superframe configuration @ref mac_status_id
-} mac_mlme_poll_conf_t;
+	u8  status;             //!< Result of the attempt to start using an updated superframe configuration @ref mac_status_id
+}mac_mlme_poll_conf_t;
 
 /**
  *  @brief  Define MLME poll indication type
  */
 typedef struct{
-	u8				addrMode;	/*<! 2 - 16 bit short address. 3 - 64 bit extended address */
-	tl_zb_addr_t	devAddr;	/*<! The address of the device requesting pending data */
-} mac_mlme_poll_ind_t;
+	u8			 addrMode;	/*<! 2 - 16 bit short address. 3 - 64 bit extended address */
+	tl_zb_addr_t devAddr;	/*<! The address of the device requesting pending data */
+}mac_mlme_poll_ind_t;
 
 /**
    Parameters for orphan indication
@@ -693,31 +661,25 @@ typedef struct{
   addrExt_t orphanAddr; /*<! The 64 bits address of the orphaned device */
 }mac_mlme_orphan_ind_t;
 
-
-
 /**
    Parameters for orphan response
 */
 typedef struct{
   addrExt_t orphanAddr; /*<! The 64 bits address of the orphaned device */
-  u16 shortAddr; /*<! The 16-bit short address allocated to the
-                           * orphaned device if it is associated with this coordinator */
-  bool associated; /*<! TRUE if the orphaned device is associated with this
-                          coordinator or FALSE otherwise */
+  u16 shortAddr; 		/*<! The 16-bit short address allocated to the
+                         * orphaned device if it is associated with this coordinator */
+  bool associated; 		/*<! TRUE if the orphaned device is associated with this
+                         * coordinator or FALSE otherwise */
 }mac_mlme_orphan_resp_t;
-
-
 
 /**
    Sync loss reasons
-
    The reason that synchronization was lost.
  */
-typedef enum
-{
-  ZB_SYNC_LOSS_REASON_PAN_ID_CONFLICT,
-  ZB_SYNC_LOSS_REASON_REALIGNMENT,
-  ZB_SYNC_LOSS_REASON_BEACON_LOST
+typedef enum{
+	ZB_SYNC_LOSS_REASON_PAN_ID_CONFLICT,
+	ZB_SYNC_LOSS_REASON_REALIGNMENT,
+	ZB_SYNC_LOSS_REASON_BEACON_LOST
 }zb_sync_loss_reason_t;
 
 /**
@@ -725,12 +687,11 @@ typedef enum
 */
 typedef struct{
 	u16 panId; 						/* The PAN identifier with which the device lost
-					   	   	   	   	   * synchronization or to which it was realigned */
+					   	   	   	   	 * synchronization or to which it was realigned */
 	zb_sync_loss_reason_t reason; 	/* Lost syncronisation reason */
 	u8 logicalChannel; 				/* Logical channel */
 	u8 channelPage;					/* Channel page */
 }zb_mlme_sync_loss_ind_t;
-
 
 typedef struct{
 	u8 srcAddrMode;
@@ -739,7 +700,6 @@ typedef struct{
 	tl_zb_addr_t dstAddr;
 	u8 cbType;
 }zb_mlme_data_req_cmd_t;
-
 
 typedef struct{
 	u32 timestamp;
@@ -799,13 +759,13 @@ typedef struct{
 /*
  * beacon payload
  * */
-typedef struct  zb_mac_beacon_payload_s{
+typedef struct zb_mac_beacon_payload_s{
 	u8 protocol_id;
 	u8 stack_profile:4;
 	u8 protocol_version:4;
 
-	u8 tc:1;
-	u8 longUptime:1;
+	u8 long_uptime:1;		//wwah, has been up for more than 24 hours
+	u8 tc_connectivity:1;	//wwah, active communication path to TC
 	u8 router_capacity:1;
 	u8 device_depth:4;
 	u8 end_device_capacity:1;
@@ -826,29 +786,25 @@ typedef struct{
 	zb_mac_beacon_payload_t beaconPayload;
 }zb_rfpkt_beacon_t;
 
-
 /*
  * status for processing the indirect data
  */
 enum{
 	ZB_INDRECT_IDLE,
-	ZB_INDRECT_ASSOCIATE = 1,
+	ZB_INDRECT_ASSOCIATE,
 	ZB_INDRECT_POLL,
-
 	ZB_INDRECT_ASSOCIATE_RESPONSE,
 	ZB_INDRECT_MCPS_DATA,
 	ZB_INDRECT_DISASSOCIATE_NOTIFY
 };
 
-#define ZB_MAC_PENDING_TRANS_QUEUE_NUM	6
 
-/* According to 802.15.4, should be 0. */
-#define ZB_MAC_INTERNAL_EXPIRY_CNT		0
 
 /**
    define RF transmit callback function
 */
-typedef void(* tl_zb_max_tx_conf_cb)(void *arg, u8 status);
+typedef void (*tl_zb_max_tx_conf_cb)(void *arg, u8 status);
+
 typedef struct{
 	void *arg;
 	tl_zb_max_tx_conf_cb cb;
@@ -857,15 +813,6 @@ typedef struct{
 /**
    Parameters for storing data in a pending transaction
 */
-typedef struct
-{
-	void *data;
-	ev_time_event_t pendingTranstimer;
-	addr_t dstAddr;
-	u8 type:7;
- 	u8 send:1;
-}zb_mac_pending_trans_t;
-
 typedef struct mac_indirPendingList_t{
 	struct mac_indirPendingList_t *next;
 	void 	*data;
@@ -877,66 +824,57 @@ typedef struct mac_indirPendingList_t{
 }mac_indirPendingList_t;
 
 enum{
-	MAC_PENDIND_READY = 0x1,
-	MAC_PENDIND_TX_READY = 0x2,
-	MAC_PENDIND_TXING = 0x3,
-	MAC_PENDIND_EXPIRY = 0x4,
+	MAC_PENDIND_READY  		= 0x1,
+	MAC_PENDIND_TX_READY 	= 0x2,
+	MAC_PENDIND_TXING  		= 0x3,
+	MAC_PENDIND_EXPIRY 		= 0x4,
 };
-
-extern u8 ZB_MAC_PENDING_TRANS_QUEUE_SIZE;
-
-extern u8 ZB_MAC_EXT_EXPEIRY_CNT;
-
 
 /**
    Parameters for storing data in a pending queue
 */
-typedef struct zb_mac_pending_data_s
-{
-  zb_buf_t *pending_data;
-  zb_addr_mode_t dst_addr_mode;
-  tl_zb_addr_t dst_addr;
+typedef struct zb_mac_pending_data_s{
+	zb_buf_t 		*pending_data;
+	zb_addr_mode_t 	dst_addr_mode;
+	tl_zb_addr_t 	dst_addr;
 }zb_mac_pending_data_t;
 
 /**
    Parameters for MAC layer
 */
 typedef struct{
-	u8 warmStart;							/*!< The restart mode of the MAC layer. */
-	u8 status;								/*!< The status of the MAC layer. */
-	u8 curChannel;							/*!< The selected channel of the MAC layer. */
+	u8 warmStart;					/*!< The restart mode of the MAC layer. */
+	u8 status;						/*!< The status of the MAC layer. */
+	u8 curChannel;					/*!< The selected channel of the MAC layer. */
 	u8 beaconTriesNum;
+
 	struct{
-		ev_time_event_t *timer; 	/* for original */;
+		ev_timer_event_t *timer; 	/* for original */;
 	}indirectData;
 
 	u8 *txRawDataBuf;
 }tl_zb_mac_ctx_t;
 
-
 /**
    the struct for parsing MAC header
 */
-typedef struct
-{
-  u16 		frameCtrl;
-  u8 		dstAddrMode;
-  u8 		srcAddrMode;
-  u8		panIdMode;
-  u8 		seqNum;
-  u16 		dstPanId;
-  tl_zb_addr_t dstAddr;
-  u16 		srcPanId;
-  tl_zb_addr_t srcAddr;
-
+typedef struct{
+	u16 frameCtrl;
+	u8  dstAddrMode;
+	u8  srcAddrMode;
+	u8  panIdMode;
+	u8  seqNum;
+	u16 dstPanId;
+	tl_zb_addr_t dstAddr;
+	u16 srcPanId;
+	tl_zb_addr_t srcAddr;
 #ifdef ZB_MAC_SECURITY
-  u8      secLevel;
-  u8      keyIdMode;
-  u8      keySrc[8];
-  u8      keyIdx;
-  u32     framCounter;
+	u8  secLevel;
+	u8  keyIdMode;
+	u8  keySrc[8];
+	u8  keyIdx;
+	u32 framCounter;
 #endif
-
 }tl_zb_mac_mhr_t;
 
 /**
@@ -951,17 +889,13 @@ typedef struct{
     u16 superframeOrder;
 }tl_zbBeaconFrame_t;
 
-
-
 /**
    Parameters for sending data request
 */
-typedef enum
-{
-  MAC_ASS_CONFIRM_CALLBACK = 0,
-  MAC_POLL_REQUEST_CALLBACK = 1
+typedef enum{
+	MAC_ASS_CONFIRM_CALLBACK  = 0,
+	MAC_POLL_REQUEST_CALLBACK = 1
 }zb_callback_type_t;
-
 
 typedef struct{
 	u16 shortAddr;
@@ -969,66 +903,64 @@ typedef struct{
 }access_addr_t;
 
 
-#define MAGIC_ROUND_TO_4(a) (((a) + ((4)-1)) & -(4))
 
 
+extern u8 ZB_MAC_PENDING_TRANS_QUEUE_SIZE;
+extern u8 ZB_MAC_EXT_EXPEIRY_CNT;
 extern tl_zb_mac_ctx_t g_zbMacCtx;
 
-#define TL_ZB_MAC_STATUS_SET(sta) 			g_zbMacCtx.status = sta
-#define TL_ZB_MAC_STATUS_GET() 				g_zbMacCtx.status
+#define TL_ZB_MAC_STATUS_SET(sta) 			(g_zbMacCtx.status = sta)
+#define TL_ZB_MAC_STATUS_GET() 				(g_zbMacCtx.status)
 
-
-u8 tl_zbMacHdrParse(tl_zb_mac_mhr_t *mHhr, u8 *ptr);
-
-u8 tl_zbMacHdrSize(u16 frameCtrl);
-
-u8 *tl_zbMacHdrBuilder(u8 *pBuf, tl_zb_mac_mhr_t *pMacHdr);
-
-void tl_zbMacMcpsDataRequestProc(void *arg);
 
 /* PIB access macros */
-
 /**
    Get mac short address
  */
-#define ZB_PIB_SHORT_ADDRESS()  g_zbMacPib.shortAddress
+#define ZB_PIB_SHORT_ADDRESS()  			(g_zbMacPib.shortAddress)
 /**
    Get mac extended address
  */
-#define ZB_PIB_EXTENDED_ADDRESS() g_zbMacPib.extAddress
-
+#define ZB_PIB_EXTENDED_ADDRESS() 			(g_zbMacPib.extAddress)
 /**
    Get mac rx on when idle
  */
-#define ZB_PIB_RX_ON_WHEN_IDLE()  g_zbMacPib.rxOnWhenIdle
-
+#define ZB_PIB_RX_ON_WHEN_IDLE()  			(g_zbMacPib.rxOnWhenIdle)
 /**
    Get mac ack wait duration
  */
-#define ZB_PIB_ACK_WAIT_DURATION()  g_zbMacPib.ackWaitDuration
-
+#define ZB_PIB_ACK_WAIT_DURATION()  		(g_zbMacPib.ackWaitDuration)
 /**
    Get mac DSN
  */
-#define ZB_MAC_DSN() g_zbMacPib.seqNum
+#define ZB_MAC_DSN() 						(g_zbMacPib.seqNum)
 /**
    Get mac pan BSN
  */
-#define ZB_MAC_BSN() g_zbMacPib.beaconSeqNum
+#define ZB_MAC_BSN() 						(g_zbMacPib.beaconSeqNum)
 /**
    Increment mac pan DSN
  */
-#define ZB_INC_MAC_DSN() (g_zbMacPib.seqNum++)
+#define ZB_INC_MAC_DSN() 					(g_zbMacPib.seqNum++)
 /**
    Increment mac pan BSN
  */
-#define ZB_INC_MAC_BSN() (g_zbMacPib.beaconSeqNum++)
+#define ZB_INC_MAC_BSN() 					(g_zbMacPib.beaconSeqNum++)
 /**
    Get mac beacon payload
  */
-#define ZB_PIB_BEACON_PAYLOAD() g_zbMacPib.beaconPayload
+#define ZB_PIB_BEACON_PAYLOAD() 			(g_zbMacPib.beaconPayload)
 
-#define ZB_MAC_DEVICE_TYPE_SET(type) (g_zbMacCtx.devType = (type))
+
+
+
+
+void tl_zbMacChannelSet(u8 chan);
+
+#define ZB_TRANSCEIVER_SET_CHANNEL(chn) 	tl_zbMacChannelSet(chn);
+
+
+void tl_zbMacReset(void);
 
 /*
  * MAC layer initialization
@@ -1040,7 +972,6 @@ void tl_zbMacMcpsDataRequestProc(void *arg);
  * */
 void tl_zbMacInit(u8 coldReset);
 
-void tl_macPibSave2Flash();
 /*
  * MAC layer main task procedure
  *
@@ -1049,7 +980,10 @@ void tl_macPibSave2Flash();
  * @return None
  *
  * */
-void  tl_zbMacTaskProc(void);
+void tl_zbMacTaskProc(void);
+
+
+void tl_zbMacMcpsDataRequestProc(void *arg);
 
 /*
  * NWK layer to MAC layer primitive
@@ -1065,7 +999,6 @@ void  tl_zbMacTaskProc(void);
  * */
 #define tl_zbMacMcpsDataRequst(p)		tl_zbMacMcpsDataRequestProc(p)
 
-
 /*
  * MLME-RESET.request primitive from upper layer to MAC layer
  *
@@ -1076,7 +1009,6 @@ void  tl_zbMacTaskProc(void);
  * */
 #define tl_zbMacResetRequst(p)			tl_zbPrimitivePost(TL_Q_NWK2MAC, MAC_MLME_RESET_REQ, p)
 
-
 /*
  * MLME-POLL.request primitive from upper layer to MAC layer
  *
@@ -1086,7 +1018,6 @@ void  tl_zbMacTaskProc(void);
  *
  * */
 #define tl_zbMacPollRequst(p)			tl_zbPrimitivePost(TL_Q_NWK2MAC, MAC_MLME_POLL_REQ, p)
-
 
 /*
  * MLME-ASSOCIATE.request primitive from upper layer to MAC layer
@@ -1141,47 +1072,17 @@ void  tl_zbMacTaskProc(void);
 
 
 /*
- * MLME-SET.request to set MAC pib attribute from upper layer to MAC layer
- *
- * @param attribute MAC PIB attribut MAC PIB attributee id(Table 86 ?a MAC PIB attributes)
- *
- * @param value the pointer value of the attribute
- *
- * @param len the length of the attribute vlaue
- *
- * @return MAC_SUCCESS if it's successful, or MAC_INVALID_PARAMETER
- *
- * */
-u8 tl_zbMacAttrSet(u8 attribute, u8 *value, u8 len);
-
-/*
-* MLME-GET.request to get MAC pib attribute from upper layer to MAC layer
-*
-* @param attribute MAC PIB attribut MAC PIB attributee id(Table 86 ?a MAC PIB attributes)
-*
-* @param value the pointer to the value of the attribute
-*
-* @param len the length of the attribute vlaue
-*
-* @return MAC_SUCCESS if it's successful, or MAC_INVALID_PARAMETER
-*
-* */
-u8 tl_zbMacAttrGet(u8 attribute, u8* value, u8* len);
-
-void generateIEEEAddr(void);
-
-/*
  * MAC layer to NWK layer primitive
  * */
 
- /*
-  * MLME-RESET.confirm primitive from MAC layer to upper layer
-  *
-  * @param p the pointer to the MLME-RESET.confirm primitive and msdu
-  *
-  * @return ZB_RET_OVERFLOW if failure, ZB_RET_OK else
-  *
-  * */
+/*
+ * MLME-RESET.confirm primitive from MAC layer to upper layer
+ *
+ * @param p the pointer to the MLME-RESET.confirm primitive and msdu
+ *
+ * @return ZB_RET_OVERFLOW if failure, ZB_RET_OK else
+ *
+ * */
 #define tl_zbMacResetConfirm(p)			tl_zbPrimitivePost(TL_Q_MAC2NWK, MAC_MLME_RESET_CNF, p)
 
 /*
@@ -1194,8 +1095,7 @@ void generateIEEEAddr(void);
 * */
 #define tl_zbMacAssociateConfirm(p)		tl_zbPrimitivePost(TL_Q_MAC2NWK, MAC_MLME_ASSOCIATE_CNF, p)
 
-
- /*
+/*
  * MLME-DISASSOCIATE.confirm primitive from MAC layer to upper layer
  *
  * @param p the pointer to the MLME-DISASSOCIATE.confirm primitive and msdu
@@ -1203,7 +1103,7 @@ void generateIEEEAddr(void);
  * @return ZB_RET_OVERFLOW if failure, ZB_RET_OK else
  *
  * */
- #define tl_zbMacDisassociateConfirm(p)		tl_zbPrimitivePost(TL_Q_MAC2NWK, MAC_MLME_DISASSOCIATE_CNF, p)
+#define tl_zbMacDisassociateConfirm(p)	tl_zbPrimitivePost(TL_Q_MAC2NWK, MAC_MLME_DISASSOCIATE_CNF, p)
 
 /*
 * MLME-ASSOCIATE.indiccation primitive from MAC layer to upper layer
@@ -1215,7 +1115,7 @@ void generateIEEEAddr(void);
 * */
 #define tl_zbMacAssociateIndicate(p)	tl_zbPrimitivePost(TL_Q_MAC2NWK, MAC_MLME_ASSOCIATE_IND, p)
 
- /*
+/*
  * MLME-DISASSOCIATE.indiccation primitive from MAC layer to upper layer
  *
  * @param p the pointer to the MLME-DISASSOCIATE.indiccation primitive and msdu
@@ -1223,9 +1123,9 @@ void generateIEEEAddr(void);
  * @return ZB_RET_OVERFLOW if failure, ZB_RET_OK else
  *
  * */
- #define tl_zbMacDisassociateIndicate(p)	tl_zbPrimitivePost(TL_Q_MAC2NWK, MAC_MLME_DISASSOCIATE_IND, p)
+#define tl_zbMacDisassociateIndicate(p)	tl_zbPrimitivePost(TL_Q_MAC2NWK, MAC_MLME_DISASSOCIATE_IND, p)
 
- /*
+/*
  * MLDE-MCPS-DATA.indiccation primitive from MAC layer to upper layer
  *
  * @param p the pointer to the MLDE-MCPS-DATA.indiccation primitive and msdu
@@ -1235,7 +1135,7 @@ void generateIEEEAddr(void);
  * */
 #define tl_zbMacDataIndicate(p)			tl_zbPrimitivePost(TL_Q_MAC2NWK, MAC_MCPS_DATA_IND, p)
 
- /*
+/*
  * MLDE-MCPS-DATA.confirm primitive from MAC layer to upper layer
  *
  * @param p the pointer to the MLDE-MCPS-DATA.confirm primitive and msdu
@@ -1245,7 +1145,7 @@ void generateIEEEAddr(void);
  * */
 #define tl_zbMacDataConfirm(p)			tl_zbPrimitivePost(TL_Q_MAC2NWK, MAC_MCPS_DATA_CNF, p)
 
- /*
+/*
  * MLDE-MCPS-DATA.confirm primitive from MAC layer to upper layer
  *
  * @param p the pointer to the MLDE-MCPS-PURGE.confirm primitive and msdu
@@ -1255,8 +1155,7 @@ void generateIEEEAddr(void);
  * */
 #define tl_zbMacPurgeConfirm(p)			tl_zbPrimitivePost(TL_Q_MAC2NWK, MAC_MCPS_PURGE_CNF, p)
 
-
- /*
+/*
  * MLME-POLL.confirm primitive from MAC layer to upper layer
  *
  * @param p the pointer to the MLME-POLL.confirm primitive and msdu
@@ -1266,8 +1165,7 @@ void generateIEEEAddr(void);
  * */
 #define tl_zbMacPollConfirm(p)			tl_zbPrimitivePost(TL_Q_MAC2NWK, MAC_MLME_POLL_CNF, p)
 
-
- /*
+/*
  * MLME-POLL.indication primitive from MAC layer to upper layer
  *
  * @param p the pointer to the MLME-POLL.indication primitive and msdu
@@ -1277,7 +1175,7 @@ void generateIEEEAddr(void);
  * */
 #define tl_zbMacPollIndication(p)		tl_zbPrimitivePost(TL_Q_MAC2NWK, MAC_MLME_POLL_IND, p)
 
- /*
+/*
  * MLME-BEACON-NOTIFY.indication primitive from MAC layer to upper layer
  *
  * @param p the pointer to the MLME-BEACON-NOTIFY.indication primitive and msdu
@@ -1287,8 +1185,7 @@ void generateIEEEAddr(void);
  * */
 #define tl_zbMacBeaconNotifyIndicate(p)	tl_zbPrimitivePost(TL_Q_MAC2NWK, MAC_MLME_BEACON_NOTIFY_IND, p)
 
-
- /*
+/*
  * MLME-ORPHAN.indication primitive from MAC layer to upper layer
  *
  * @param p the pointer to the MLME-ORPHAN.indication primitive and msdu
@@ -1298,8 +1195,7 @@ void generateIEEEAddr(void);
  * */
 #define tl_zbMacOrphanIndicate(p)		tl_zbPrimitivePost(TL_Q_MAC2NWK, MAC_MLME_ORPHAN_IND, p)
 
-
- /*
+/*
  * MLME-SCAN.confirm primitive from MAC layer to upper layer
  *
  * @param p the pointer to the MLME-SCAN.confirm primitive and msdu
@@ -1309,7 +1205,7 @@ void generateIEEEAddr(void);
  * */
 #define tl_zbMacScanConfirm(p)			tl_zbPrimitivePost(TL_Q_MAC2NWK, MAC_MLME_SCAN_CNF, p)
 
- /*
+/*
  * MLME-COMM-STATUS.indication primitive from MAC layer to upper layer
  *
  * @param p the pointer to the MLME-COMM-STATUS.indication primitive and msdu
@@ -1319,7 +1215,7 @@ void generateIEEEAddr(void);
  * */
 #define tl_zbMacCommStatusIndication(p)	tl_zbPrimitivePost(TL_Q_MAC2NWK, MAC_MLME_COMM_STATUS_IND, p)
 
- /*
+/*
  * MLME-START.confirm primitive from MAC layer to upper layer
  *
  * @param p the pointer to the MLME-START.confirm primitive and msdu
@@ -1329,7 +1225,7 @@ void generateIEEEAddr(void);
  * */
 #define tl_zbMacStartConfirm(p)			tl_zbPrimitivePost(TL_Q_MAC2NWK, MAC_MLME_START_CNF, p)
 
- /*
+/*
  * MLME-SYNC-LOSS.indicaion primitive from MAC layer to upper layer
  *
  * @param p the pointer to the MLME-START.confirm primitive and msdu
@@ -1339,47 +1235,15 @@ void generateIEEEAddr(void);
  * */
 #define tl_zbMacSyncLossIndication(p)	tl_zbPrimitivePost(TL_Q_MAC2NWK, MAC_MLME_SYNC_LOSS_IND, p)
 
- void tl_zbMacMcpsDataRequestSendConfirm(void *arg, u8 status);
 
- /*
- * @brief initialize the rf transceiver and state
- *
- * @param
- *
- * @return
- *
- * */
- void mac_trxInit(void);
 
- /*
- * @brief reset the rf transceiver and state
- *
- * @param
- *
- * @return
- *
- * */
- void mac_trxReset(void);
-
-#define ZB_TAIL_SIZE_FOR_RECEIVED_MAC_FRAME (1 /*LQI */)
-
-typedef u8 zb_mac_capability_info_t;
-
-typedef 	mac_sts_t zb_mac_status_t;
-#define		LOGICCHANNEL_TO_PHYSICAL(p)					(((p)-10)*5)
-
-void tl_zbMacChannelSet(u8 chan);
-#define ZB_TRANSCEIVER_SET_CHANNEL(chan) 		tl_zbMacChannelSet(chan);
-#define	TL_COMMISSIONSET_CHANNEL(chan)			RF_TrxStateSet(RF_TrxStateGet(),LOGICCHANNEL_TO_PHYSICAL(chan));
-
-/** @} end of group TELINK_ZIGBEE_MAC */
 
 typedef bool (*mac_callback)(void *p);
 
 typedef struct{
-	mac_callback	macBeaconReqRcvCb;
-	mac_callback	macBeaconRcvCb;
-	mac_callback	macAssociationReqRcvCb;
+	mac_callback macBeaconReqRcvCb;
+	mac_callback macBeaconRcvCb;
+	mac_callback macAssociationReqRcvCb;
 }mac_appIndCb_t;
 
 extern mac_appIndCb_t *macAppIndCb;
@@ -1388,4 +1252,4 @@ void mac_appIndCbRegister(mac_appIndCb_t *cb);
 
 /** @} end of group TELINK_ZIGBEE_STACK */
 
-#endif
+#endif	/* TL_ZB_MAC_H */

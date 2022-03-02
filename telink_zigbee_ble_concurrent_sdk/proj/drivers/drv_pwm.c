@@ -1,43 +1,45 @@
 /********************************************************************************************************
- * @file     drv_pwm.c
+ * @file    drv_pwm.c
  *
- * @brief	 PWM driver interface file
+ * @brief   This is the source file for drv_pwm
  *
- * @author
- * @date     Oct. 8, 2016
+ * @author  Zigbee Group
+ * @date    2021
  *
- * @par      Copyright (c) 2016, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *           The information contained herein is confidential property of Telink
- *           Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *           of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *           Co., Ltd. and the licensee or the terms described here-in. This heading
- *           MUST NOT be removed from this file.
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
  *
- *           Licensees are granted free, non-transferable use of the information in this
- *           file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
+ *              http://www.apache.org/licenses/LICENSE-2.0
  *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *******************************************************************************************************/
-#include "drv_pwm.h"
-#include "platform_includes.h"
+
+#include "../tl_common.h"
 
 void drv_pwm_init(void){
 #if defined(MCU_CORE_826x)
 	pwm_Init(0);
-#elif defined(MCU_CORE_HAWK)
-#else
-
+#elif defined(MCU_CORE_B91)
+	pwm_set_clk(0);
 #endif
 }
 
-void drv_pwm_cfg(u32 pwmId, unsigned short cmp_tick, unsigned short cycle_tick){
+void drv_pwm_cfg(u8 pwmId, u16 cmp_tick, u16 cycle_tick){
 #if defined(MCU_CORE_826x)
 	pwm_Open(pwmId, NORMAL, 0, cmp_tick, cycle_tick, 0x2fff);
-#elif defined(MCU_CORE_HAWK)
-#else
+#elif defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
 	pwm_set_mode(pwmId, PWM_NORMAL_MODE);
 	pwm_set_phase(pwmId, 0);   //no phase at pwm beginning
 	pwm_set_cycle_and_duty(pwmId, cycle_tick, cmp_tick);
+#elif defined(MCU_CORE_B91)
+	pwm_set_tcmp(pwmId, cmp_tick);
+	pwm_set_tmax(pwmId, cycle_tick);
 #endif
 }

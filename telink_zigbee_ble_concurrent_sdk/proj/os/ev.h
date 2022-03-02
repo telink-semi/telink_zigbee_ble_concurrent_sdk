@@ -1,49 +1,30 @@
 /********************************************************************************************************
- * @file     ev.h
+ * @file    ev.h
  *
- * @brief    Interface of event header file
+ * @brief   This is the header file for ev
  *
- * @author
- * @date     Oct. 8, 2016
+ * @author  Zigbee Group
+ * @date    2021
  *
- * @par      Copyright (c) 2016, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *           The information contained herein is confidential property of Telink
- *           Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *           of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *           Co., Ltd. and the licensee or the terms described here-in. This heading
- *           MUST NOT be removed from this file.
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
  *
- *           Licensees are granted free, non-transferable use of the information in this
- *           file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
+ *              http://www.apache.org/licenses/LICENSE-2.0
  *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *******************************************************************************************************/
+
 #pragma once
 
-#include "../common/types.h"
-#include "ev_poll.h"
-#include "ev_timer.h"
-
-
-enum{EV_FIRED_EVENT_MAX_MASK = EV_FIRED_EVENT_MAX - 1};
-
-typedef void (*sys_exception_cb_t)(void);
-
-typedef struct ev_loop_ctrl_t{
-    ev_poll_t                poll[EV_POLL_MAX];
-	/*
-	Time events is sorted, use single linked list
-	*/
-    ev_time_event_t        	*timer_head;
-    ev_time_event_t     	*timer_nearest;        // find the nearest fired timer,
-} ev_loop_ctrl_t;
 
 enum {
-	EV_TIMER_SAFE_MARGIN_US = 4000000	// in us,
-};
-
-enum{
 	SYS_EXCEPTTION_COMMON_MEM_ACCESS = 0,
 	SYS_EXCEPTTION_COMMON_TIMER_EVEVT,
 	SYS_EXCEPTTION_COMMON_BUFFER_OVERFLOWN,
@@ -84,12 +65,15 @@ enum{
 	SYS_EXCEPTTION_EV_TASK_POST,
 };
 
+typedef void (*sys_exception_cb_t)(void);
+
 void sys_exceptHandlerRegister(sys_exception_cb_t cb);
+
 u8 sys_exceptionPost(u16 line, u8 evt);
 #define ZB_EXCEPTION_POST(evt)  sys_exceptionPost(__LINE__, evt)
 
 //will be called in every main loop
-void ev_main(bool schedule);
+void ev_main(void);
 
 
 

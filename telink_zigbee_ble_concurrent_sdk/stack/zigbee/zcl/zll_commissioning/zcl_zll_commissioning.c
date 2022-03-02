@@ -1,37 +1,36 @@
 /********************************************************************************************************
- * @file     zcl_zll_commissioning.c
+ * @file    zcl_zll_commissioning.c
  *
- * @brief	 process touch link command
+ * @brief   This is the source file for zcl_zll_commissioning
  *
- * @author
- * @date     June. 11, 2017
+ * @author  Zigbee Group
+ * @date    2021
  *
- * @par      Copyright (c) 2016, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *			 The information contained herein is confidential and proprietary property of Telink
- * 		     Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *			 of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *			 Co., Ltd. and the licensee in separate contract or the terms described here-in.
- *           This heading MUST NOT be removed from this file.
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
  *
- * 			 Licensees are granted free, non-transferable use of the information in this
- *			 file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
+ *              http://www.apache.org/licenses/LICENSE-2.0
  *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *******************************************************************************************************/
-
 
 /**********************************************************************
  * INCLUDES
  */
 #include "../zcl_include.h"
-#include "zcl_touchlink_attr.h"
 #include "zcl_zll_commissioning_internal.h"
 
 /**********************************************************************
  * LOCAL CONSTANTS
  */
-#define		DEBUG_TOUCHLINK_EN				0
+#define	DEBUG_TOUCHLINK_EN				0
 
 
 /**********************************************************************
@@ -52,11 +51,6 @@ zcl_zllTouckLink_t g_zllTouchLink = {
 		.keyType = MASTER_KEY,
 };
 
-static nwkForTouchlinkCb_t  g_nwkTouchlinkCb = {
-	.scanConfCb = tl_zbNwkZllCommissionScanConfirm,
-	.attrClrCb = ll_zllAttrClr,
-};
-
 bool scanReqProfileInterop = 0;
 
 zcl_zllCommission_t g_zllCommission;
@@ -64,6 +58,11 @@ zcl_zllCommission_t g_zllCommission;
 touchlink_attr_t g_touchlinkAttrDft = { 0x0001, 0xfff7, 0x0001, 0xfeff };
 
 zdo_touchLinkCb_t touchLinkCb = {zcl_zllTouchLinkLeaveCnfCb};
+
+nwkForTouchlinkCb_t g_nwkTouchlinkCb = {
+	.scanConfCb = tl_zbNwkZllCommissionScanConfirm,
+	.attrClrCb = ll_zllAttrClr,
+};
 
 #define TOUCHLIK_INITIATOR_SET(mode) 		g_zllTouchLink.zllInfo.bf.linkInitiator = mode
 #define TOUCHLIK_ADDR_ASSIGN_SET(mode) 		g_zllTouchLink.zllInfo.bf.addrAssign = mode
@@ -503,13 +502,13 @@ _CODE_ZCL_ static u8 zcl_touchLinkClientCmdHandler(zclIncoming_t *pInMsg){
 
 				if(req.identifyDuration == 0){
 					identifyTime = 0;
-				}else if (req.identifyDuration >= 0x0001 && req.identifyDuration <= 0xfffe){
+				}else if (req.identifyDuration >= 0x0001 && req.identifyDuration <= NWK_BROADCAST_RESERVED){
 					identifyTime = req.identifyDuration;
 				}else if(req.identifyDuration == 0xffff ){
 					identifyTime = DEFAULT_IDENTIFY_DURATION;
 				}
 
-				zcl_identify_commissioningIdentify(pApsdeInd, identifyTime);
+				zcl_identify_commissioningIdentify(pInMsg, identifyTime);
 			}
 			break;
 		}
@@ -634,7 +633,7 @@ _CODE_ZCL_ static u8 zcl_zllCommissionServerCmdHandler(zclIncoming_t *pInMsg){
 					g_zllTouchLink.workingChannelBackUp = nscr->logicalChannel;
 				}
 				zcl_zllTouchLinkStartNetworkStartOrJoinTimerStop();
-				TL_ZB_TIMER_SCHEDULE(zcl_zllTouchLinkNetworkStartResponseHandler, nscr, ZB_MIN_STARTUP_DELAY_TIME + 1000 * 1000);
+				TL_ZB_TIMER_SCHEDULE(zcl_zllTouchLinkNetworkStartResponseHandler, nscr, ZB_MIN_STARTUP_DELAY_TIME + 1000);
 			}else{
 				ev_buf_free((u8 *)nscr);
 			}
@@ -755,7 +754,8 @@ _CODE_ZCL_ u8 zcl_touchLinkInit(void){
 	g_zllTouchLink.startNetworkAllowed = 1;
 	g_zllTouchLink.zllInfo.byte = 0;
 
-	g_zllTouchLink.scanListNum = TOUCHLINK_SCANLIST_NUM;
+	//todo
+	g_zllTouchLink.scanListNum = (LARGE_BUFFER - OFFSETOF(zcl_zllTouckLinkDisc_t, scanList))/sizeof(zll_touchLinkScanInfo);
 
 	af_endpoint_descriptor_t *aed = af_epDescriptorGet();
 
@@ -784,7 +784,7 @@ _CODE_ZCL_ u8 zcl_touchLinkInit(void){
  */
 
 _CODE_ZCL_ void zcl_touchLinkStart(void){
-	DEBUG(DEBUG_TOUCHLINK_EN,"ZLL trigger touch link operation, current state %d\n",g_zllTouchLink.state);
+	DEBUG(DEBUG_TOUCHLINK_EN, "ZLL trigger touch link operation, current state %d\n", g_zllTouchLink.state);
 	if(g_zllTouchLink.state != ZCL_ZLL_COMMISSION_STATE_IDLE){
 		if(g_zllCommission.appCb->touchLinkCallback){
 			g_zllCommission.appCb->touchLinkCallback(ZCL_ZLL_TOUCH_LINK_BUSY, NULL);
@@ -812,7 +812,7 @@ _CODE_ZCL_ void zcl_touchLinkStart(void){
 		ev_buf_free((u8 *)g_zllTouchLink.disc);
 		g_zllTouchLink.disc = NULL;
 	}
-	g_zllTouchLink.disc = (zcl_zllTouckLinkDisc_t *)ev_buf_allocate(sizeof(zcl_zllTouckLinkDisc_t));
+	g_zllTouchLink.disc = (zcl_zllTouckLinkDisc_t *)ev_buf_allocate(LARGE_BUFFER);//todo
 	if(!g_zllTouchLink.disc){
 		ZB_EXCEPTION_POST(SYS_EXCEPTTION_ZB_BUFFER_OVERFLOWN);
 		return;
@@ -850,7 +850,6 @@ _CODE_ZCL_ void zcl_touchLinkStart(void){
 
 	rf_setTxPower(g_zllTouchLink.commissionTxPower);
 
-	//zdo_syn_parent_pause();
 	zb_setPollRate(0);
 
 	/* scan start */
@@ -878,9 +877,9 @@ _CODE_ZCL_ void  touchlink_commissionTxPowerSet(u8 power){
 }
 
 /*
-*
-*
-*/
+ *
+ *
+ */
 _CODE_ZCL_ u8 zcl_touchLinkCmdHandler(zclIncoming_t *pInMsg){
 	if (pInMsg->hdr.frmCtrl.bf.dir == ZCL_FRAME_CLIENT_SERVER_DIR) {
 		return zcl_touchLinkClientCmdHandler(pInMsg);
@@ -891,14 +890,14 @@ _CODE_ZCL_ u8 zcl_touchLinkCmdHandler(zclIncoming_t *pInMsg){
 
 
 /*
-	*  zcl_touchlink_register
-	*
-*/
+ *  zcl_touchlink_register
+ *
+ */
 _CODE_ZCL_ status_t zcl_touchlink_register(u8 endpoint, const zcl_touchlinkAppCallbacks_t *cb){
 	g_zllCommission.appCb = cb;
 	zcl_touchLinkInit();
 	tl_nwkTouchLinkCbRegister(&g_nwkTouchlinkCb);
-	return zcl_registerCluster(endpoint, ZCL_CLUSTER_TOUCHLINK_COMMISSIONING, 0, NULL, zcl_touchLinkCmdHandler, NULL);
+	return zcl_registerCluster(endpoint, ZCL_CLUSTER_TOUCHLINK_COMMISSIONING, 0, 0, NULL, zcl_touchLinkCmdHandler, NULL);
 }
 
 

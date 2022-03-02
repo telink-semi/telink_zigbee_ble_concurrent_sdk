@@ -1,25 +1,25 @@
 /********************************************************************************************************
- * @file     zcl_alarm.c
+ * @file    zcl_alarm.c
  *
- * @brief	 APIs for alarm cluster
+ * @brief   This is the source file for zcl_alarm
  *
- * @author
- * @date     June. 10, 2017
+ * @author  Zigbee Group
+ * @date    2021
  *
- * @par      Copyright (c) 2016, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *			 The information contained herein is confidential and proprietary property of Telink
- * 		     Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *			 of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *			 Co., Ltd. and the licensee in separate contract or the terms described here-in.
- *           This heading MUST NOT be removed from this file.
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
  *
- * 			 Licensees are granted free, non-transferable use of the information in this
- *			 file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
+ *              http://www.apache.org/licenses/LICENSE-2.0
  *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *******************************************************************************************************/
-
 
 /**********************************************************************
  * INCLUDES
@@ -50,9 +50,9 @@ zcl_alarmTable_t g_zcl_alarmTab[ZCL_ALARM_TABLE_NUM];
 static status_t zcl_alarm_cmdHandler(zclIncoming_t *pInMsg);
 
 
-_CODE_ZCL_ status_t zcl_alarm_register(u8 endpoint, u8 attrNum, const zclAttrInfo_t attrTbl[], cluster_forAppCb_t cb)
+_CODE_ZCL_ status_t zcl_alarm_register(u8 endpoint, u16 manuCode, u8 attrNum, const zclAttrInfo_t attrTbl[], cluster_forAppCb_t cb)
 {
-    return zcl_registerCluster(endpoint, ZCL_CLUSTER_GEN_ALARMS, attrNum, attrTbl, zcl_alarm_cmdHandler, cb);
+    return zcl_registerCluster(endpoint, ZCL_CLUSTER_GEN_ALARMS, manuCode, attrNum, attrTbl, zcl_alarm_cmdHandler, cb);
 }
 
 
@@ -216,24 +216,15 @@ _CODE_ZCL_ status_t zcl_alarm_resetAlarmLog(u8 srcEp, epInfo_t *pDstEpInfo, u8 d
 _CODE_ZCL_ static status_t zcl_alarm_resetAlarmPrc(zclIncoming_t *pInMsg)
 {
 	u8 status = ZCL_STA_SUCCESS;
-	apsdeDataInd_t *pApsdeInd = (apsdeDataInd_t*)pInMsg->msg;
 	u8 *pData = pInMsg->pData;
 
 	if(pInMsg->clusterAppCb){
-		zclIncomingAddrInfo_t addrInfo;
-		addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-		addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-		addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-		addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-		addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-		addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
 		resetAlarm_t resetAlarm;
 		resetAlarm.alarmCode = *pData++;
 		resetAlarm.clusterId = BUILD_U16(pData[0], pData[1]);
 		pData += 2;
 
-		pInMsg->clusterAppCb(&addrInfo, pInMsg->hdr.cmd, &resetAlarm);
+		pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, &resetAlarm);
 	}else{
 		status = ZCL_STA_FAILURE;
 	}
@@ -244,18 +235,9 @@ _CODE_ZCL_ static status_t zcl_alarm_resetAlarmPrc(zclIncoming_t *pInMsg)
 _CODE_ZCL_ static status_t zcl_alarm_resetAllAlarmsPrc(zclIncoming_t *pInMsg)
 {
 	u8 status = ZCL_STA_SUCCESS;
-	apsdeDataInd_t *pApsdeInd = (apsdeDataInd_t*)pInMsg->msg;
 
 	if(pInMsg->clusterAppCb){
-		zclIncomingAddrInfo_t addrInfo;
-		addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-		addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-		addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-		addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-		addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-		addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
-		pInMsg->clusterAppCb(&addrInfo, pInMsg->hdr.cmd, NULL);
+		pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, NULL);
 	}else{
 		status = ZCL_STA_FAILURE;
 	}
@@ -269,15 +251,7 @@ _CODE_ZCL_ static status_t zcl_alarm_getAlarmPrc(zclIncoming_t *pInMsg)
 	apsdeDataInd_t *pApsdeInd = (apsdeDataInd_t*)pInMsg->msg;
 
 	if(pInMsg->clusterAppCb){
-		zclIncomingAddrInfo_t addrInfo;
-		addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-		addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-		addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-		addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-		addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-		addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
-		pInMsg->clusterAppCb(&addrInfo, pInMsg->hdr.cmd, NULL);
+		pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, NULL);
 
 		getAlarmRsp_t getAlarmRsp;
 		TL_SETSTRUCTCONTENT(getAlarmRsp, 0);
@@ -321,15 +295,7 @@ _CODE_ZCL_ static status_t zcl_alarm_resetAlarmLogPrc(zclIncoming_t *pInMsg)
 	apsdeDataInd_t *pApsdeInd = (apsdeDataInd_t*)pInMsg->msg;
 
 	if(pInMsg->clusterAppCb){
-		zclIncomingAddrInfo_t addrInfo;
-		addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-		addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-		addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-		addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-		addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-		addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
-		pInMsg->clusterAppCb(&addrInfo, pInMsg->hdr.cmd, NULL);
+		pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, NULL);
 
 		/* remove all entries */
 		zcl_alarm_removeAllAlarmEntries(pApsdeInd->indInfo.dst_ep);
@@ -343,24 +309,15 @@ _CODE_ZCL_ static status_t zcl_alarm_resetAlarmLogPrc(zclIncoming_t *pInMsg)
 _CODE_ZCL_ static status_t zcl_alarm_alarmPrc(zclIncoming_t *pInMsg)
 {
 	u8 status = ZCL_STA_SUCCESS;
-	apsdeDataInd_t *pApsdeInd = (apsdeDataInd_t*)pInMsg->msg;
 	u8 *pData = pInMsg->pData;
 
 	if(pInMsg->clusterAppCb){
-		zclIncomingAddrInfo_t addrInfo;
-		addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-		addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-		addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-		addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-		addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-		addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
 		alarm_t alarm;
 		alarm.alarmCode = *pData++;
 		alarm.clusterId = BUILD_U16(pData[0], pData[1]);
 		pData += 2;
 
-		pInMsg->clusterAppCb(&addrInfo, pInMsg->hdr.cmd, &alarm);
+		pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, &alarm);
 	}else{
 		status = ZCL_STA_FAILURE;
 	}
@@ -371,18 +328,9 @@ _CODE_ZCL_ static status_t zcl_alarm_alarmPrc(zclIncoming_t *pInMsg)
 _CODE_ZCL_ static status_t zcl_alarm_getAlarmRspPrc(zclIncoming_t *pInMsg)
 {
 	u8 status = ZCL_STA_SUCCESS;
-	apsdeDataInd_t *pApsdeInd = (apsdeDataInd_t*)pInMsg->msg;
 	u8 *pData = pInMsg->pData;
 
 	if(pInMsg->clusterAppCb){
-		zclIncomingAddrInfo_t addrInfo;
-		addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-		addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-		addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-		addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-		addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-		addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
 		getAlarmRsp_t getAlarmRsp;
 		getAlarmRsp.status = *pData++;
 		if(getAlarmRsp.status == ZCL_STA_SUCCESS){
@@ -393,7 +341,7 @@ _CODE_ZCL_ static status_t zcl_alarm_getAlarmRspPrc(zclIncoming_t *pInMsg)
 			pData += 4;
 		}
 
-		pInMsg->clusterAppCb(&addrInfo, pInMsg->hdr.cmd, &getAlarmRsp);
+		pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, &getAlarmRsp);
 	}else{
 		status = ZCL_STA_FAILURE;
 	}

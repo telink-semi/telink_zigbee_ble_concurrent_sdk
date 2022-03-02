@@ -1,48 +1,38 @@
 /********************************************************************************************************
- * @file     zb_task_queue.h
+ * @file    zb_task_queue.h
  *
- * @brief    task queue for zigbee stack
+ * @brief   This is the header file for zb_task_queue
  *
- * @author
- * @date     May. 27, 2017
+ * @author  Zigbee Group
+ * @date    2021
  *
- * @par      Copyright (c) 2017, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *			 The information contained herein is confidential and proprietary property of Telink
- * 		     Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *			 of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *			 Co., Ltd. and the licensee in separate contract or the terms described here-in.
- *           This heading MUST NOT be removed from this file.
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
  *
- * 			 Licensees are granted free, non-transferable use of the information in this
- *			 file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
+ *              http://www.apache.org/licenses/LICENSE-2.0
  *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *******************************************************************************************************/
-#ifndef EV_SCHEDULER_H
-#define EV_SCHEDULER_H 1
 
-#include "tl_common.h"
+#ifndef ZB_TASK_QUEUE_H
+#define ZB_TASK_QUEUE_H
 
+
+
+#define	TL_ZBTASKQ_USERUSE_SIZE				32
+#define	TL_ZBTASKQ_STACKUSE_SIZE			16
 
 enum{
 	ZB_RET_OK,			/*!< status: success */
 	ZB_RET_OVERFLOW,	/*!< status: array or buffer overflow */
 }zb_sta_e;
-
-/**
-   Callback function typedef.
-   Callback is function planned to execute by another function.
-   Note that callback must be declared as reentrant for dscc.
-
-   @param param - callback parameter - usually, but not always, ref to packet buf
-
-   @return none.
- */
-typedef void (* zb_callback_t)(u8 param) ;
-typedef void (* tl_zb_callback_t)(void *arg) ;
-
-typedef void (* zb_timer_callback_t)(void *arg) ;
 
 enum{
 	TL_Q_EV_TASK = 0,
@@ -53,14 +43,22 @@ enum{
 	TL_Q_TYPE_MAX
 };
 
+/**
+   Callback function typedef.
+   Callback is function planned to execute by another function.
+   Note that callback must be declared as reentrant for dscc.
+
+   @param param - callback parameter - usually, but not always, ref to packet buf
+
+   @return none.
+ */
+typedef void (*tl_zb_callback_t)(void *arg);
+
+
 typedef struct tl_zb_task_s{
 	 tl_zb_callback_t tlCb;
 	 void *data;
 }tl_zb_task_t;
-
-
-#define	TL_ZBTASKQ_USERUSE_SIZE				32
-#define	TL_ZBTASKQ_STACKUSE_SIZE			16
 
 typedef struct{
 	tl_zb_task_t evt[TL_ZBTASKQ_USERUSE_SIZE];
@@ -76,22 +74,15 @@ typedef struct{
 	u8 resv;
 }tl_zbtaskq_stack_t;
 
-#define		TL_QUEUE_HAS_SPACE(wptr,rptr,size)		((wptr - rptr) < (size))
-
-
-extern u8 TIMER_EVENT_SIZE;
-
-extern u8 TIMER_EVENT_NUM_BRC_ENOUGH;
-
-extern ev_time_event_pool_t 	g_timerEventPool;
+#define	TL_QUEUE_HAS_SPACE(wptr, rptr, size)		((wptr - rptr) < (size))
 
 /**
    Initialize scheduler subsystem.
  */
-extern void zb_sched_init() ;
+void zb_sched_init(void);
 
 
-void tl_zbTaskProcedure(bool schedule) ;
+void tl_zbTaskProcedure(void);
 
 /**
   * @brief       get the valid task from task quenue list
@@ -115,41 +106,11 @@ tl_zb_task_t *tl_zbTaskQPop(u8 idx, tl_zb_task_t *taskInfo);
 u8 tl_zbTaskQPush(u8 idx, tl_zb_task_t *task);
 
 
-
-/**
-  * @brief       push timer task to task list
-  *
-  * @param[in]   func - the callback of the timer event
-  *
-  * @param[in]   arg - the parameter to the callback
-  *
-  * @param		 cycle - the timer interval
-  *
-  * @return      the status
-  */
-extern ev_time_event_t *tl_zbTimerTaskPost(u8 brc, ev_timer_callback_t func, void *arg, u32 t_us);
-#define TL_ZB_TIMER_SCHEDULE(a, b, c) 			tl_zbTimerTaskPost(0, a, b , c)
-
-#define		TL_SUPERFRAMETIME_TO_US(n)				(n*15360)
-#define		TL_TIMEUS_TO_SUPEFRAMETIME(t)			(t/15360)
-/**
-  * @brief       cancel timer task from task list
-  *
-  * @param[in]   te - the pointer to the the timer event pointer
-  *
-  * @return      the status
-  */
-u8 tl_zbTimerTaskCancel(ev_time_event_t **te);
-#define TL_ZB_TIMER_CANCEL 		tl_zbTimerTaskCancel
-
-void tl_zbTimerTaskChkAndDec(ev_time_event_t *e);
-
 #if 0
 u8 my_tl_zbPrimitivePost(u8 layerQ, u8 primitive, void *arg, u32 line, char *file);
 #define tl_zbPrimitivePost(layerQ, primitive, arg) my_tl_zbPrimitivePost(layerQ, primitive, arg, __LINE__, __FILE__)
 #else
 u8 tl_zbPrimitivePost(u8 layerQ, u8 primitive, void *arg);
-
 #endif
 
 /**
@@ -164,13 +125,10 @@ u8 tl_zbPrimitivePost(u8 layerQ, u8 primitive, void *arg);
 u8 tl_zbTaskPost(tl_zb_callback_t func, void *arg);
 #define	TL_SCHEDULE_TASK	tl_zbTaskPost
 
-bool zb_timerTaskIdle(void);
-bool zb_isTimerTaskQEnough(void);
-u8 zb_isTaskDone(void);
-bool tl_stackBusy(void);
 
+u8 zb_isTaskDone(void);
+u8 tl_zbUserTaskQNum(void);
 void secondClockStop(void);
 
-u8 tl_zbUserTaskQNum(void);
 
-#endif /* EV_SCHEDULER_H */
+#endif /* ZB_TASK_QUEUE_H */

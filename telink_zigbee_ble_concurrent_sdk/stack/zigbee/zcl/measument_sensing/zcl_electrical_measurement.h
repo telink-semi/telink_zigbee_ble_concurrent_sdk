@@ -1,29 +1,30 @@
 /********************************************************************************************************
- * @file     zcl_electrical_measurement.h
+ * @file    zcl_electrical_measurement.h
  *
- * @brief	 APIs statement for electrical measurement cluster
+ * @brief   This is the header file for zcl_electrical_measurement
  *
- * @author
- * @date     June. 10, 2017
+ * @author  Zigbee Group
+ * @date    2021
  *
- * @par      Copyright (c) 2016, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *			 The information contained herein is confidential and proprietary property of Telink
- * 		     Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *			 of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *			 Co., Ltd. and the licensee in separate contract or the terms described here-in.
- *           This heading MUST NOT be removed from this file.
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
  *
- * 			 Licensees are granted free, non-transferable use of the information in this
- *			 file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
+ *              http://www.apache.org/licenses/LICENSE-2.0
  *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *******************************************************************************************************/
-#pragma once
 
-#include "tl_common.h"
-#include "../../zdo/zb_af.h"
-#include "../zcl.h"
+#ifndef ZCL_ELECTRICAL_MEASUREMENT_H
+#define ZCL_ELECTRICAL_MEASUREMENT_H
+
+
 
 /*********************************************************************
  * CONSTANTS
@@ -31,7 +32,7 @@
 /**
  *  @brief	Attribute Sets
  */
-#define BASIC_INFOMATION											0x00
+#define BASIC_INFORMATION											0x00
 #define DC_MEASUREMENT												0x01
 #define DC_FORMATTING												0x02
 #define AC_NON_PHASE_SPEC_MEASUREMENTS								0x03
@@ -255,17 +256,18 @@ extern const u8 zcl_electricalMeasure_attrNum;
 #endif
 
 
-status_t zcl_electricalMeasure_register(u8 endpoint, u8 attrNum, const zclAttrInfo_t attrTbl[], cluster_forAppCb_t cb);
+status_t zcl_electricalMeasure_register(u8 endpoint, u16 manuCode, u8 attrNum, const zclAttrInfo_t attrTbl[], cluster_forAppCb_t cb);
 
 status_t zcl_electricalMeasure_getProfileInfo(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo);
-#define zcl_electricalMeasure_getProfileInfoCmd(a,b,c)	(zcl_electricalMeasure_getProfileInfo((a), (b), (c), ZCL_SEQ_NUM))
+#define zcl_electricalMeasure_getProfileInfoCmd(a,b,c)					(zcl_electricalMeasure_getProfileInfo((a), (b), (c), ZCL_SEQ_NUM))
 
 status_t zcl_electricalMeasure_getMeasurementProfile(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, zcl_electricalMeasure_getMeasurementProfileCmd_t *pReq);
-#define zcl_electricalMeasure_getMeasurementProfileCmd(a,b,c,d)	(zcl_electricalMeasure_getMeasurementProfile((a), (b), (c), ZCL_SEQ_NUM, (d)))
+#define zcl_electricalMeasure_getMeasurementProfileCmd(a,b,c,d)			(zcl_electricalMeasure_getMeasurementProfile((a), (b), (c), ZCL_SEQ_NUM, (d)))
 
 status_t zcl_electricalMeasure_getProfileInfoRsp(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, zcl_electricalMeasure_getProfileInfoRspCmd_t *pRsp);
-#define zcl_electricalMeasure_getProfileInfoRspCmd(a,b,c,d)	(zcl_electricalMeasure_getProfileInfoRsp((a), (b), (c), ZCL_SEQ_NUM, (d)))
+#define zcl_electricalMeasure_getProfileInfoRspCmd(a,b,c,d,e)			(zcl_electricalMeasure_getProfileInfoRsp((a), (b), (c), (d), (e)))
 
 status_t zcl_electricalMeasure_getMeasurementProfileRsp(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, zcl_electricalMeasure_getMeasurementProfileRspCmd_t *pRsp);
-#define zcl_electricalMeasure_getMeasurementProfileRspCmd(a,b,c,d)	(zcl_electricalMeasure_getMeasurementProfileRsp((a), (b), (c), ZCL_SEQ_NUM, (d)))
+#define zcl_electricalMeasure_getMeasurementProfileRspCmd(a,b,c,d,e)	(zcl_electricalMeasure_getMeasurementProfileRsp((a), (b), (c), (d), (e)))
 
+#endif	/* ZCL_ELECTRICAL_MEASUREMENT_H */

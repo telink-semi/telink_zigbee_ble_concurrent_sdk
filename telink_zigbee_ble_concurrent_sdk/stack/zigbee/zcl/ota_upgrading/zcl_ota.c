@@ -1,25 +1,25 @@
 /********************************************************************************************************
- * @file     zcl_ota.c
+ * @file    zcl_ota.c
  *
- * @brief	 APIs for ota cluster
+ * @brief   This is the source file for zcl_ota
  *
- * @author
- * @date     June. 10, 2017
+ * @author  Zigbee Group
+ * @date    2021
  *
- * @par      Copyright (c) 2016, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *			 The information contained herein is confidential and proprietary property of Telink
- * 		     Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *			 of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *			 Co., Ltd. and the licensee in separate contract or the terms described here-in.
- *           This heading MUST NOT be removed from this file.
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
  *
- * 			 Licensees are granted free, non-transferable use of the information in this
- *			 file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
+ *              http://www.apache.org/licenses/LICENSE-2.0
  *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *******************************************************************************************************/
-
 
 /**********************************************************************
  * INCLUDES
@@ -48,9 +48,9 @@
  */
 static status_t zcl_ota_cmdHandler(zclIncoming_t *pInMsg);
 
-_CODE_ZCL_ status_t zcl_ota_register(u8 endpoint, u8 arrtNum, const zclAttrInfo_t attrTbl[], cluster_forAppCb_t cb)
+_CODE_ZCL_ status_t zcl_ota_register(u8 endpoint, u16 manuCode, u8 arrtNum, const zclAttrInfo_t attrTbl[], cluster_forAppCb_t cb)
 {
-	return zcl_registerCluster(endpoint, ZCL_CLUSTER_OTA, arrtNum, attrTbl, zcl_ota_cmdHandler, cb);
+	return zcl_registerCluster(endpoint, ZCL_CLUSTER_OTA, manuCode, arrtNum, attrTbl, zcl_ota_cmdHandler, cb);
 }
 
 _CODE_ZCL_ status_t zcl_ota_imageNotifySend(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, ota_imageNotify_t *pReq)
@@ -344,17 +344,8 @@ _CODE_ZCL_ static status_t zcl_ota_queryNextImageReqPrc(zclIncoming_t *pInMsg)
 	u8 status = ZCL_STA_SUCCESS;
 
 	u8 *pData = pInMsg->pData;
-    apsdeDataInd_t *pApsdeInd = (apsdeDataInd_t*)pInMsg->msg;
 
 	if(pInMsg->clusterAppCb){
-		zclIncomingAddrInfo_t addrInfo;
-		addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-		addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-		addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-		addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-		addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-		addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
 		ota_queryNextImageReq_t req;
 		req.fc = *pData++;
 		req.manuCode = BUILD_U16(pData[0], pData[1]);
@@ -367,7 +358,7 @@ _CODE_ZCL_ static status_t zcl_ota_queryNextImageReqPrc(zclIncoming_t *pInMsg)
 			req.hdrwareVer = BUILD_U16(pData[0], pData[1]);
 		}
 
-		status = pInMsg->clusterAppCb(&addrInfo, pInMsg->hdr.cmd, &req);
+		status = pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, &req);
 	}else{
 		status = ZCL_STA_FAILURE;
 	}
@@ -380,17 +371,8 @@ _CODE_ZCL_ static status_t zcl_ota_imageBlockReqPrc(zclIncoming_t *pInMsg)
 	status_t status = ZCL_STA_SUCCESS;
 
 	u8 *pData = pInMsg->pData;
-    apsdeDataInd_t *pApsdeInd = (apsdeDataInd_t*)pInMsg->msg;
 
 	if(pInMsg->clusterAppCb){
-		zclIncomingAddrInfo_t addrInfo;
-		addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-		addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-		addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-		addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-		addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-		addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
 		ota_imageBlockReq_t req;
 		req.fc = *pData++;
 		req.manuCode = BUILD_U16(pData[0], pData[1]);
@@ -410,7 +392,7 @@ _CODE_ZCL_ static status_t zcl_ota_imageBlockReqPrc(zclIncoming_t *pInMsg)
 			req.blockReqDelay = BUILD_U16(pData[0], pData[1]);
 		}
 
-		status = pInMsg->clusterAppCb(&addrInfo, pInMsg->hdr.cmd, &req);
+		status = pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, &req);
 	}else{
 		status = ZCL_STA_FAILURE;
 	}
@@ -423,17 +405,8 @@ _CODE_ZCL_ static status_t zcl_ota_imagePageReqPrc(zclIncoming_t *pInMsg)
 	status_t status = ZCL_STA_SUCCESS;
 
 	u8 *pData = pInMsg->pData;
-    apsdeDataInd_t *pApsdeInd = (apsdeDataInd_t*)pInMsg->msg;
 
 	if(pInMsg->clusterAppCb){
-		zclIncomingAddrInfo_t addrInfo;
-		addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-		addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-		addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-		addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-		addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-		addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
 		ota_imagePageReq_t req;
 		req.fc = *pData++;
 		req.manuCode = BUILD_U16(pData[0], pData[1]);
@@ -454,7 +427,7 @@ _CODE_ZCL_ static status_t zcl_ota_imagePageReqPrc(zclIncoming_t *pInMsg)
 			pData += EXT_ADDR_LEN;
 		}
 
-		status = pInMsg->clusterAppCb(&addrInfo, pInMsg->hdr.cmd, &req);
+		status = pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, &req);
 	}else{
 		status = ZCL_STA_FAILURE;
 	}
@@ -467,17 +440,8 @@ _CODE_ZCL_ static status_t zcl_ota_upgradeEndReqPrc(zclIncoming_t *pInMsg)
 	status_t status = ZCL_STA_SUCCESS;
 
 	u8 *pData = pInMsg->pData;
-    apsdeDataInd_t *pApsdeInd = (apsdeDataInd_t*)pInMsg->msg;
 
 	if(pInMsg->clusterAppCb){
-		zclIncomingAddrInfo_t addrInfo;
-		addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-		addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-		addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-		addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-		addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-		addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
 		ota_upgradeEndReq_t req;
 		req.st = *pData++;
 		if(req.st == ZCL_STA_SUCCESS){
@@ -488,7 +452,7 @@ _CODE_ZCL_ static status_t zcl_ota_upgradeEndReqPrc(zclIncoming_t *pInMsg)
 			req.fileVer = BUILD_U32(pData[0], pData[1], pData[2], pData[3]);
 		}
 
-		status = pInMsg->clusterAppCb(&addrInfo, pInMsg->hdr.cmd, &req);
+		status = pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, &req);
 	}else{
 		status = ZCL_STA_FAILURE;
 	}
@@ -501,17 +465,8 @@ _CODE_ZCL_ static status_t zcl_ota_queryDeviceSpecificFileReqPrc(zclIncoming_t *
 	status_t status = ZCL_STA_SUCCESS;
 
 	u8 *pData = pInMsg->pData;
-    apsdeDataInd_t *pApsdeInd = (apsdeDataInd_t*)pInMsg->msg;
 
 	if(pInMsg->clusterAppCb){
-		zclIncomingAddrInfo_t addrInfo;
-		addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-		addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-		addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-		addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-		addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-		addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
 		ota_querySpecFileReq_t req;
 		ZB_IEEE_ADDR_COPY(req.reqNodeAddr, pData);
 		pData += EXT_ADDR_LEN;
@@ -524,7 +479,7 @@ _CODE_ZCL_ static status_t zcl_ota_queryDeviceSpecificFileReqPrc(zclIncoming_t *
 		req.zbStackVer = BUILD_U16(pData[0], pData[1]);
 		pData += 2;
 
-		status = pInMsg->clusterAppCb(&addrInfo, pInMsg->hdr.cmd, &req);
+		status = pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, &req);
 	}else{
 		status = ZCL_STA_FAILURE;
 	}
@@ -537,29 +492,8 @@ _CODE_ZCL_ static status_t zcl_ota_imageNotifyPrc(zclIncoming_t *pInMsg)
 	status_t status = ZCL_STA_SUCCESS;
 
 	u8 *pData = pInMsg->pData;
-    apsdeDataInd_t *pApsdeInd = (apsdeDataInd_t*)pInMsg->msg;
-
-#ifdef ZCL_WWAH
-	bool disable = FALSE;
-	u16 len;
-
-	if(zcl_getAttrVal(pApsdeInd->indInfo.dst_ep, ZCL_CLUSTER_WWAH, ZCL_ATTRID_WWAH_DISABLE_OTA_DOWNGRADES, &len, (u8 *)&disable) == ZCL_STA_SUCCESS){
-		if(disable){
-			return ZCL_STA_ACTION_DENIED;
-		}
-	}
-#endif
 
 	if(pInMsg->clusterAppCb){
-		zclIncomingAddrInfo_t addrInfo;
-		addrInfo.apsSec = pInMsg->msg->indInfo.security_status & SECURITY_IN_APSLAYER ? TRUE : FALSE;
-		addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-		addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-		addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-		addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-		addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-		addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
 		ota_imageNotify_t imageNotify;
 		imageNotify.payloadType = *pData++;
 		imageNotify.queryJitter = *pData++;
@@ -576,7 +510,7 @@ _CODE_ZCL_ static status_t zcl_ota_imageNotifyPrc(zclIncoming_t *pInMsg)
 			imageNotify.newFileVer = BUILD_U32(pData[0], pData[1], pData[2], pData[3]);
 		}
 
-		status = pInMsg->clusterAppCb(&addrInfo, pInMsg->hdr.cmd, &imageNotify);
+		status = pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, &imageNotify);
 	}else{
 		status = ZCL_STA_FAILURE;
 	}
@@ -589,17 +523,8 @@ _CODE_ZCL_ static status_t zcl_ota_queryNextImageRspPrc(zclIncoming_t *pInMsg)
 	status_t status = ZCL_STA_SUCCESS;
 
 	u8 *pData = pInMsg->pData;
-    apsdeDataInd_t *pApsdeInd = (apsdeDataInd_t*)pInMsg->msg;
 
 	if(pInMsg->clusterAppCb){
-		zclIncomingAddrInfo_t addrInfo;
-		addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-		addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-		addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-		addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-		addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-		addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
 		ota_queryNextImageRsp_t rsp;
 		rsp.st = *pData++;
 		if(rsp.st == ZCL_STA_SUCCESS){
@@ -612,7 +537,7 @@ _CODE_ZCL_ static status_t zcl_ota_queryNextImageRspPrc(zclIncoming_t *pInMsg)
 			rsp.imageSize = BUILD_U32(pData[0], pData[1], pData[2], pData[3]);
 		}
 
-		status = pInMsg->clusterAppCb(&addrInfo, pInMsg->hdr.cmd, &rsp);
+		status = pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, &rsp);
 	}else{
 		status = ZCL_STA_FAILURE;
 	}
@@ -625,17 +550,8 @@ _CODE_ZCL_ static status_t zcl_ota_imageBlockRspPrc(zclIncoming_t *pInMsg)
 	status_t status = ZCL_STA_SUCCESS;
 
 	u8 *pData = pInMsg->pData;
-    apsdeDataInd_t *pApsdeInd = (apsdeDataInd_t*)pInMsg->msg;
 
 	if(pInMsg->clusterAppCb){
-		zclIncomingAddrInfo_t addrInfo;
-		addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-		addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-		addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-		addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-		addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-		addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
 		ota_imageBlockRsp_t rsp;
 		rsp.st = *pData++;
 		if(rsp.st == ZCL_STA_SUCCESS){
@@ -657,7 +573,7 @@ _CODE_ZCL_ static status_t zcl_ota_imageBlockRspPrc(zclIncoming_t *pInMsg)
 			rsp.rsp.wait.blockReqDelay = BUILD_U16(pData[0], pData[1]);
 		}
 
-		status = pInMsg->clusterAppCb(&addrInfo, pInMsg->hdr.cmd, &rsp);
+		status = pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, &rsp);
 	}else{
 		status = ZCL_STA_FAILURE;
 	}
@@ -670,17 +586,8 @@ _CODE_ZCL_ static status_t zcl_ota_upgradeEndRspPrc(zclIncoming_t *pInMsg)
 	status_t status = ZCL_STA_SUCCESS;
 
 	u8 *pData = pInMsg->pData;
-    apsdeDataInd_t *pApsdeInd = (apsdeDataInd_t*)pInMsg->msg;
 
 	if(pInMsg->clusterAppCb){
-		zclIncomingAddrInfo_t addrInfo;
-		addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-		addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-		addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-		addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-		addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-		addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
 		ota_upgradeEndRsp_t rsp;
 		rsp.manuCode = BUILD_U16(pData[0], pData[1]);
 		pData += 2;
@@ -692,7 +599,7 @@ _CODE_ZCL_ static status_t zcl_ota_upgradeEndRspPrc(zclIncoming_t *pInMsg)
 		pData += 4;
 		rsp.upgradeTime = BUILD_U32(pData[0], pData[1], pData[2], pData[3]);
 
-		status = pInMsg->clusterAppCb(&addrInfo, pInMsg->hdr.cmd, &rsp);
+		status = pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, &rsp);
 	}else{
 		status = ZCL_STA_FAILURE;
 	}
@@ -705,17 +612,8 @@ _CODE_ZCL_ static status_t zcl_ota_queryDeviceSpecificFileRspPrc(zclIncoming_t *
 	status_t status = ZCL_STA_SUCCESS;
 
 	u8 *pData = pInMsg->pData;
-    apsdeDataInd_t *pApsdeInd = (apsdeDataInd_t*)pInMsg->msg;
 
 	if(pInMsg->clusterAppCb){
-		zclIncomingAddrInfo_t addrInfo;
-		addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-		addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-		addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-		addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-		addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-		addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
 		ota_querySpecFileRsp_t rsp;
 		rsp.st = *pData++;
 		if(rsp.st == ZCL_STA_SUCCESS){
@@ -728,7 +626,7 @@ _CODE_ZCL_ static status_t zcl_ota_queryDeviceSpecificFileRspPrc(zclIncoming_t *
 			rsp.imageSize = BUILD_U32(pData[0], pData[1], pData[2], pData[3]);
 		}
 
-		status = pInMsg->clusterAppCb(&addrInfo, pInMsg->hdr.cmd, &rsp);
+		status = pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, &rsp);
 	}else{
 		status = ZCL_STA_FAILURE;
 	}

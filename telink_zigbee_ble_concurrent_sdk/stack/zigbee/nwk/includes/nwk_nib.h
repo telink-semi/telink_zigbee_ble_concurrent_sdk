@@ -1,29 +1,28 @@
 /********************************************************************************************************
- * @file     nwk_nib.h
+ * @file    nwk_nib.h
  *
- * @brief	 Network layer information base
+ * @brief   This is the header file for nwk_nib
  *
- * @author
- * @date     Dec. 1, 2016
+ * @author  Zigbee Group
+ * @date    2021
  *
- * @par      Copyright (c) 2016, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *			 The information contained herein is confidential and proprietary property of Telink
- * 		     Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *			 of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *			 Co., Ltd. and the licensee in separate contract or the terms described here-in.
- *           This heading MUST NOT be removed from this file.
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
  *
- * 			 Licensees are granted free, non-transferable use of the information in this
- *			 file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
+ *              http://www.apache.org/licenses/LICENSE-2.0
  *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *******************************************************************************************************/
-#ifndef ZB_NWK_NIB_H
-#define ZB_NWK_NIB_H 1
 
-#include "tl_common.h"
-#include "../../mac/includes/tl_zb_mac.h"
+#ifndef NWK_NIB_H
+#define NWK_NIB_H
 
 
 /**
@@ -31,32 +30,29 @@
  */
 #define NWK_MAX_DEPTH                          	15
 
-
 #define NWK_MAX_ROUTERS  						8
-
 
 /**
  *  @brief  Default value of nib.max_children
             max number of children which can join to this device
  */
 #define DEFAULT_MAX_CHILDREN                   	25
+
 /***************************************************************************
 * @brief	max number of routers per node
 */
 #if !defined ( NWK_MAX_ROUTERS )
-#define NWK_MAX_ROUTERS  8
+#define NWK_MAX_ROUTERS  						8
 #endif
-
 
 /***************************************************************************
 * @brief	max network depth
 */
 #if !defined ( NWK_MAX_DEPTH )
-#define NWK_MAX_DEPTH    5
+#define NWK_MAX_DEPTH    						5
 #endif
 
-
-#define ZB_NWK_LINK_STATUS_PEROID_DEFAULT              	15
+#define ZB_NWK_LINK_STATUS_PEROID_DEFAULT       15
 
 
 /***************************************************************************
@@ -124,11 +120,7 @@ typedef struct
 #define NIB_IEEE_ADDRESS()  			g_zbMacPib.extAddress
 #define NIB_PAN_ID()					g_zbNIB.panId//g_zbMacPib.panId
 
-
 #define NIB_GET_USE_MULTICAST()   		g_zbNIB.useMulticast
 #define NIB_SET_USE_MULTICAST(v) 		(g_zbNIB.useMulticast = (v))
 
-
-
-
-#endif /* ZB_NWK_MIB_H */
+#endif /* NWK_NIB_H */

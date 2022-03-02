@@ -20,73 +20,18 @@
  *           
  *******************************************************************************************************/
 
-#ifndef BLE_H_
-#define BLE_H_
+#ifndef BLE_H__
+#define BLE_H__
+
+#if defined (MCU_CORE_8258)
+#include "ble_8258/ble.h"
+#define BLE_BLT_STATE_GET()    blt_state
+
+#elif defined (MCU_CORE_B91)
+#include "ble_b91/ble.h"
+#define BLE_BLT_STATE_GET()    bltParam.blt_state
+
+#endif
 
 
-#include "blt_config.h"
-#include "ble_common.h"
-
-
-#include "l2cap/l2cap.h"
-#include "phy/phy.h"
-#include "phy/phy_test.h"
-
-
-#include "attr/att.h"
-#include "attr/gatt.h"
-#include "attr/gatt_uuid.h"
-
-
-#include "smp/smp.h"
-#include "smp/smp_const.h"
-#include "smp/smp_central.h"
-#include "smp/smp_peripheral.h"
-#include "smp/smp_storage.h"
-
-#include "gap/gap.h"
-#include "gap/gap_event.h"
-
-#include "crypt/aes_ccm.h"
-#include "crypt/le_crypto.h"
-#include "crypt/aes/aes_att.h"
-
-#include "hci/hci.h"
-#include "hci/hci_const.h"
-#include "hci/hci_event.h"
-//#include "hci/usb_desc.h"
-
-#include "service/ble_ll_ota.h"
-#include "service/device_information.h"
-#include "service/hids.h"
-
-#include "ll/ll.h"
-#include "ll/ll_adv.h"
-#include "ll/ll_encrypt.h"
-#include "ll/ll_init.h"
-#include "ll/ll_pm.h"
-#include "ll/ll_scan.h"
-#include "ll/ll_whitelist.h"
-#include "ll/ll_conn/ll_conn.h"
-#include "ll/ll_conn/ll_slave.h"
-#include "ll/ll_conn/ll_master.h"
-#include "ll/ll_conn/ll_conn_phy.h"
-#include "ll/ll_conn/ll_conn_csa.h"
-
-#include "ll/ll_ext.h"
-#include "ll/ll_ext_adv.h"
-#include "ll/ll_ext_scan.h"
-
-
-
-#include "llms/llms.h"
-#include "llms/llms_slot.h"
-#include "llms/llms_adv.h"
-#include "llms/llms_scan.h"
-#include "llms/llms_init.h"
-#include "llms/llms_slave.h"
-#include "llms/llms_master.h"
-
-#include "bqb/bqb_ll.h"
-
-#endif /* BLE_H_ */
+#endif /* BLE_H_H_ */

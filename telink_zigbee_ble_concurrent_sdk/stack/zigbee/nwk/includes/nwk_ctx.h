@@ -1,31 +1,28 @@
 /********************************************************************************************************
- * @file     nwk_ctx.h
+ * @file    nwk_ctx.h
  *
- * @brief	 Network layer subsystem globals
+ * @brief   This is the header file for nwk_ctx
  *
- * @author
- * @date     Dec. 1, 2016
+ * @author  Zigbee Group
+ * @date    2021
  *
- * @par      Copyright (c) 2016, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *			 The information contained herein is confidential and proprietary property of Telink
- * 		     Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *			 of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *			 Co., Ltd. and the licensee in separate contract or the terms described here-in.
- *           This heading MUST NOT be removed from this file.
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
  *
- * 			 Licensees are granted free, non-transferable use of the information in this
- *			 file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
+ *              http://www.apache.org/licenses/LICENSE-2.0
  *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *******************************************************************************************************/
+
 #ifndef NWK_CTX_H
-#define NWK_CTX_H 1
-
-#include "tl_common.h"
-#include "nwk_neighbor.h"
-#include "nwk.h"
-
+#define NWK_CTX_H
 
 
 /**
@@ -38,7 +35,6 @@ typedef enum
     STARTUP_CONTROL_REJOIN_NETWORK,
     STARTUP_CONTROL_START_FROM_SCRATCH
 }StartupControl_attr_t;
-
 
 /**
    Network layer running state
@@ -70,20 +66,6 @@ typedef enum
 
 typedef struct
 {
-	u8   used;
-	u8   buf_ref;
-	u8   tsn;
-	u16  src_addr;
-}leave_pendingList_t;
-
-typedef struct
-{
-	u8 	addr_ref;
-	u8 	rejoin;
-}leave_ind_prnt_t;
-
-typedef struct
-{
 	u16	nwkFwdDstAddr;
 	u16 nwkFwdSrcAddr;
 	u16	senderAddr;
@@ -95,6 +77,7 @@ typedef struct
 	u16	nwkFwdDstAddr;
 	u16 nwkFwdSrcAddr;
 }srcRoute_repair_t;
+
 
 /**
    Place to store values between multiply operations
@@ -121,7 +104,7 @@ typedef struct
 	/* End [8 bytes]*/
 
 	/* For coordinator or router store current joining device info */
-	ev_time_event_t *curJoiningDevTimerEvt;
+	ev_timer_event_t *curJoiningDevTimerEvt;//TODO: removed
 
     u32	scanChannels;
 
@@ -137,13 +120,13 @@ typedef struct
 	u8	known_panids_cnt:4;
 	u8	discoverRoute:1;	/*!< Always TRUE for NLDE data request! see 2.2.4.1.1.3 */
 	u8  panidUpdateRecv:1;	/*receive network update for panid conflict*/
-	u8  unauthedTransportNwkKey:1;
+	u8  resv:1;
 	u8	parentIsChanged:1;	/*!< A flag indicates that the device's parent is changed through rejoin */
 	u8 	user_state:4;		/*!< Current network user_state_t */
 	u8 	state:4; 			/*!< Current network subsystem state nlme_state_t */
 
 	u8 	parent; 			/*!< parent address (valid if we are not ZC and joined) */
-	u8 	leaveRejoin;		/*!< if we need rejoin after leave */
+	u8 	leaveRejoin;		/*!< if we need rejoin after leave *///TODO: removed
 	u16 new_panid;
 
 	/* For PANID conflict resolution */
@@ -151,12 +134,9 @@ typedef struct
 
 	manyToOne_repair_t	manyToOneRepair; /* saved for check nlde-data.confirm status when unicast data frame using many-to-one */
 	srcRoute_repair_t 	srcRouteRepair;
-
-	u16 accept_update_panid; /* for wwah */
 }nwk_ctx_t;
 
-
-nwk_ctx_t g_zbNwkCtx;
+extern nwk_ctx_t g_zbNwkCtx;
 
 
 #define ZB_SET_DISCOVER_ROUTE(v)		(g_zbNwkCtx.discoverRoute = v)
@@ -165,10 +145,4 @@ nwk_ctx_t g_zbNwkCtx;
 #define ZB_SET_USER_STATE(v)			(g_zbNwkCtx.user_state = v)
 #define ZB_GET_USER_STATE				(g_zbNwkCtx.user_state)
 
-#define ZB_SET_ACCEPT_UPDATE_PANID(v)			(g_zbNwkCtx.accept_update_panid = v)
-#define ZB_GET_ACCEPT_UPDATE_PANID				(g_zbNwkCtx.accept_update_panid)
-
-#define ZB_SET_UNAUTHED_TRANSPORT_NWK_KEY(v)	(g_zbNwkCtx.unauthedTransportNwkKey = v)
-#define ZB_GET_UNAUTHED_TRANSPORT_NWK_KEY		(g_zbNwkCtx.unauthedTransportNwkKey)
-
-#endif /* ZB_NWK_GLOBALS_H */
+#endif /* NWK_CTX_H */

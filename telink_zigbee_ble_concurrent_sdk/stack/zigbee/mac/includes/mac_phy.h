@@ -1,96 +1,68 @@
 /********************************************************************************************************
- * @file     mac_phy.h
+ * @file    mac_phy.h
  *
- * @brief    Zigbee API for phy layer
+ * @brief   This is the header file for mac_phy
  *
- * @author
- * @date     Dec. 1, 2016
+ * @author  Zigbee Group
+ * @date    2021
  *
- * @par      Copyright (c) 2016, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *			 The information contained herein is confidential and proprietary property of Telink
- * 		     Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *			 of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *			 Co., Ltd. and the licensee in separate contract or the terms described here-in.
- *           This heading MUST NOT be removed from this file.
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
  *
- * 			 Licensees are granted free, non-transferable use of the information in this
- *			 file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
+ *              http://www.apache.org/licenses/LICENSE-2.0
  *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *******************************************************************************************************/
-#ifndef  __MAC_PHY_H__
-#define  __MAC_PHY_H__
 
-#include "tl_common.h"
+#ifndef MAC_PHY_H
+#define MAC_PHY_H
 
 
 /*********************************************************************
  * CONSTANTS
  */
 
-/**
- * Default RF Channel when power up
- */
-#define RF_PKT_BUFF_LEN		144//(128+32) //(128+16)
-
-
-/*
- * Definition for RF TX power
- */
-    /**
-     *  @brief  Definition for TX power level
-     */
-#define PHY_TX_POWER_MAX           0
-#define PHY_TX_POWER_5DB           1
-#define PHY_TX_POWER_0DB           2
-#define PHY_TX_POWER_N_5DB         3
-#define PHY_TX_POWER_N_10DB        4
-#define PHY_TX_POWER_N_13DB        5
-#define PHY_TX_POWER_N_18DB        6
-#define PHY_TX_POWER_N_23DB        7
-#define PHY_TX_POWER_N_27DB        8
-#define PHY_TX_POWER_N_30DB        9
-#define PHY_TX_POWER_N_37DB        10
-#define PHY_TX_POWER_MIN           100
-
-#define CCA_THRESHOLD       		-50
-#define RSSI_PASS_THRESHOLD			-30
+#define CCA_THRESHOLD       		(-70)
+#define RSSI_PASS_THRESHOLD			(-30)
 
 /*********************************************************************
  * ENUMS
  */
-enum {
+enum{
     RF_SUCC,
     RF_CSMA_FAILURE,
 };
 
-enum {
+enum{
     RF_RX_OFF,
     RF_RX_ON,
 };
 
-
-enum {
+enum{
     CCA_ED_ONLY,
     CCA_CS_ONLY,
     CCA_ED_AND_CS,
     CCA_ED_OR_CS,
 };
 
-
-enum {
+enum{
     RF_STATE_TX = 0,
     RF_STATE_RX,
     RF_STATE_ED,
     RF_STATE_OFF,
 };
 
-
 /*
  * Definition for RF Setting identifier.
  */
-enum {
+enum{
 	SUCC,
     RF_BLACK_LIST_FULL,
     RF_BLACK_LIST_NO_MEMBER,
@@ -99,14 +71,13 @@ enum {
 /*
  * Definition for RF Setting identifier.
  */
-enum {
+enum{
     /* General ID */
     RF_ID_CHANNEL               = 0x00,
     RF_ID_TX_POWER,
     RF_ID_RX_ONOFF,
     RF_ID_GENERAL_END           = 0x9F,
     
-
     /* Protocol Specific ID*/
     RF_ID_ZIGBEE                = 0xA0,
     RF_ID_MAC_SHORT_ADDR,
@@ -120,81 +91,66 @@ enum {
     RF_ID_BLE                   = 0xB0,
 };
 
-typedef enum{
-	RF_GAIN_MODE_AUTO,
-	RF_GAIN_MODE_MANU_MAX,
-}rf_rxGainMode_t;
-
 /*********************************************************************
  * TYPES
  */
-
-/*
- * Definition for RF callback function type
- */
-typedef void ( *rf_txCB_t )( void* arg );
-typedef void ( *rf_rxCB_t )( void* arg ); 
-typedef void ( *rf_ackCB_t )( int fPendingFrame, u8 seq );
-
-typedef void ( *rf_protocolSpecificInit_t) (void);
-typedef void ( *rf_protocolSpecificReset_t) (void);
-typedef void ( *rf_protocolSpecificSet_t) (u8 id, u8 *pValue, u8 len);
-
+typedef enum{
+    PHY_CCA_IDLE       = 0x04,
+    PHY_CCA_TRX_OFF    = 0x03,
+    PHY_CCA_BUSY       = 0x00,
+}phy_ccaSts_t;
 
 /**
  *  @brief  Definition for Telink RX packet format
  */
-typedef struct {
+typedef struct{
     u32 dmaLen;
     u8  rssi;
     u8  rseverd[7];
     u8  payloadLen;
     u8  payload[1];
-} rf_recvPkt_t;
-
+}rf_recvPkt_t;
 
 /**
  *  @brief  Definition for Telink TX packet format
  */
-typedef struct {
+typedef struct{
     u32 dmaLen;
     u8  rfLen;
     u8  payload[1];
-} rf_sendPkt_t;
-
+}rf_sendPkt_t;
 
 /*
  * Definition for RF Rx buffer format
  */
-typedef struct {
+typedef struct{
     u8	*psdu;
     u32 timeStamp;
     s8  rssi;
     u8  psduLen;
-} rx_buf_t;
-
-/*
- * Definition for Protocol Specific RF functions
- */
-typedef struct {
-    rf_protocolSpecificInit_t initFunc;
-    rf_protocolSpecificReset_t resetFunc;
-} rf_specificFunc_t;
+}rx_buf_t;
 
 
-/*********************************************************************
- * Public Variables
- */
-
-extern u8 rf_tx_buf[];
-
-
+extern u8 g_zb_txPowerSet;
 
 
 /*********************************************************************
  * Public Functions
  */
 
+
+/*********************************************************************
+ * @fn      rf_reset
+ *
+ * @brief   Reset RF module.
+ *
+ * @param   none
+ *
+ * @return  none
+ */
+void rf_reset(void);
+
+#define mac_phyReconfig()	rf_reset();
 
 /*********************************************************************
  * @fn      rf_init
@@ -208,52 +164,26 @@ extern u8 rf_tx_buf[];
 void rf_init(void);
 
 /*********************************************************************
- * @fn      rf_setCBFunc
+ * @fn      rf_setRxBuf
  *
- * @brief   Set TX finish callback function and RX callback function
+ * @brief   Set RX buffer.
  *
- * @param   rxCbFunc - The specified RX callback function
- *          txCbFunc - The specified TX callback function
- *
- * @return  none
- */
-void rf_setCBFunc(rf_txCB_t txCbFunc, rf_rxCB_t rxCbFunc);
-
-/*********************************************************************
- * @fn      rf_setAckCB
- *
- * @brief   Initialize ZigBee ACK packet Callback function.
- *
- * @param   ackCbFunc - Pointer to the ack callback function
+ * @param   pBuf - RX buffer
  *
  * @return  none
  */
-void rf_setAckCB(rf_ackCB_t ackCbFunc);
+void rf_setRxBuf(u8 *pBuf);
 
 /*********************************************************************
- * @fn      rf_regProtocolSpecific
+ * @fn      rf_TrxStateGet
  *
- * @brief   Register protocol specific RF functions.
- *            Note: This function must be called before rf_init() and rf_reset()
- *
- * @param   txCbFunc - tx done callback function
- * @param   rxCbFunc - rx done callback function
- *
- * @return  none
- */
-void rf_regProtocolSpecific(rf_specificFunc_t* funcs);
-
-/*********************************************************************
- * @fn      rf_reset
- *
- * @brief   Reset RF module.
+ * @brief   Get current TRX state.
  *
  * @param   none
  *
- * @return  none
+ * @return  state
  */
-void rf_reset(void);
-
+u8 rf_TrxStateGet(void);
 
 /*********************************************************************
  * @fn      rf_setTrxState
@@ -266,7 +196,6 @@ void rf_reset(void);
  */
 void rf_setTrxState(u8 state);
 
-
 /*********************************************************************
  * @fn      rf_setChannel
  *
@@ -276,7 +205,18 @@ void rf_setTrxState(u8 state);
  *
  * @return  none
  */
-void rf_setChannel(u8 ch);
+void rf_setChannel(u8 chn);
+
+/*********************************************************************
+ * @fn      rf_getChannel
+ *
+ * @brief   Get specified channel.
+ *
+ * @param   none
+ *
+ * @return  chn
+ */
+u8 rf_getChannel(void);
 
 /*********************************************************************
  * @fn      rf_setTxPower
@@ -289,41 +229,6 @@ void rf_setChannel(u8 ch);
  */
 void rf_setTxPower(u8 txPower);
 
-
-/*********************************************************************
- * @fn      rf_setCCAMode
- *
- * @brief   Set specified mode to CCA.
- *
- * @param   mode - CCA mode
- *
- * @return  none
- */
-void rf_setCCAMode(u8 mode);
-
-
-/*********************************************************************
- * @fn      rf_setCCALevel
- *
- * @brief   Set CCA detect threshold.
- *
- * @param   threshold - the threshold value
- *
- * @return  none
- */
-void rf_setCCALevel(u8 threshold);
-
-/*********************************************************************
- * @fn      rf_getRssi
- *
- * @brief   Get RSSI value from last received frame.
- *
- * @param   none
- *
- * @return  rssi value
- */
-s8 rf_getRssi(void);
-
 /*********************************************************************
  * @fn      rf_getLqi
  *
@@ -333,57 +238,43 @@ s8 rf_getRssi(void);
  *
  * @return  lqi result
  */
-u8 rf_getLqi(u8 rssi);
+u8 rf_getLqi(s8 rssi);
 
 /*********************************************************************
- * @fn      rf_getED
+ * @fn      rf_startED
  *
- * @brief   Get calculated ED value
+ * @brief   Start ED detect
  *
  * @param   none
  *
- * @return  ed value
+ * @return  none
  */
-u8 rf_getED(void);
 void rf_startED(void);
+
+/*********************************************************************
+ * @fn      rf_stopED
+ *
+ * @brief   Stop Energy Detect
+ *
+ * @param   none
+ *
+ * @return  ED result
+ */
 u8 rf_stopED(void);
 
-
-
-
 /*********************************************************************
- * @fn      rf_getCCAState
+ * @fn      rf_performCCA
  *
- * @brief   Set CCA detect threshold.
+ * @brief   Perform CCA
  *
- * @param   threshold - the threshold value
+ * @param   none
  *
- * @return  none
+ * @return  phy_ccaSts_t
  */
-u8 rf_getCCAState(void);
+u8 rf_performCCA(void);
 
-/*********************************************************************
- * @fn      rf_enableRx
- *
- * @brief   Turn on/off the receiver if it's not already on/off.
- *
- * @param   fEnable - 1 means on and 0 means off
- *
- * @return  none
- */
-void rf_enableRx(u8 fEnable);
-
-/*********************************************************************
- * @fn      rf_tx
- *
- * @brief   Transmit the data through CSMA/CA mechnism.
- *
- * @param   buf - The buffer to be transmitted
- * @param   len - The length of byte to be transmitted
- *
- * @return  none
- */
-void rf_tx(u8* buf, u8 len);
+void rf802154_tx_ready(u8 *buf, u8 len);
+void rf802154_tx(void);
 
 /*********************************************************************
  * @fn      rf_paInit
@@ -397,62 +288,11 @@ void rf_tx(u8* buf, u8 len);
  * @return  none
  */
 void rf_paInit(u32 TXEN_pin, u32 RXEN_pin);
-void rf_paTX(void);
-void rf_paRX(void);
 void rf_paShutDown(void);
-
-
-u8 rf_performCCA(void);
-void rf_setRxBuf(u8* pBuf);
-void rf_setRxBackupBuf(u8* pBuf);
-
-void rf_setRxState(u8 fEnable);
-u8 rf_getChannel(void);
-u8 rf_TrxStateGet(void);
-/*********************************************************************
- * @fn      rf_set
- *
- * @brief   Set rf parameter according to specified RF ID   
- *
- * @param   id     - The specified RF ID
- *          pValue - The detailed rf parameter
- *          len    - The length will be set to
- *
- * @return  none
- */
-void rf_set(u8 id, u8 *pValue, u8 len);
-
-void mac_resetPhy(void);
-
-void rf802154_tx(u8* buf, u8 len);
-
-void rf802154_tx_ready(u8* buf, u8 len);
-
-void mac_phyReconfig(void);
 
 bool zb_rfSwitchAllow(void);
 bool zb_rfTxDoing(void);
 
-_attribute_ram_code_ u32 mac_currentTickGet(void);
+void restore_zb_rf_context(void);
 
-extern u8 g_zb_txPowerSet;
-#define RF_TX_POWER_DEFAULT_SET(v)		g_zb_txPowerSet = v
-
-/*
- *
- * make sure the API is correct for different platform
- *
- * */
-#if defined (MCU_CORE_826x)
-	#include "./phy_radio_826x.h"
-#endif
-
-#if defined (MCU_CORE_HAWK)
-	#include "./phy_radio_hawk.h"
-#endif
-
-#if defined (MCU_CORE_8258)
-	#include "./phy_radio_8258.h"
-#endif
-
-#endif  /* __RF_H__ */
+#endif  /* MAC_PHY_H */

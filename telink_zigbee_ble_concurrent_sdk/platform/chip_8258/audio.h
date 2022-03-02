@@ -1,43 +1,51 @@
 /********************************************************************************************************
- * @file     audio.h
+ * @file    audio.h
  *
- * @brief    This is the Audio driver header file for TLSR8258
+ * @brief   This is the header file for B85
  *
- * @author	 Driver Group
- * @date     May 8, 2018
+ * @author  Driver & Zigbee Group
+ * @date    2021
  *
- * @par      Copyright (c) 2018, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *           The information contained herein is confidential property of Telink
- *           Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *           of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *           Co., Ltd. and the licensee or the terms described here-in. This heading
- *           MUST NOT be removed from this file.
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
  *
- *           Licensees are granted free, non-transferable use of the information in this
- *           file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
- * @par      History:
- * 			 1.initial release(DEC. 26 2018)
+ *              http://www.apache.org/licenses/LICENSE-2.0
  *
- * @version  A001
- *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *******************************************************************************************************/
 
-#ifndef audio_H
-#define audio_H
+#ifndef AUDIO_H
+#define AUDIO_H
 
 
 #include "register.h"
 #include "i2c.h"
-#include "dfifo.h"
 
+#define DMIC_INPUT_MODE_STEREO    	0
+#define AUDIO_DBL_BUF_ENABLE	   	0
 
-#define  AMIC_INPUT_MODE_STEREO    0
+/**
+ * define audio amic mode.
+ */
+typedef enum{
+	AUDIO_AMIC_MONO_MODE,
+	AUDIO_AMIC_STEREO_MODE,
+}Audio_Amic_mode;
 
-#define AUDIO_DBL_BUF_ENABLE	   0
-
-#define 	AUDIO_CODEC_TO_CODEC    1
+/**
+ * define audio sdm output mode.
+ */
+typedef enum{
+	AUDIO_SDM_SINGLE_OUTPUT,
+	AUDIO_SDM_DUAL_OUTPUT,
+}Audio_SDM_output_mode;
 
 /**
  * define audio rate value.
@@ -188,6 +196,47 @@ void audio_set_i2s_output(AudioInput_Typedef InType,AudioRate_Typedef Audio_Rate
  * 	@param[in] sysclk - system clock.
  * 	@return    none.
  */
-void audio_set_codec(I2C_GPIO_GroupTypeDef i2c_pin_group, CodecMode_Typedef CodecMode,unsigned sysclk);
+void audio_set_codec(I2C_GPIO_GroupTypeDef i2c_pin_group, CodecMode_Typedef CodecMode, unsigned int sysclk);
+
+
+
+/**
+ * @brief     This function servers to receive data from buffer.
+ * @param[in] buf - the buffer in which the data need to write
+ * @param[in] len - the length of the buffer.
+ * @return    none.
+ */
+void audio_rx_data_from_buff(signed char* buf,unsigned int len);
+
+/**
+ * @brief     This function servers to receive data from sample buffer by 16 bits.
+ * @param[in] buf - the buffer in which the data need to write
+ * @param[in] len - the length of the buffer by short.
+ * @return    none.
+ */
+void audio_rx_data_from_sample_buff(const short *buf, unsigned int len);
+
+/**
+ * @brief     This function servers to receive data from sample buffer by 16 bits.
+ * @param[in] buf - the buffer in which the data need to write
+ * @param[in] len - the length of the buffer by short.
+ * @return    none.
+ */
+void audio_rx_data_from_sample_buff(const short *buf, unsigned int len);
+
+/**
+ * 	@brief      This function serves to set amic mode
+ * 	@param[in]  mode - the amic mode(mono mode or stereo mode)
+ * 	@return     none
+ */
+void audio_set_amic_mode(Audio_Amic_mode mode);
+
+/**
+ * 	@brief      This function serves to set sdm output mode
+ * 	@param[in]  mode - the amic mode(mono mode or stereo mode)
+ * 	@return     none
+ */
+void audio_set_sdm_output_mode(Audio_SDM_output_mode mode);
+
 
 #endif

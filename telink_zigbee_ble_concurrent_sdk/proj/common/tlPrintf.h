@@ -1,61 +1,66 @@
 /********************************************************************************************************
- * @file     tlPrintf.h
+ * @file    tlPrintf.h
  *
- * @brief    Header file, extend printf interface which called by external usage
+ * @brief   This is the header file for tlPrintf
  *
- * @author
- * @date     Oct. 8, 2016
+ * @author  Driver & Zigbee Group
+ * @date    2021
  *
- * @par      Copyright (c) 2016, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *           The information contained herein is confidential property of Telink
- *           Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *           of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *           Co., Ltd. and the licensee or the terms described here-in. This heading
- *           MUST NOT be removed from this file.
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
  *
- *           Licensees are granted free, non-transferable use of the information in this
- *           file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
+ *              http://www.apache.org/licenses/LICENSE-2.0
  *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *******************************************************************************************************/
+
 #pragma once
 
+#if defined(MCU_CORE_B91)
+#include <stdio.h>
+#endif
 
+#if defined(MCU_CORE_826x) || defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
 int Tl_printf(const char *format, ...);
-
-
+#endif
 
 
 #if (UART_PRINTF_MODE || USB_PRINTF_MODE)
-	#define	arrayPrint(arrayAddr,len)					\
-	{													\
-		Tl_printf("\n*********************************\n");		\
-		unsigned char	i = 0;							\
-		do{												\
-			Tl_printf(" %x",((unsigned char *)arrayAddr)[i++]);						\
-		}while(i<len);										\
-		Tl_printf("\n*********************************\n");		\
-	}
-
-	#define	DEBUG(compileFlag,...)						\
-			do{											\
-				if(compileFlag) Tl_printf(__VA_ARGS__);					\
-			}while(0)
-
-	#define printf			Tl_printf
-	#define	printfArray		arrayPrint
-#else
-	#define printf
-	#define	printfArray
-	#define	DEBUG(compileFlag,...)
+#if defined(MCU_CORE_826x) || defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
+	#define printf										Tl_printf
 #endif
 
-#if (FLASH_PRINTF_MODE)
+	#define TRACE										printf
 
-#define quick_printf ftl_write
+	#define	DEBUG(compileFlag, ...)						do{	\
+															if(compileFlag) TRACE(__VA_ARGS__);		\
+														}while(0)
+
+	#define DEBUG_ARRAY(compileFlag, arrayAddr, len)	do{	\
+															if(compileFlag){											\
+																TRACE("*********************************\n");			\
+																unsigned char i = 0;									\
+																do{														\
+																	TRACE(" %x", ((unsigned char *)arrayAddr)[i++]);	\
+																}while(i < len);										\
+																TRACE("\n*********************************\n");			\
+															}															\
+														}while(0)
 #else
-#define quick_printf
+#if defined(MCU_CORE_826x) || defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
+	#define printf  Tl_printf
+#endif
+
+	#define TRACE
+	#define	DEBUG(compileFlag, ...)
+	#define DEBUG_ARRAY(compileFlag, arrayAddr, len)
 #endif
 
 

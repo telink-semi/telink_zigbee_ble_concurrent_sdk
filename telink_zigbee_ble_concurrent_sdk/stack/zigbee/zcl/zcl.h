@@ -1,30 +1,30 @@
 /********************************************************************************************************
- * @file     zcl.h
+ * @file    zcl.h
  *
- * @brief
+ * @brief   This is the header file for zcl
  *
- * @author
- * @date     Dec. 1, 2016
+ * @author  Zigbee Group
+ * @date    2021
  *
- * @par      Copyright (c) 2016, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *			 The information contained herein is confidential and proprietary property of Telink
- * 		     Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *			 of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *			 Co., Ltd. and the licensee in separate contract or the terms described here-in.
- *           This heading MUST NOT be removed from this file.
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
  *
- * 			 Licensees are granted free, non-transferable use of the information in this
- *			 file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
+ *              http://www.apache.org/licenses/LICENSE-2.0
  *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *******************************************************************************************************/
-#pragma once
 
-#include "tl_common.h"
-#include "../zbapi/zb_api.h"
-#include "../zdo/zb_af.h"
-#include "zcl_config.h"
+#ifndef ZCL_H
+#define ZCL_H
+
+
 
 
 /** @addtogroup  TELINK_ZIGBEE_STACK TELINK ZigBee Stack
@@ -38,6 +38,10 @@
 /** @addtogroup  ZCL_Constant ZCL Constants
  *  @{
  */
+#define MANUFACTURER_CODE_NONE							0x0000
+#define MANUFACTURER_CODE_AMAZON						0x1217
+
+
 //Global Cluster Revision (0x0001 - 0xFFFE)
 #define ZCL_ATTR_GLOBAL_CLUSTER_REVISION_DEFAULT	    0x0001
 
@@ -122,7 +126,8 @@
 /**
  *  @brief  Definition for ZCL Attribute Information Entry
  */
-typedef struct zclAttrInfo {
+typedef struct zclAttrInfo
+{
     u16 id;                     //!< Attribute ID
     u8  type;                   //!< Attribute type
     u8  access;                 //!< Attribute access control
@@ -132,7 +137,8 @@ typedef struct zclAttrInfo {
 /**
  *  @brief  Definition for ZCL Frame control format
  */
-typedef union zclFrmCtrl {
+typedef union zclFrmCtrl
+{
 	struct {
 		u8 type:2;              //!< ZCL Frame type
 		u8 manufSpec:1;         //!< Manufacturer specific frame
@@ -146,7 +152,8 @@ typedef union zclFrmCtrl {
 /**
  *  @brief  Definition for ZCL header format
  */
-typedef struct zclHdr {
+typedef struct zclHdr
+{
 	zclFrmCtrl_t frmCtrl;       //!< Frame control field structure
 	u16 manufCode;              //!< Manufacturer code
 	u8 seqNum;                  //!< Sequence number - used to identify response frame
@@ -455,6 +462,7 @@ typedef struct {
 	u16 dstAddr;
 	u8  srcEp;
 	u8	dstEp;
+	u8	seqNum;
 	u8	dirCluster:1;
 	u8	apsSec:1;
 	u8	reserved:6;
@@ -470,12 +478,13 @@ typedef status_t (*cluster_forAppCb_t)(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdI
  */
 typedef struct
 {
-	cluster_forAppCb_t clusterAppCb;
-	apsdeDataInd_t  *msg;      //!< incoming message
-	zclHdr_t     	hdr;       //!< ZCL header parsed
-	u8              *pData;    //!< pointer to data after header
-	u16             dataLen;   //!< length of remaining data
-	void            *attrCmd;  //!< pointer to the parsed attribute or command
+	cluster_forAppCb_t 		clusterAppCb;
+	apsdeDataInd_t  		*msg;      //!< incoming message
+	u8              		*pData;    //!< pointer to data after header
+	void            		*attrCmd;  //!< pointer to the parsed attribute or command
+	u16             		dataLen;   //!< length of remaining data
+	zclIncomingAddrInfo_t 	addrInfo;
+	zclHdr_t     			hdr;       //!< ZCL header parsed
 } zclIncoming_t;
 
 /**
@@ -487,7 +496,7 @@ typedef status_t (*cluster_cmdHdlr_t)(zclIncoming_t *pInHdlrMsg);
 /**
  *  @brief  Definition for function pointer type to register a clutser.
  */
-typedef status_t (*cluster_registerFunc_t)(u8 endpoint, u8 attrNum, const zclAttrInfo_t attrTbl[], cluster_forAppCb_t cb);
+typedef status_t (*cluster_registerFunc_t)(u8 endpoint, u16 manuCode, u8 attrNum, const zclAttrInfo_t attrTbl[], cluster_forAppCb_t cb);
 
 /**
  *  @brief  Definition for ZCL Hook function format.
@@ -503,17 +512,19 @@ typedef struct {
 	cluster_cmdHdlr_t 	cmdHandlerFunc;
 	cluster_forAppCb_t 	clusterAppCb;
 	u16 clusterID;
-	u8 endpoint;
-	u8 attrNum;
+	u16 manuCode;
+	u8 	endpoint;
+	u8 	attrNum;
 } clusterInfo_t;
 
 typedef struct {
 	u16 clusterId;
+	u16 manuCode;
 	u16 attrNum;
 	const zclAttrInfo_t 	*attrTbl;
 	cluster_registerFunc_t	clusterRegisterFunc;
 	cluster_forAppCb_t 		clusterAppCb;
-}zcl_specClusterInfo_t;
+} zcl_specClusterInfo_t;
 
 
 #ifndef ZCL_CLUSTER_NUM_MAX
@@ -590,13 +601,14 @@ clusterInfo_t *zcl_findCluster(u8 endpoint, u16 clusterId);
  *
  * @param[in]  endpoint  - Specified endpoint
  * @param[in]  clusterId - Specified cluster ID
+ * @param[in]  manuCode  - manufacturer code for proprietary extensions to a profile
  * @param[in]  attrNum   - Specified attribute number in the cluster
  * @param[in]  pAttrTbl  - Specified attributes
  * @oaran[in]  cmdHdlrFn - Specified cluster commands handler function
  *
  * @return     ZCL Status @ref zcl_error_codes
  */
-status_t zcl_registerCluster(u8 endpoint, u16 clusterId, u8 attrNum, const zclAttrInfo_t *pAttrTbl, cluster_cmdHdlr_t cmdHdlrFn, cluster_forAppCb_t cb);
+status_t zcl_registerCluster(u8 endpoint, u16 clusterId, u16 manuCode, u8 attrNum, const zclAttrInfo_t *pAttrTbl, cluster_cmdHdlr_t cmdHdlrFn, cluster_forAppCb_t cb);
 
 /**
  * @brief       Used to send Profile and Cluster Specific Command messages.
@@ -709,6 +721,7 @@ zclAttrInfo_t *zcl_findAttribute(u8 endpoint, u16 clusterId, u16 attrId);
  * @param[in]   srcEp - source endpoint
  * @param[in]   pDstEpInfo - destination endpoint information
  * @param[in]   clusterId - cluster ID
+ * @param[in]   manuCode - manufacturer code for proprietary extensions to a profile
  * @param[in]   disableDefaultRsp - disable Default Response command
  * @param[in]   direction - specified the command direction
  * @param[in]   seqNo - identification number for the transaction
@@ -717,7 +730,7 @@ zclAttrInfo_t *zcl_findAttribute(u8 endpoint, u16 clusterId, u16 attrId);
  * @return      status_t
  */
 status_t zcl_read(u8 srcEp, epInfo_t *pDstEpInfo, u16 clusterId, u16 manuCode, u8 disableDefaultRsp, u8 direction, u8 seqNo, zclReadCmd_t *readCmd);
-#define zcl_sendReadCmd(a,b,c,d,e,f)				(zcl_read((a), (b), (c), 0, (d), (e), ZCL_SEQ_NUM, (f)))
+#define zcl_sendReadCmd(a,b,c,d,e,f)				(zcl_read((a), (b), (c), MANUFACTURER_CODE_NONE, (d), (e), ZCL_SEQ_NUM, (f)))
 #define zcl_sendReadWithMfgCodeCmd(a,b,c,d,e,f,g)	(zcl_read((a), (b), (c), (d), (e), (f), ZCL_SEQ_NUM, (g)))
 
 #endif /* ZCL_READ */
@@ -739,10 +752,10 @@ status_t zcl_read(u8 srcEp, epInfo_t *pDstEpInfo, u16 clusterId, u16 manuCode, u
  * @return      status_t
  */
 status_t zcl_writeReq(u8 srcEp, epInfo_t *pDstEpInfo, u16 clusterId, u16 manuCode, u8 cmd, u8 disableDefaultRsp, u8 direction, u8 seqNo, zclWriteCmd_t *writeCmd);
-#define zcl_sendWriteCmd(a,b,c,d,e,f)				(zcl_writeReq((a), (b), (c), 0, ZCL_CMD_WRITE, (d), (e), ZCL_SEQ_NUM, (f)))
+#define zcl_sendWriteCmd(a,b,c,d,e,f)				(zcl_writeReq((a), (b), (c), MANUFACTURER_CODE_NONE, ZCL_CMD_WRITE, (d), (e), ZCL_SEQ_NUM, (f)))
 #define zcl_sendWriteWithMfgCodeCmd(a,b,c,d,e,f,g)	(zcl_writeReq((a), (b), (c), (d), ZCL_CMD_WRITE, (e), (f), ZCL_SEQ_NUM, (g)))
-#define zcl_sendWriteUndividedCmd(a,b,c,d,e,f)		(zcl_writeReq((a), (b), (c), 0, ZCL_CMD_WRITE_UNDIVIDED, (d), (e), ZCL_SEQ_NUM, (f)))
-#define zcl_sendWriteNoRspCmd(a,b,c,d,e,f)			(zcl_writeReq((a), (b), (c), 0, ZCL_CMD_WRITE_NO_RSP, (d), (e), ZCL_SEQ_NUM, (f)))
+#define zcl_sendWriteUndividedCmd(a,b,c,d,e,f)		(zcl_writeReq((a), (b), (c), MANUFACTURER_CODE_NONE, ZCL_CMD_WRITE_UNDIVIDED, (d), (e), ZCL_SEQ_NUM, (f)))
+#define zcl_sendWriteNoRspCmd(a,b,c,d,e,f)			(zcl_writeReq((a), (b), (c), MANUFACTURER_CODE_NONE, ZCL_CMD_WRITE_NO_RSP, (d), (e), ZCL_SEQ_NUM, (f)))
 
 #endif /* ZCL_WRITE */
 
@@ -753,6 +766,7 @@ status_t zcl_writeReq(u8 srcEp, epInfo_t *pDstEpInfo, u16 clusterId, u16 manuCod
  * @param[in]   srcEp - source endpoint
  * @param[in]   pDstEpInfo - destination endpoint information
  * @param[in]   clusterId - cluster ID
+ * @param[in]   manuCode - manufacturer code for proprietary extensions to a profile
  * @param[in]   disableDefaultRsp - disable Default Response command
  * @param[in]   direction - specified the command direction
  * @param[in]   seqNo - identification number for the transaction
@@ -761,13 +775,13 @@ status_t zcl_writeReq(u8 srcEp, epInfo_t *pDstEpInfo, u16 clusterId, u16 manuCod
  * @return      None
  */
 status_t zcl_configReport(u8 srcEp, epInfo_t *pDstEpInfo, u16 clusterId, u16 manuCode, u8 disableDefaultRsp, u8 direction, u8 seqNo, zclCfgReportCmd_t *cfgReportCmd);
-#define zcl_sendCfgReportCmd(a,b,c,d,e,f)	(zcl_configReport((a), (b), (c), 0, (d), (e), ZCL_SEQ_NUM, (f)))
+#define zcl_sendCfgReportCmd(a,b,c,d,e,f)	(zcl_configReport((a), (b), (c), MANUFACTURER_CODE_NONE, (d), (e), ZCL_SEQ_NUM, (f)))
 
 status_t zcl_readReportConfig(u8 srcEp, epInfo_t *pDstEpInfo, u16 clusterId, u16 manuCode, u8 disableDefaultRsp, u8 direction, u8 seqNo, zclReadReportCfgCmd_t *readReportCfgCmd);
-#define zcl_sendReadReportCfgCmd(a,b,c,d,e,f)	(zcl_readReportConfig((a), (b), (c), 0, (d), (e), ZCL_SEQ_NUM, (f)))
+#define zcl_sendReadReportCfgCmd(a,b,c,d,e,f)	(zcl_readReportConfig((a), (b), (c), MANUFACTURER_CODE_NONE, (d), (e), ZCL_SEQ_NUM, (f)))
 
 status_t zcl_report(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 direction, u8 seqNo, u16 manuCode, u16 clusterId, u16 attrID, u8 dataType, u8 *pData);
-#define zcl_sendReportCmd(a,b,c,d,e,f,g,h) 	(zcl_report((a), (b), (c), (d), ZCL_SEQ_NUM, 0, (e), (f), (g), (h)))
+#define zcl_sendReportCmd(a,b,c,d,e,f,g,h) 	(zcl_report((a), (b), (c), (d), ZCL_SEQ_NUM, MANUFACTURER_CODE_NONE, (e), (f), (g), (h)))
 
 //for internal
 void zcl_reportingTabInit(void);
@@ -803,10 +817,10 @@ void reportAttrTimerStop(void);
  * @return      status_t
  */
 status_t zcl_discAttrs(u8 srcEp, epInfo_t *pDstEpInfo, u16 clusterId, u16 manuCode, u8 disableDefaultRsp, u8 direction, u8 seqNo, zclDiscoverAttrCmd_t *discAttrCmd);
-#define zcl_sendDiscAttrsCmd(a,b,c,d,e,f)	(zcl_discAttrs((a), (b), (c), 0, (d), (e), ZCL_SEQ_NUM, (f)))
+#define zcl_sendDiscAttrsCmd(a,b,c,d,e,f)	(zcl_discAttrs((a), (b), (c), MANUFACTURER_CODE_NONE, (d), (e), ZCL_SEQ_NUM, (f)))
 
 status_t zcl_discAttrsExtended(u8 srcEp, epInfo_t *pDstEpInfo, u16 clusterId, u16 manuCode, u8 disableDefaultRsp, u8 direction, u8 seqNo, zclDiscoverAttrCmd_t *discAttrCmd);
-#define zcl_sendDiscAttrsExtendedCmd(a,b,c,d,e,f)	(zcl_discAttrsExtended((a), (b), (c), 0, (d), (e), ZCL_SEQ_NUM, (f)))
+#define zcl_sendDiscAttrsExtendedCmd(a,b,c,d,e,f)	(zcl_discAttrsExtended((a), (b), (c), MANUFACTURER_CODE_NONE, (d), (e), ZCL_SEQ_NUM, (f)))
 
 #endif /* ZCL_DISCOVER */
 
@@ -817,3 +831,4 @@ status_t zcl_discAttrsExtended(u8 srcEp, epInfo_t *pDstEpInfo, u16 clusterId, u1
 /** @} end of group TELINK_ZIGBEE_STACK */
 
 
+#endif	/* ZCL_H */

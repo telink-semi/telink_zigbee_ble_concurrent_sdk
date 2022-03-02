@@ -1,31 +1,30 @@
 /********************************************************************************************************
- * @file     zcl_zllTouchLinkDiscovery.c
+ * @file    zcl_zllTouchLinkDiscovery.c
  *
- * @brief	 touch link discovery procedure
+ * @brief   This is the source file for zcl_zllTouchLinkDiscovery
  *
- * @author
- * @date     June. 12, 2017
+ * @author  Zigbee Group
+ * @date    2021
  *
- * @par      Copyright (c) 2016, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *			 The information contained herein is confidential and proprietary property of Telink
- * 		     Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *			 of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *			 Co., Ltd. and the licensee in separate contract or the terms described here-in.
- *           This heading MUST NOT be removed from this file.
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
  *
- * 			 Licensees are granted free, non-transferable use of the information in this
- *			 file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
+ *              http://www.apache.org/licenses/LICENSE-2.0
  *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *******************************************************************************************************/
-
 
 /**********************************************************************
  * INCLUDES
  */
 #include "../zcl_include.h"
-#include "zcl_touchlink_attr.h"
 #include "zcl_zll_commissioning_internal.h"
 
 #define ZB_PRIMARY_CHANNEL_1	11
@@ -90,7 +89,7 @@ _CODE_ZCL_ static void zcl_zllTouchLinkIdentifyRequest(void *arg){
 				zdo_nlmeChannelShift(peerInfo->logicalChannel);
 			}
 			/* channel restore */
-			TL_ZB_TIMER_SCHEDULE(zcl_touchLinkIdentifyRequestDone, (void *)ZCL_ZLL_TOUCH_LINK_STA_EXIST, 5000);
+			TL_ZB_TIMER_SCHEDULE(zcl_touchLinkIdentifyRequestDone, (void *)ZCL_ZLL_TOUCH_LINK_STA_EXIST, 5);
 			return;
 		}
 
@@ -354,7 +353,7 @@ _CODE_ZCL_ void zcl_zllTouchLinkScanResponseHandler(zcl_zllTouchLinkScanResp_t *
 	zcl_zllTouchLinkScanResp_t *p = resp;
 
 	u8 idx = g_zllTouchLink.disc->targetNum;
-	if(idx >= g_zllTouchLink.scanListNum - 1){
+	if(idx >= g_zllTouchLink.scanListNum){
 		return;// ZCL_STA_INVALID_VALUE;
 	}
 
@@ -550,7 +549,7 @@ _CODE_ZCL_ void zcl_zllTouchLinkDiscoveyStart(void){
 	if(g_zllTouchLink.runTimer){
 		TL_ZB_TIMER_CANCEL(&g_zllTouchLink.runTimer);
 	}
-	g_zllTouchLink.runTimer = TL_ZB_TIMER_SCHEDULE(zcl_touchLinkScanStart, NULL, 5000);
+	g_zllTouchLink.runTimer = TL_ZB_TIMER_SCHEDULE(zcl_touchLinkScanStart, NULL, 5);
 
 	/* start a timer which is used during the whole touch link */
 	if(g_zllTouchLink.transIdLifeTimer){

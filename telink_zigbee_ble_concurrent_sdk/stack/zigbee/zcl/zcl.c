@@ -1,25 +1,25 @@
 /********************************************************************************************************
- * @file     zcl.c
+ * @file    zcl.c
  *
- * @brief
+ * @brief   This is the source file for zcl
  *
- * @author
- * @date     Dec. 1, 2016
+ * @author  Zigbee Group
+ * @date    2021
  *
- * @par      Copyright (c) 2016, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *			 The information contained herein is confidential and proprietary property of Telink
- * 		     Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *			 of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *			 Co., Ltd. and the licensee in separate contract or the terms described here-in.
- *           This heading MUST NOT be removed from this file.
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
  *
- * 			 Licensees are granted free, non-transferable use of the information in this
- *			 file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
+ *              http://www.apache.org/licenses/LICENSE-2.0
  *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *******************************************************************************************************/
-
 
 /**********************************************************************
  * INCLUDES
@@ -134,7 +134,7 @@ _CODE_ZCL_ void zcl_register(u8 endpoint, u8 clusterNum, zcl_specClusterInfo_t *
 	zcl_specClusterInfo_t *p = info;
 	for(u32 i = 0; i < clusterNum; i++){
 		if(p->clusterRegisterFunc){
-			if(p->clusterRegisterFunc(endpoint, p->attrNum, p->attrTbl, p->clusterAppCb) == ZCL_STA_INSUFFICIENT_SPACE){
+			if(p->clusterRegisterFunc(endpoint, p->manuCode, p->attrNum, p->attrTbl, p->clusterAppCb) == ZCL_STA_INSUFFICIENT_SPACE){
 				return;
 			}
 		}
@@ -169,12 +169,13 @@ _CODE_ZCL_ clusterInfo_t *zcl_findCluster(u8 endpoint, u16 clusterId)
  *
  * @param   endpoint  Specified endpoint
  * @param   clusterId Specified cluster ID
+ * @param   manuCode - manufacturer code for proprietary extensions to a profile
  * @param   attrNum   Specified attribute number in the cluster
  * @param   pAttrTbl  Specified attributes
  *
  * @return  ZCL Status @ref zcl_error_codes
  */
-_CODE_ZCL_ status_t zcl_registerCluster(u8 endpoint, u16 clusterId, u8 attrNum, const zclAttrInfo_t *pAttrTbl, cluster_cmdHdlr_t cmdHdlrFn, cluster_forAppCb_t cb)
+_CODE_ZCL_ status_t zcl_registerCluster(u8 endpoint, u16 clusterId, u16 manuCode, u8 attrNum, const zclAttrInfo_t *pAttrTbl, cluster_cmdHdlr_t cmdHdlrFn, cluster_forAppCb_t cb)
 {
 	if(zcl_vars.clusterNum >= ZCL_CLUSTER_NUM_MAX){
 		return ZCL_STA_INSUFFICIENT_SPACE;
@@ -186,6 +187,7 @@ _CODE_ZCL_ status_t zcl_registerCluster(u8 endpoint, u16 clusterId, u8 attrNum, 
 
 	zcl_vars.clusterList[zcl_vars.clusterNum].endpoint = endpoint;
 	zcl_vars.clusterList[zcl_vars.clusterNum].clusterID = clusterId;
+	zcl_vars.clusterList[zcl_vars.clusterNum].manuCode = manuCode;
 	zcl_vars.clusterList[zcl_vars.clusterNum].attrNum = attrNum;
 	zcl_vars.clusterList[zcl_vars.clusterNum].cmdHandlerFunc = cmdHdlrFn;
 	zcl_vars.clusterList[zcl_vars.clusterNum].clusterAppCb = cb;
@@ -603,7 +605,7 @@ _CODE_ZCL_ static u8 zcl_buildHdr(u8 *buf, u8 clusterSpec, u8 dir, u8 disDefRsp,
  *                the Sequence Number.
  *
  * @param   srcEp - source endpoint
- * @param   pDstEpInfo - destination endpoint infomation
+ * @param   pDstEpInfo - destination endpoint information
  * @param   clusterID - cluster ID
  * @param   cmd - command ID
  * @param   specific - whether the command is Cluster Specific
@@ -725,7 +727,7 @@ _CODE_ZCL_ status_t zcl_foundationCmdHandler(zclIncoming_t *pCmd)
 			break;
 #endif
 		case ZCL_CMD_DEFAULT_RSP:
-			status  = zcl_dfltRspHandler(pCmd);
+			status = zcl_dfltRspHandler(pCmd);
 			break;
 #ifdef ZCL_DISCOVER
 		case ZCL_CMD_DISCOVER_ATTR:
@@ -738,7 +740,7 @@ _CODE_ZCL_ status_t zcl_foundationCmdHandler(zclIncoming_t *pCmd)
 		case ZCL_CMD_DISCOVER_CMDS_RCVD_RSP:
 		case ZCL_CMD_DISCOVER_CMDS_GEN:
 		case ZCL_CMD_DISCOVER_CMDS_GEN_RSP:
-			status = ZCL_STA_UNSUP_GENERAL_COMMAND;
+			status = (pCmd->hdr.manufCode == MANUFACTURER_CODE_NONE) ? ZCL_STA_UNSUP_GENERAL_COMMAND : ZCL_STA_UNSUP_MANU_GENERAL_COMMAND;
 			break;
 		case ZCL_CMD_DISCOVER_ATTR_EXTD:
 			status = zcl_discAttrsExtendedHandler(pCmd);
@@ -748,7 +750,7 @@ _CODE_ZCL_ status_t zcl_foundationCmdHandler(zclIncoming_t *pCmd)
 			break;
 #endif
 		default:
-			status = ZCL_STA_UNSUP_GENERAL_COMMAND;
+			status = (pCmd->hdr.manufCode == MANUFACTURER_CODE_NONE) ? ZCL_STA_UNSUP_GENERAL_COMMAND : ZCL_STA_UNSUP_MANU_GENERAL_COMMAND;
 			break;
 	}
 
@@ -804,47 +806,41 @@ _CODE_ZCL_ void zcl_cmdHandler(void *pCmd)
 		return;
 	}
 
+#ifdef ZCL_WWAH
+	status = zcl_wwah_acceptCheck(&inMsg);
+#endif
+
 	u16 devEnableAttrLen = 0;
 	bool devEnable = TRUE;
-
-#ifdef ZCL_WWAH
-	if(zcl_wwah_apsLinkKeyAuthCheck(pApsdeInd->indInfo.cluster_id, pApsdeInd->indInfo.security_status & SECURITY_IN_APSLAYER) == FALSE){
-		status = ZCL_STA_NOT_AUTHORIZED;
-	}
-	if(zcl_wwah_apsAckRequirementCheck(pApsdeInd->indInfo.cluster_id) == FALSE){
-
-	}
-	if(pApsdeInd->indInfo.cluster_id == ZCL_CLUSTER_TOUCHLINK_COMMISSIONING){
-		if(!zcl_wwah_touchlinkEnabled(&inMsg)){
-			status = ZCL_STA_NOT_AUTHORIZED;
-		}
-	}
-#endif
 
 	if(status == ZCL_STA_SUCCESS){
 		/* Command dispatch */
 		if(inMsg.hdr.frmCtrl.bf.type == ZCL_FRAME_TYPE_PROFILE_CMD){
-			if(inMsg.hdr.cmd > ZCL_CMD_MAX){
-				// Unsupported message
-				status = ZCL_STA_UNSUP_GENERAL_COMMAND;
-			}else{
-				status = zcl_foundationCmdHandler(&inMsg);
-				if((status != ZCL_STA_SUCCESS) && (status != ZCL_STA_CMD_HAS_RESP)){
-					status = ZCL_STA_FAILURE;
-				}
-				toAppFlg = 1;
+			status = zcl_foundationCmdHandler(&inMsg);
+			if((status != ZCL_STA_UNSUP_GENERAL_COMMAND) && (status != ZCL_STA_UNSUP_MANU_GENERAL_COMMAND) &&
+			   (status != ZCL_STA_SUCCESS) && (status != ZCL_STA_CMD_HAS_RESP)){
+				status = ZCL_STA_FAILURE;
 			}
-		}else{
-			/* Cluster specific command */
+			toAppFlg = 1;
+		}else{/* Cluster command */
 			clusterInfo_t *pCluster = zcl_findCluster(pApsdeInd->indInfo.dst_ep, pApsdeInd->indInfo.cluster_id);
-			if(!pCluster){
-				status = ZCL_STA_UNSUP_CLUSTER_COMMAND;
+
+			if(!pCluster || (pCluster && (pCluster->manuCode != inMsg.hdr.manufCode))){
+				status = (inMsg.hdr.manufCode == MANUFACTURER_CODE_NONE) ? ZCL_STA_UNSUP_CLUSTER_COMMAND : ZCL_STA_UNSUP_MANU_CLUSTER_COMMAND;
 			}else{
 				/* Check if basic device enable support */
 				zcl_getAttrVal(pApsdeInd->indInfo.dst_ep, ZCL_CLUSTER_GEN_BASIC, ZCL_ATTRID_BASIC_DEV_ENABLED, &devEnableAttrLen, &devEnable);
 
 				if(devEnable || (pCluster->clusterID == ZCL_CLUSTER_GEN_IDENTIFY)){
 					inMsg.clusterAppCb = pCluster->clusterAppCb;
+					inMsg.addrInfo.dirCluster = inMsg.hdr.frmCtrl.bf.dir;
+					inMsg.addrInfo.profileId = pApsdeInd->indInfo.profile_id;
+					inMsg.addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
+					inMsg.addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
+					inMsg.addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
+					inMsg.addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
+					inMsg.addrInfo.seqNum = inMsg.hdr.seqNum;
+
 					status = pCluster->cmdHandlerFunc(&inMsg);
 
 					devEnable = TRUE;
@@ -868,7 +864,6 @@ _CODE_ZCL_ void zcl_cmdHandler(void *pCmd)
 	ev_buf_free(pCmd);
 }
 
-
 /*********************************************************************
  * @fn      zcl_rx_handler
  *
@@ -878,9 +873,11 @@ _CODE_ZCL_ void zcl_cmdHandler(void *pCmd)
  *
  * @return  None
  */
-_CODE_ZCL_ void zcl_rx_handler(void *pData){
+_CODE_ZCL_ void zcl_rx_handler(void *pData)
+{
 	TL_SCHEDULE_TASK(zcl_cmdHandler, pData);
 }
+
 
 /***************************************************************************
  **************************** Read *****************************************
@@ -1047,15 +1044,6 @@ _CODE_ZCL_ status_t zcl_readRspHandler(zclIncoming_t *pCmd)
 		return ZCL_STA_INSUFFICIENT_SPACE;
 	}else{
 		pCmd->attrCmd = (void *)pReadRspCmd;
-
-#ifdef ZCL_WWAH
-		for(u8 i = 0; i < pReadRspCmd->numAttr; i++){
-			if(pReadRspCmd->attrList[i].attrID == ZCL_ATTRID_GLOBAL_CLUSTER_REVISION){
-				zcl_wwah_periodicRouterChecked();
-				break;
-			}
-		}
-#endif
 	}
 
 	return ZCL_STA_SUCCESS;
@@ -1354,8 +1342,7 @@ _CODE_ZCL_ status_t zcl_writeHandler(zclIncoming_t *pCmd)
 				succWriteAttrCnt++;
 			}else{
 				pWriteRspCmd->attrList[failWriteAttrCnt].status = status;
-				pWriteRspCmd->attrList[failWriteAttrCnt].attrID = pWriteRec->attrID;
-				failWriteAttrCnt++;
+				pWriteRspCmd->attrList[failWriteAttrCnt++].attrID = pWriteRec->attrID;
 			}
 		}
 	}

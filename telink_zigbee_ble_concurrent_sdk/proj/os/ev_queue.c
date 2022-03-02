@@ -1,32 +1,27 @@
 /********************************************************************************************************
- * @file     ev_queue.c
+ * @file    ev_queue.c
  *
- * @brief    Implementation of Telink EV Queue Module.
+ * @brief   This is the source file for ev_queue
  *
- * @author
- * @date     Oct. 8, 2016
+ * @author  Zigbee Group
+ * @date    2021
  *
- * @par      Copyright (c) 2016, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *           The information contained herein is confidential property of Telink
- *           Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *           of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *           Co., Ltd. and the licensee or the terms described here-in. This heading
- *           MUST NOT be removed from this file.
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
  *
- *           Licensees are granted free, non-transferable use of the information in this
- *           file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
+ *              http://www.apache.org/licenses/LICENSE-2.0
  *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *******************************************************************************************************/
-#include "ev_queue.h"
-#include "ev_buffer.h"
-#include "user_config.h"
-#include "platform_includes.h"
-#include "../common/string.h"
 
-
-#if (MODULE_PRIQ_ENABLE)
+#include "../tl_common.h"
 
 
 
@@ -45,13 +40,12 @@ ev_queue_sts_t ev_queue_rawPush( ev_queue_t* q, queue_item_t* newElement )
 {
     queue_item_t* previous;
     queue_item_t* current;
-    u8 r;
 
     if (NULL == q || NULL == newElement) {
         return QUEUE_INVALID_PARAMETER;
     }
 
-    r = irq_disable();
+    u32 r = drv_disable_irq();
 
     /* if the Q was empty, then update the head */
     if (NULL==q->head) {
@@ -59,7 +53,7 @@ ev_queue_sts_t ev_queue_rawPush( ev_queue_t* q, queue_item_t* newElement )
         q->tail = newElement;
         newElement->next = NULL;
         q->curNum++;
-        irq_restore(r);
+        drv_restore_irq(r);
         return (ev_queue_sts_t)SUCCESS;
     }
     /* find a place for insertion */
@@ -93,7 +87,7 @@ ev_queue_sts_t ev_queue_rawPush( ev_queue_t* q, queue_item_t* newElement )
     }
     q->curNum++;
 
-    irq_restore(r);
+    drv_restore_irq(r);
     return (ev_queue_sts_t)SUCCESS;
 }
 
@@ -109,9 +103,8 @@ ev_queue_sts_t ev_queue_rawPush( ev_queue_t* q, queue_item_t* newElement )
 queue_item_t* ev_queue_rawPop(ev_queue_t* q)
 {
     queue_item_t* oldHead;
-    u8 r;
 
-    r = irq_disable();
+    u32 r = drv_disable_irq();
 
     oldHead = q->head;
     if (NULL!=oldHead){
@@ -126,7 +119,7 @@ queue_item_t* ev_queue_rawPop(ev_queue_t* q)
 	if ( q->curNum == 0 ) {
 		q->head = q->tail = NULL;
 	}
-    irq_restore(r);
+	drv_restore_irq(r);
     return oldHead;
 }
 
@@ -144,16 +137,15 @@ ev_queue_sts_t ev_queue_rawDelete(ev_queue_t* q, queue_item_t* delElement)
 {
     queue_item_t* previous;
     queue_item_t* current;
-    u8 r;
 
     if (NULL == q || NULL == delElement) {
         return QUEUE_INVALID_PARAMETER;
     }
 
-    r = irq_disable();
+    u32 r = drv_disable_irq();
 
     if (NULL == q->head) { /* invalid q or newElement */
-        irq_restore(r);
+    	drv_restore_irq(r);
         return QUEUE_EMPTY;
     }
 
@@ -163,7 +155,7 @@ ev_queue_sts_t ev_queue_rawDelete(ev_queue_t* q, queue_item_t* delElement)
             q->tail = NULL;
         }
         q->curNum--;
-        irq_restore(r);
+        drv_restore_irq(r);
         return (ev_queue_sts_t)SUCCESS;
     }
 
@@ -186,12 +178,12 @@ ev_queue_sts_t ev_queue_rawDelete(ev_queue_t* q, queue_item_t* delElement)
     }
     else {
         /* element not in the Queue */
-        irq_restore(r);
+    	drv_restore_irq(r);
         return QUEUE_NOT_FOUND;
 
     }
 
-    irq_restore(r);
+    drv_restore_irq(r);
     return (ev_queue_sts_t)SUCCESS;
 }
 
@@ -296,14 +288,6 @@ ev_queue_sts_t ev_queue_freeQ( ev_queue_t *q )
     }
 
     return (ev_queue_sts_t)SUCCESS;
-
-    
 }
-
-#endif  /* MODULE_PRIQ_ENABLE */
-
-
-
-
 
 

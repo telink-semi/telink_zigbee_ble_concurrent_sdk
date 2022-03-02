@@ -1,52 +1,53 @@
 /********************************************************************************************************
- * @file     ota.h
+ * @file    ota.h
  *
- * @brief
+ * @brief   This is the header file for ota
  *
- * @author
- * @date     May. 27, 2017
+ * @author  Zigbee Group
+ * @date    2021
  *
- * @par      Copyright (c) 2017, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *			 The information contained herein is confidential and proprietary property of Telink
- * 		     Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *			 of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *			 Co., Ltd. and the licensee in separate contract or the terms described here-in.
- *           This heading MUST NOT be removed from this file.
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
  *
- * 			 Licensees are granted free, non-transferable use of the information in this
- *			 file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
+ *              http://www.apache.org/licenses/LICENSE-2.0
  *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *******************************************************************************************************/
+
 #ifndef OTA_H
 #define OTA_H
 
-#include "tl_common.h"
-#include "../zdo/zb_af.h"
-#include "../zcl/zcl.h"
 
-#define	FLASH_OTA_NEWIMAGE_ADDR						NV_ADDR_FOR_OTA
 
-#define	OTA_TLNK_KEYWORD_ADDROFFSET					8
 #define	OTA_IMAGESECTORHDR_SIZE						6
 #define OTA_IMAGE_MAX_DATA_SIZE						48
 
 #define OTA_HDR_LEN_OFFSET							6
 #define OTA_STACK_VER_OFFSET						18
 
-#define OTA_UPGRADE_IMAGE_TAG_ID					0
 #define OTA_UPGRADE_FILE_ID							0x0BEEF11E
 
-#define OTA_CHECK_PERIOD_MIN 						30	// Actual OTA check period, in minutes
-#define OTA_PERIODIC_QUERY_SERVER_INTERVAL_S		60//s
+#define OTA_UPGRADE_IMAGE_TAG_ID					0x0000	//Upgrade Image
+#define OTA_UPGRADE_IMAGE_AES_TAG_ID				0xF000	//Upgrade Image with AES, Manufacturer Specific Use
+
+#define OTA_QUERY_START_JITTER						(5 * 1000)//ms
+#define OTA_PERIODIC_QUERY_INTERVAL					(5 * 60)//s
 #define OTA_MAX_IMAGE_BLOCK_RSP_WAIT_TIME			5//s
+#define OTA_IEEE_ADDR_RSP_WAIT_TIME					2//s
 
 #define OTA_IMAGE_BLOCK_FC							BLOCK_FC_BITMASK_MIN_PERIOD_PRESENT//BLOCK_FC_BITMASK_GENERIC
 
 
 #define OTA_MAX_IMAGE_BLOCK_RETRIES					10
 #define OTA_MAX_UPGRADE_END_REQ_RETRIES				2
+#define OTA_IEEE_ADDR_REQ_RETRIES					3
 
 typedef enum{
 	OTA_TYPE_CLIENT,
@@ -66,10 +67,10 @@ typedef struct{
 	/*The value is a unique 4-byte value that is included at the beginning of all ZigBee OTA upgrade image
 	files in order to quickly identify and distinguish the file as being a ZigBee OTA cluster upgrade file,
 	without having to examine the whole file content. This helps distinguishing the file from other file
-	types on disk. The value is defined to be ¡°0x0BEEF11E¡±.*/
+	types on disk. The value is defined to be "0x0BEEF11E".*/
 	u32			otaUpgradeFileID;
 
-	/*The current OTA header version shall be 0x0100 with major version of ¡°01¡± and minor version of ¡°00¡±.*/
+	/*The current OTA header version shall be 0x0100 with major version of "01" and minor version of "00".*/
 	u16			otaHdrVer;
 
 	/*This value indicates full length of the OTA header in bytes, including the OTA upgrade file identifier,
@@ -141,6 +142,8 @@ typedef enum{
 	OTA_FLAG_IMAGE_ELEM_LEN2,
 	OTA_FLAG_IMAGE_ELEM_LEN3,
 	OTA_FLAG_IMAGE_ELEM_LEN4,
+	OTA_FLAG_IMAGE_ELEM_INFO1,//manufacturer specific use
+	OTA_FLAG_IMAGE_ELEM_INFO2,//manufacturer specific use
 	OTA_FLAG_IMAGE_ELEMENT,
 }otaFlg_t;
 
@@ -160,6 +163,8 @@ typedef struct{
 	u32		otaElementPos;
 	u32		otaElementLen;
 	u16		otaElementTag;
+	u8		otaElementInfo1;//manufacturer specific use
+	u8		otaElementInfo2;//manufacturer specific use, fillNum
 	u8		clientOtaFlg;
 }ota_clientInfo_t;
 
@@ -193,13 +198,19 @@ extern const zcl_specClusterInfo_t g_otaClusterList[];
 extern u8 OTA_CB_CLUSTER_NUM;
 
 
+extern bool g_otaEncryptionNeeded;
+#define OTA_IMAGE_UNENCRYPTION_SUPPORT()    g_otaEncryptionNeeded = 0
+#define OTA_IMAGE_UNENCRYPTION_REJECT()     g_otaEncryptionNeeded = 1
+
+
 status_t zcl_otaCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayload);
 
-unsigned int xcrc32 (const unsigned char *buf, int len, unsigned int init);
+unsigned int xcrc32(const unsigned char *buf, int len, unsigned int init);
 
 void ota_wwah_useTrustCenter(u8 endpoint);
+
 void ota_init(ota_type_e type, af_simple_descriptor_t *simpleDesc, ota_preamble_t *otaPreamble, ota_callBack_t *cb);
-void ota_queryStart(u8 period);
+void ota_queryStart(u16 seconds);
 void ota_serverAddrPerprogrammed(addrExt_t ieeeAddr, u8 srvEndPoint);
 void ota_mcuReboot(void);
 void ota_upgradeAbort(void);

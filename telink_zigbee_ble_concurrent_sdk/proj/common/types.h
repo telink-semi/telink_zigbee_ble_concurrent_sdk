@@ -1,47 +1,53 @@
 /********************************************************************************************************
- * @file     types.h
+ * @file    types.h
  *
- * @brief    the file used to define the data types
+ * @brief   This is the header file for types
  *
- * @author
- * @date     Oct. 8, 2016
+ * @author  Driver & Zigbee Group
+ * @date    2021
  *
- * @par      Copyright (c) 2016, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *           The information contained herein is confidential property of Telink
- *           Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *           of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *           Co., Ltd. and the licensee or the terms described here-in. This heading
- *           MUST NOT be removed from this file.
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
  *
- *           Licensees are granted free, non-transferable use of the information in this
- *           file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
+ *              http://www.apache.org/licenses/LICENSE-2.0
  *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *******************************************************************************************************/
+
 #pragma once
 
-
+#if 0
 typedef signed char int8_t;
 typedef unsigned char uint8_t;
+
 typedef signed short int16_t;
 typedef unsigned short uint16_t;
+
 typedef signed int int32_t;
 typedef unsigned int uint32_t;
-typedef int16_t coffee_page_t;
 
-typedef unsigned char u8 ;
+typedef int16_t coffee_page_t;
+#endif
+
+typedef unsigned char u8;
 typedef signed char s8;
 
 typedef unsigned short u16;
 typedef signed short s16;
 
-typedef int s32;
 typedef unsigned int u32;
+typedef signed int s32;
+
 
 typedef long long s64;
 typedef unsigned long long u64;
-
 
 typedef void (*fn_ptr)(u8*);
 
@@ -54,7 +60,7 @@ typedef u32 UTCTime;
 
 typedef u32 arg_t;
 
-enum{
+enum {
   ZB_FALSE = 0,
   ZB_TRUE = 1
 };
@@ -67,15 +73,14 @@ typedef u8 cId_t;
 typedef u8 addrExt_t[8];
 typedef u8 extPANId_t[8];
 
-typedef addrExt_t	extAddr_t;
+typedef addrExt_t extAddr_t;
 
 typedef union {
 	u16  shortAddr;
 	addrExt_t extAddr;
 }tl_zb_addr_t;
 
-typedef union
-{
+typedef union {
 	u32	srcId;
 	addrExt_t gpdIeeeAddr;
 }gpdId_t;
@@ -83,30 +88,26 @@ typedef union
 /**
  *  @brief Type definition for combined short/extended device address
  */
-typedef struct
-{
-    union
-    {
+typedef struct {
+    union {
         u16         shortAddr;         //!< Short address
         addrExt_t   extAddr;           //!< Extended address
     } addr;
     u8  addrMode;                      //!< Address mode
 } addr_t;
 
-typedef struct
-{
+typedef struct {
 	u16 id;
     u8  mode;                      //!< Address mode
 } pan_id_t;
 
 #ifdef WIN32
-#   ifndef FALSE
-#        define FALSE 0
-#    endif
-
-#   ifndef TRUE
-#        define TRUE 1
-#    endif
+#ifndef FALSE
+#define FALSE	0
+#endif
+#ifndef TRUE
+#define TRUE	1
+#endif
 
 #define PACK_1
 #define CODE
@@ -124,7 +125,7 @@ typedef struct
 #endif
 
 #ifndef NULL
-#define NULL 	0
+#define NULL	0
 #endif
 
 #ifndef __cplusplus
@@ -138,17 +139,16 @@ typedef u8 bool;
 #define TRUE 	(!FALSE)
 #endif
 
-#define false     FALSE
-#define true     TRUE
+#define false	FALSE
+#define true	TRUE
 
 #elif defined WIN32
 
 #ifndef FALSE
-#define FALSE     0
+#define FALSE	0
 #endif
-
 #ifndef TRUE
-#define TRUE      1
+#define TRUE	1
 #endif
 
 #endif
@@ -165,10 +165,10 @@ typedef u32 size_t;
 
 #define U32_MAX ((u32)0xffffffff)
 #define U16_MAX ((u16)0xffff)
-#define U8_MAX ((u8)0xff)
+#define U8_MAX  ((u8)0xff)
 #define U31_MAX ((u32)0x7fffffff)
 #define U15_MAX ((u16)0x7fff)
-#define U7_MAX ((u8)0x7f)
+#define U7_MAX  ((u8)0x7f)
 
 
 /*** Generic Status Return Values ***/
@@ -187,9 +187,9 @@ typedef u32 size_t;
 #define NV_BAD_ITEM_LEN           0x0C
 
 
-#define ADDR_MODE_NONE       0        //!< Address not present
-#define ADDR_MODE_SHORT      2        //!< Short address
-#define ADDR_MODE_EXT        3        //!< Extended address
+#define ADDR_MODE_NONE				0        //!< Address not present
+#define ADDR_MODE_SHORT      		2        //!< Short address
+#define ADDR_MODE_EXT       		3        //!< Extended address
 
 
 

@@ -1,10 +1,34 @@
-#include "../include/zb_common.h"
+/********************************************************************************************************
+ * @file    aps_group.c
+ *
+ * @brief   This is the source file for aps_group
+ *
+ * @author  Zigbee Group
+ * @date    2021
+ *
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
+ *******************************************************************************************************/
 
-#define 		APS_GROUP_EP_INVALID          0xff
-#define			APS_INVALID_GRP_ADDR           0xffff
+#include "../common/includes/zb_common.h"
 
 
-static u8	aps_group_entry_num = 0;  //number of group entry items in group table
+#define APS_GROUP_EP_INVALID          0xff
+#define	APS_INVALID_GRP_ADDR          0xffff
+
+
+static u8 aps_group_entry_num = 0;  //number of group entry items in group table
 
 _CODE_APS_ void aps_groupTblSave2Flash(void *arg){
 #if NV_ENABLE
@@ -12,15 +36,13 @@ _CODE_APS_ void aps_groupTblSave2Flash(void *arg){
 #endif
 }
 
-_CODE_APS_ u8 aps_groupTblNvInit(void ){
+_CODE_APS_ u8 aps_groupTblNvInit(void){
 	u8 ret = NV_ITEM_NOT_FOUND;
 #if NV_ENABLE
 	ret = nv_flashReadNew(1, NV_MODULE_APS, NV_ITEM_APS_GROUP_TABLE, APS_GROUP_TABLE_SIZE * sizeof(aps_group_tbl_ent_t), (u8*)aps_group_tbl);
 #endif
 	return ret;
 }
-
-
 
 _CODE_APS_ aps_group_tbl_ent_t *aps_group_search_by_addr(u16 group_addr)
 {
@@ -105,7 +127,6 @@ _CODE_APS_ u8 *aps_group_ep_find(aps_group_tbl_ent_t *entry, u8 endpoint)
 
 	return NULL;
 }
-
 
 _CODE_APS_ aps_group_tbl_ent_t *aps_group_search(u16 groupAddr, u8 endpoint)
 {
@@ -205,7 +226,6 @@ _CODE_APS_ aps_status_t aps_me_group_delete_req(aps_delete_group_req_t *req){
 	return status;
 }
 
-
 _CODE_APS_ void aps_groupTblReset(void){
 	aps_group_entry_num = 0;
 	for (u8 i = 0; i < APS_GROUP_TABLE_SIZE; i++) {
@@ -268,8 +288,6 @@ _CODE_APS_ u8 aps_group_entry_num_get(void){
 	return aps_group_entry_num;
 }
 
-
-
 _CODE_APS_ void aps_group_list_get(u8 *counter, u16 *group_list)
 {
 	u8 i = 0;
@@ -285,7 +303,6 @@ _CODE_APS_ void aps_group_list_get(u8 *counter, u16 *group_list)
 		i++;
 	}
 }
-
 
 _CODE_APS_ void aps_init_group_num_set(void){
 	for(u8 i=0; i<APS_GROUP_TABLE_SIZE; i++){

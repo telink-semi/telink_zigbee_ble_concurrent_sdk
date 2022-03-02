@@ -1,29 +1,30 @@
 /********************************************************************************************************
- * @file     zcl_level.h
+ * @file    zcl_level.h
  *
- * @brief	 APIs statement for level cluster
+ * @brief   This is the header file for zcl_level
  *
- * @author
- * @date     June. 10, 2017
+ * @author  Zigbee Group
+ * @date    2021
  *
- * @par      Copyright (c) 2016, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *			 The information contained herein is confidential and proprietary property of Telink
- * 		     Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *			 of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *			 Co., Ltd. and the licensee in separate contract or the terms described here-in.
- *           This heading MUST NOT be removed from this file.
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
  *
- * 			 Licensees are granted free, non-transferable use of the information in this
- *			 file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
+ *              http://www.apache.org/licenses/LICENSE-2.0
  *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *******************************************************************************************************/
-#pragma once
 
-#include "tl_common.h"
-#include "../../zdo/zb_af.h"
-#include "../zcl.h"
+#ifndef ZCL_LEVEL_H
+#define ZCL_LEVEL_H
+
+
 
 /** @addtogroup  TELINK_ZIGBEE_STACK TELINK ZigBee Stack
  *  @{
@@ -75,18 +76,18 @@
  */
 #define ZCL_ATTRID_LEVEL_CURRENT_LEVEL                    0x0000
 #define ZCL_ATTRID_LEVEL_REMAINING_TIME                   0x0001
-#define ZCL_ATTRID_LEVLE_MIN_LEVEL						  0x0002
-#define ZCL_ATTRID_LEVLE_MAX_LEVEL						  0x0003
-#define ZCL_ATTRID_LEVLE_CURRENT_FREQUENCY				  0x0004
-#define ZCL_ATTRID_LEVLE_MIN_FREQUENCY				  	  0x0005
-#define ZCL_ATTRID_LEVLE_MAX_FREQUENCY				  	  0x0006
+#define ZCL_ATTRID_LEVEL_MIN_LEVEL						  0x0002
+#define ZCL_ATTRID_LEVEL_MAX_LEVEL						  0x0003
+#define ZCL_ATTRID_LEVEL_CURRENT_FREQUENCY				  0x0004
+#define ZCL_ATTRID_LEVEL_MIN_FREQUENCY				  	  0x0005
+#define ZCL_ATTRID_LEVEL_MAX_FREQUENCY				  	  0x0006
 #define ZCL_ATTRID_LEVEL_ON_OFF_TRANSITION_TIME           0x0010
 #define ZCL_ATTRID_LEVEL_ON_LEVEL                         0x0011
 #define ZCL_ATTRID_LEVEL_ON_TRANSITION_TIME               0x0012
 #define ZCL_ATTRID_LEVEL_OFF_TRANSITION_TIME              0x0013
 #define ZCL_ATTRID_LEVEL_DEFAULT_MOVE_RATE                0x0014
-#define ZCL_ATTRID_LEVLE_OPTIONS				  	  	  0x000F
-#define ZCL_ATTRID_LEVLE_START_UP_CURRENT_LEVEL		  	  0x4000
+#define ZCL_ATTRID_LEVEL_OPTIONS				  	  	  0x000F
+#define ZCL_ATTRID_LEVEL_START_UP_CURRENT_LEVEL		  	  0x4000
 /** @} end of group zcl_level_attrId */
 
 
@@ -249,7 +250,7 @@ extern const u8 zcl_level_attrNum;
  *
  * @return      Status
  */
-status_t zcl_level_register(u8 endpoint, u8 attrNum, const zclAttrInfo_t attrTbl[], cluster_forAppCb_t cb);
+status_t zcl_level_register(u8 endpoint, u16 manuCode, u8 attrNum, const zclAttrInfo_t attrTbl[], cluster_forAppCb_t cb);
 
 
 /**
@@ -324,3 +325,5 @@ status_t zcl_level_stop(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8
 /** @} end of group ZCL_Module */
 
 /** @} end of group TELINK_ZIGBEE_STACK */
+
+#endif	/* ZCL_LEVEL_H */

@@ -29,7 +29,7 @@ extern u16 my_random(void);
 #endif
 
 #if DBG_ZIGBEE_STATUS_EN
-u8 T_rfStatusDbg[256] = {0};
+volatile u8 T_rfStatusDbg[256] = {0};
 u32 T_rfStatusCnt;
 #endif
 
@@ -55,7 +55,7 @@ void generateRandomData(u8 *pData, u8 len)
 	}
 }
 
-#if BLE_CONCURRENT_MODE
+#if 1
 /****************************************************************************
  * @fn          addrExtCmp
  *

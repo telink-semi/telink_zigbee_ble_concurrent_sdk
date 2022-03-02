@@ -1,48 +1,60 @@
 /********************************************************************************************************
- * @file     drv_flash.c
+ * @file    drv_flash.c
  *
- * @brief	 flash read/write interface file
+ * @brief   This is the source file for drv_flash
  *
- * @author
- * @date     Oct. 8, 2016
+ * @author  Zigbee Group
+ * @date    2021
  *
- * @par      Copyright (c) 2016, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *           The information contained herein is confidential property of Telink
- *           Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *           of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *           Co., Ltd. and the licensee or the terms described here-in. This heading
- *           MUST NOT be removed from this file.
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
  *
- *           Licensees are granted free, non-transferable use of the information in this
- *           file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
+ *              http://www.apache.org/licenses/LICENSE-2.0
  *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *******************************************************************************************************/
-#include "drv_flash.h"
-#include "platform_includes.h"
+
+#include "../tl_common.h"
+
 
 void flash_write(u32 addr, u32 len, u8 *buf){
+#if (MODULE_WATCHDOG_ENABLE)
+	drv_wd_clear();
+#endif
+
+#if (VOLTAGE_DETECT_ENABLE)
+	if(drv_get_adc_data() < BATTERY_SAFETY_THRESHOLD){return;}
+#endif
+
 	flash_write_page(addr, len, buf);
 }
 
 void flash_read(u32 addr, u32 len, u8 *buf){
-	flash_read_page(addr, len ,buf);
+	flash_read_page(addr, len, buf);
 }
 
 void flash_erase(u32 addr){
-#if(MODULE_WATCHDOG_ENABLE)
-	wd_clear();
+#if (MODULE_WATCHDOG_ENABLE)
+	drv_wd_clear();
 #endif
+
+#if (VOLTAGE_DETECT_ENABLE)
+	if(drv_get_adc_data() < BATTERY_SAFETY_THRESHOLD){return;}
+#endif
+
 	flash_erase_sector(addr);
-#if(MODULE_WATCHDOG_ENABLE)
-	wd_clear();
-#endif
 }
 
 #ifdef CFS_ENABLE
 _attribute_ram_code_ void cfs_flash_write_page(u32 addr, u32 len, u8 *buf){
-	u8 r = irq_disable();
+	u32 r = drv_disable_irq();
 	// important:  buf must not reside at flash, such as constant string.  If that case, pls copy to memory first before write
 	flash_send_cmd(FLASH_WRITE_ENABLE_CMD);
 	flash_send_cmd(FLASH_WRITE_CMD);
@@ -55,11 +67,11 @@ _attribute_ram_code_ void cfs_flash_write_page(u32 addr, u32 len, u8 *buf){
 	}
 	mspi_high();
 	flash_wait_done();
-	irq_restore(r);
+	drv_restore_irq(r);
 }
 
 _attribute_ram_code_ void cfs_flash_read_page(u32 addr, u32 len, u8 *buf){
-	u8 r = irq_disable();
+	u32 r = drv_disable_irq();
 	flash_send_cmd(FLASH_READ_CMD);
 	flash_send_addr(addr);
 
@@ -73,7 +85,7 @@ _attribute_ram_code_ void cfs_flash_read_page(u32 addr, u32 len, u8 *buf){
 		mspi_wait();
 	}
 	mspi_high();
-	irq_restore(r);
+	drv_restore_irq(r);
 }
 
 void cfs_flash_op(u8 opmode, u32 addr, u32 len, u8 *buf){

@@ -1,33 +1,32 @@
 /********************************************************************************************************
- * @file     zcl_zll_commissioning.h
+ * @file    zcl_zll_commissioning.h
  *
- * @brief	 APIs for ZLL zigbee light link commissioning
+ * @brief   This is the header file for zcl_zll_commissioning
  *
- * @author
- * @date     June. 10, 2017
+ * @author  Zigbee Group
+ * @date    2021
  *
- * @par      Copyright (c) 2016, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *			 The information contained herein is confidential and proprietary property of Telink
- * 		     Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *			 of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *			 Co., Ltd. and the licensee in separate contract or the terms described here-in.
- *           This heading MUST NOT be removed from this file.
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
  *
- * 			 Licensees are granted free, non-transferable use of the information in this
- *			 file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
+ *              http://www.apache.org/licenses/LICENSE-2.0
  *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *******************************************************************************************************/
-#pragma once
 
-#include "tl_common.h"
-#include "../../zdo/zb_af.h"
+#ifndef ZCL_ZLL_COMMOSSIONING_H
+#define ZCL_ZLL_COMMOSSIONING_H
+
 
 //RF power configure for touch link
 #define RF_POWER_FOR_COMMISSION				RF_POWER_m0P6dBm//RF_POWER_7dBm//RF_POWER_m9P5dBm//
-
-#define TOUCHLINK_SCANLIST_NUM				2
 
 
 /** @addtogroup  TELINK_ZIGBEE_STACK TELINK ZigBee Stack
@@ -147,7 +146,7 @@ enum{
  *  @{
  */
 /**
- *  @brief  Definition for zigbee infomation for zll commissiong
+ *  @brief  Definition for zigbee information for zll commissioning
  */
 typedef struct{
 	union{
@@ -162,7 +161,7 @@ typedef struct{
 
 
 /**
- *  @brief  Definition for zll infomation for zll commissiong
+ *  @brief  Definition for zll information for zll commissioning
  */
 typedef struct{
 	union{
@@ -234,7 +233,7 @@ typedef struct{
 	bool					primaryChannelScanComplete; /*!< primary channel scan complete */
 	u8						currentScannChannel;		/*!< current scan channel */
 	u8						scanCnt;					/*!< scan count */
-	zll_touchLinkScanInfo	scanList[TOUCHLINK_SCANLIST_NUM];				/*!< pointer to the target information by touch link discovery */
+	zll_touchLinkScanInfo	scanList[1];				/*!< pointer to the target information by touch link discovery */
 } zcl_zllTouckLinkDisc_t;
 
 
@@ -646,3 +645,4 @@ void zcl_touchLinkStart(void);
 
 /** @} end of group TELINK_ZIGBEE_STACK */
 
+#endif	/* ZCL_ZLL_COMMOSSIONING_H */

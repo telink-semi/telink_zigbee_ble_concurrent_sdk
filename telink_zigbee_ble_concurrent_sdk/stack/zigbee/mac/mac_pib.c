@@ -1,12 +1,36 @@
+/********************************************************************************************************
+ * @file    mac_pib.c
+ *
+ * @brief   This is the source file for mac_pib
+ *
+ * @author  Zigbee Group
+ * @date    2021
+ *
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
+ *******************************************************************************************************/
 
-/**************************************************************************
- *                                                                          *
- * INSERT COPYRIGHT HERE!                                                   *
- *                                                                          *
- ****************************************************************************
-PURPOSE: MAC layer main module
-*/
-#include "../include/zb_common.h"
+#include "../common/includes/zb_common.h"
+
+
+/* PIB access and min/max table type */
+typedef struct{
+    u8 offset;
+    u8 len;
+    u8 min;
+    u8 max;
+}mac_pibTbl_t;
 
 //Telink ieee address range
 const u8 startIEEEAddr[] = {0x38, 0xc1, 0xa4};
@@ -50,7 +74,7 @@ const mac_pibTbl_t g_zbMacPibTbl[] = {
 /*
  * MLME-SET.request to set MAC pib attribute
  *
- * @param attribute MAC PIB attribut MAC PIB attributee id(Table 86 ¡ª MAC PIB attributes)
+ * @param attribute MAC PIB attribut MAC PIB attributee id(Table 86  MAC PIB attributes)
  *
  * @param value the pointer value of the attribute
  *
@@ -88,7 +112,7 @@ _CODE_MAC_ u8 tl_zbMacAttrSet(u8 attribute, u8 *value, u8 len){
 /*
  * MLME-GET.request to get MAC pib attribute
  *
- * @param attribute MAC PIB attribut MAC PIB attributee id(Table 86 ¡ª MAC PIB attributes)
+ * @param attribute MAC PIB attribut MAC PIB attributee id(Table 86  MAC PIB attributes)
  *
  * @param value the pointer to the value of the attribute
  *
@@ -117,16 +141,15 @@ _CODE_MAC_ void generateIEEEAddr(void){
 
 	flash_read(CFG_MAC_ADDRESS, 8, addr);
 
-	if(ZB_IEEE_ADDR_IS_INVAILD(addr)){
+	if(ZB_IEEE_ADDR_IS_INVALID(addr)){
 		unsigned int t0 = clock_time();
 		u32 jitter = 0;
 		do{
-			jitter = rand();
-			jitter &= 0xfff;
+			jitter = drv_u32Rand() % 0x0fff;
 		}while(jitter == 0);
 		while(!clock_time_exceed(t0, jitter));
 
-		generateRandomData(addr, 5);
+		drv_generateRandomData(addr, 5);
 		memcpy(addr+5, startIEEEAddr, 3);
 		flash_write(CFG_MAC_ADDRESS, 6, addr + 2);
 		flash_write(CFG_MAC_ADDRESS + 6, 2, addr);
@@ -135,12 +158,14 @@ _CODE_MAC_ void generateIEEEAddr(void){
 		 * xx xx xx 38 C1 A4 xx xx
   	  	 * xx xx xx D1 19 C4 xx xx
   	  	 * xx xx xx CB 0B D8 xx xx
+  	  	 * xx xx xx 77 5F D8 xx xx
 		 *
 		 * so, it need to do shift
 		 * */
 		if((addr[3] == 0x38 && addr[4] == 0xC1 && addr[5] == 0xA4) ||
 		   (addr[3] == 0xD1 && addr[4] == 0x19 && addr[5] == 0xC4) ||
-		   (addr[3] == 0xCB && addr[4] == 0x0B && addr[5] == 0xD8)){
+		   (addr[3] == 0xCB && addr[4] == 0x0B && addr[5] == 0xD8) ||
+		   (addr[3] == 0x77 && addr[4] == 0x5F && addr[5] == 0xD8)){
 			flash_read(CFG_MAC_ADDRESS, 6, addr + 2);
 			flash_read(CFG_MAC_ADDRESS + 6, 2, addr);
 		}

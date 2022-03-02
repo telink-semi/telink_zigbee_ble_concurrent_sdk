@@ -1,25 +1,25 @@
 /********************************************************************************************************
- * @file     zcl_identify.c
+ * @file    zcl_identify.c
  *
- * @brief	 APIs for identify cluster
+ * @brief   This is the source file for zcl_identify
  *
- * @author
- * @date     June. 10, 2017
+ * @author  Zigbee Group
+ * @date    2021
  *
- * @par      Copyright (c) 2016, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *			 The information contained herein is confidential and proprietary property of Telink
- * 		     Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *			 of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *			 Co., Ltd. and the licensee in separate contract or the terms described here-in.
- *           This heading MUST NOT be removed from this file.
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
  *
- * 			 Licensees are granted free, non-transferable use of the information in this
- *			 file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
+ *              http://www.apache.org/licenses/LICENSE-2.0
  *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *******************************************************************************************************/
-
 
 /**********************************************************************
  * INCLUDES
@@ -49,28 +49,22 @@
 static status_t zcl_identify_cmdHandler(zclIncoming_t *pInMsg);
 
 
-_CODE_ZCL_ status_t zcl_identify_register(u8 endpoint, u8 attrNum, const zclAttrInfo_t attrTbl[], cluster_forAppCb_t cb)
+_CODE_ZCL_ status_t zcl_identify_register(u8 endpoint, u16 manuCode, u8 attrNum, const zclAttrInfo_t attrTbl[], cluster_forAppCb_t cb)
 {
-    return zcl_registerCluster(endpoint, ZCL_CLUSTER_GEN_IDENTIFY, attrNum, attrTbl, zcl_identify_cmdHandler, cb);
+    return zcl_registerCluster(endpoint, ZCL_CLUSTER_GEN_IDENTIFY, manuCode, attrNum, attrTbl, zcl_identify_cmdHandler, cb);
 }
 
 
-_CODE_ZCL_ void zcl_identify_commissioningIdentify(apsdeDataInd_t *pApsdeInd, u16 identifyTime)
+_CODE_ZCL_ void zcl_identify_commissioningIdentify(zclIncoming_t *pInMsg, u16 identifyTime)
 {
+	apsdeDataInd_t *pApsdeInd = (apsdeDataInd_t*)pInMsg->msg;
+
 	clusterInfo_t *pCluster = zcl_findCluster(pApsdeInd->indInfo.dst_ep, ZCL_CLUSTER_GEN_IDENTIFY);
 	if(pCluster && pCluster->clusterAppCb){
-		zclIncomingAddrInfo_t addrInfo;
-		addrInfo.dirCluster = ZCL_FRAME_CLIENT_SERVER_DIR;
-		addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-		addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-		addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-		addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-		addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
 		zcl_identifyCmd_t identify;
 		identify.identifyTime = identifyTime;
 
-		pCluster->clusterAppCb(&addrInfo, ZCL_CMD_IDENTIFY, &identify);
+		pCluster->clusterAppCb(&(pInMsg->addrInfo), ZCL_CMD_IDENTIFY, &identify);
 	}
 }
 
@@ -140,7 +134,6 @@ _CODE_ZCL_ static status_t zcl_identifyQueryPrc(zclIncoming_t *pInMsg)
 _CODE_ZCL_ static status_t zcl_identify_clientCmdHandler(zclIncoming_t *pInMsg)
 {
 	u8 status = ZCL_STA_SUCCESS;
-	apsdeDataInd_t *pApsdeInd = (apsdeDataInd_t*)pInMsg->msg;
 
 	zcl_identify_cmdPayload_t cmdPayload;
 	memset((u8 *)&cmdPayload, 0, sizeof(zcl_identify_cmdPayload_t));
@@ -166,15 +159,7 @@ _CODE_ZCL_ static status_t zcl_identify_clientCmdHandler(zclIncoming_t *pInMsg)
 
 	if(status == ZCL_STA_SUCCESS){
 		if(pInMsg->clusterAppCb){
-			zclIncomingAddrInfo_t addrInfo;
-			addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-			addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-			addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-			addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-			addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-			addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
-			status = pInMsg->clusterAppCb(&addrInfo, pInMsg->hdr.cmd, &cmdPayload);
+			status = pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, &cmdPayload);
 		}else{
 			status = ZCL_STA_FAILURE;
 		}
@@ -186,7 +171,6 @@ _CODE_ZCL_ static status_t zcl_identify_clientCmdHandler(zclIncoming_t *pInMsg)
 _CODE_ZCL_ static status_t zcl_identify_serverCmdHandler(zclIncoming_t *pInMsg)
 {
 	u8 status = ZCL_STA_SUCCESS;
-	apsdeDataInd_t *pApsdeInd = (apsdeDataInd_t*)pInMsg->msg;
 
 	zcl_identify_cmdPayload_t cmdPayload;
 	memset((u8 *)&cmdPayload, 0, sizeof(zcl_identify_cmdPayload_t));
@@ -204,15 +188,7 @@ _CODE_ZCL_ static status_t zcl_identify_serverCmdHandler(zclIncoming_t *pInMsg)
 
 	if(status == ZCL_STA_SUCCESS){
 		if(pInMsg->clusterAppCb){
-			zclIncomingAddrInfo_t addrInfo;
-			addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-			addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-			addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-			addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-			addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-			addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
-			status = pInMsg->clusterAppCb(&addrInfo, pInMsg->hdr.cmd, &cmdPayload);
+			status = pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, &cmdPayload);
 		}else{
 			status = ZCL_STA_FAILURE;
 		}

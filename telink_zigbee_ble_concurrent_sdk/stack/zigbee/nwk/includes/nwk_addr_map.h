@@ -1,33 +1,32 @@
 /********************************************************************************************************
- * @file     nwk_addr_map.h
+ * @file    nwk_addr_map.h
  *
- * @brief	 Network layer address map
+ * @brief   This is the header file for nwk_addr_map
  *
- * @author
- * @date     Dec. 1, 2016
+ * @author  Zigbee Group
+ * @date    2021
  *
- * @par      Copyright (c) 2016, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *			 The information contained herein is confidential and proprietary property of Telink
- * 		     Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *			 of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *			 Co., Ltd. and the licensee in separate contract or the terms described here-in.
- *           This heading MUST NOT be removed from this file.
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
  *
- * 			 Licensees are granted free, non-transferable use of the information in this
- *			 file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
+ *              http://www.apache.org/licenses/LICENSE-2.0
  *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *******************************************************************************************************/
-#ifndef ZB_NWK_ADDR_MAP_H
-#define ZB_NWK_ADDR_MAP_H 1
 
-#include "tl_common.h"
-#include "../../include/tl_config.h"
-#include "nwk.h"
+#ifndef NWK_ADDR_MAP_H
+#define NWK_ADDR_MAP_H
 
 
-#define ZB_UNKNOWN_SHORT_ADDR (u16)(-1)
+
+#define ZB_UNKNOWN_SHORT_ADDR 			(u16)(-1)
 
 #ifndef TL_ZB_NWK_ADDR_MAP_NUM
 #if (ZB_ROUTER_ROLE)
@@ -45,9 +44,9 @@ typedef struct addrMapping_t{
 	u16 shortAddr;
 	u8 aps_dup_cnt;
 	u8 used:1;
-	u8 aps_dup_clock:2;
+	u8 aps_dup_clock:3;
 	u8 bind:1;
-	u8 resv:4;
+	u8 resv:3;
 }tl_zb_addr_map_entry_t;//size 20
 
 typedef struct{
@@ -57,35 +56,38 @@ typedef struct{
 	tl_zb_addr_map_entry_t addrMap[TL_ZB_NWK_ADDR_MAP_NUM]; //shall be allocated at the last field in the structure of the tl_zb_addr_map_t
 }tl_zb_addr_map_t;
 
-
 typedef struct{
-	u16 		shortAddr;
-	addrExt_t 	extAddr;
-	u8			depth;
-	u8 			rxOnWhileIdle : 1;
-	u8 			deviceType : 3;
-	u8 			relationship : 3;
-	u8 			used : 1;
+	u16 shortAddr;
+	addrExt_t extAddr;
+	u8	depth;
+	u8 	rxOnWhileIdle:1;
+	u8 	deviceType:3;
+	u8 	relationship:3;
+	u8 	used:1;
 }zb_addrForNeighbor_t;
-
 
 typedef struct{
 	u16			mask_dstTable;
 	addrExt_t 	dstExtAddr;
 }zb_addrForBind_t;
 
+typedef struct{
+	u32 devTimeout;
+	addrExt_t extAddr;
+}zb_addrForEDTimeout_t;
+
 extern u16 TL_ZB_NWK_ADDR_MAP_SIZE;
 extern tl_zb_addr_map_t g_nwkAddrMap;
 
 
-#define zb_addressTableNumGet()		g_nwkAddrMap.validNum
+#define zb_addressTableNumGet()			(g_nwkAddrMap.validNum)
 
 
-zb_nwk_status_t tl_addrByShort(u16 shortAddr, bool create, bool lock, u16 *idx);
+
 
 
 u8 zb_address_ieee_by_short(u16 short_addr, addrExt_t ieee_address) ;
-s32 tl_addrMapSave2Flash(void *arg);
+
 void tl_addrMappingForBind(u8 bind, u16 idx);
 
 addrExt_t *tl_zbExtAddrPtrByShortAddr(u16 shortAddr);
@@ -107,4 +109,4 @@ s32 nwk_bindAddrInfoUpdate(zb_addrForBind_t *pAddrNv);
 s32 nwk_bindAddrInfoDelete(zb_addrForBind_t *pAddrNv);
 
 
-#endif /* ZB_NWK_NEIGHBOR_H */
+#endif /* NWK_ADDR_MAP_H */

@@ -1,29 +1,34 @@
 /********************************************************************************************************
- * @file     rf_drv.h
+ * @file    rf_drv.h
  *
- * @brief    RF configuration interface for tlsr8258
+ * @brief   This is the header file for B85
  *
- * @author   jian.zhang@telink-semi.com
- * @date     Oct. 8, 2016
+ * @author  Driver & Zigbee Group
+ * @date    2021
  *
- * @par      Copyright (c) 2016, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *           The information contained herein is confidential property of Telink
- *           Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *           of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *           Co., Ltd. and the licensee or the terms described here-in. This heading
- *           MUST NOT be removed from this file.
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
  *
- *           Licensees are granted free, non-transferable use of the information in this
- *           file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
+ *              http://www.apache.org/licenses/LICENSE-2.0
  *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *******************************************************************************************************/
+
 #ifndef _RF_DRV_H_
 #define _RF_DRV_H_
 
+#include "bit.h"
 #include "bsp.h"
 #include "flash.h"
+#include "register.h"
+#include "analog.h"
 
 #define RF_CHN_TABLE 		0x8000
 
@@ -365,9 +370,20 @@ static inline unsigned char rf_tx_finish(void)
 {
     return (READ_REG8(0xf20) & BIT(1));
 }
+
 static inline void rf_tx_finish_clear_flag(void)
 {
     WRITE_REG8(0xf20, 0x02);
+}
+
+/**
+ *	@brief	  	This function serves to determine whether sending a packet of rf_tx_acc_code_select is finished
+ *	@param[in]	none.
+ *	@return	 	Yes: 1, NO: 0.
+ */
+static inline unsigned char rf_rx_finish(void)
+{
+    return ((read_reg8(0xf20) & BIT(0)) == 0x01);
 }
 
 static inline void rf_rx_finish_clear_flag(void)
@@ -412,25 +428,38 @@ static inline void rf_drv_cap(unsigned long addr)
 	}
 }
 
+/**
+ * @brief	  	This function serves to clear the TX/RX irq mask.
+ * @param[in]   mask 	- RX/TX irq value.
+ * @return	 	none.
+ */
+static inline void rf_clr_irq_mask(rf_irq_e mask)
+{
+	BM_CLR(reg_rf_irq_mask,mask);
+}
+
+/**
+ * @brief	  	This function serves to clear the TX/RX irq mask.
+ * @param[in]   mask 	- RX/TX irq value.
+ * @return	 	none.
+ */
+static inline void rf_set_irq_mask(rf_irq_e mask)
+{
+	BM_SET(reg_rf_irq_mask,mask);
+}
+
 extern unsigned short crc16_ccitt_cal(unsigned char *input, unsigned int len, unsigned short init_val);
 extern void rf_tx_500k_simulate_100k(unsigned char *preamble, unsigned char preamble_len,
                                      unsigned char *acc_code, unsigned char acc_len,
                                      unsigned char *payload, unsigned char pld_len,
                                      unsigned char *tx_buf, unsigned short crc_init);
-extern signed char rf_ed_detecct_154(void);
+extern signed char rf_rssi_get_154(void);
 extern unsigned char rf_stop_ed_154(void);
 
 void rf_ble_1m_param_init(void);
 
 void ble_rf_drv_init (RF_ModeTypeDef rf_mode);
 
-void backup_zigbee_rf_context(void);
-
-void restore_zigbee_rf_context(unsigned char *rxBuf);
-
-void backup_ble_rf_context(void);
-
-void restore_ble_rf_context(void);
 
 void rf_baseband_reset(void);
 

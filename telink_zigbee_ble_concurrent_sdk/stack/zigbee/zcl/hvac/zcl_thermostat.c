@@ -1,25 +1,25 @@
 /********************************************************************************************************
- * @file     zcl_thermostat.c
+ * @file    zcl_thermostat.c
  *
- * @brief	 APIs for thermostat cluster
+ * @brief   This is the source file for zcl_thermostat
  *
- * @author
- * @date     June. 10, 2017
+ * @author  Zigbee Group
+ * @date    2021
  *
- * @par      Copyright (c) 2016, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *			 The information contained herein is confidential and proprietary property of Telink
- * 		     Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *			 of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *			 Co., Ltd. and the licensee in separate contract or the terms described here-in.
- *           This heading MUST NOT be removed from this file.
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
  *
- * 			 Licensees are granted free, non-transferable use of the information in this
- *			 file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
+ *              http://www.apache.org/licenses/LICENSE-2.0
  *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *******************************************************************************************************/
-
 
 /**********************************************************************
  * INCLUDES
@@ -48,9 +48,9 @@
 static status_t zcl_thermostat_cmdHandler(zclIncoming_t *pInMsg);
 
 
-_CODE_ZCL_ status_t zcl_thermostat_register(u8 endpoint, u8 arrtNum, const zclAttrInfo_t attrTbl[], cluster_forAppCb_t cb)
+_CODE_ZCL_ status_t zcl_thermostat_register(u8 endpoint, u16 manuCode, u8 arrtNum, const zclAttrInfo_t attrTbl[], cluster_forAppCb_t cb)
 {
-	return zcl_registerCluster(endpoint, ZCL_CLUSTER_HAVC_THERMOSTAT, arrtNum, attrTbl, zcl_thermostat_cmdHandler, cb);
+	return zcl_registerCluster(endpoint, ZCL_CLUSTER_HAVC_THERMOSTAT, manuCode, arrtNum, attrTbl, zcl_thermostat_cmdHandler, cb);
 }
 
 
@@ -230,25 +230,16 @@ _CODE_ZCL_ status_t zcl_thermostat_getRelayStatusLogRspCmd(u8 srcEp, epInfo_t *p
 _CODE_ZCL_ static status_t zcl_thermostat_setpointRaiseLowerPrc(zclIncoming_t *pInMsg)
 {
 	status_t status = ZCL_STA_SUCCESS;
-    apsdeDataInd_t *pApsdeInd = (apsdeDataInd_t*)pInMsg->msg;
     u8 *pData = pInMsg->pData;
 
 	if(pInMsg->clusterAppCb){
-		zclIncomingAddrInfo_t addrInfo;
-		addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-		addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-		addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-		addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-		addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-		addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
 		zcl_thermostat_setpointRaiseLowerCmd_t cmd;
 		TL_SETSTRUCTCONTENT(cmd, 0);
 
 		cmd.mode = *pData++;
 		cmd.amount = *pData++;
 
-		status = pInMsg->clusterAppCb(&addrInfo, pInMsg->hdr.cmd, &cmd);
+		status = pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, &cmd);
 	}else{
 		status = ZCL_STA_FAILURE;
 	}
@@ -259,18 +250,9 @@ _CODE_ZCL_ static status_t zcl_thermostat_setpointRaiseLowerPrc(zclIncoming_t *p
 _CODE_ZCL_ static status_t zcl_thermostat_setWeeklySchedulePrc(zclIncoming_t *pInMsg)
 {
 	status_t status = ZCL_STA_SUCCESS;
-    apsdeDataInd_t *pApsdeInd = (apsdeDataInd_t*)pInMsg->msg;
     u8 *pData = pInMsg->pData;
 
 	if(pInMsg->clusterAppCb){
-		zclIncomingAddrInfo_t addrInfo;
-		addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-		addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-		addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-		addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-		addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-		addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
 		zcl_thermostat_setWeeklyScheduleCmd_t cmd;
 		TL_SETSTRUCTCONTENT(cmd, 0);
 
@@ -287,7 +269,7 @@ _CODE_ZCL_ static status_t zcl_thermostat_setWeeklySchedulePrc(zclIncoming_t *pI
 			}
 		}
 
-		status = pInMsg->clusterAppCb(&addrInfo, pInMsg->hdr.cmd, &cmd);
+		status = pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, &cmd);
 	}else{
 		status = ZCL_STA_FAILURE;
 	}
@@ -298,25 +280,16 @@ _CODE_ZCL_ static status_t zcl_thermostat_setWeeklySchedulePrc(zclIncoming_t *pI
 _CODE_ZCL_ static status_t zcl_thermostat_getWeeklySchedulePrc(zclIncoming_t *pInMsg)
 {
 	status_t status = ZCL_STA_SUCCESS;
-    apsdeDataInd_t *pApsdeInd = (apsdeDataInd_t*)pInMsg->msg;
     u8 *pData = pInMsg->pData;
 
 	if(pInMsg->clusterAppCb){
-		zclIncomingAddrInfo_t addrInfo;
-		addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-		addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-		addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-		addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-		addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-		addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
 		zcl_thermostat_getWeeklyScheduleCmd_t cmd;
 		TL_SETSTRUCTCONTENT(cmd, 0);
 
 		cmd.daysToReturn = *pData++;
 		cmd.modeToReturn = *pData++;
 
-		status = pInMsg->clusterAppCb(&addrInfo, pInMsg->hdr.cmd, &cmd);
+		status = pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, &cmd);
 	}else{
 		status = ZCL_STA_FAILURE;
 	}
@@ -327,20 +300,9 @@ _CODE_ZCL_ static status_t zcl_thermostat_getWeeklySchedulePrc(zclIncoming_t *pI
 _CODE_ZCL_ static status_t zcl_thermostat_clearWeeklySchedulePrc(zclIncoming_t *pInMsg)
 {
 	status_t status = ZCL_STA_SUCCESS;
-    apsdeDataInd_t *pApsdeInd = (apsdeDataInd_t*)pInMsg->msg;
 
 	if(pInMsg->clusterAppCb){
-		zclIncomingAddrInfo_t addrInfo;
-		addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-		addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-		addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-		addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-		addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-		addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
-		//no payload.
-
-		status = pInMsg->clusterAppCb(&addrInfo, pInMsg->hdr.cmd, NULL);
+		status = pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, NULL);
 	}else{
 		status = ZCL_STA_FAILURE;
 	}
@@ -351,20 +313,11 @@ _CODE_ZCL_ static status_t zcl_thermostat_clearWeeklySchedulePrc(zclIncoming_t *
 _CODE_ZCL_ static status_t zcl_thermostat_getRelayStatusLogPrc(zclIncoming_t *pInMsg)
 {
 	status_t status = ZCL_STA_SUCCESS;
-    apsdeDataInd_t *pApsdeInd = (apsdeDataInd_t*)pInMsg->msg;
 
 	if(pInMsg->clusterAppCb){
-		zclIncomingAddrInfo_t addrInfo;
-		addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-		addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-		addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-		addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-		addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-		addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
 		//no payload.
 
-		status = pInMsg->clusterAppCb(&addrInfo, pInMsg->hdr.cmd, NULL);
+		status = pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, NULL);
 	}else{
 		status = ZCL_STA_FAILURE;
 	}
@@ -375,18 +328,9 @@ _CODE_ZCL_ static status_t zcl_thermostat_getRelayStatusLogPrc(zclIncoming_t *pI
 _CODE_ZCL_ static status_t zcl_thermostat_getWeeklyScheduleRspPrc(zclIncoming_t *pInMsg)
 {
 	status_t status = ZCL_STA_SUCCESS;
-    apsdeDataInd_t *pApsdeInd = (apsdeDataInd_t*)pInMsg->msg;
     u8 *pData = pInMsg->pData;
 
 	if(pInMsg->clusterAppCb){
-		zclIncomingAddrInfo_t addrInfo;
-		addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-		addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-		addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-		addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-		addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-		addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
 		zcl_thermostat_getWeeklyScheduleRspCmd_t cmd;
 		TL_SETSTRUCTCONTENT(cmd, 0);
 
@@ -403,7 +347,7 @@ _CODE_ZCL_ static status_t zcl_thermostat_getWeeklyScheduleRspPrc(zclIncoming_t 
 			}
 		}
 
-		status = pInMsg->clusterAppCb(&addrInfo, pInMsg->hdr.cmd, &cmd);
+		status = pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, &cmd);
 	}else{
 		status = ZCL_STA_FAILURE;
 	}
@@ -414,18 +358,9 @@ _CODE_ZCL_ static status_t zcl_thermostat_getWeeklyScheduleRspPrc(zclIncoming_t 
 _CODE_ZCL_ static status_t zcl_thermostat_getRelayStatusLogRspPrc(zclIncoming_t *pInMsg)
 {
 	status_t status = ZCL_STA_SUCCESS;
-    apsdeDataInd_t *pApsdeInd = (apsdeDataInd_t*)pInMsg->msg;
     u8 *pData = pInMsg->pData;
 
 	if(pInMsg->clusterAppCb){
-		zclIncomingAddrInfo_t addrInfo;
-		addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-		addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-		addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-		addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-		addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-		addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
 		zcl_thermostat_getRelayStatusLogRspCmd_t cmd;
 		TL_SETSTRUCTCONTENT(cmd, 0);
 
@@ -441,7 +376,7 @@ _CODE_ZCL_ static status_t zcl_thermostat_getRelayStatusLogRspPrc(zclIncoming_t 
 		cmd.unreadEntries = BUILD_U16(pData[0], pData[1]);
 		pData += 2;
 
-		status = pInMsg->clusterAppCb(&addrInfo, pInMsg->hdr.cmd, &cmd);
+		status = pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, &cmd);
 	}else{
 		status = ZCL_STA_FAILURE;
 	}

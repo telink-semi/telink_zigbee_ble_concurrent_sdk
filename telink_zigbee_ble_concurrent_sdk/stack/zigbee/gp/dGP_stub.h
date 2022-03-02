@@ -1,28 +1,29 @@
 /********************************************************************************************************
- * @file     dGP_stub.h
+ * @file    dGP_stub.h
  *
- * @brief    header file for dedicated Green Power
+ * @brief   This is the header file for dGP_stub
  *
- * @author
- * @date     May. 27, 2017
+ * @author  Zigbee Group
+ * @date    2021
  *
- * @par      Copyright (c) 2017, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *			 The information contained herein is confidential and proprietary property of Telink
- * 		     Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *			 of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *			 Co., Ltd. and the licensee in separate contract or the terms described here-in.
- *           This heading MUST NOT be removed from this file.
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
  *
- * 			 Licensees are granted free, non-transferable use of the information in this
- *			 file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
+ *              http://www.apache.org/licenses/LICENSE-2.0
  *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *******************************************************************************************************/
+
 #ifndef DGP_STUB_H
 #define DGP_STUB_H
 
-#include "tl_common.h"
 
 
 //A GP Basic Proxy device shall have a minimum length of 1 entry
@@ -235,7 +236,10 @@ typedef struct
 	gp_data_ind_t *buf;	//hold gpDataInd buffer
 	u8	timeout;
 	u8	dGpStubHandle;
-	u8	used;
+	u8	gpdfSecKey:1;
+	u8	gpdfSecLevel:2;
+	u8	used:1;
+	u8	reserved:4;
 }gp_data_ind_entry_t;
 
 

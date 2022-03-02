@@ -1,33 +1,32 @@
 /********************************************************************************************************
- * @file     adc.h
+ * @file    adc.h
  *
- * @brief    This is the ADC driver header file for TLSR8258
+ * @brief   This is the header file for B85
  *
- * @author	 Driver Group
- * @date     May 8, 2018
+ * @author  Driver & Zigbee Group
+ * @date    2021
  *
- * @par      Copyright (c) 2018, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *           The information contained herein is confidential property of Telink
- *           Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *           of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *           Co., Ltd. and the licensee or the terms described here-in. This heading
- *           MUST NOT be removed from this file.
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
  *
- *           Licensees are granted free, non-transferable use of the information in this
- *           file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
- * @par      History:
- * 			 1.initial release(DEC. 26 2018)
+ *              http://www.apache.org/licenses/LICENSE-2.0
  *
- * @version  A001
- *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *******************************************************************************************************/
+
 #pragma once
-#include "bsp.h"
-#include "analog.h"
+
 #include "register.h"
-#include "gpio_8258.h"
+#include "analog.h"
+#include "bit.h"
+#include "gpio.h"
 
 
 /**
@@ -38,7 +37,7 @@ typedef enum{
 	ADC_SAMPLE_RATE_96K
 }ADC_SampleRateTypeDef;
 
-#define   ADC_SAMPLE_RATE_SELECT        ADC_SAMPLE_RATE_23K
+#define ADC_SAMPLE_RATE_SELECT        ADC_SAMPLE_RATE_23K
 
 
 
@@ -50,7 +49,6 @@ typedef struct {
 
 extern adc_vref_ctr_t adc_vref_cfg;
 
-extern GPIO_PinTypeDef ADC_GPIO_tab[10];
 
 /**
  *  ADC reference voltage
@@ -61,8 +59,6 @@ typedef enum{
 	ADC_VREF_1P2V,
 	ADC_VREF_VBAT_N,
 }ADC_RefVolTypeDef;
-
-
 
 /**
  *  ADC Vbat divider
@@ -226,18 +222,17 @@ typedef enum {
  * @param[in] en - 1 enable  0 disable
  * @return     none.
  */
-static inline void	adc_calib_vref_enable(unsigned char en)
+static inline void adc_calib_vref_enable(unsigned char en)
 {
 	adc_vref_cfg.adc_calib_en = en;
 }
-
 
 /**
  * @brief      This function reset adc module
  * @param[in]  none.
  * @return     none.
  */
-static inline void	adc_reset_adc_module (void)
+static inline void adc_reset_adc_module(void)
 {
 	reg_rst1 = FLD_RST1_ADC;
 	reg_rst1 = 0;
@@ -248,17 +243,18 @@ static inline void	adc_reset_adc_module (void)
  * @param[in]  en - variable of source clock state 1: enable;  0: disable.
  * @return     none.
  */
-static inline void adc_enable_clk_24m_to_sar_adc (unsigned int en)
+static inline void adc_enable_clk_24m_to_sar_adc(unsigned int en)
 {
 	if(en)
 	{
-		analog_write(areg_clk_setting	, analog_read(areg_clk_setting	) | FLD_CLK_24M_TO_SAR_EN);
+		analog_write(areg_clk_setting, analog_read(areg_clk_setting) | FLD_CLK_24M_TO_SAR_EN);
 	}
 	else
 	{
-		analog_write(areg_clk_setting	, analog_read(areg_clk_setting	) & ~FLD_CLK_24M_TO_SAR_EN);
+		analog_write(areg_clk_setting, analog_read(areg_clk_setting) & ~FLD_CLK_24M_TO_SAR_EN);
 	}
 }
+
 /**************************************************************************************
 afe_0xF4
     BIT<2:0>  adc_clk_div
@@ -279,7 +275,7 @@ enum{
 static inline void adc_set_sample_clk(unsigned char div)
 {
 	//afe_0xF4<7:3> is reserved, so no need to care its value (confirmed by junwei & congqing 20190805)
-	analog_write(areg_adc_sampling_clk_div,  div & 0x07 );
+	analog_write(areg_adc_sampling_clk_div, div & 0x07 );
 }
 
 /**************************************************************************************
@@ -318,7 +314,7 @@ enum{
  */
 static inline void adc_set_vref(ADC_RefVolTypeDef vRef_L, ADC_RefVolTypeDef vRef_R, ADC_RefVolTypeDef vRef_M)
 {
-	analog_write(areg_adc_vref, vRef_L | vRef_R<<2 | vRef_M<<4);
+	analog_write(areg_adc_vref, vRef_L | vRef_R << 2 | vRef_M << 4);
 }
 
 /**
@@ -328,7 +324,7 @@ static inline void adc_set_vref(ADC_RefVolTypeDef vRef_L, ADC_RefVolTypeDef vRef
  */
 static inline void adc_set_vref_chn_left(ADC_RefVolTypeDef v_ref)
 {
-	analog_write(areg_adc_vref, ((analog_read(areg_adc_vref)&(~FLD_ADC_VREF_CHN_L)) | (v_ref)) );
+	analog_write(areg_adc_vref, ((analog_read(areg_adc_vref) & (~FLD_ADC_VREF_CHN_L)) | (v_ref)));
 }
 
 /**
@@ -337,9 +333,8 @@ static inline void adc_set_vref_chn_left(ADC_RefVolTypeDef v_ref)
  * @return     none
  */
 static inline void adc_set_vref_chn_right(ADC_RefVolTypeDef v_ref)
-
 {
-	analog_write(areg_adc_vref, ((analog_read(areg_adc_vref)&(~FLD_ADC_VREF_CHN_R)) | (v_ref<<2) ));
+	analog_write(areg_adc_vref, ((analog_read(areg_adc_vref) & (~FLD_ADC_VREF_CHN_R)) | (v_ref << 2)));
 }
 
 /**
@@ -348,9 +343,8 @@ static inline void adc_set_vref_chn_right(ADC_RefVolTypeDef v_ref)
  * @return     none
  */
 static inline void adc_set_vref_chn_misc(ADC_RefVolTypeDef v_ref)
-
 {
-	analog_write(areg_adc_vref, ((analog_read(areg_adc_vref)&(~FLD_ADC_VREF_CHN_M)) | (v_ref<<4)) );
+	analog_write(areg_adc_vref, ((analog_read(areg_adc_vref) & (~FLD_ADC_VREF_CHN_M)) | (v_ref << 4)));
 }
 
 /**
@@ -374,7 +368,7 @@ enum{
  */
 static inline void adc_set_vref_vbat_divider(ADC_VbatDivTypeDef vbat_div)
 {
-	analog_write (areg_adc_vref_vbat_div, (analog_read(areg_adc_vref_vbat_div)&(~FLD_ADC_VREF_VBAT_DIV)) | (vbat_div<<2) );
+	analog_write(areg_adc_vref_vbat_div, (analog_read(areg_adc_vref_vbat_div) & (~FLD_ADC_VREF_VBAT_DIV)) | (vbat_div << 2));
 }
 
 
@@ -435,9 +429,8 @@ enum{
  * @return none
  */
 static inline void adc_set_ain_chn_misc(ADC_InputPchTypeDef p_ain, ADC_InputNchTypeDef n_ain)
-
 {
-	analog_write (areg_adc_ain_chn_misc	, n_ain | p_ain<<4 );
+	analog_write(areg_adc_ain_chn_misc, n_ain | p_ain << 4);
 }
 
 /**
@@ -447,9 +440,8 @@ static inline void adc_set_ain_chn_misc(ADC_InputPchTypeDef p_ain, ADC_InputNchT
  * @return none
  */
 static inline void adc_set_ain_chn_left(ADC_InputPchTypeDef p_ain, ADC_InputNchTypeDef n_ain)
-
 {
-	analog_write (areg_adc_ain_chn_left, n_ain | p_ain<<4 );
+	analog_write(areg_adc_ain_chn_left, n_ain | p_ain << 4);
 }
 
 /**
@@ -459,9 +451,8 @@ static inline void adc_set_ain_chn_left(ADC_InputPchTypeDef p_ain, ADC_InputNchT
  * @return none
  */
 static inline void adc_set_ain_chn_right(ADC_InputPchTypeDef p_ain, ADC_InputNchTypeDef n_ain)
-
 {
-	analog_write (areg_adc_ain_chn_right, n_ain | p_ain<<4 );
+	analog_write(areg_adc_ain_chn_right, n_ain | p_ain << 4);
 }
 
 /**
@@ -470,19 +461,18 @@ static inline void adc_set_ain_chn_right(ADC_InputPchTypeDef p_ain, ADC_InputNch
  * @return     none
  */
 static inline void adc_set_ain_negative_chn_misc(ADC_InputNchTypeDef v_ain)
-
 {
-	analog_write (areg_adc_ain_chn_misc	, (analog_read(areg_adc_ain_chn_misc	)&(~FLD_ADC_AIN_NEGATIVE)) | (v_ain) );
+	analog_write(areg_adc_ain_chn_misc, (analog_read(areg_adc_ain_chn_misc) & (~FLD_ADC_AIN_NEGATIVE)) | (v_ain));
 }
+
 /**
  * @brief      This function sets ADC analog positive input channel for the MISC channel
  * @param[in]  v_ain - enum variable of ADC analog positive input.
  * @return     none
  */
 static inline void adc_set_ain_positive_chn_misc(ADC_InputPchTypeDef v_ain)
-
 {
-	analog_write (areg_adc_ain_chn_misc	, (analog_read(areg_adc_ain_chn_misc	)&(~FLD_ADC_AIN_POSITIVE)) | (v_ain<<4) );
+	analog_write(areg_adc_ain_chn_misc, (analog_read(areg_adc_ain_chn_misc) & (~FLD_ADC_AIN_POSITIVE)) | (v_ain << 4));
 }
 
 /**
@@ -491,9 +481,8 @@ static inline void adc_set_ain_positive_chn_misc(ADC_InputPchTypeDef v_ain)
  * @return     none
  */
 static inline void adc_set_ain_negative_chn_left(ADC_InputNchTypeDef v_ain)
-
 {
-	analog_write (areg_adc_ain_chn_left, (analog_read(areg_adc_ain_chn_left)&(~FLD_ADC_AIN_NEGATIVE)) | (v_ain) );
+	analog_write (areg_adc_ain_chn_left, (analog_read(areg_adc_ain_chn_left) & (~FLD_ADC_AIN_NEGATIVE)) | (v_ain));
 }
 
 /**
@@ -501,11 +490,9 @@ static inline void adc_set_ain_negative_chn_left(ADC_InputNchTypeDef v_ain)
  * @param[in]  v_ain - enum variable of ADC analog positive input.
  * @return     none
  */
-
 static inline void adc_set_ain_positive_chn_left(ADC_InputPchTypeDef v_ain)
-
 {
-	analog_write (areg_adc_ain_chn_left, (analog_read(areg_adc_ain_chn_left)&(~FLD_ADC_AIN_POSITIVE)) | (v_ain<<4) );
+	analog_write (areg_adc_ain_chn_left, (analog_read(areg_adc_ain_chn_left) & (~FLD_ADC_AIN_POSITIVE)) | (v_ain << 4));
 }
 
 /**
@@ -513,11 +500,9 @@ static inline void adc_set_ain_positive_chn_left(ADC_InputPchTypeDef v_ain)
  * @param[in]  v_ain - enum variable of ADC analog negative input.
  * @return     none
  */
-
 static inline void adc_set_ain_negative_chn_right(ADC_InputNchTypeDef v_ain)
-
 {
-analog_write (areg_adc_ain_chn_right, (analog_read(areg_adc_ain_chn_right)&(~FLD_ADC_AIN_NEGATIVE)) | (v_ain) );
+	analog_write (areg_adc_ain_chn_right, (analog_read(areg_adc_ain_chn_right) & (~FLD_ADC_AIN_NEGATIVE)) | (v_ain));
 }
 
 /**
@@ -526,9 +511,8 @@ analog_write (areg_adc_ain_chn_right, (analog_read(areg_adc_ain_chn_right)&(~FLD
  * @return     none
  */
 static inline void adc_set_ain_positive_chn_right(ADC_InputPchTypeDef v_ain)
-
 {
-	analog_write (areg_adc_ain_chn_right, (analog_read(areg_adc_ain_chn_right)&(~FLD_ADC_AIN_POSITIVE)) | (v_ain<<4) );
+	analog_write (areg_adc_ain_chn_right, (analog_read(areg_adc_ain_chn_right) & (~FLD_ADC_AIN_POSITIVE)) | (v_ain << 4));
 }
 
 /**************************************************************************************
@@ -564,7 +548,7 @@ enum{
  */
 static inline void adc_set_resolution_chn_left(ADC_ResTypeDef v_res)
 {
-	analog_write(areg_adc_res_l_r, (analog_read(areg_adc_res_l_r)&(~FLD_ADC_RES_L)) | (v_res) );
+	analog_write(areg_adc_res_l_r, (analog_read(areg_adc_res_l_r) & (~FLD_ADC_RES_L)) | (v_res));
 }
 
 /**
@@ -573,9 +557,8 @@ static inline void adc_set_resolution_chn_left(ADC_ResTypeDef v_res)
  * @return     none
  */
 static inline void adc_set_resolution_chn_right(ADC_ResTypeDef v_res)
-
 {
-	analog_write(areg_adc_res_l_r, (analog_read(areg_adc_res_l_r)&(~FLD_ADC_RES_R)) | (v_res<<4) );
+	analog_write(areg_adc_res_l_r, (analog_read(areg_adc_res_l_r) & (~FLD_ADC_RES_R)) | (v_res << 4));
 }
 
 
@@ -604,7 +587,7 @@ enum{
  */
 static inline void adc_set_resolution_chn_misc(ADC_ResTypeDef v_res)
 {
-	analog_write(anareg_adc_res_m, (analog_read(anareg_adc_res_m)&(~FLD_ADC_RES_M)) | (v_res) );
+	analog_write(anareg_adc_res_m, (analog_read(anareg_adc_res_m) & (~FLD_ADC_RES_M)) | (v_res));
 }
 
 /**
@@ -628,13 +611,12 @@ static inline void adc_set_input_mode_chn_left(ADC_InputModeTypeDef m_input)
  * @return     none
  */
 static inline void adc_set_input_mode_chn_right(ADC_InputModeTypeDef m_input)
-
 {
 	if(m_input){  //differential mode
-		analog_write(anareg_adc_res_m, analog_read(anareg_adc_res_m) | FLD_ADC_EN_DIFF_CHN_R );
+		analog_write(anareg_adc_res_m, analog_read(anareg_adc_res_m) | FLD_ADC_EN_DIFF_CHN_R);
 	}
 	else{  //single-ended mode
-		analog_write(anareg_adc_res_m, analog_read(anareg_adc_res_m) & (~FLD_ADC_EN_DIFF_CHN_R) );
+		analog_write(anareg_adc_res_m, analog_read(anareg_adc_res_m) & (~FLD_ADC_EN_DIFF_CHN_R));
 	}
 }
 
@@ -646,10 +628,10 @@ static inline void adc_set_input_mode_chn_right(ADC_InputModeTypeDef m_input)
 static inline void adc_set_input_mode_chn_misc(ADC_InputModeTypeDef m_input)
 {
 	if(m_input){  //differential mode
-		analog_write(anareg_adc_res_m, analog_read(anareg_adc_res_m) | FLD_ADC_EN_DIFF_CHN_M );
+		analog_write(anareg_adc_res_m, analog_read(anareg_adc_res_m) | FLD_ADC_EN_DIFF_CHN_M);
 	}
 	else{  //single-ended mode
-		analog_write(anareg_adc_res_m, analog_read(anareg_adc_res_m) & (~FLD_ADC_EN_DIFF_CHN_M) );
+		analog_write(anareg_adc_res_m, analog_read(anareg_adc_res_m) & (~FLD_ADC_EN_DIFF_CHN_M));
 	}
 }
 
@@ -659,7 +641,7 @@ static inline void adc_set_input_mode_chn_misc(ADC_InputModeTypeDef m_input)
  * @param[in]  m_input - enum variable of ADC channel input mode.
  * @return none
  */
-void adc_set_input_mode(ADC_ChTypeDef ch_n,  ADC_InputModeTypeDef m_input);
+void adc_set_input_mode(ADC_ChTypeDef ch_n, ADC_InputModeTypeDef m_input);
 
 
 #define areg_adc_tsmaple_m				0xee
@@ -676,7 +658,7 @@ static inline void adc_set_tsample_cycle_chn_misc(ADC_SampCycTypeDef adcST)
 {
 	//ana_ee<7:4> is reserved, so no need care its value (confirmed by junwei & congqing 20190805)
 	//analog_write(areg_adc_tsmaple_m, (analog_read(areg_adc_tsmaple_m)&(~FLD_ADC_TSAMPLE_CYCLE_CHN_M)) | (adcST) );
-	analog_write(areg_adc_tsmaple_m, adcST );  //optimize, <7:4> not cared
+	analog_write(areg_adc_tsmaple_m, adcST);  //optimize, <7:4> not cared
 }
 
 /**************************************************************************************
@@ -706,9 +688,8 @@ enum{
  * @return     none
  */
 static inline void adc_set_tsample_cycle_chn_left(ADC_SampCycTypeDef adcST)
-
 {
-	analog_write(areg_adc_tsmaple_l_r, (analog_read(areg_adc_tsmaple_l_r)&(~FLD_ADC_TSAMPLE_CYCLE_CHN_L)) | (adcST) );
+	analog_write(areg_adc_tsmaple_l_r, (analog_read(areg_adc_tsmaple_l_r) & (~FLD_ADC_TSAMPLE_CYCLE_CHN_L)) | (adcST));
 }
 
 /**
@@ -718,7 +699,7 @@ static inline void adc_set_tsample_cycle_chn_left(ADC_SampCycTypeDef adcST)
  */
 static inline void adc_set_tsample_cycle_chn_right(ADC_SampCycTypeDef adcST)
 {
-	analog_write(areg_adc_tsmaple_l_r, (analog_read(areg_adc_tsmaple_l_r)&(~FLD_ADC_TSAMPLE_CYCLE_CHN_R)) | (adcST<<4) );
+	analog_write(areg_adc_tsmaple_l_r, (analog_read(areg_adc_tsmaple_l_r) & (~FLD_ADC_TSAMPLE_CYCLE_CHN_R)) | (adcST << 4));
 }
 
 /**
@@ -737,9 +718,9 @@ afe_0xF1
 		<5:4>   r_max_c[9:8]
 		<7:6>   r_max_mc[9:8]
 
-	r_max_mc[9:0]: serves to set length of ¡°capture¡± state for RNS and Misc channel.
-	r_max_c[9:0]:  serves to set length of ¡°capture¡± state for left and right channel.
-	r_max_s:       serves to set length of ¡°set¡± state for left, right and Misc channel.
+	r_max_mc[9:0]: serves to set length of capture state for RNS and Misc channel.
+	r_max_c[9:0]:  serves to set length of capture state for left and right channel.
+	r_max_s:       serves to set length of set state for left, right and Misc channel.
 
 	Note: State length indicates number of 24M clock cycles occupied by the state.
  *************************************************************************************/
@@ -760,13 +741,13 @@ enum{
 };
 
 /**
- * @brief      This function sets length of each ¡°set¡± state
+ * @brief      This function sets length of each set state
  * @param[in]  r_max_s - variable of length of "set" state
  * @return     none
  */
-static inline void adc_set_length_set_state (unsigned char r_max_s)
+static inline void adc_set_length_set_state(unsigned char r_max_s)
 {
-	analog_write(areg_r_max_s, (analog_read(areg_r_max_s)&(~FLD_R_MAX_S)) | (r_max_s) );
+	analog_write(areg_r_max_s, (analog_read(areg_r_max_s) & (~FLD_R_MAX_S)) | (r_max_s));
 }
 
 /**
@@ -776,10 +757,10 @@ static inline void adc_set_length_set_state (unsigned char r_max_s)
  * note :  0xef<7:0>  r_max_mc[7:0]
  *         0xf1<7:6>  r_max_mc[9:8]
  */
-static inline void adc_set_length_capture_state_for_chn_misc_rns (unsigned short r_max_mc)
+static inline void adc_set_length_capture_state_for_chn_misc_rns(unsigned short r_max_mc)
 {
-	analog_write(areg_r_max_mc,  (r_max_mc & 0x0ff));
-	analog_write(areg_r_max_s,  ((analog_read(areg_r_max_s)&(~FLD_R_MAX_MC1)) | ((r_max_mc&0x3ff)>>8)<<6 ));
+	analog_write(areg_r_max_mc, (r_max_mc & 0x0ff));
+	analog_write(areg_r_max_s, ((analog_read(areg_r_max_s) & (~FLD_R_MAX_MC1)) | ((r_max_mc&0x3ff) >> 8) << 6));
 }
 
 /**
@@ -789,10 +770,10 @@ static inline void adc_set_length_capture_state_for_chn_misc_rns (unsigned short
  * note : 0xf0<7:0>  r_max_c[7:0]
  *        0xf1<5:4>  r_max_c[9:8]
  */
-static inline void  adc_set_length_capture_state_for_chn_left_right(unsigned short r_max_c)
+static inline void adc_set_length_capture_state_for_chn_left_right(unsigned short r_max_c)
 {
-	analog_write(areg_r_max_c ,  r_max_c & 0xff);
-	analog_write(areg_r_max_s,  (analog_read(areg_r_max_s)&(~FLD_R_MAX_C1)) | (((r_max_c&0x3ff)>>8)<<4));
+	analog_write(areg_r_max_c, r_max_c & 0xff);
+	analog_write(areg_r_max_s, (analog_read(areg_r_max_s) & (~FLD_R_MAX_C1)) | (((r_max_c&0x3ff) >> 8) << 4));
 }
 
 /**
@@ -806,8 +787,7 @@ static inline void adc_set_state_length(unsigned short R_max_mc, unsigned short 
 {
 	analog_write(areg_r_max_mc, R_max_mc);
 	analog_write(areg_r_max_c, R_max_c);
-	analog_write(areg_r_max_s, ((R_max_mc>>8)<<6) | ((R_max_c>>8)<<4)  | (R_max_s & FLD_R_MAX_S)   );
-
+	analog_write(areg_r_max_s, ((R_max_mc >> 8) << 6) | ((R_max_c >> 8) << 4) | (R_max_s & FLD_R_MAX_S));
 }
 
 /***************************************************************************************
@@ -831,9 +811,9 @@ enum{
  * @param[in]  ad_ch - enum variable of ADC input channel.
  * @return     none
  */
-static inline void  adc_set_chn_enable(ADC_ChTypeDef ad_ch)
+static inline void adc_set_chn_enable(ADC_ChTypeDef ad_ch)
 {
-	analog_write(areg_adc_chn_en, (analog_read(areg_adc_chn_en)&0xf0) | ad_ch );
+	analog_write(areg_adc_chn_en, (analog_read(areg_adc_chn_en) & 0xf0) | ad_ch);
 }
 
 /**
@@ -844,7 +824,7 @@ static inline void  adc_set_chn_enable(ADC_ChTypeDef ad_ch)
  */
 static inline void adc_set_chn_enable_and_max_state_cnt(ADC_ChTypeDef ad_ch, unsigned char s_cnt)
 {
-	analog_write(areg_adc_chn_en, ad_ch | ((s_cnt&0x07)<<4) );
+	analog_write(areg_adc_chn_en, ad_ch | ((s_cnt & 0x07) << 4));
 }
 
 /**
@@ -854,7 +834,7 @@ static inline void adc_set_chn_enable_and_max_state_cnt(ADC_ChTypeDef ad_ch, uns
  */
 static inline void adc_set_max_state_cnt(unsigned char s_cnt)
 {
-	analog_write(areg_adc_chn_en, (analog_read(areg_adc_chn_en)&(~FLD_ADC_MAX_SCNT)) | ((s_cnt&0x07)<<4) );
+	analog_write(areg_adc_chn_en, (analog_read(areg_adc_chn_en) & (~FLD_ADC_MAX_SCNT)) | ((s_cnt & 0x07) << 4));
 }
 
 /**************************************************************************************
@@ -886,7 +866,7 @@ enum{
  */
 static inline void adc_set_itrim_preamp(ADC_Cur_TrimTypeDef bias)
 {
-	analog_write( areg_ain_scale  , (analog_read( areg_ain_scale  )&(~FLD_ADC_ITRIM_PREAMP)) | (bias<<0) );
+	analog_write(areg_ain_scale, (analog_read(areg_ain_scale) & (~FLD_ADC_ITRIM_PREAMP)) | (bias << 0));
 }
 
 /**
@@ -896,7 +876,7 @@ static inline void adc_set_itrim_preamp(ADC_Cur_TrimTypeDef bias)
  */
 static inline void adc_set_itrim_vrefbuf(ADC_Cur_TrimTypeDef bias)
 {
-	analog_write( areg_ain_scale  , (analog_read( areg_ain_scale  )&(~FLD_ADC_ITRIM_VREFBUF)) | (bias<<2) );
+	analog_write(areg_ain_scale, (analog_read(areg_ain_scale) & (~FLD_ADC_ITRIM_VREFBUF)) | (bias << 2));
 }
 
 /**
@@ -906,7 +886,7 @@ static inline void adc_set_itrim_vrefbuf(ADC_Cur_TrimTypeDef bias)
  */
 static inline void adc_set_itrim_vcmbuf(ADC_Cur_TrimTypeDef bias)
 {
-	analog_write( areg_ain_scale  , (analog_read( areg_ain_scale  )&(~FLD_ADC_ITRIM_VCMBUF)) | (bias<<4) );
+	analog_write(areg_ain_scale, (analog_read(areg_ain_scale) & (~FLD_ADC_ITRIM_VCMBUF)) | (bias << 4));
 }
 
 /**************************************************************************************
@@ -954,7 +934,7 @@ enum{
  */
 static inline void adc_set_left_boost_bias(ADC_Gain_BiasTypeDef bias)
 {
-	analog_write(areg_adc_pga_boost, (analog_read(areg_adc_pga_boost)&(~FLD_PGA_ITRIM_BOOST_L)) | (bias<<4) | FLD_PGA_CAP_TRIM_EN_L );
+	analog_write(areg_adc_pga_boost, (analog_read(areg_adc_pga_boost) & (~FLD_PGA_ITRIM_BOOST_L)) | (bias << 4) | FLD_PGA_CAP_TRIM_EN_L);
 }
 
 /**
@@ -964,7 +944,7 @@ static inline void adc_set_left_boost_bias(ADC_Gain_BiasTypeDef bias)
  */
 static inline void adc_set_right_boost_bias(ADC_Gain_BiasTypeDef bias)
 {
-	analog_write(areg_adc_pga_boost, (analog_read(areg_adc_pga_boost)&(~FLD_PGA_ITRIM_BOOST_R)) | (bias<<6) |  FLD_PGA_CAP_TRIM_EN_R);
+	analog_write(areg_adc_pga_boost, (analog_read(areg_adc_pga_boost) & (~FLD_PGA_ITRIM_BOOST_R)) | (bias << 6) | FLD_PGA_CAP_TRIM_EN_R);
 }
 
 #define areg_adc_pga_ctrl		0xfc
@@ -985,7 +965,7 @@ enum{
  */
 static inline void adc_set_left_right_gain_bias(ADC_Gain_BiasTypeDef bias_L, ADC_Gain_BiasTypeDef bias_R)
 {
-	analog_write(areg_adc_pga_ctrl, (analog_read(areg_adc_pga_ctrl) & 0xf0) | (bias_L | bias_R<<2) );
+	analog_write(areg_adc_pga_ctrl, (analog_read(areg_adc_pga_ctrl) & 0xf0) | (bias_L | bias_R << 2) );
 }
 
 /**
@@ -995,7 +975,7 @@ static inline void adc_set_left_right_gain_bias(ADC_Gain_BiasTypeDef bias_L, ADC
  */
 static inline void adc_set_left_gain_bias(ADC_Gain_BiasTypeDef bias)
 {
-	analog_write(areg_adc_pga_ctrl, (analog_read(areg_adc_pga_ctrl)&(~FLD_PGA_ITRIM_GAIN_L)) | (bias) );
+	analog_write(areg_adc_pga_ctrl, (analog_read(areg_adc_pga_ctrl) & (~FLD_PGA_ITRIM_GAIN_L)) | (bias));
 }
 
 /**
@@ -1005,7 +985,7 @@ static inline void adc_set_left_gain_bias(ADC_Gain_BiasTypeDef bias)
  */
 static inline void adc_set_right_gain_bias(ADC_Gain_BiasTypeDef bias)
 {
-	analog_write(areg_adc_pga_ctrl, (analog_read(areg_adc_pga_ctrl)&(~FLD_PGA_ITRIM_GAIN_R)) | (bias<<2) );
+	analog_write(areg_adc_pga_ctrl, (analog_read(areg_adc_pga_ctrl) & (~FLD_PGA_ITRIM_GAIN_R)) | (bias << 2));
 }
 
 /**
@@ -1015,7 +995,7 @@ static inline void adc_set_right_gain_bias(ADC_Gain_BiasTypeDef bias)
  */
 static inline void adc_set_mode(ADC_ModeTypeDef adc_m)
 {
-	analog_write (areg_adc_pga_ctrl, (analog_read(areg_adc_pga_ctrl)&(~FLD_ADC_MODE)) | adc_m);
+	analog_write(areg_adc_pga_ctrl, (analog_read(areg_adc_pga_ctrl) & (~FLD_ADC_MODE)) | adc_m);
 }
 
 /**
@@ -1024,9 +1004,9 @@ static inline void adc_set_mode(ADC_ModeTypeDef adc_m)
  * @return     none
  * caution power on cause  audio  creepage
  */
-static inline void adc_power_on_sar_adc (unsigned char on_off)
+static inline void adc_power_on_sar_adc(unsigned char on_off)
 {
-	analog_write (areg_adc_pga_ctrl, (analog_read(areg_adc_pga_ctrl)&(~FLD_SAR_ADC_POWER_DOWN)) | (!on_off)<<5  );
+	analog_write(areg_adc_pga_ctrl, (analog_read(areg_adc_pga_ctrl) & (~FLD_SAR_ADC_POWER_DOWN)) | (!on_off) << 5);
 }
 
 /**
@@ -1036,7 +1016,7 @@ static inline void adc_power_on_sar_adc (unsigned char on_off)
  */
 static inline void pga_left_chn_power_on(unsigned char on_off)
 {
-	analog_write (areg_adc_pga_ctrl, (analog_read(areg_adc_pga_ctrl)&(~FLD_POWER_DOWN_PGA_CHN_L)) | (!on_off)<<6 );
+	analog_write(areg_adc_pga_ctrl, (analog_read(areg_adc_pga_ctrl) & (~FLD_POWER_DOWN_PGA_CHN_L)) | (!on_off) << 6);
 }
 
 /**
@@ -1046,20 +1026,20 @@ static inline void pga_left_chn_power_on(unsigned char on_off)
  */
 static inline void pga_right_chn_power_on(unsigned char on_off)
 {
-	analog_write (areg_adc_pga_ctrl, (analog_read(areg_adc_pga_ctrl)&(~FLD_POWER_DOWN_PGA_CHN_R)) | (!on_off)<<7 );
+	analog_write(areg_adc_pga_ctrl, (analog_read(areg_adc_pga_ctrl) & (~FLD_POWER_DOWN_PGA_CHN_R)) | (!on_off) << 7);
 }
 
-#define areg_fe	 0xfe//0xfe default value is 0xe5,for output audio, mast claer 0xfe<7:5>
+#define areg_fe	 0xfe//0xfe default value is 0xe5,for output audio, mast clear 0xfe<7:5>
 
 /**
- * @brief      This function sets  ADC RNS channel source and random updata type.
+ * @brief      This function sets  ADC RNS channel source and random update type.
  * @param[in]  src - the type of ADC RNS channel source
- * @param[in]  update_type - the type of random updata
+ * @param[in]  update_type - the type of random update
  * @return     none
  */
 static inline void RNG_Set(RNG_SrcTypeDef src,RNG_UpdataTypeDef update_type)
 {
-	WriteAnalogReg(0xfe, src|update_type);//Set
+	WriteAnalogReg(0xfe, src | update_type);//Set
 }
 
 /**************************************************************************************
@@ -1087,15 +1067,15 @@ enum{
  */
 static inline unsigned short RNG_Read(void)
 {
-	#if 1
-	return ( ReadAnalogReg(areg_adc_rng_h)<<8 |  ReadAnalogReg(areg_adc_rng_l) );
-  #else
+#if 1
+	return (ReadAnalogReg(areg_adc_rng_h) << 8 | ReadAnalogReg(areg_adc_rng_l));
+#else
 	unsigned short tmp1,tmp2,RngValue;
 	tmp2 = ReadAnalogReg(0xf5);
 	tmp1 = ReadAnalogReg(0xf6);  //read
 	RngValue = (tmp1<<8) + tmp2;
 	return RngValue;
-   #endif
+#endif
 }
 
 /**
@@ -1128,7 +1108,7 @@ void adc_set_ain_pre_scaler(ADC_PreScalingTypeDef v_scl);
  * @param[in]   none
  * @return none
  */
-void adc_init(void );
+void adc_init(void);
 
 /**
  * @brief This function is used for IO port configuration of ADC IO port voltage sampling.
@@ -1167,11 +1147,3 @@ void adc_vbat_init(GPIO_PinTypeDef pin);
  * @return the result of sampling.
  */
 unsigned int adc_sample_and_get_result(void);
-
-
-/**
- * @brief This function is to set adc calibration value
- * @param[in]  index for adc calibration.
- * @return NULL.
- */
-void adc_ref_cal_set(unsigned char ref_idx);

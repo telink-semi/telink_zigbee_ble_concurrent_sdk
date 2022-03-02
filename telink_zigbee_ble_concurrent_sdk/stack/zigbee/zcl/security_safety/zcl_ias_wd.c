@@ -1,25 +1,25 @@
 /********************************************************************************************************
- * @file     zcl_ias_wd.c
+ * @file    zcl_ias_wd.c
  *
- * @brief	 APIs for Warning Device equipment of the IAS system.
+ * @brief   This is the source file for zcl_ias_wd
  *
- * @author
- * @date     June. 10, 2017
+ * @author  Zigbee Group
+ * @date    2021
  *
- * @par      Copyright (c) 2016, Telink Semiconductor (Shanghai) Co., Ltd.
- *           All rights reserved.
+ * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *			 The information contained herein is confidential and proprietary property of Telink
- * 		     Semiconductor (Shanghai) Co., Ltd. and is available under the terms
- *			 of Commercial License Agreement between Telink Semiconductor (Shanghai)
- *			 Co., Ltd. and the licensee in separate contract or the terms described here-in.
- *           This heading MUST NOT be removed from this file.
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
  *
- * 			 Licensees are granted free, non-transferable use of the information in this
- *			 file under Mutual Non-Disclosure Agreement. NO WARRENTY of ANY KIND is provided.
+ *              http://www.apache.org/licenses/LICENSE-2.0
  *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *******************************************************************************************************/
-
 
 /**********************************************************************
  * INCLUDES
@@ -48,10 +48,10 @@
  */
 static status_t zcl_iasWd_cmdHandler(zclIncoming_t *pInMsg);
 
-_CODE_ZCL_ status_t zcl_iasWd_register(u8 endpoint, u8 attrNum, const zclAttrInfo_t attrTbl[], cluster_forAppCb_t cb)
+_CODE_ZCL_ status_t zcl_iasWd_register(u8 endpoint, u16 manuCode, u8 attrNum, const zclAttrInfo_t attrTbl[], cluster_forAppCb_t cb)
 {
 
-	return zcl_registerCluster(endpoint, ZCL_CLUSTER_SS_IAS_WD, attrNum, attrTbl, zcl_iasWD_cmdHandler, cb);
+	return zcl_registerCluster(endpoint, ZCL_CLUSTER_SS_IAS_WD, manuCode, attrNum, attrTbl, zcl_iasWD_cmdHandler, cb);
 }
 
 _CODE_ZCL_ status_t zcl_iasWd_startWarning(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, startWarning_t *pStartWarning)
@@ -83,18 +83,9 @@ _CODE_ZCL_ status_t zcl_iasWd_squawk(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableD
 _CODE_ZCL_ static status_t zcl_startWarningPrc(zclIncoming_t *pInMsg)
 {
 	u8 status = ZCL_STA_SUCCESS;
-	apsdeDataInd_t *pApsdeInd = (apsdeDataInd_t*)pInMsg->msg;
 	u8 *pData = pInMsg->pData;
 
 	if(pInMsg->clusterAppCb){
-		zclIncomingAddrInfo_t addrInfo;
-		addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-		addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-		addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-		addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-		addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-		addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
 		startWarning_t startWarning;
 		startWarning.warning.byte = *pData++;
 		startWarning.warningDuration = BUILD_U16(pData[0], pData[1]);
@@ -102,7 +93,7 @@ _CODE_ZCL_ static status_t zcl_startWarningPrc(zclIncoming_t *pInMsg)
 		startWarning.strobeDutyCycle = *pData++;
 		startWarning.strobeLevel = *pData++;
 
-		pInMsg->clusterAppCb(&addrInfo, pInMsg->hdr.cmd, &startWarning);
+		pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, &startWarning);
 	}else{
 		status = ZCL_STA_FAILURE;
 	}
@@ -113,21 +104,12 @@ _CODE_ZCL_ static status_t zcl_startWarningPrc(zclIncoming_t *pInMsg)
 _CODE_ZCL_ static status_t zcl_squawkPrc(zclIncoming_t *pInMsg)
 {
 	u8 status = ZCL_STA_SUCCESS;
-	apsdeDataInd_t *pApsdeInd = (apsdeDataInd_t*)pInMsg->msg;
 
 	if(pInMsg->clusterAppCb){
-		zclIncomingAddrInfo_t addrInfo;
-		addrInfo.dirCluster = pInMsg->hdr.frmCtrl.bf.dir;
-		addrInfo.profileId = pApsdeInd->indInfo.profile_id;
-		addrInfo.srcAddr = pApsdeInd->indInfo.src_short_addr;
-		addrInfo.dstAddr = pApsdeInd->indInfo.dst_addr;
-		addrInfo.srcEp = pApsdeInd->indInfo.src_ep;
-		addrInfo.dstEp = pApsdeInd->indInfo.dst_ep;
-
 		squawk_t squawk;
 		squawk.byte = pInMsg->pData[0];
 
-		pInMsg->clusterAppCb(&addrInfo, pInMsg->hdr.cmd, &squawk);
+		pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, &squawk);
 	}else{
 		status = ZCL_STA_FAILURE;
 	}
