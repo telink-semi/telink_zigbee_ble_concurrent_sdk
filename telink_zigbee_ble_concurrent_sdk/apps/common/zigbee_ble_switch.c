@@ -64,6 +64,8 @@ _attribute_ram_code_ void switch_to_zb_context(void){
 
 _attribute_ram_code_ void switch_to_ble_context(void){
     /* disable zb rx dma to avoid un-excepted rx interrupt*/
+	ZB_RADIO_TX_DISABLE;
+
 	ZB_RADIO_RX_DISABLE;
 
 	restore_ble_rf_context();

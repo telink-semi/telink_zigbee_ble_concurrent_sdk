@@ -467,7 +467,7 @@ _CODE_ZCL_ s32 reportAttrTimerCb(void *arg)
 	if(zcl_reportingEntryActiveNumGet()){
 		for(u8 i = 0; i < ZCL_REPORTING_TABLE_NUM; i++){
 			reportCfgInfo_t *pEntry = &reportingTab.reportCfgInfo[i];
-			if(pEntry->used && (pEntry->minInterval || (pEntry->maxInterval && (pEntry->maxInterval != 0xFFFF)))){
+			if(pEntry->used && (pEntry->maxInterval != 0xFFFF) && (pEntry->minInterval || pEntry->maxInterval)){
 				if(pEntry->minIntCnt){
 					pEntry->minIntCnt--;
 				}

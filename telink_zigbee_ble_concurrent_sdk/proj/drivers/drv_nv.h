@@ -38,14 +38,18 @@
  *		0x7A000 |------------|			 0xFE000 |------------|
  *	 		    | U_Cfg_Info |					 | U_Cfg_Info |
  * 		0x78000 |------------|			 0xFC000 |------------|
+ *	   		    |            |                   |			  |
+ *	   		    |            |           0xF9000 |------------|
  *		   		|            |					 |   NV_BLE   |
- *	   		    |F_CFG_Info	 |           0xF6000 |------------|
+ *	   		    |F_CFG_Info	 |           0xF7000 |------------|
  *	   		    |            |                   |			  |
  *		   		|		   	 |	                 |  NV_ZIGBEE |
  *		   		|			 |                   |			  |
  * 		0x77000 |------------|			 0xE0000 |------------|
  * 		   		|  MAC_Addr  |					 |     Resv   |
  * 		0x76000 |------------|			 0x80000 |------------|
+ * 		   		|  NV_BLE	 |					 |			  |
+ * 		0x74000 |------------|					 |			  |
  * 		   		|		     |					 |			  |
  * 		   		|  OTA_Image |					 |			  |
  * 		   		|		     |					 |	OTA_Image |
@@ -54,10 +58,8 @@
  * 		   		|  	 NV_1 	 |			 0x40000 |------------|
  * 		   		|		     |					 |			  |
  * 		0x34000 |------------|					 |			  |
- * 		        |   NV_BLE   |					 |            |
- * 		0x33000 |------------|					 |			  |
  * 		   		|		     |					 |  Firmware  |
- * 		   		|  Firmware  |	204k			 |			  | 256k
+ * 		   		|  Firmware  |	208k			 |			  | 256k
  * 		   		|		     |					 |			  |
  * 		0x00000  ------------			 0x00000  ------------
  *
@@ -76,18 +78,18 @@
  *	 			|  MAC_Addr  |					 |		      |
  *	 	0x76000 |------------|			 0xE6000 |------------|
  *	 			|		     |					 |	 NV_BLE   |
- *	 			|		     |			 0xE5000 |------------|
+ *	 			|		     |			 0xE4000 |------------|
  *	 			|  	 NV_1	 |					 |		      |
  *	 			|		     |					 |	OTA_Image |
  *	 	0x6A000 |------------|					 |		      |
  *	 	        |   NV_BLE   |					 |		      |
- *	 	0x69000 |------------|					 |		      |
+ *	 	0x68000 |------------|					 |		      |
  *	 			|		     |					 |		      |
- *	 			|  OTA_Image |			 0x76800 |------------|
+ *	 			|  OTA_Image |			 0x76000 |------------|
  *	 			|		     |					 |		      |
- *	 	0x38800 |------------|					 |		      |
+ *	 	0x38000 |------------|					 |		      |
  *	 			|			 |					 |  Firmware  |
- *	 			|  Firmware	 |	194k			 |		      | 440k
+ *	 			|  Firmware	 |	192k			 |		      | 440k
  *	 			|			 |					 |		      |
  *	 	0x08000 |------------|			 0x08000 |------------|
  *	 			| BootLoader |					 | BootLoader |
@@ -111,7 +113,7 @@
  *	 			|		     |
  *      0x40000 |------------|
  *	 			|   RESV	 |
- *	 	0x3D000 |------------|
+ *	 	0x3E000 |------------|
  *	 			|   NV-BLE   |
  *	 	0x3C000	|------------|
  *	 			|            |
@@ -229,9 +231,9 @@ extern u32 g_u32CfgFlashAddr;
 	#define NV_BASE_ADDRESS				(0xE0000)
 	#define CFG_NV_START_FOR_BLE		(0xF7000)
 #else
-    #define CFG_NV_START_FOR_BLE		(0x33000)
 	#define	NV_BASE_ADDRESS				(0x34000)
-	#define	NV_BASE_ADDRESS2			(0x7A000)
+    #define	NV_BASE_ADDRESS2			(0x7A000)
+    #define CFG_NV_START_FOR_BLE		(0x74000)
 #endif
 #if DUAL_MODE
     #error "should use bootloade mode!!!"
@@ -243,11 +245,11 @@ extern u32 g_u32CfgFlashAddr;
         #define NV_BASE_ADDRESS				(0x26000)
         #define CFG_NV_START_FOR_BLE		(0x3C000)
     #else
-		#define CFG_NV_START_FOR_BLE		(0xE5000)
+		#define CFG_NV_START_FOR_BLE		(0xE4000)
 		#define NV_BASE_ADDRESS				(0xE6000)
     #endif
 #else
-    #define CFG_NV_START_FOR_BLE		(0x69000)
+    #define CFG_NV_START_FOR_BLE		(0x68000)
 	#define	NV_BASE_ADDRESS				(0x6A000)
 	#define	NV_BASE_ADDRESS2			(0x7A000)
     #if DUAL_MODE
@@ -280,25 +282,26 @@ typedef enum{
  * Flash address of OTA image.
  */
 #if !defined(BOOT_LOADER_MODE) || (BOOT_LOADER_MODE == 0)
+//unchangeable address
+#define FLASH_ADDR_OF_OTA_IMAGE		    (0x40000)
 #if FLASH_CAP_SIZE_1M
 	//max size = (0x80000 - 0) / 2 = 256k
-	#define FLASH_OTA_IMAGE_MAX_SIZE	(256)
+	#define FLASH_OTA_IMAGE_MAX_SIZE	    (FLASH_ADDR_OF_OTA_IMAGE - FLASH_ADDR_OF_APP_FW)
 #else
-	//max size = (0x33000 - 0) = 204k
-	#define FLASH_OTA_IMAGE_MAX_SIZE	(CFG_NV_START_FOR_BLE - FLASH_ADDR_OF_APP_FW)
+	//max size = (0x34000 - 0) = 204k
+	#define FLASH_OTA_IMAGE_MAX_SIZE	    (NV_BASE_ADDRESS - FLASH_ADDR_OF_APP_FW)
 #endif
-	//unchangeable address
-	#define FLASH_ADDR_OF_OTA_IMAGE		(0x40000)
+
 #else
     #if DUAL_MODE
-        #define FLASH_OTA_IMAGE_MAX_SIZE	256
+        #define FLASH_OTA_IMAGE_MAX_SIZE	(0x40000)
         #define FLASH_ADDR_OF_OTA_IMAGE		(0x40000)
     #else
-		//1M   Flash: max size = (0xE5000 - 0x8000) / 2 = 442k
-		//512k Flash: max size = (0x6A000 - 0x8000) / 2 = 196k
+		//1M   Flash: max size = (0xE4000 - 0x8000) / 2 = 440k
+		//512k Flash: max size = (0x68000 - 0x8000) / 2 = 192k
 		#define FLASH_OTA_IMAGE_MAX_SIZE	((CFG_NV_START_FOR_BLE - FLASH_ADDR_OF_APP_FW) / 2)
-		//1M   Flash: ota addr = 0x8000 + 444k = 0x77000
-		//512k Flash: ota addr = 0x8000 + 196k = 0x39000
+		//1M   Flash: ota addr = 0x8000 + 440k = 0x76000
+		//512k Flash: ota addr = 0x8000 + 192k = 0x38000
 		#define FLASH_ADDR_OF_OTA_IMAGE		(FLASH_ADDR_OF_APP_FW + FLASH_OTA_IMAGE_MAX_SIZE)
     #endif
 #endif
@@ -318,6 +321,9 @@ typedef struct{
 	u16 size;
 	u8  itemId;
 	u8  usedState;
+#if defined(MCU_CORE_B91)
+	u8  resv[8];   //PUYA flash only supports re-write 64 times every page
+#endif
 }nv_info_idx_t;
 
 /* item:  item_hdr(8Bytes) + payload*/
@@ -338,14 +344,14 @@ typedef struct{
  * Store zigbee information in flash.
  * 		Module ID				|			512K Flash				|			1M Flash				|
  * -----------------------------|-----------------------------------|-----------------------------------|
- * NV_MODULE_ZB_INFO			|		0x34000 - 0x36000			|		0x80000 - 0x82000			|
- * NV_MODULE_ADDRESS_TABLE		|		0x36000 - 0x38000			|		0x82000 - 0x84000			|
- * NV_MODULE_APS				|		0x38000 - 0x3a000			|		0x84000 - 0x86000			|
- * NV_MODULE_ZCL				|		0x3a000 - 0x3c000			|		0x86000 - 0x88000			|
- * NV_MODULE_NWK_FRAME_COUNT	|		0x3c000 - 0x3e000			|		0x88000 - 0x8a000			|
- * NV_MODULE_OTA				|		0x3e000 - 0x40000			|		0x8a000 - 0x8c000			|
- * NV_MODULE_APP				|		0x7a000 - 0x7c000			|		0x8c000 - 0x8e000			|
- * NV_MODULE_KEYPAIR			|		0x7c000 - 0x80000			|		0x8e000 - 0x96000			|
+ * NV_MODULE_ZB_INFO			|		0x34000 - 0x36000			|		0xE0000 - 0xE2000			|
+ * NV_MODULE_ADDRESS_TABLE		|		0x36000 - 0x38000			|		0xE2000 - 0xE4000			|
+ * NV_MODULE_APS				|		0x38000 - 0x3a000			|		0xE4000 - 0xE6000			|
+ * NV_MODULE_ZCL				|		0x3a000 - 0x3c000			|		0xE6000 - 0xE8000			|
+ * NV_MODULE_NWK_FRAME_COUNT	|		0x3c000 - 0x3e000			|		0xE8000 - 0xEa000			|
+ * NV_MODULE_OTA				|		0x3e000 - 0x40000			|		0xEa000 - 0xEc000			|
+ * NV_MODULE_APP				|		0x7a000 - 0x7c000			|		0xEc000 - 0xEe000			|
+ * NV_MODULE_KEYPAIR			|		0x7c000 - 0x80000			|		0xEe000 - 0xF6000			|
  * 								|	*16K - can store 127 nodes		|	*32K - can store 302 nodes		|
  * NV_MAX_MODULS
  */

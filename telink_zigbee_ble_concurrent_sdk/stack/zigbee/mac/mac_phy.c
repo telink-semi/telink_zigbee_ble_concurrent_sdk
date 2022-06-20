@@ -138,6 +138,9 @@ u32 rf_pa_rxen_pin;
 									}	\
 								}while(0)
 
+_attribute_ram_code_ u32 mac_currentTickGet(void){
+	 return clock_time();
+}
 /*********************************************************************
  * @fn      rf_reset
  *
@@ -362,6 +365,22 @@ u8 rf_getLqi(s8 rssi)
 	u8 lqi = 0;
 	ZB_RADIO_RSSI_TO_LQI(mode, rssi, lqi);
 	return lqi;
+}
+
+/*********************************************************************
+ * @fn      rf_lqi2cost
+ *
+ * @brief   Get calculated cost value
+ *
+ * @param   lqi
+ *
+ * @return  cost
+ */
+u8 rf_lqi2cost(u8 lqi)
+{
+	u8 cost = 0;
+	ZB_LQI_TO_PATH_COST(lqi, cost);
+	return cost;
 }
 
 /*********************************************************************
@@ -695,7 +714,7 @@ _attribute_ram_code_ __attribute__((optimize("-Os"))) void rf_tx_irq_handler(voi
 
 
 inline bool zb_rfSwitchAllow(void){
-	return (rf_busyFlag !=  (TX_BUSY | TX_ACKPACKET));
+	return (rf_busyFlag !=  (TX_BUSY));
 }
 
 inline bool zb_rfTxDoing(void){

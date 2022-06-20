@@ -443,7 +443,7 @@ extern bdb_ctx_t  g_bdbCtx;
 											}while(0)
 
 
-#define NODE_COMMISSIONING_CAPABILITY_SET(v)  	g_bdbAttrs.nodeCommissioningCapability = v;
+#define NODE_COMMISSIONING_CAPABILITY_SET(v)  	g_bdbAttrs.nodeCommissioningCapability = v
 
 #define BDB_STATE_SET(v)						g_bdbCtx.state = v
 #define BDB_STATE_GET()							g_bdbCtx.state

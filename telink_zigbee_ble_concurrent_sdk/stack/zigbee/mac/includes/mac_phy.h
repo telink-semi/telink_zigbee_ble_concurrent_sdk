@@ -241,6 +241,17 @@ void rf_setTxPower(u8 txPower);
 u8 rf_getLqi(s8 rssi);
 
 /*********************************************************************
+ * @fn      rf_lqi2cost
+ *
+ * @brief   Get calculated cost value
+ *
+ * @param   lqi
+ *
+ * @return  cost
+ */
+u8 rf_lqi2cost(u8 lqi);
+
+/*********************************************************************
  * @fn      rf_startED
  *
  * @brief   Start ED detect
@@ -294,5 +305,7 @@ bool zb_rfSwitchAllow(void);
 bool zb_rfTxDoing(void);
 
 void restore_zb_rf_context(void);
+
+_attribute_ram_code_ u32 mac_currentTickGet(void);
 
 #endif  /* MAC_PHY_H */

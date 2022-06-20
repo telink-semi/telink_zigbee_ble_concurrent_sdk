@@ -2,7 +2,7 @@
 <?fileVersion 4.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
 	<storageModule moduleId="org.eclipse.cdt.core.settings">
 		<cconfiguration id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520">
-			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520" moduleId="org.eclipse.cdt.core.settings" name="sampleGW_9518">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520" moduleId="org.eclipse.cdt.core.settings" name="sampleGW_b91">
 				<externalSettings>
 					<externalSetting>
 						<entry flags="BUILTIN|RESOLVED" kind="macro" name="__ATOMIC_ACQ_REL" value="4"/>
@@ -18,7 +18,7 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactExtension="elf" artifactName="${ConfigName}" buildArtefactType="nds.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=nds.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" description="Coordinator-9518" id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520" name="sampleGW_9518" parent="config.nds32le-elf-mculib-v5f.exe.debug" postbuildStep="&quot;../../../tools/tl_check_fw.sh&quot; ${ConfigName} riscv" prebuildStep="&quot;../../../tools/tl_link_load.sh&quot; &quot;../../../platform/boot/b91/boot_b91.link&quot; &quot;${workspace_loc:/${ProjName}}/boot.link&quot;">
+				<configuration artifactExtension="elf" artifactName="${ConfigName}" buildArtefactType="nds.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=nds.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" description="Coordinator-b91" id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520" name="sampleGW_b91" parent="config.nds32le-elf-mculib-v5f.exe.debug" postbuildStep="&quot;../../../tools/tl_check_fw.sh&quot; ${ConfigName} riscv" prebuildStep="&quot;../../../tools/tl_link_load.sh&quot; &quot;../../../platform/boot/b91/boot_b91.link&quot; &quot;${workspace_loc:/${ProjName}}/boot.link&quot;">
 					<folderInfo id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520." name="/" resourcePath="">
 						<toolChain id="nds.nds32le-elf-mculib-v5f.exe.debug.619005439" name="nds32le-elf-mculib-v5f" superClass="nds.nds32le-elf-mculib-v5f.exe.debug">
 							<option id="nds32le-elf-mculib-v5f.managedbuild.option.toolchain.RSE_CONNECT.468329742" name="RSE_CONNECT" superClass="nds32le-elf-mculib-v5f.managedbuild.option.toolchain.RSE_CONNECT" value="ICE" valueType="string"/>
@@ -121,7 +121,7 @@
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
 		</cconfiguration>
 		<cconfiguration id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520.2070989666">
-			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520.2070989666" moduleId="org.eclipse.cdt.core.settings" name="sampleLight_9518">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520.2070989666" moduleId="org.eclipse.cdt.core.settings" name="sampleLight_b91">
 				<externalSettings>
 					<externalSetting>
 						<entry flags="BUILTIN|RESOLVED" kind="macro" name="__ATOMIC_ACQ_REL" value="4"/>
@@ -137,7 +137,7 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactExtension="elf" artifactName="${ConfigName}" buildArtefactType="nds.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=nds.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" description="Router-9518" id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520.2070989666" name="sampleLight_9518" parent="config.nds32le-elf-mculib-v5f.exe.debug" postbuildStep="&quot;../../../tools/tl_check_fw.sh&quot; ${ConfigName} riscv" prebuildStep="&quot;../../../tools/tl_link_load.sh&quot; &quot;../../../platform/boot/b91/boot_b91.link&quot; &quot;${workspace_loc:/${ProjName}}/boot.link&quot;">
+				<configuration artifactExtension="elf" artifactName="${ConfigName}" buildArtefactType="nds.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=nds.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" description="Router-b91" id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520.2070989666" name="sampleLight_b91" parent="config.nds32le-elf-mculib-v5f.exe.debug" postbuildStep="&quot;../../../tools/tl_check_fw.sh&quot; ${ConfigName} riscv" prebuildStep="&quot;../../../tools/tl_link_load.sh&quot; &quot;../../../platform/boot/b91/boot_b91.link&quot; &quot;${workspace_loc:/${ProjName}}/boot.link&quot;">
 					<folderInfo id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520.2070989666." name="/" resourcePath="">
 						<toolChain id="nds.nds32le-elf-mculib-v5f.exe.debug.1963758122" name="nds32le-elf-mculib-v5f" superClass="nds.nds32le-elf-mculib-v5f.exe.debug">
 							<option id="nds32le-elf-mculib-v5f.managedbuild.option.toolchain.RSE_CONNECT.168895470" name="RSE_CONNECT" superClass="nds32le-elf-mculib-v5f.managedbuild.option.toolchain.RSE_CONNECT" value="ICE" valueType="string"/>
@@ -263,7 +263,7 @@
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
 		</cconfiguration>
 		<cconfiguration id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520.2070989666.1686655720">
-			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520.2070989666.1686655720" moduleId="org.eclipse.cdt.core.settings" name="sampleSwitch_9518">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520.2070989666.1686655720" moduleId="org.eclipse.cdt.core.settings" name="sampleSwitch_b91">
 				<externalSettings>
 					<externalSetting>
 						<entry flags="BUILTIN|RESOLVED" kind="macro" name="__ATOMIC_ACQ_REL" value="4"/>
@@ -279,7 +279,7 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactExtension="elf" artifactName="${ConfigName}" buildArtefactType="nds.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=nds.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" description="EndDevice-9518" id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520.2070989666.1686655720" name="sampleSwitch_9518" parent="config.nds32le-elf-mculib-v5f.exe.debug" postbuildStep="&quot;../../../tools/tl_check_fw.sh&quot; ${ConfigName} riscv" prebuildStep="&quot;../../../tools/tl_link_load.sh&quot; &quot;../../../platform/boot/b91/boot_b91.link&quot; &quot;${workspace_loc:/${ProjName}}/boot.link&quot;">
+				<configuration artifactExtension="elf" artifactName="${ConfigName}" buildArtefactType="nds.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=nds.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" description="EndDevice-b91" id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520.2070989666.1686655720" name="sampleSwitch_b91" parent="config.nds32le-elf-mculib-v5f.exe.debug" postbuildStep="&quot;../../../tools/tl_check_fw.sh&quot; ${ConfigName} riscv" prebuildStep="&quot;../../../tools/tl_link_load.sh&quot; &quot;../../../platform/boot/b91/boot_b91.link&quot; &quot;${workspace_loc:/${ProjName}}/boot.link&quot;">
 					<folderInfo id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520.2070989666.1686655720." name="/" resourcePath="">
 						<toolChain id="nds.nds32le-elf-mculib-v5f.exe.debug.1914761163" name="nds32le-elf-mculib-v5f" superClass="nds.nds32le-elf-mculib-v5f.exe.debug">
 							<option id="nds32le-elf-mculib-v5f.managedbuild.option.toolchain.RSE_CONNECT.110314990" name="RSE_CONNECT" superClass="nds32le-elf-mculib-v5f.managedbuild.option.toolchain.RSE_CONNECT" value="ICE" valueType="string"/>
@@ -404,7 +404,7 @@
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
 		</cconfiguration>
 		<cconfiguration id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520.2070989666.926504847">
-			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520.2070989666.926504847" moduleId="org.eclipse.cdt.core.settings" name="bootLoader_9518">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520.2070989666.926504847" moduleId="org.eclipse.cdt.core.settings" name="bootLoader_b91">
 				<externalSettings>
 					<externalSetting>
 						<entry flags="BUILTIN|RESOLVED" kind="macro" name="__ATOMIC_ACQ_REL" value="4"/>
@@ -420,7 +420,7 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactExtension="elf" artifactName="${ConfigName}" buildArtefactType="nds.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=nds.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" description="boot loader for 9518" id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520.2070989666.926504847" name="bootLoader_9518" parent="config.nds32le-elf-mculib-v5f.exe.debug" postbuildStep="&quot;../../../tools/tl_check_fw.sh&quot; ${ConfigName} riscv" prebuildStep="&quot;../../../tools/tl_link_load.sh&quot; &quot;../../../platform/boot/b91/boot_b91.link&quot; &quot;${workspace_loc:/${ProjName}}/boot.link&quot;">
+				<configuration artifactExtension="elf" artifactName="${ConfigName}" buildArtefactType="nds.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=nds.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" description="boot loader for b91" id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520.2070989666.926504847" name="bootLoader_b91" parent="config.nds32le-elf-mculib-v5f.exe.debug" postbuildStep="&quot;../../../tools/tl_check_fw.sh&quot; ${ConfigName} riscv" prebuildStep="&quot;../../../tools/tl_link_load.sh&quot; &quot;../../../platform/boot/b91/boot_b91.link&quot; &quot;${workspace_loc:/${ProjName}}/boot.link&quot;">
 					<folderInfo id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520.2070989666.926504847." name="/" resourcePath="">
 						<toolChain id="nds.nds32le-elf-mculib-v5f.exe.debug.213849056" name="nds32le-elf-mculib-v5f" superClass="nds.nds32le-elf-mculib-v5f.exe.debug">
 							<option id="nds32le-elf-mculib-v5f.managedbuild.option.toolchain.RSE_CONNECT.89216778" name="RSE_CONNECT" superClass="nds32le-elf-mculib-v5f.managedbuild.option.toolchain.RSE_CONNECT" value="ICE" valueType="string"/>
@@ -532,7 +532,7 @@
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
 		</cconfiguration>
 		<cconfiguration id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520.2070989666.862728624">
-			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520.2070989666.862728624" moduleId="org.eclipse.cdt.core.settings" name="sampleLight_bootload_9518">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520.2070989666.862728624" moduleId="org.eclipse.cdt.core.settings" name="sampleLight_bootload_b91">
 				<externalSettings>
 					<externalSetting>
 						<entry flags="BUILTIN|RESOLVED" kind="macro" name="__ATOMIC_ACQ_REL" value="4"/>
@@ -548,7 +548,7 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactExtension="elf" artifactName="${ConfigName}" buildArtefactType="nds.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=nds.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" description="route-9518 bootload mode" id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520.2070989666.862728624" name="sampleLight_bootload_9518" parent="config.nds32le-elf-mculib-v5f.exe.debug" postbuildStep="&quot;../../../tools/tl_check_fw.sh&quot; ${ConfigName} riscv" prebuildStep="&quot;../../../tools/tl_link_load.sh&quot; &quot;../../../platform/boot/b91/boot_b91.link&quot; &quot;${workspace_loc:/${ProjName}}/boot.link&quot;">
+				<configuration artifactExtension="elf" artifactName="${ConfigName}" buildArtefactType="nds.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=nds.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" description="route-b91 bootload mode" id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520.2070989666.862728624" name="sampleLight_bootload_b91" parent="config.nds32le-elf-mculib-v5f.exe.debug" postbuildStep="&quot;../../../tools/tl_check_fw.sh&quot; ${ConfigName} riscv" prebuildStep="&quot;../../../tools/tl_link_load.sh&quot; &quot;../../../platform/boot/b91/boot_b91.link&quot; &quot;${workspace_loc:/${ProjName}}/boot.link&quot;">
 					<folderInfo id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520.2070989666.862728624." name="/" resourcePath="">
 						<toolChain id="nds.nds32le-elf-mculib-v5f.exe.debug.62935920" name="nds32le-elf-mculib-v5f" superClass="nds.nds32le-elf-mculib-v5f.exe.debug">
 							<option id="nds32le-elf-mculib-v5f.managedbuild.option.toolchain.RSE_CONNECT.680112451" name="RSE_CONNECT" superClass="nds32le-elf-mculib-v5f.managedbuild.option.toolchain.RSE_CONNECT" value="ICE" valueType="string"/>

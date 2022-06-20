@@ -94,7 +94,7 @@ typedef struct zb_buf_s{
 #if ZB_BUFFER_DEBUG
 	zb_buf_allocInfo_t allocInfo[ZB_BUFF_DBG_NUM];
 #endif
-}zb_buf_t ;
+}zb_buf_t;
 
 typedef struct{
 	zb_buf_t *head;

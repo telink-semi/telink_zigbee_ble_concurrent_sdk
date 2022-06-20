@@ -110,8 +110,9 @@ nwk_routeRecordTabEntry_t g_routeRecTab[NWK_ROUTE_RECORD_TABLE_NUM];
 
 /* Broadcasting table */
 #if ZB_ROUTER_ROLE
-bool NWK_BRC_PASSIVE_ACK_ENABLE = TRUE;
+bool NWK_BRC_PASSIVE_ACK_ENABLE = FALSE;//TRUE;
 u8 NWK_BRC_TRANSTBL_SIZE = NWK_BRC_TRANSTBL_NUM;
+u32 NWK_BRC_JITTER = NWK_MAX_BROADCAST_JITTER;
 nwk_brcTransRecordEntry_t g_brcTransTab[NWK_BRC_TRANSTBL_NUM];
 #endif
 
@@ -180,7 +181,7 @@ const tl_zb_mac_pib_t macPibDefault = {
 	.maxBe = 8,
 	.beaconOrder = 15,
 	.superframeOrder = 0,
-	.maxCsmaBackoffs = 4,
+	.maxCsmaBackoffs = 5, //4,
 	.associationPermit = 0,
 	.coordShortAddress = 0xffff,
 #if ZB_ED_ROLE
@@ -203,7 +204,7 @@ const nwk_nib_t nwkNibDefault = {
 #ifdef ZB_ROUTER_ROLE
 	.maxChildren = DEFAULT_MAX_CHILDREN,
 	.maxBroadcastRetries = NWK_MAX_BROADCAST_RETRIES,
-	.passiveAckTimeout = NWK_PASSIVE_ACK_TIMEOUT,
+	.passiveAckTimeout = 15000, //NWK_PASSIVE_ACK_TIMEOUT,
 	.nwkBroadcastDeliveryTime = NWK_BROADCAST_DELIVERY_TIME,
  	.linkStatusPeriod = ZB_NWK_LINK_STATUS_PEROID_DEFAULT,//45
 	.routerAgeLimit = 3,
