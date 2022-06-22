@@ -97,6 +97,7 @@ void app_pm_task(void){
 			drv_pm_lowPowerEnter();
 		}else{
 			if(!is_switch_to_ble()){
+				switch_to_ble_context();
 				drv_pm_sleep(sleepMode, wakeupSrc, get_ble_next_event_tick());
 			}
 		}

@@ -55,11 +55,11 @@
 
 
 #define     MY_APP_ADV_CHANNEL			BLT_ENABLE_ADV_ALL
-#define 	MY_ADV_INTERVAL_MIN			ADV_INTERVAL_300MS
-#define 	MY_ADV_INTERVAL_MAX			ADV_INTERVAL_305MS
+#define 	MY_ADV_INTERVAL_MIN			ADV_INTERVAL_30MS
+#define 	MY_ADV_INTERVAL_MAX			ADV_INTERVAL_35MS
 
-#define 	ADV_IDLE_ENTER_DEEP_TIME			60  //60 s
-#define 	CONN_IDLE_ENTER_DEEP_TIME			60  //60 s
+#define 	ADV_IDLE_ENTER_DEEP_TIME			5  //60 s
+#define 	CONN_IDLE_ENTER_DEEP_TIME			5  //60 s
 
 #define 	MY_DIRECT_ADV_TMIE					2000000
 
@@ -269,7 +269,7 @@ _attribute_data_retention_	u8	app_acl_rxfifo[ACL_RX_FIFO_SIZE * ACL_RX_FIFO_NUM]
 _attribute_data_retention_  u8	app_acl_txfifo[ACL_TX_FIFO_SIZE * ACL_TX_FIFO_NUM] = {0};
 /******************** ACL connection LinkLayer TX & RX data FIFO allocation, End ***********************************/
 
-u8 g_bleConnDoing = 1;
+u8 g_bleConnDoing = 0;
 _attribute_data_retention_	int device_in_connection_state;
 _attribute_data_retention_	u32 advertise_begin_tick;
 _attribute_data_retention_	u8	sendTerminate_before_enterDeep = 0;
@@ -372,12 +372,13 @@ void 	task_terminate(u8 e,u8 *p, int n) //*p is terminate reason
 	}
 #endif
 
-
-#if (UI_LED_ENABLE && !TEST_CONN_CURRENT_ENABLE)
-	gpio_write(GPIO_LED_RED, !LED_ON_LEVAL);  //yellow light off
-#endif
+	bls_ll_setAdvEnable(0);  //adv disable
 
 	advertise_begin_tick = clock_time();
+
+	if(*p != HCI_ERR_OP_CANCELLED_BY_HOST){
+		bls_ll_setAdvEnable(1);  //adv enable
+	}
 }
 
 /**
@@ -616,7 +617,7 @@ void user_ble_normal_init(void)
 	else   //set indirect adv
 #endif
 	{
-		u8 status = bls_ll_setAdvParam(  ADV_INTERVAL_100MS, ADV_INTERVAL_105MS,
+		u8 status = bls_ll_setAdvParam(  MY_ADV_INTERVAL_MIN, MY_ADV_INTERVAL_MAX,
 										 ADV_TYPE_CONNECTABLE_UNDIRECTED, app_own_address_type,
 										 0,  NULL,
 										 BLT_ENABLE_ADV_ALL,
@@ -714,7 +715,7 @@ _attribute_ram_code_ u32 blt_pm_proc(void){
 		{
 
 			bls_ll_terminateConnection(HCI_ERR_REMOTE_USER_TERM_CONN); //push terminate cmd into ble TX buffer
-			//bls_ll_setAdvEnable(BLC_ADV_DISABLE);   //disable adv
+			bls_ll_setAdvEnable(BLC_ADV_DISABLE);   //disable adv
 			sendTerminate_before_enterDeep = 1;
 		}
 	}

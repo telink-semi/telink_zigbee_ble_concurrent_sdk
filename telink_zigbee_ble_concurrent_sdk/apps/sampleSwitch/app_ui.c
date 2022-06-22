@@ -33,6 +33,8 @@
 #include "app_ui.h"
 #include "zigbee_ble_switch.h"
 
+#include "stack/ble/ble.h"
+
 extern void ble_advertiseTickUpdate(void);
 
 /**********************************************************************
@@ -257,9 +259,10 @@ void keyScan_keyPressedCB(kb_data_t *kbEvt){
 		g_switchAppCtx.state = APP_FACTORY_NEW_SET_CHECK;
 	}
 
-
-	ble_task_restart();
-	ble_advertiseTickUpdate();
+	if(APP_BLE_STATE_GET() == BLS_LINK_STATE_IDLE){
+		ble_task_restart();
+		ble_advertiseTickUpdate();
+	}
 }
 
 
