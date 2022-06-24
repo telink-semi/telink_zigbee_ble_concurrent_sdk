@@ -1,3 +1,36 @@
+## V2.1.0.0
+
+### Bugs
+* None
+
+###Features
+* compatible with 8258 and b91
+* use zigbee stack v3.6.7.4
+
+BREAKING CHANGES
+* Change the directory structure to adapt to the multi-platform(8258/b91) SDK.
+
+### Bugs
+* None
+
+###Features
+* sdk兼容8258, b91
+* 使用zigbee stack v3.6.7.4
+
+### BREAKING CHANGES
+* 更改目录结构以适配多平台(8258/b91)SDK。
+
+### CodeSize
+* Flash:
+  - ZC:    205kb
+  - ZR:    205kb
+  - ZED:   159kb
+* RAM:
+  - ZC:   43kb
+  - ZR:   40kb
+  - ZED:  31kb
+
+
 ## V1.6.2.0
 
 ### Bugs
