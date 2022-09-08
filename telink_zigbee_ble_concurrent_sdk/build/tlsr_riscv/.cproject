@@ -50,6 +50,7 @@
 									<listOptionValue builtIn="false" value="../../../apps/common"/>
 									<listOptionValue builtIn="false" value="../../../apps/sampleGW"/>
 									<listOptionValue builtIn="false" value="../../../platform"/>
+									<listOptionValue builtIn="false" value="../../../platform/chip_b91"/>
 									<listOptionValue builtIn="false" value="../../../proj/common"/>
 									<listOptionValue builtIn="false" value="../../../proj"/>
 									<listOptionValue builtIn="false" value="../../../stack/zigbee/common/includes"/>
@@ -169,6 +170,7 @@
 									<listOptionValue builtIn="false" value="../../../apps/common"/>
 									<listOptionValue builtIn="false" value="../../../apps/sampleLight"/>
 									<listOptionValue builtIn="false" value="../../../platform"/>
+									<listOptionValue builtIn="false" value="../../../platform/chip_b91"/>
 									<listOptionValue builtIn="false" value="../../../proj/common"/>
 									<listOptionValue builtIn="false" value="../../../proj"/>
 									<listOptionValue builtIn="false" value="../../../stack/zigbee/common/includes"/>
@@ -311,6 +313,7 @@
 									<listOptionValue builtIn="false" value="../../../apps/common"/>
 									<listOptionValue builtIn="false" value="../../../apps/sampleSwitch"/>
 									<listOptionValue builtIn="false" value="../../../platform"/>
+									<listOptionValue builtIn="false" value="../../../platform/chip_b91"/>
 									<listOptionValue builtIn="false" value="../../../proj/common"/>
 									<listOptionValue builtIn="false" value="../../../proj"/>
 									<listOptionValue builtIn="false" value="../../../stack/zigbee/common/includes"/>
@@ -451,6 +454,7 @@
 									<listOptionValue builtIn="false" value="../../../apps/common"/>
 									<listOptionValue builtIn="false" value="../../../apps/bootLoader"/>
 									<listOptionValue builtIn="false" value="../../../platform"/>
+									<listOptionValue builtIn="false" value="../../../platform/chip_b91"/>
 									<listOptionValue builtIn="false" value="../../../proj/common"/>
 									<listOptionValue builtIn="false" value="../../../proj"/>
 								</option>
@@ -580,6 +584,7 @@
 									<listOptionValue builtIn="false" value="../../../apps/common"/>
 									<listOptionValue builtIn="false" value="../../../apps/sampleLight"/>
 									<listOptionValue builtIn="false" value="../../../platform"/>
+									<listOptionValue builtIn="false" value="../../../platform/chip_b91"/>
 									<listOptionValue builtIn="false" value="../../../proj/common"/>
 									<listOptionValue builtIn="false" value="../../../proj"/>
 									<listOptionValue builtIn="false" value="../../../stack/zigbee/common/includes"/>
