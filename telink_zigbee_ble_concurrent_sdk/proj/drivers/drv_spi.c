@@ -7,6 +7,7 @@
  * @date    2021
  *
  * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *          All rights reserved.
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -19,6 +20,7 @@
  *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
+ *
  *******************************************************************************************************/
 
 #include "../tl_common.h"
@@ -36,7 +38,7 @@ pspi_csn_pin_def_e drv_cs_pin;
  */
 void drv_spi_master_init(u32 spiClock, drv_spi_mode_type_def mode)
 {
-	u8 divClock = (u8)(SPI_CLOCK_SOURCE / (2 * spiClock) - 1);
+	u8 divClock = ((2 * spiClock) >= SPI_CLOCK_SOURCE) ? 0 : (u8)(SPI_CLOCK_SOURCE / (2 * spiClock) - 1);
 
 #if	defined(MCU_CORE_826x)
 	SPI_MasterInit(divClock, mode);

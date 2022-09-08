@@ -7,6 +7,7 @@
  * @date    2021
  *
  * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *          All rights reserved.
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -19,6 +20,7 @@
  *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
+ *
  *******************************************************************************************************/
 
 #ifndef BDB_H
@@ -443,7 +445,7 @@ extern bdb_ctx_t  g_bdbCtx;
 											}while(0)
 
 
-#define NODE_COMMISSIONING_CAPABILITY_SET(v)  	g_bdbAttrs.nodeCommissioningCapability = v
+#define NODE_COMMISSIONING_CAPABILITY_SET(v)  	g_bdbAttrs.nodeCommissioningCapability = v;
 
 #define BDB_STATE_SET(v)						g_bdbCtx.state = v
 #define BDB_STATE_GET()							g_bdbCtx.state

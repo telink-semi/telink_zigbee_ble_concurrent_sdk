@@ -7,6 +7,7 @@
  * @date    2021
  *
  * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *          All rights reserved.
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -19,6 +20,7 @@
  *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
+ *
  *******************************************************************************************************/
 
 #include "zcl_include.h"
@@ -278,7 +280,7 @@ static void zbhciMgmtBindRspMsgPush(void* arg){
 	zdo_zdpDataInd_t *p = (zdo_zdpDataInd_t *)arg;
 	zdo_mgmt_bind_resp_t *rsp = (zdo_mgmt_bind_resp_t *)p->zpdu;
 	u8 num = rsp->bind_tbl_lst_cnt;
-	u8 list_ptr = 5;	//
+	u8 list_ptr = 5;
 
 	for(u8 n = 0; n < num; n++){
 		zdo_bindTabListRec_t *rsp_list = (zdo_bindTabListRec_t *)(p->zpdu + list_ptr);
@@ -331,6 +333,33 @@ static void zbhciMgmtLeaveRspMsgPush(void *arg){
 
 		zbhciTx(ZBHCI_CMD_MGMT_LEAVE_RSP, pBuf - array, array);
 	}
+}
+
+static void zbhciMgmtUpdateNotifyPush(void *arg){
+	zdo_zdpDataInd_t *p = (zdo_zdpDataInd_t *)arg;
+	zdo_mgmt_nwk_update_noti_t *rsp = (zdo_mgmt_nwk_update_noti_t *)p->zpdu;
+
+	u8 array[32] = {0};
+	u8* pBuf = array;
+
+	COPY_U16TOBUFFER_BE(pBuf, p->src_addr);
+	pBuf += 2;
+	*pBuf++ = rsp->seq_num;
+	*pBuf++ = rsp->status;
+	if(rsp->status == SUCCESS){
+		COPY_U32TOBUFFER_BE(pBuf, rsp->scan_result.scanned_channels);
+		pBuf += 4;
+		COPY_U16TOBUFFER_BE(pBuf, rsp->scan_result.total_transmissions);
+		pBuf += 2;
+		COPY_U16TOBUFFER_BE(pBuf, rsp->scan_result.transmissions_fail);
+		pBuf += 2;
+		*pBuf++ = rsp->scan_result.size;
+		if(rsp->scan_result.size <= 16){
+			memcpy(pBuf, rsp->scan_result.energyValues, rsp->scan_result.size);
+			pBuf += rsp->scan_result.size;
+		}
+	}
+	zbhciTx(ZBHCI_CMD_MGMT_NWK_UPDATE_NOTIFY, pBuf - array, array);
 }
 
 s32 rxtx_performance_result_start(void *arg){
@@ -655,7 +684,7 @@ static void zbhci_mgmtCmdHandler(void *arg){
 		COPY_BUFFERTOU32_BE(req.scan_ch, &p[4]);
 		req.scan_duration = p[8];
 		req.scan_cnt = p[9];
-		zb_mgmtNwkUpdateReq(dstAddr, &req, &sn);
+		zb_mgmtNwkUpdateReq(dstAddr, &req, &sn, zbhciMgmtUpdateNotifyPush);
 	}
 
 	ev_buf_free(arg);

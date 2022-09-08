@@ -40,7 +40,7 @@ int main(void){
 
 #if VOLTAGE_DETECT_ENABLE
 	if(!isRetention){
-		voltage_detect();
+		voltage_detect(1);
 	}
 #endif
 
@@ -73,7 +73,7 @@ int main(void){
 #if VOLTAGE_DETECT_ENABLE
 		if(clock_time_exceed(tick, 200 * 1000)){
 			voltage_detect();
-			tick = clock_time();
+			tick = clock_time(0);
 		}
 #endif
 

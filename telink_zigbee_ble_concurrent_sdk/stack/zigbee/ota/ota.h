@@ -7,6 +7,7 @@
  * @date    2021
  *
  * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *          All rights reserved.
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -19,6 +20,7 @@
  *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
+ *
  *******************************************************************************************************/
 
 #ifndef OTA_H
@@ -38,7 +40,7 @@
 #define OTA_UPGRADE_IMAGE_AES_TAG_ID				0xF000	//Upgrade Image with AES, Manufacturer Specific Use
 
 #define OTA_QUERY_START_JITTER						(5 * 1000)//ms
-#define OTA_PERIODIC_QUERY_INTERVAL					(5 * 60)//s
+#define OTA_PERIODIC_QUERY_INTERVAL					(30 * 60)//s
 #define OTA_MAX_IMAGE_BLOCK_RSP_WAIT_TIME			5//s
 #define OTA_IEEE_ADDR_RSP_WAIT_TIME					2//s
 

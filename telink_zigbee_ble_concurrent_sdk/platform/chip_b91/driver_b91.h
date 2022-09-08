@@ -59,3 +59,5 @@
 #include "mspi.h"
 #include "adc.h"
 #include "swire.h"
+
+#include "flash/flash_type.h"

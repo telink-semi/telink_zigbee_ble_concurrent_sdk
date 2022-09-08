@@ -103,7 +103,7 @@ void app_pm_task(void){
 		}
 	}
 
-	if((APP_BLE_STATE_GET() != BLS_LINK_STATE_IDLE) && blt_pm_proc()){
+	if(CURRENT_SLOT_GET() == DUALMODE_SLOT_BLE && (APP_BLE_STATE_GET() != BLS_LINK_STATE_IDLE) && blt_pm_proc()){
 		 /*
 		  * here call "bls_ll_setAdvEnable(BLC_ADV_DISABLE)" to let ble enter state of BLS_LINK_STATE_IDLE,
 		  * and then need to call ble_task_restart() to start ble task again

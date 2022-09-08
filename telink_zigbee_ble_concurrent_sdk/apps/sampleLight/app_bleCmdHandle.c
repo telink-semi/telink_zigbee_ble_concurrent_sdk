@@ -81,7 +81,7 @@ int zb_ble_ci_cmd_handler(u16 clusterId, u8 len, u8 *payload){
 		req.scan_duration = ZDO_NWK_MANAGER_ATTRIBUTES_CHANGE;
 		req.nwk_update_id = 0x00;
 
-		zb_mgmtNwkUpdateReq(dstAddr, &req, &sn);
+		zb_mgmtNwkUpdateReq(dstAddr, &req, &sn, NULL);
 	}else if(clusterId == ZCL_CLUSTER_GEN_ON_OFF){
 		sampleLight_onOffCb(NULL, cmdId, pCmd);
 	}else if(clusterId == ZCL_CLUSTER_GEN_LEVEL_CONTROL){

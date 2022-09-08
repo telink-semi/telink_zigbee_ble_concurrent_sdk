@@ -7,6 +7,7 @@
  * @date    2021
  *
  * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *          All rights reserved.
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -19,6 +20,7 @@
  *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
+ *
  *******************************************************************************************************/
 
 #pragma once
@@ -154,6 +156,12 @@
 //1M flash
 #define FLASH_ADDR_0F_MAC_ADDR_1M		0xFF000
 #define FLASH_ADDR_OF_F_CFG_INFO_1M		0xFE000
+//2M flash
+#define FLASH_ADDR_0F_MAC_ADDR_2M		0x1FF000
+#define FLASH_ADDR_OF_F_CFG_INFO_2M		0x1FE000
+//4M flash
+#define FLASH_ADDR_0F_MAC_ADDR_4M		0x3FF000
+#define FLASH_ADDR_OF_F_CFG_INFO_4M		0x3FE000
 
 /************************************************************************/
 extern u32 g_u32MacFlashAddr;
@@ -206,7 +214,7 @@ extern u32 g_u32CfgFlashAddr;
  * The following is the detailed user configure information (U_CFG_Info).
  */
 /* 16 bytes for pre-install code. */
-#if FLASH_CAP_SIZE_1M
+#if(FLASH_CAP_SIZE_1M || FLASH_CAP_SIZE_2M || FLASH_CAP_SIZE_4M)
 #define CFG_PRE_INSTALL_CODE			(0xFD000)
 #else
 #define CFG_PRE_INSTALL_CODE			(0x78000)
@@ -217,7 +225,7 @@ extern u32 g_u32CfgFlashAddr;
  * The device will check this byte when powered on, if it is not 0xFF,
  * it will erase NV first.
  */
-#if FLASH_CAP_SIZE_1M
+#if(FLASH_CAP_SIZE_1M || FLASH_CAP_SIZE_2M || FLASH_CAP_SIZE_4M)
 #define CFG_FACTORY_RST_CNT			  	(0xFC000)
 #else
 #define CFG_FACTORY_RST_CNT			  	(0x79000)
@@ -227,7 +235,7 @@ extern u32 g_u32CfgFlashAddr;
  * Flash address of NV module.
  */
 #if !defined(BOOT_LOADER_MODE) || (BOOT_LOADER_MODE == 0)
-#if FLASH_CAP_SIZE_1M
+#if(FLASH_CAP_SIZE_1M || FLASH_CAP_SIZE_2M || FLASH_CAP_SIZE_4M)
 	#define NV_BASE_ADDRESS				(0xE0000)
 	#define CFG_NV_START_FOR_BLE		(0xF7000)
 #else
@@ -239,7 +247,7 @@ extern u32 g_u32CfgFlashAddr;
     #error "should use bootloade mode!!!"
 #endif
 #else
-#if FLASH_CAP_SIZE_1M
+#if(FLASH_CAP_SIZE_1M || FLASH_CAP_SIZE_2M || FLASH_CAP_SIZE_4M)
     #if DUAL_MODE
         #define NV_ADDR_FOR_SDK_TYPE		(0x24000)
         #define NV_BASE_ADDRESS				(0x26000)
@@ -284,7 +292,7 @@ typedef enum{
 #if !defined(BOOT_LOADER_MODE) || (BOOT_LOADER_MODE == 0)
 //unchangeable address
 #define FLASH_ADDR_OF_OTA_IMAGE		    (0x40000)
-#if FLASH_CAP_SIZE_1M
+#if(FLASH_CAP_SIZE_1M || FLASH_CAP_SIZE_2M || FLASH_CAP_SIZE_4M)
 	//max size = (0x80000 - 0) / 2 = 256k
 	#define FLASH_OTA_IMAGE_MAX_SIZE	    (FLASH_ADDR_OF_OTA_IMAGE - FLASH_ADDR_OF_APP_FW)
 #else
@@ -322,7 +330,7 @@ typedef struct{
 	u8  itemId;
 	u8  usedState;
 #if defined(MCU_CORE_B91)
-	u8  resv[8];   //PUYA flash only supports re-write 64 times every page
+	u8  resv[8];   //PUYA flash only supports re-write 64 times
 #endif
 }nv_info_idx_t;
 
@@ -400,6 +408,9 @@ typedef enum{
 
 	NV_ITEM_APP_SIMPLE_DESC,
 	NV_ITEM_APP_POWER_CNT,
+	NV_ITEM_APP_GP_TRANS_TABLE,
+
+	NV_ITEM_APS_BINDING_TABLE_V2    = 0x80,
 
 	NV_ITEM_ID_MAX					= 0xFF,/* Item id 0xFF should not be used. */
 }nv_item_t;
@@ -430,7 +441,7 @@ typedef enum{
 #define ITEM_FIELD_IDLE							0xFF
 
 
-#if FLASH_CAP_SIZE_1M
+#if(FLASH_CAP_SIZE_1M || FLASH_CAP_SIZE_2M || FLASH_CAP_SIZE_4M)
 #define MODULES_START_ADDR(id)					(NV_BASE_ADDRESS + FLASH_SECTOR_SIZE * (2 * id))
 #define NV_SECTOR_SIZE(id)						((id == NV_MODULE_KEYPAIR) ? (4 * FLASH_SECTOR_SIZE) : FLASH_SECTOR_SIZE)
 #define MODULE_INFO_SIZE(id)					((id == NV_MODULE_OTA || id == NV_MODULE_KEYPAIR || id == NV_MODULE_ADDRESS_TABLE) ? ((id == NV_MODULE_KEYPAIR) ? (12*FLASH_PAGE_SIZE) : (4*FLASH_PAGE_SIZE)) : (2*FLASH_PAGE_SIZE))
@@ -460,11 +471,14 @@ nv_sts_t nv_resetModule(u8 modules);
 nv_sts_t nv_flashWriteNew(u8 single, u16 id, u8 itemId, u16 len, u8 *buf);
 nv_sts_t nv_flashReadNew(u8 single, u8 id, u8 itemId, u16 len, u8 *buf);
 nv_sts_t nv_itemDeleteByIndex(u8 id, u8 itemId, u8 opSect, u16 opIdx);
+nv_sts_t nv_flashSingleItemRemove(u8 id, u8 itemId, u16 len);
 nv_sts_t nv_flashReadByIndex(u8 id, u8 itemId, u8 opSect, u16 opIdx, u16 len, u8 *buf);
+void nv_itemLengthCheckAdd(u8 itemId, u16 len);
 nv_sts_t nv_resetToFactoryNew(void);
 bool nv_facrotyNewRstFlagCheck(void);
 void nv_facrotyNewRstFlagSet(void);
 void nv_facrotyNewRstFlagClear(void);
 nv_sts_t nv_nwkFrameCountSaveToFlash(u32 frameCount);
 nv_sts_t nv_nwkFrameCountFromFlash(u32 *frameCount);
+nv_sts_t nv_flashSingleItemSizeGet(u8 id, u8 itemId, u16 *len);
 
