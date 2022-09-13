@@ -58,7 +58,7 @@ s32 sampleSwitch_bdbNetworkJoinDirect(void *arg){
 	u8 nwkKey[] = {0x12, 0x23, 0x34, 0x45, 0x56, 0x67, 0x78, 0x89, 0x9a, 0xab, 0xbc, 0xcd, 0xde, 0xef, 0xf0, 0x01};
 
 	T_sampleSwitch_bdbNetworkJoinDirect[0]++;
-	if(SUCCESS == bdb_join_direct(g_joinNetworkInfo.channel, g_joinNetworkInfo.panId, g_joinNetworkInfo.nwkAddr, extPanId, nwkKey, SS_SEMODE_DISTRIBUTED, 1)){
+	if(SUCCESS == bdb_join_direct(g_joinNetworkInfo.channel, g_joinNetworkInfo.panId, g_joinNetworkInfo.nwkAddr, extPanId, nwkKey, SS_SEMODE_DISTRIBUTED, 1, NULL)){
 		T_sampleSwitch_bdbNetworkJoinDirect[1];
 		return -1;
 	}
