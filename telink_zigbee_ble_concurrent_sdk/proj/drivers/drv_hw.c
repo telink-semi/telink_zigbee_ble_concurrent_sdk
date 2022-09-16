@@ -230,10 +230,6 @@ startup_state_e drv_platform_init(void)
 #endif
 	}
 
-#if FLASH_W_PROTECT
-	flash_load();
-#endif
-
 #if VOLTAGE_DETECT_ENABLE
 	voltage_detect_init(VOLTAGE_DETECT_ADC_PIN);
 #endif
