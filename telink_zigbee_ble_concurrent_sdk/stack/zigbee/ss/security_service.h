@@ -159,9 +159,10 @@ typedef struct{
 	u16						devKeyPairNum;
 	addrExt_t				trust_center_address;						//10
 	u8						securityLevel:3;
+	u8						resv1:1;
 	u8						secureAllFresh:1;
 	u8						activeSecureMaterialIndex:2;
-	u8						reserved:2;
+	u8						reserved:1;
 	u8						activeKeySeqNum;
 	ss_preconfiguredKey_e	preConfiguredKeyType;//pre-configured type, should be set during init state which used for ZDO auth
 	ss_tcPolicy_t			tcPolicy;									//10
