@@ -1,3 +1,35 @@
+## V2.2.0.0
+### Bugs
+* group(with multi-ep) can't removed when receiving remove group command with group-casting
+* fix the issue that the tx interrupt maybe miss when calling the "bls_ll_setAdvEnable" 
+* can't remove the child device when receiving Remove Device command  
+
+### Features
+* upgrade the group/binding/scene table to support changing the table size
+* support gp sink
+* add functions for flash write protection
+* add voltage detection
+* use zigbee stack v3.6.8.1
+
+BREAKING CHANGES
+* add a paramter "tcAddr" in the function of the “bdb_join_direct()”.
+
+### Bugs
+* 收到组播的remove group时，当group table存在多个Ep时，不能正常删除
+* 关闭ble广播模式导致zigbee模式下tx中断丢失
+* 无法通过Remove Device正常删除子设备
+
+### Features
+* 更新group/binding/scene table从而支持动态修改table大小
+* 支持gp sink
+* 添加flash写保护代码
+* 添加电池检测代码
+* 同步zigbee stack v3.6.8.1
+
+### BREAKING CHANGES
+* bdb_join_direct（）添加了参数“tcAddr”
+
+
 ## V2.1.0.0
 
 ### Bugs
