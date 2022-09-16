@@ -26,21 +26,6 @@
 #include "../tl_common.h"
 
 
-
-static void flash_lock(void){
-	if(p_drv_flashLockOp && p_drv_flashLockOp->lock){
-		p_drv_flashLockOp->lock();
-	}
-}
-
-static void flash_unlock(void){
-	if(p_drv_flashLockOp && p_drv_flashLockOp->unlock){
-		p_drv_flashLockOp->unlock();
-	}
-}
-#endif
-
-
 void flash_write(u32 addr, u32 len, u8 *buf){
 #if (MODULE_WATCHDOG_ENABLE)
 	drv_wd_clear();
