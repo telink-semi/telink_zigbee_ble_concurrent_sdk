@@ -54,7 +54,8 @@ drv_pm_pinCfg_t g_switchPmCfg[] = {
 
 bool app_zigbeeIdle(void){
 	bool ret = 0;
-	ret = !g_switchAppCtx.keyPressed && bdb_isIdle() && !tl_stackBusy() && zb_isTaskDone() && !ev_timer_process(1);
+	
+	ret = bdb_isIdle() && !tl_stackBusy() && zb_isTaskDone() && !ev_timer_process(1);
 
 	return ret;
 }
@@ -93,6 +94,7 @@ void app_pm_task(void){
 	}
 
 	if(CURRENT_SLOT_GET() == DUALMODE_SLOT_ZIGBEE && app_zigbeeIdle()){
+		drv_pm_wakeupPinLevelChange(g_switchPmCfg, sizeof(g_switchPmCfg)/sizeof(drv_pm_pinCfg_t));
 		if(APP_BLE_STATE_GET() == BLS_LINK_STATE_IDLE){
 			drv_pm_lowPowerEnter();
 		}else{
