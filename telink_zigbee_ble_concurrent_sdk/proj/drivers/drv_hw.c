@@ -85,24 +85,24 @@ static void internalFlashSizeCheck(void){
 	u8 *pMid = (u8 *)&mid;
 
 	if( (pMid[2] < FLASH_SIZE_512K) || \
-		((g_u32MacFlashAddr == FLASH_ADDR_0F_MAC_ADDR_1M) && (pMid[2] < FLASH_SIZE_1M)) || \
-		((g_u32MacFlashAddr == FLASH_ADDR_0F_MAC_ADDR_2M) && (pMid[2] < FLASH_SIZE_2M)) || \
-		((g_u32MacFlashAddr == FLASH_ADDR_0F_MAC_ADDR_4M) && (pMid[2] < FLASH_SIZE_4M))){
+		((g_u32MacFlashAddr == FLASH_ADDR_OF_MAC_ADDR_1M) && (pMid[2] < FLASH_SIZE_1M)) || \
+		((g_u32MacFlashAddr == FLASH_ADDR_OF_MAC_ADDR_2M) && (pMid[2] < FLASH_SIZE_2M)) || \
+		((g_u32MacFlashAddr == FLASH_ADDR_OF_MAC_ADDR_4M) && (pMid[2] < FLASH_SIZE_4M))){
 		/* Flash space not matched. */
 		while(1);
 	}
 
 	switch(pMid[2]){
 		case FLASH_SIZE_1M:
-			g_u32MacFlashAddr = FLASH_ADDR_0F_MAC_ADDR_1M;
+			g_u32MacFlashAddr = FLASH_ADDR_OF_MAC_ADDR_1M;
 			g_u32CfgFlashAddr = FLASH_ADDR_OF_F_CFG_INFO_1M;
 			break;
 		case FLASH_SIZE_2M:
-			g_u32MacFlashAddr = FLASH_ADDR_0F_MAC_ADDR_2M;
+			g_u32MacFlashAddr = FLASH_ADDR_OF_MAC_ADDR_2M;
 			g_u32CfgFlashAddr = FLASH_ADDR_OF_F_CFG_INFO_2M;
 			break;
 		case FLASH_SIZE_4M:
-			g_u32MacFlashAddr = FLASH_ADDR_0F_MAC_ADDR_4M;
+			g_u32MacFlashAddr = FLASH_ADDR_OF_MAC_ADDR_4M;
 			g_u32CfgFlashAddr = FLASH_ADDR_OF_F_CFG_INFO_4M;
 			break;
 		default:
@@ -111,8 +111,6 @@ static void internalFlashSizeCheck(void){
 #endif
 }
 
-#if VOLTAGE_DETECT_ENABLE
-#define VOLTAGE_DEBOUNCE_NUM 	5
 
 static void voltage_detect_init(u32 detectPin)
 {
@@ -130,6 +128,9 @@ static void voltage_detect_init(u32 detectPin)
 	drv_adc_enable(1);
 }
 
+
+#if VOLTAGE_DETECT_ENABLE
+#define VOLTAGE_DEBOUNCE_NUM 	5
 void voltage_detect(bool powerOn)
 {
 	u16 voltage = drv_get_adc_data();
@@ -232,6 +233,18 @@ startup_state_e drv_platform_init(void)
 
 #if VOLTAGE_DETECT_ENABLE
 	voltage_detect_init(VOLTAGE_DETECT_ADC_PIN);
+#endif
+
+	
+#if defined(MCU_CORE_8258)
+	if(flash_is_zb()){
+
+#if (!VOLTAGE_DETECT_ENABLE) || !defined(VOLTAGE_DETECT_ENABLE)
+		voltage_detect_init(VOLTAGE_DETECT_ADC_PIN);
+		flash_safe_voltage_set(BATTERY_SAFETY_THRESHOLD);
+#endif
+		flash_unlock_mid13325e();  //add it for the flash which sr is expired
+	}
 #endif
 
 	ZB_RADIO_INIT();

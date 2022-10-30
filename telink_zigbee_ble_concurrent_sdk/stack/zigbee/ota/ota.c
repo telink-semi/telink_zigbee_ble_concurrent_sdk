@@ -140,7 +140,9 @@ void ota_mcuReboot(void)
 	u32 newAddr = FLASH_ADDR_OF_OTA_IMAGE;
 
 #if (BOOT_LOADER_MODE)
-	flash_write((newAddr + FLASH_TLNK_FLAG_OFFSET), 1, &flashInfo);//enable boot-up flag
+	if(flash_writeWithCheck((newAddr + FLASH_TLNK_FLAG_OFFSET), 1, &flashInfo) != TRUE){
+		return;
+	}
 #else
 	u32 baseAddr = 0;
 
@@ -149,7 +151,10 @@ void ota_mcuReboot(void)
 		newAddr = 0;
 	}
 
-	flash_write((newAddr + FLASH_TLNK_FLAG_OFFSET), 1, &flashInfo);//enable boot-up flag
+	if(flash_writeWithCheck((newAddr + FLASH_TLNK_FLAG_OFFSET), 1, &flashInfo) != TRUE){
+		return;
+	}
+
 	flashInfo = 0;
 	flash_write((baseAddr + FLASH_TLNK_FLAG_OFFSET), 1, &flashInfo);//disable boot-up flag
 #endif
@@ -883,7 +888,9 @@ u8 ota_imageDataProcess(u8 len, u8 *pData)
 					pOtaUpdateInfo->otaServerAddrInfo.txOptions = g_otaCtx.otaServerEpInfo.txOptions;
 					//memcpy((u8 *)&(pOtaUpdateInfo->otaServerEpInfo), (u8 *)&g_otaCtx.otaServerEpInfo, sizeof(g_otaCtx.otaServerEpInfo));
 
-					nv_flashWriteNew(1, NV_MODULE_OTA, NV_ITEM_OTA_HDR_SERVERINFO, sizeof(ota_updateInfo_t), (u8 *)pOtaUpdateInfo);
+					if(nv_flashWriteNew(1, NV_MODULE_OTA, NV_ITEM_OTA_HDR_SERVERINFO, sizeof(ota_updateInfo_t), (u8 *)pOtaUpdateInfo) != NV_SUCC){
+						return ZCL_STA_INVALID_IMAGE;
+					}
 					ev_buf_free((u8 *)pOtaUpdateInfo);
 					pOtaUpdateInfo = NULL;
 
@@ -981,8 +988,10 @@ u8 ota_imageDataProcess(u8 len, u8 *pData)
 						pData[i + (FLASH_TLNK_FLAG_OFFSET - otaClientInfo.otaElementPos)] = 0xff;
 					}
 					u32 baseAddr = (mcuBootAddr) ? 0 : FLASH_ADDR_OF_OTA_IMAGE;
-					flash_write(baseAddr + otaClientInfo.otaElementPos, copyLen, &pData[i]);
-
+					if(flash_writeWithCheck(baseAddr + otaClientInfo.otaElementPos, copyLen, &pData[i]) != TRUE){
+						return ZCL_STA_INVALID_IMAGE;
+					}
+					
 					otaClientInfo.otaElementPos += copyLen;
 					zcl_attr_fileOffset += copyLen;
 

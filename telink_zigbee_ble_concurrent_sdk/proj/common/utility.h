@@ -194,6 +194,8 @@ u8 * my_fifo_get (my_fifo_t *f);
 
 #define LOG(x, s,...)
 
+extern unsigned int xcrc32(const unsigned char *buf, int len, unsigned int init);
+
 
 #define DBG_ZIGBEE_STATUS_EN		1
 #if DBG_ZIGBEE_STATUS_EN

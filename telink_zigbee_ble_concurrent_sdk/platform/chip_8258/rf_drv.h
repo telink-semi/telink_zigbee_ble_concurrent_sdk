@@ -228,13 +228,12 @@ static inline void reset_sn_nesn(void)
 	REG_ADDR8(0xf01) =  0x01;
 }
 
-#if BLE_CONCURRENT_MODE
 static inline unsigned char is_rf_receiving_pkt(void)
 {
 	//if the value of [5:4] of the reg_0x448 is 0b10 or 0b10, it means that the RF is in the receiving packet phase.(confirmed by junwen)
 	return (((read_reg8(0x448)>>5)& 1) == 1);
 }
-#endif
+
 
 static inline void 	tx_settle_adjust(unsigned short txstl_us)
 {

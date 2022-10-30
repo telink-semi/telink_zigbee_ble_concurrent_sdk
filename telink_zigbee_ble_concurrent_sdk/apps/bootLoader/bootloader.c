@@ -7,6 +7,7 @@
  * @date    2021
  *
  * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *			All rights reserved.
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -19,6 +20,7 @@
  *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
+ *
  *******************************************************************************************************/
 
 #if (__PROJECT_TL_BOOT_LOADER__)
@@ -60,14 +62,44 @@ static bool is_valid_fw_bootloader(u32 addr_fw){
 }
 
 void bootloader_with_ota_check(u32 addr_load, u32 new_image_addr){
+	drv_disable_irq();
+
 	if(new_image_addr != addr_load){
 		if(is_valid_fw_bootloader(new_image_addr)){
+			bool isNewImageVaild = FALSE;
+
 			u8 buf[256];
 
 			flash_read(new_image_addr, 256, buf);
 			u32 fw_size = *(u32 *)(buf + 0x18);
 
 			if(fw_size <= FLASH_OTA_IMAGE_MAX_SIZE){
+				s32 totalLen = fw_size - 4;
+				u32 wLen = 0;
+				u32 sAddr = new_image_addr;
+
+				u32 crcVal = 0;
+				flash_read(new_image_addr + fw_size - 4, 4, (u8 *)&crcVal);
+
+				u32 curCRC = 0xffffffff;
+
+				while(totalLen > 0){
+					wLen = (totalLen > 256) ? 256 : totalLen;
+					flash_read(sAddr, wLen, buf);
+					curCRC = xcrc32(buf, wLen, curCRC);
+
+					totalLen -= wLen;
+					sAddr += wLen;
+				}
+
+				if(curCRC == crcVal){
+					isNewImageVaild = TRUE;
+				}
+			}
+
+			if(isNewImageVaild){
+				u8 readBuf[256];
+
 				for(int i = 0; i < fw_size; i += 256){
 					if((i & 0xfff) == 0){
 						flash_erase(addr_load + i);
@@ -75,6 +107,12 @@ void bootloader_with_ota_check(u32 addr_load, u32 new_image_addr){
 
 					flash_read(new_image_addr + i, 256, buf);
 					flash_write(addr_load + i, 256, buf);
+
+					flash_read(addr_load + i, 256, readBuf);
+					if(memcmp(readBuf, buf, 256)){
+						SYSTEM_RESET();
+					}
+					
 				}
 			}
 

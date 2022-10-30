@@ -7,6 +7,7 @@
  * @date    2021
  *
  * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *          All rights reserved.
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -19,6 +20,7 @@
  *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
+ *
  *******************************************************************************************************/
 
  
@@ -80,13 +82,17 @@ SECTIONS
     PROVIDE (_DATA_VMA_END = .);
     PROVIDE (_DATA_VMA_START = ADDR(.data));
 	PROVIDE (_DATA_LMA_START = LOADADDR(.data));
-	PROVIDE (BIN_SIZE = LOADADDR(.data) + SIZEOF(.data) - BIN_BEGIN);
 	
 	. = ALIGN(8);
 	PROVIDE (_BSS_VMA_START = .);
 	.sbss 	(NOLOAD)	: { *(.dynsbss ) *(.sbss .sbss.* .gnu.linkonce.sb.* ) *(.scommon .scommon.* ) }
 	.bss 	(NOLOAD)	: { *(.dynbss ) *(.bss .bss.* .gnu.linkonce.b.* ) *(COMMON ) . = ALIGN(8); }
 	PROVIDE (_BSS_VMA_END = .);
+	
+	.sdk_version  	: AT(LOADADDR (.data) + SIZEOF (.data))
+		{ KEEP(*(.sdk_version )) }
+	
+	PROVIDE (BIN_SIZE = LOADADDR(.sdk_version) + SIZEOF(.sdk_version) - BIN_BEGIN);
 	
 	. = ALIGN(8);
 	/* end is the starting address of the heap, the heap grows upward */
