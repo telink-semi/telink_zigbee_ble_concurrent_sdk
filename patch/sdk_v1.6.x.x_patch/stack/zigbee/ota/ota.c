@@ -32,6 +32,10 @@
 /* 4 + 8 + 8N + 69 + 9 + 8 + (20 + 8)N = 4096; N = 110*/
 #define FLASH_WRITE_COUNT_GET(size)		((size / (110 * OTA_IMAGE_MAX_DATA_SIZE)) + 1)
 
+
+#define FLASH_OTA_IMAGE_MAX_SIZE	   	 0x40000
+#define TL_IMAGE_START_FLAG              0x4b
+
 /**********************************************************************
  * TYPEDEFS
  */
@@ -128,9 +132,58 @@ u8 mcuBootAddrGet(void)
 #endif
 }
 
+
+bool ota_newImageValid(u32 new_image_addr){
+	bool ret = FALSE;
+	u32 bufCache[256/4];  //align-4
+	u8 *buf = (u8 *)bufCache;
+	flash_read(new_image_addr, 256, (u8 *)buf);
+	u32 fw_size = *(u32 *)(buf + 0x18);
+
+	if(fw_size <= FLASH_OTA_IMAGE_MAX_SIZE){
+		s32 totalLen = fw_size - 4;
+		u32 wLen = 0;
+		u32 sAddr = new_image_addr;
+		u32 oft = 0;
+
+		u32 crcVal = 0;
+		flash_read(new_image_addr + fw_size - 4, 4, (u8 *)&crcVal);
+
+		u32 *pStartFlag = (u32 *)(buf + OTA_TLNK_KEYWORD_ADDROFFSET);
+		if((*pStartFlag & 0xffffff00) != 0x544c4e00){
+			return FALSE;
+		}
+
+		u32 curCRC = 0xffffffff;
+
+		while(totalLen > 0){
+			wLen = (totalLen > 256) ? 256 : totalLen;
+			flash_read(sAddr, wLen, buf);
+			if(oft == 0){
+				buf[OTA_TLNK_KEYWORD_ADDROFFSET] = TL_IMAGE_START_FLAG;
+			}
+			curCRC = xcrc32(buf, wLen, curCRC);
+
+			totalLen -= wLen;
+			sAddr += wLen;
+			oft += wLen;
+		}
+
+		if(curCRC == crcVal){
+			ret = TRUE;
+		}
+	}
+
+	return ret;
+}
+
+
 void ota_mcuReboot(void)
 {
-#if DUAL_MODE_SW_BOOT
+#if DUAL_MODE_SW_BOOT
+	if(!ota_newImageValid(newAddr)){
+		return;
+	}	
 	u8 flashInfo = 0x4b;
 	if(flash_writeWithCheck((FLASH_OTA_NEWIMAGE_ADDR + 8), 1, &flashInfo) != TRUE){
 		return;
@@ -144,6 +197,10 @@ void ota_mcuReboot(void)
 	if(mcuBootAddr){
 		baseAddr = FLASH_OTA_NEWIMAGE_ADDR;
 		newAddr = 0;
+	}
+
+	if(!ota_newImageValid(newAddr)){
+		return;
 	}
 
 	if(flash_writeWithCheck((newAddr + 8), 1, &flashInfo) != TRUE){
