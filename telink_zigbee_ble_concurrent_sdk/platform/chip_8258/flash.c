@@ -536,9 +536,9 @@ unsigned char flash_is_zb(void)
 }
 
 /**
- * @brief		This function is to config the flash operation voltage threshold
- * @param[in]	none.
- * @return		1 - is zb flash;   0 - is not zb flash.
+ * @brief		This function is to config the flash operation voltage threshold,  just for zbit flash
+ * @param[in]	voltage threshold.
+ * @return		none
  */
 unsigned char flash_safe_voltage_set(unsigned short vol)
 {

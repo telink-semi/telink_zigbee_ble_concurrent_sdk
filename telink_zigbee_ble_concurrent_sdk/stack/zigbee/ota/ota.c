@@ -134,10 +134,59 @@ u8 mcuBootAddrGet(void)
 #endif
 }
 
+
+bool ota_newImageValid(u32 new_image_addr){
+	bool ret = FALSE;
+	u32 bufCache[256/4];  //align-4
+	u8 *buf = (u8 *)bufCache;
+	flash_read(new_image_addr, 256, (u8 *)buf);
+	u32 fw_size = *(u32 *)(buf + 0x18);
+
+	if(fw_size <= FLASH_OTA_IMAGE_MAX_SIZE){
+		s32 totalLen = fw_size - 4;
+		u32 wLen = 0;
+		u32 sAddr = new_image_addr;
+		u32 oft = 0;
+
+		u32 crcVal = 0;
+		flash_read(new_image_addr + fw_size - 4, 4, (u8 *)&crcVal);
+
+		u32 *pStartFlag = (u32 *)(buf + FLASH_TLNK_FLAG_OFFSET);
+		if((*pStartFlag & 0xffffff00) != 0x544c4e00){
+			return FALSE;
+		}
+
+		u32 curCRC = 0xffffffff;
+
+		while(totalLen > 0){
+			wLen = (totalLen > 256) ? 256 : totalLen;
+			flash_read(sAddr, wLen, buf);
+			if(oft == 0){
+				buf[FLASH_TLNK_FLAG_OFFSET] = TL_IMAGE_START_FLAG;
+			}
+			curCRC = xcrc32(buf, wLen, curCRC);
+
+			totalLen -= wLen;
+			sAddr += wLen;
+			oft += wLen;
+		}
+
+		if(curCRC == crcVal){
+			ret = TRUE;
+		}
+	}
+
+	return ret;
+}
+
 void ota_mcuReboot(void)
 {
 	u8 flashInfo = TL_IMAGE_START_FLAG;
 	u32 newAddr = FLASH_ADDR_OF_OTA_IMAGE;
+
+	if(!ota_newImageValid(newAddr)){
+		return;
+	}
 
 #if (BOOT_LOADER_MODE)
 	if(flash_writeWithCheck((newAddr + FLASH_TLNK_FLAG_OFFSET), 1, &flashInfo) != TRUE){
