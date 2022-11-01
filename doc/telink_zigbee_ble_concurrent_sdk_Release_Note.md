@@ -1,3 +1,25 @@
+## V2.3.0.0
+### Bugs
+* need to add validation field and read back while writing operation to avoid the wrong data and firmware   being overwritten under extreme condition (drv_nv.c, drv_flash.c, ota.c)    
+* the voltage detection must be used for the zbit flash to avoid firmware being overwritten（adc.c flash.c）
+
+### Features
+* discard the current packet while the rf is busy to avoid receiving the wrong data
+
+BREAKING CHANGES
+* None
+
+### Bugs
+* 写flash时添加校验标志以及回读操作，读时数据进行有效性校验，以免获取错误数据以及避免极端条件下固件被修改的风险
+   (drv_nv.c, drv_flash.c, ota.c)
+* 当采用zbit flash时，必须进行低压检测，避免固件被修改的风险（flash.c）
+
+### Features
+* 当rf处于busy状态时，丢弃当前数据帧，以免获取错误数据
+
+### BREAKING CHANGES
+* 无
+
 ## V2.2.0.0
 ### Bugs
 * group(with multi-ep) can't removed when receiving remove group command with group-casting
