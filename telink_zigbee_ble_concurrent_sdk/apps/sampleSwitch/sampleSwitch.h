@@ -53,6 +53,7 @@ typedef struct{
 	u8 	times;		//blink times
 	u8  state;
 
+	s32 keyPressDebounce;
 	u8  keyPressed;
 
 	app_linkKey_info_t tcLinkKey;

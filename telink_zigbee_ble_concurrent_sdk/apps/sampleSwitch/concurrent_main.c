@@ -20,12 +20,14 @@
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
  *******************************************************************************************************/
-
+#include "tl_common.h"
 #include "zb_common.h"
 #include "stack/ble/ble_config.h"
 #include "stack/ble/ble_common.h"
 #include "stack/ble/ble.h"
 #include "zigbee_ble_switch.h"
+#include "zcl_include.h"
+#include "sampleSwitch.h"
 
 extern void user_zb_init(bool isRetention);
 extern void user_ble_init(bool isRetention);
@@ -66,6 +68,7 @@ int main(void){
 #endif
 
 #if PM_ENABLE
+    g_switchAppCtx.keyPressDebounce = 3;
 	app_pm_init();
 #endif
 
@@ -82,7 +85,11 @@ int main(void){
 		app_key_handler();
 
 #if PM_ENABLE
-		app_pm_task();
+		if(g_switchAppCtx.keyPressDebounce > 0){
+			g_switchAppCtx.keyPressDebounce--;
+		}else{
+			app_pm_task();
+		}
 #endif
 
 		T_taskRunCnt++;
