@@ -25,8 +25,6 @@
 
 #pragma once
 
-#define BATTERY_SAFETY_THRESHOLD	2200//2.2v
-
 #if defined(MCU_CORE_826x) || defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
 	#define SYSTEM_RESET()			mcu_reset()
 #elif defined(MCU_CORE_B91)
@@ -34,8 +32,9 @@
 #endif
 
 typedef enum{
-	SYSTEM_RETENTION_NONE,
-	SYSTEM_RETENTION_EN,
+	SYSTEM_BOOT,			//power on or boot
+	SYSTEM_DEEP_RETENTION,	//deep with retention back
+	SYSTEM_DEEP,			//deep back
 }startup_state_e;
 
 extern u32 sysTimerPerUs;
@@ -53,5 +52,5 @@ void drv_wd_clear(void);
 u32 drv_u32Rand(void);
 void drv_generateRandomData(u8 *pData, u8 len);
 
-void voltage_detect(bool powerOn);
+u16 voltage_detect(bool powerOn);
 

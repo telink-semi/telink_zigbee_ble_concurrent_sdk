@@ -656,7 +656,7 @@ u32 blt_pm_proc(void){
 				clock_time_exceed(latest_user_event_tick, CONN_IDLE_ENTER_DEEP_TIME * 1000000) )
 		{
 			bls_ll_terminateConnection(HCI_ERR_REMOTE_USER_TERM_CONN); //push terminate cmd into ble TX buffer
-			bls_ll_setAdvEnable(0);   //disable adv
+			//bls_ll_setAdvEnable(0);   //remove it to avoid to call it in the zigbee slot
 			sendTerminate_before_enterDeep = 1;
 		}
 	}

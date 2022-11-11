@@ -27,6 +27,6 @@
 #define _BOOTLOADER_H_
 
 
-void bootloader_init(void);
+void bootloader_init(bool powerOn);
 
 #endif	/* _BOOTLOADER_H_ */

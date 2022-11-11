@@ -153,7 +153,7 @@ void buttonKeepPressed(u8 btNum){
 	}
 }
 
-void set_detect_voltage(s32 v){
+void set_detect_voltage(u16 v){
     g_switchAppCtx.Vbat = v;
 }
 

@@ -52,6 +52,10 @@ extern app_dualModeInfo_t g_dualModeInfo;
 #define APP_BLE_STATE_SET(state)	 g_dualModeInfo.bleState = state
 #define APP_BLE_STATE_GET()			 g_dualModeInfo.bleState
 
+#define ZB_RF_ISR_RECOVERY		do{  \
+									if(CURRENT_SLOT_GET() == DUALMODE_SLOT_ZIGBEE) rf_set_irq_mask(FLD_RF_IRQ_RX|FLD_RF_IRQ_TX);  \
+								}while(0)
+
 _attribute_ram_code_ void switch_to_zb_context(void);
 
 _attribute_ram_code_ void switch_to_ble_context(void);

@@ -123,6 +123,7 @@ extern "C" {
  * such as VCC.
  */
 #define VOLTAGE_DETECT_ENABLE						0
+#define VOLTAGE_SAFETY_THRESHOLD                    2200
 
 #if defined(MCU_CORE_826x)
 	#define VOLTAGE_DETECT_ADC_PIN					0

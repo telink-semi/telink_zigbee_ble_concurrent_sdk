@@ -62,68 +62,77 @@ static bool is_valid_fw_bootloader(u32 addr_fw){
     return ((startup_flag == FW_START_UP_FLAG_WHOLE) ? TRUE : FALSE);
 }
 
-void bootloader_with_ota_check(u32 addr_load, u32 new_image_addr){
+void bootloader_with_ota_check(bool powerOn, u32 addr_load, u32 new_image_addr){
 	drv_disable_irq();
 
-	if(new_image_addr != addr_load){
-		if(is_valid_fw_bootloader(new_image_addr)){
-			bool isNewImageVaild = FALSE;
+#if VOLTAGE_DETECT_ENABLE
+	/*
+	 * !!!recommend setting VOLTAGE_DETECT_ENABLE as 1 to get the stable/safe voltage
+	 */
+	u16 voltage = voltage_detect(powerOn);
+	if(voltage > VOLTAGE_SAFETY_THRESHOLD)
+#endif
+	{
+		if(new_image_addr != addr_load){
+			if(is_valid_fw_bootloader(new_image_addr)){
+				bool isNewImageVaild = FALSE;
 
-			u32 bufCache[256/4];  //align-4
-			u8 *buf = (u8 *)bufCache;
+				u32 bufCache[256/4];  //align-4
+				u8 *buf = (u8 *)bufCache;
 
-			flash_read(new_image_addr, 256, buf);
-			u32 fw_size = *(u32 *)(buf + 0x18);
+				flash_read(new_image_addr, 256, buf);
+				u32 fw_size = *(u32 *)(buf + 0x18);
 
-			if(fw_size <= FLASH_OTA_IMAGE_MAX_SIZE){
-				s32 totalLen = fw_size - 4;
-				u32 wLen = 0;
-				u32 sAddr = new_image_addr;
+				if(fw_size <= FLASH_OTA_IMAGE_MAX_SIZE){
+					s32 totalLen = fw_size - 4;
+					u32 wLen = 0;
+					u32 sAddr = new_image_addr;
 
-				u32 crcVal = 0;
-				flash_read(new_image_addr + fw_size - 4, 4, (u8 *)&crcVal);
+					u32 crcVal = 0;
+					flash_read(new_image_addr + fw_size - 4, 4, (u8 *)&crcVal);
 
-				u32 curCRC = 0xffffffff;
+					u32 curCRC = 0xffffffff;
 
-				while(totalLen > 0){
-					wLen = (totalLen > 256) ? 256 : totalLen;
-					flash_read(sAddr, wLen, buf);
-					curCRC = xcrc32(buf, wLen, curCRC);
+					while(totalLen > 0){
+						wLen = (totalLen > 256) ? 256 : totalLen;
+						flash_read(sAddr, wLen, buf);
+						curCRC = xcrc32(buf, wLen, curCRC);
 
-					totalLen -= wLen;
-					sAddr += wLen;
-				}
-
-				if(curCRC == crcVal){
-					isNewImageVaild = TRUE;
-				}
-			}
-
-			if(isNewImageVaild){
-				u8 readBuf[256];
-
-				for(int i = 0; i < fw_size; i += 256){
-					if((i & 0xfff) == 0){
-						flash_erase(addr_load + i);
+						totalLen -= wLen;
+						sAddr += wLen;
 					}
 
-					flash_read(new_image_addr + i, 256, buf);
-					flash_write(addr_load + i, 256, buf);
-
-					flash_read(addr_load + i, 256, readBuf);
-					if(memcmp(readBuf, buf, 256)){
-						SYSTEM_RESET();
+					if(curCRC == crcVal){
+						isNewImageVaild = TRUE;
 					}
-					
 				}
-			}
 
-			buf[0] = 0;
-			flash_write(new_image_addr + FLASH_TLNK_FLAG_OFFSET, 1, buf);   //clear OTA flag
+				if(isNewImageVaild){
+					u8 readBuf[256];
 
-			//erase the new firmware
-			for(int i = 0; i < ((fw_size + 4095)/4096); i++) {
-				flash_erase(new_image_addr + i*4096);
+					for(int i = 0; i < fw_size; i += 256){
+						if((i & 0xfff) == 0){
+							flash_erase(addr_load + i);
+						}
+
+						flash_read(new_image_addr + i, 256, buf);
+						flash_write(addr_load + i, 256, buf);
+
+						flash_read(addr_load + i, 256, readBuf);
+						if(memcmp(readBuf, buf, 256)){
+							SYSTEM_RESET();
+						}
+
+					}
+				}
+
+				buf[0] = 0;
+				flash_write(new_image_addr + FLASH_TLNK_FLAG_OFFSET, 1, buf);   //clear OTA flag
+
+				//erase the new firmware
+				for(int i = 0; i < ((fw_size + 4095)/4096); i++) {
+					flash_erase(new_image_addr + i*4096);
+				}
 			}
 		}
 	}
@@ -143,8 +152,8 @@ void bootloader_with_ota_check(u32 addr_load, u32 new_image_addr){
     }
 }
 
-void bootloader_init(void){
-	bootloader_with_ota_check(APP_RUNNING_ADDR, APP_NEW_IMAGE_ADDR);
+void bootloader_init(u8 powerOn){
+	bootloader_with_ota_check(powerOn, APP_RUNNING_ADDR, APP_NEW_IMAGE_ADDR);
 }
 
 #endif	/* __PROJECT_TL_BOOT_LOADER__ */

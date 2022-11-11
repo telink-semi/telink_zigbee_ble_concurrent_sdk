@@ -707,8 +707,15 @@ _CODE_BDB_ static u8 bdb_commissioningNetworkFormation(void)
 			return bdb_commissioningFindBind();
 		}else{
 #if ZB_ROUTER_ROLE
-			u32 scanChannels = aps_ib.aps_channel_mask;
+#if ZB_COORDINATOR_ROLE
+	        ss_securityModeSet(SS_SEMODE_CENTRALIZED);
+#else
+	        if((!g_bdbAttrs.nodeIsOnANetwork)||(ZB_IEEE_ADDR_IS_INVALID(ss_ib.trust_center_address))){
+		        ss_securityModeSet(SS_SEMODE_DISTRIBUTED);
+	        }
+#endif
 
+			u32 scanChannels = aps_ib.aps_channel_mask;
 			/* network formation */
 			zb_nwkFormation(scanChannels, g_bdbAttrs.scanDuration);
 
@@ -1458,14 +1465,6 @@ _CODE_BDB_ u8 bdb_networkFormationStart(void)
 	g_bdbAttrs.commissioningMode.touchlink = 0;
 	g_bdbAttrs.commissioningMode.findOrBind = 0;
 	g_bdbAttrs.commissioningMode.networkFormation = 1;
-
-#if ZB_COORDINATOR_ROLE
-	ss_securityModeSet(SS_SEMODE_CENTRALIZED);
-#else
-	if((!g_bdbAttrs.nodeIsOnANetwork)||(ZB_IEEE_ADDR_IS_INVALID(ss_ib.trust_center_address))){
-		ss_securityModeSet(SS_SEMODE_DISTRIBUTED);
-	}
-#endif
 
 	return bdb_topLevelCommissioning(BDB_COMMISSIONING_ROLE_TARGET);
 }

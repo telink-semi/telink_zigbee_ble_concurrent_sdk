@@ -108,6 +108,8 @@ extern "C" {
  */
 #define VOLTAGE_DETECT_ENABLE						0
 
+#define VOLTAGE_SAFETY_THRESHOLD                    2200
+
 #if defined(MCU_CORE_826x)
 	#define VOLTAGE_DETECT_ADC_PIN					0
 #elif defined(MCU_CORE_8258) || defined(MCU_CORE_8278)

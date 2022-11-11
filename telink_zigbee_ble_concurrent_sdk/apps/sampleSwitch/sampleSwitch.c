@@ -168,6 +168,9 @@ void user_app_init(void)
 	/* register endPoint */
 	af_endpointRegister(SAMPLE_SWITCH_ENDPOINT, (af_simple_descriptor_t *)&sampleSwitch_simpleDesc, zcl_rx_handler, NULL);
 
+
+	zcl_reportingTabInit();
+
 	/* Register ZCL specific cluster information */
 	zcl_register(SAMPLE_SWITCH_ENDPOINT, SAMPLE_SWITCH_CB_CLUSTER_NUM, (zcl_specClusterInfo_t *)g_sampleSwitchClusterList);
 
@@ -188,6 +191,30 @@ static void sampleSwitchSysException(void)
 	SYSTEM_RESET();
 	//light_on();
 	//while(1);
+}
+
+void report_handler(void)
+{
+	if(zb_isDeviceJoinedNwk()){
+		if(zcl_reportingEntryActiveNumGet()){
+			u16 second = 1;//TODO: fix me
+
+			reportNoMinLimit();
+
+			//start report timer
+			reportAttrTimerStart(second);
+		}else{
+			//stop report timer
+			reportAttrTimerStop();
+		}
+	}
+}
+
+void app_task(void)
+{
+	if(BDB_STATE_GET() == BDB_STATE_IDLE){
+		report_handler();
+	}
 }
 
 /*********************************************************************
@@ -227,6 +254,8 @@ void user_zb_init(bool isRetention)
 #if ZBHCI_EN
 		ev_on_poll(EV_POLL_HCI, zbhciTask);
 #endif
+
+		ev_on_poll(EV_POLL_IDLE, app_task);
 
 		/* Load the pre-install code from flash */
 		if(bdb_preInstallCodeLoad(&g_switchAppCtx.tcLinkKey.keyType, g_switchAppCtx.tcLinkKey.key) == RET_OK){

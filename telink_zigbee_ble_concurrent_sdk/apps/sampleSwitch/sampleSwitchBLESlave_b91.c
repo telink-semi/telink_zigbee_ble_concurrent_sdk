@@ -715,7 +715,7 @@ _attribute_ram_code_ u32 blt_pm_proc(void){
 		{
 
 			bls_ll_terminateConnection(HCI_ERR_REMOTE_USER_TERM_CONN); //push terminate cmd into ble TX buffer
-			bls_ll_setAdvEnable(BLC_ADV_DISABLE);   //disable adv
+			//bls_ll_setAdvEnable(BLC_ADV_DISABLE);   //disable adv, remove it to avoid to call it in the zigbee slot
 			sendTerminate_before_enterDeep = 1;
 		}
 	}

@@ -41,9 +41,6 @@ app_dualModeInfo_t g_dualModeInfo = {
 		.bleState = BLS_LINK_STATE_IDLE,
 };
 
-#define ZB_RF_ISR_RECOVERY		do{  \
-									if(CURRENT_SLOT_GET() == DUALMODE_SLOT_ZIGBEE) rf_set_irq_mask(FLD_RF_IRQ_RX|FLD_RF_IRQ_TX);  \
-								}while(0)
 
 extern u8 g_ble_txPowerSet;
 

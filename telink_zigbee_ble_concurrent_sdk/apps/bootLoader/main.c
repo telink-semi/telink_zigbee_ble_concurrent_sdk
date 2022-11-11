@@ -26,28 +26,11 @@
 
 
 int main(void){
-	u8 isRetention = drv_platform_init();
+	startup_state_e state = drv_platform_init();
 
-#if VOLTAGE_DETECT_ENABLE
-	if(!isRetention){
-		voltage_detect(1);
-	}
-#endif
-
-	bootloader_init();
-
-#if VOLTAGE_DETECT_ENABLE
-    u32 tick = clock_time();
-#endif
+	bootloader_init((state == SYSTEM_BOOT));
 
 	while(1){
-#if VOLTAGE_DETECT_ENABLE
-		if(clock_time_exceed(tick, 200 * 1000)){
-			voltage_detect(0);
-			tick = clock_time();
-		}
-#endif
-
 		gpio_toggle(LED_POWER);
 		WaitMs(100);
 	}

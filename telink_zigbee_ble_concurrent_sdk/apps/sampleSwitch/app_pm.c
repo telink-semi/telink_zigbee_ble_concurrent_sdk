@@ -60,6 +60,10 @@ bool app_zigbeeIdle(void){
 	return ret;
 }
 
+void app_pm_wakeupPinCfg(void){
+	drv_pm_wakeupPinLevelChange(g_switchPmCfg, sizeof(g_switchPmCfg)/sizeof(drv_pm_pinCfg_t));
+}
+
 void app_pm_init(void){
 	drv_pm_wakeupPinConfig(g_switchPmCfg, sizeof(g_switchPmCfg)/sizeof(drv_pm_pinCfg_t));
 
@@ -93,8 +97,27 @@ void app_pm_task(void){
 		}
 	}
 
+	if((APP_BLE_STATE_GET() != BLS_LINK_STATE_IDLE)){
+		/*
+		 * adv for ADV_IDLE_ENTER_DEEP_TIME and conn for CONN_IDLE_ENTER_DEEP_TIME no event, enter deepsleep
+		 *  */
+		 if(blt_pm_proc()){
+			 /*
+				* here call "bls_ll_setAdvEnable(BLC_ADV_DISABLE)" to let ble enter state of BLS_LINK_STATE_IDLE,
+				* and then need to call ble_task_restart() to start ble task again
+				*
+				* */
+			 if(bls_ll_setAdvEnable(BLC_ADV_DISABLE) == BLE_SUCCESS){
+				 /* rf irq is cleared in the "bls_ll_setAdvEnable",
+					 * so that the rf tx/rx interrupt will be missed if the "bls_ll_setAdvEnable" is called in Zigbee mode
+					 */
+				ZB_RF_ISR_RECOVERY;
+			}
+		 }
+	}
+
 	if(CURRENT_SLOT_GET() == DUALMODE_SLOT_ZIGBEE && app_zigbeeIdle()){
-		drv_pm_wakeupPinLevelChange(g_switchPmCfg, sizeof(g_switchPmCfg)/sizeof(drv_pm_pinCfg_t));
+		app_pm_wakeupPinCfg();
 		if(APP_BLE_STATE_GET() == BLS_LINK_STATE_IDLE){
 			drv_pm_lowPowerEnter();
 		}else{
@@ -105,15 +128,19 @@ void app_pm_task(void){
 		}
 	}
 
-	if(CURRENT_SLOT_GET() == DUALMODE_SLOT_BLE && (APP_BLE_STATE_GET() != BLS_LINK_STATE_IDLE) && blt_pm_proc()){
-		 /*
-		  * here call "bls_ll_setAdvEnable(BLC_ADV_DISABLE)" to let ble enter state of BLS_LINK_STATE_IDLE,
-		  * and then need to call ble_task_restart() to start ble task again
-		  *
-		  * */
-		 bls_ll_setAdvEnable(BLC_ADV_DISABLE);
-	 }
-
 	return;
+}
+
+
+void app_enterCutOffMode(void){
+	/* enter cut-off mode to protect battery
+	 * the system should enter ultra-low-power mode,can't be wake up or only io wakeup is allowed until a new battery is used
+	 * */
+	drv_pm_wakeup_src_e wakeupSrc = PM_WAKEUP_SRC_PAD;
+	app_pm_wakeupPinCfg();
+
+	//drv_pm_sleep(PM_SLEEP_MODE_DEEPSLEEP, 0, 0);   //can't be wake up
+	drv_pm_sleep(PM_SLEEP_MODE_DEEPSLEEP, wakeupSrc, 0);   // only io wakeup is allowed
+	SYSTEM_RESET();  //shouldn't run here
 }
 #endif

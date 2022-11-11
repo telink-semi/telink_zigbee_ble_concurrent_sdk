@@ -29,16 +29,38 @@ extern void user_ble_init(void);
 volatile u8 T_taskRunCnt = 0;
 volatile u8 T_taskBleTrig = 0;
 
+static void app_bleStopRestart(void){
+	T_taskRunCnt++;
+	/* for debugging ble start/stop */
+	if(T_taskBleTrig){
+		if(T_taskBleTrig == 0x01){
+			ble_task_stop();
+		}else if(T_taskBleTrig == 0x02){
+			ble_task_restart();
+		}
+		T_taskBleTrig = 0;
+	}
+}
+
+
 int main(void){
 #if VOLTAGE_DETECT_ENABLE
 	u32 tick = 0;
 #endif
-
-	u8 isRetention = drv_platform_init();
+	startup_state_e state = drv_platform_init();
+	u8 isRetention = (state == SYSTEM_DEEP_RETENTION) ? 1 : 0;
+	u16 voltage = 0;
 
 #if VOLTAGE_DETECT_ENABLE
-	if(!isRetention){
-		voltage_detect(1);
+	/*
+	 * !!!recommend setting VOLTAGE_DETECT_ENABLE as 1 to get the stable/safe voltage
+	 */
+	bool pending = 1;
+	while(pending){
+		voltage = voltage_detect((state == SYSTEM_BOOT) ? 1 : 0);
+		if(voltage > VOLTAGE_SAFETY_THRESHOLD){
+			pending = 0;
+		}
 	}
 #endif
 
@@ -58,25 +80,21 @@ int main(void){
 #endif
 
 	while(1){
+#if (MODULE_WATCHDOG_ENABLE)
+		drv_wd_clear();
+#endif
+
 #if VOLTAGE_DETECT_ENABLE
-		if(clock_time_exceed(tick, 200 * 1000)){
-			voltage_detect(0);
-			tick = clock_time();
+		voltage = voltage_detect(0);
+		if(voltage <= VOLTAGE_SAFETY_THRESHOLD){
+			continue;
 		}
 #endif
 		concurrent_mode_main_loop();
 
-		T_taskRunCnt++;
+		/* smaple code to restart/stop ble task */
+		app_bleStopRestart();
 
-		/* for debugging ble start/stop */
-		if(T_taskBleTrig){
-			if(T_taskBleTrig == 0x01){
-				ble_task_stop();
-			}else if(T_taskBleTrig == 0x02){
-				ble_task_restart();
-			}
-			T_taskBleTrig = 0;
-		}
 	}
 
 	return 0;

@@ -1,5 +1,5 @@
 /********************************************************************************************************
- * @file    app_cfg.h
+0 * @file    app_cfg.h
  *
  * @brief   This is the header file for app_cfg
  *
@@ -134,6 +134,15 @@ extern "C" {
 #elif defined(MCU_CORE_B91)
 	#define VOLTAGE_DETECT_ADC_PIN					ADC_GPIO_PB0
 #endif
+
+#if PM_ENABLE
+#define VOLTAGE_SAFETY_THRESHOLD                    2100
+#else
+#define VOLTAGE_SAFETY_THRESHOLD                    2200
+#endif
+
+#define APP_VOLTAGE_THRESHOLD_CUTOFF                VOLTAGE_SAFETY_THRESHOLD
+#define APP_VOLTAGE_THRESHOLD_LOW_VOL               2300   //2.3v
 
 /* flash write protect */
 #define	FLASH_W_PROTECT                             0

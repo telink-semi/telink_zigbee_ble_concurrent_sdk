@@ -31,7 +31,7 @@ void flash_write(u32 addr, u32 len, u8 *buf){
 #endif
 
 #if (VOLTAGE_DETECT_ENABLE)
-	if(drv_get_adc_data() < BATTERY_SAFETY_THRESHOLD){return;}
+	if(drv_get_adc_data() < VOLTAGE_SAFETY_THRESHOLD){return;}
 #endif
 
 	flash_write_page(addr, len, buf);
@@ -50,7 +50,7 @@ bool flash_writeWithCheck(u32 addr, u32 len, u8 *buf){
 #endif
 
 #if (VOLTAGE_DETECT_ENABLE)
-	if(drv_get_adc_data() < BATTERY_SAFETY_THRESHOLD){
+	if(drv_get_adc_data() < VOLTAGE_SAFETY_THRESHOLD){
 		return FALSE;
 	}
 #endif
@@ -81,7 +81,7 @@ void flash_erase(u32 addr){
 #endif
 
 #if (VOLTAGE_DETECT_ENABLE)
-	if(drv_get_adc_data() < BATTERY_SAFETY_THRESHOLD){return;}
+	if(drv_get_adc_data() < VOLTAGE_SAFETY_THRESHOLD){return;}
 #endif
 
 	flash_erase_sector(addr);

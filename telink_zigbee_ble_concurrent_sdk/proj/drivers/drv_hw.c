@@ -131,38 +131,39 @@ static void voltage_detect_init(u32 detectPin)
 
 #if VOLTAGE_DETECT_ENABLE
 #define VOLTAGE_DEBOUNCE_NUM 	5
-void voltage_detect(bool powerOn)
+u16 voltage_detect(bool powerOn)
 {
-	u16 voltage = drv_get_adc_data();
+	u16 vol_0 = drv_get_adc_data();
+	u16 vol_1 = 0; //drv_get_adc_data();
 	u32 curTick = clock_time();
 	s32 debounceNum = VOLTAGE_DEBOUNCE_NUM;
 
-	//printf("VDD: %d\n", voltage);
-	if(powerOn || voltage < BATTERY_SAFETY_THRESHOLD){
+	if(powerOn){
+		WaitMs(10);
+		vol_1 = drv_get_adc_data();
 		while(debounceNum > 0){
-			if(voltage > BATTERY_SAFETY_THRESHOLD){
+			if(absSub(vol_1, vol_0) < 200){
 				debounceNum--;
 			}else{
 				debounceNum = VOLTAGE_DEBOUNCE_NUM;
 			}
+			vol_0 = vol_1;
+			vol_1 = drv_get_adc_data();
 
-			if(clock_time_exceed(curTick, 1000 * 1000)){
-#if PM_ENABLE
-				drv_pm_sleep(PM_SLEEP_MODE_DEEPSLEEP, 0, 0);
-#else
-				SYSTEM_RESET();
-#endif
+			if(clock_time_exceed(curTick, 5 * 1000 * 1000)){
+				break;
 			}
-
-			voltage = drv_get_adc_data();
 		}
+		return ((vol_0 + vol_1) / 2);
 	}
+
+	return vol_0;
 }
 #endif
 
 static startup_state_e platform_wakeup_init(void)
 {
-	startup_state_e state = SYSTEM_RETENTION_NONE;
+	startup_state_e state = SYSTEM_BOOT;
 
 #if defined(MCU_CORE_826x) || defined(MCU_CORE_8258)
 	cpu_wakeup_init();
@@ -177,10 +178,15 @@ static startup_state_e platform_wakeup_init(void)
 
 #if defined(MCU_CORE_826x)
 	//826x not support ram retention.
+	state = (pm_mcu_status == MCU_STATUS_DEEP_BACK) ? SYSTEM_DEEP : SYSTEM_BOOT;
 #elif defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
-	state = (pm_get_mcu_status() == MCU_STATUS_DEEPRET_BACK) ? SYSTEM_RETENTION_EN : SYSTEM_RETENTION_NONE;
+	state = (startup_state_e)pm_get_mcu_status();
 #elif defined(MCU_CORE_B91)
-	state = (g_pm_status_info.mcu_status == MCU_STATUS_DEEPRET_BACK) ? SYSTEM_RETENTION_EN : SYSTEM_RETENTION_NONE;
+	if(g_pm_status_info.mcu_status == MCU_STATUS_DEEPRET_BACK){
+		state = SYSTEM_DEEP_RETENTION;
+	}else if(g_pm_status_info.mcu_status == MCU_STATUS_DEEP_BACK){
+		state = SYSTEM_DEEP;
+	}
 #endif
 
 	return state;
@@ -219,7 +225,7 @@ startup_state_e drv_platform_init(void)
 	DEBUG_TX_PIN_INIT();
 #endif
 
-	if(state == SYSTEM_RETENTION_NONE){
+	if(state != SYSTEM_DEEP_RETENTION){
 		randInit();
 		internalFlashSizeCheck();
 #if PM_ENABLE
@@ -241,7 +247,7 @@ startup_state_e drv_platform_init(void)
 
 #if (!VOLTAGE_DETECT_ENABLE) || !defined(VOLTAGE_DETECT_ENABLE)
 		voltage_detect_init(VOLTAGE_DETECT_ADC_PIN);
-		flash_safe_voltage_set(BATTERY_SAFETY_THRESHOLD);
+		flash_safe_voltage_set(VOLTAGE_SAFETY_THRESHOLD);
 #endif
 		flash_unlock_mid13325e();  //add it for the flash which sr is expired
 	}
