@@ -186,21 +186,26 @@ typedef enum {
 #define		RF_PACKET_LENGTH_OK(p)		(p[0] == p[5]+13)//BLE
 #define		RF_PACKET_CRC_OK(p)			((p[p[0]+3] & 0x01) == 0x0)//BLE
 
-#define		RF_BLE_PACKET_LENGTH_OK(p)			(p[0] == (p[5]&0x3f)+13)//NONE
-#define		RF_BLE_PACKET_CRC_OK(p)				((p[p[0]+3] & 0x01) == 0)//NONE
+#define		RF_BLE_PACKET_LENGTH_OK(p)			( *((unsigned int*)p) == p[5]+13)
+#define		RF_BLE_PACKET_CRC_OK(p)				((p[*((unsigned int*)p) + 3] & 0x01) == 0x0)
 
 #define    RF_ZIGBEE_PACKET_LENGTH_OK(p)    (p[0]  == p[4]+9)//zigbee
 #define    RF_ZIGBEE_PACKET_CRC_OK(p)       ((p[p[0]+3] & 0x51) == 0x10)//zigbee
 #define    RF_ZIGBEE_PACKET_RSSI_GET(p)     (p[p[0]+2])
 #define    RF_ZIGBEE_PACKET_TIMESTAMP_GET(p)           (p[p[0]-4] | (p[p[0]-3]<<8) | (p[p[0]-2]<<16) | (p[p[0]-1]<<24))
 #define    RF_ZIGBEE_PACKET_PAYLOAD_LENGTH_GET(p)      (p[4])
-#define    RF_NRF_ESB_PACKET_LENGTH_OK(p)              (p[0] == (p[4] & 0x3f) + 11)
-#define    RF_NRF_ESB_PACKET_CRC_OK(p)                 ((p[p[0]+3] & 0x01) == 0x00)
-#define    RF_NRF_ESB_PACKET_RSSI_GET(p)               (p[p[0]+2])
-#define    RF_NRF_SB_PACKET_PAYLOAD_LENGTH_GET(p)      (p[0] - 10)
-#define    RF_NRF_SB_PACKET_CRC_OK(p)                  ((p[p[0]+3] & 0x01) == 0x00)
-#define    RF_NRF_SB_PACKET_CRC_GET(p)                 ((p[p[0]-8]<<8) + p[p[0]-7]) //Note: here assume that the MSByte of CRC is received first
-#define    RF_NRF_SB_PACKET_RSSI_GET(p)                (p[p[0]+2])
+
+#define    RF_TPLL_PACKET_LENGTH_OK(p)              	(p[0] == (p[4] & 0x3f) + 11)
+#define    RF_TPLL_PACKET_CRC_OK(p)                 	((p[p[0]+3] & 0x01) == 0x00)
+#define    RF_TPLL_PACKET_RSSI_GET(p)               	(p[p[0]+2])
+#define    RF_SB_PACKET_PAYLOAD_LENGTH_GET(p)      		(p[0] - 10)
+#define    RF_SB_PACKET_CRC_OK(p)                  		((p[p[0]+3] & 0x01) == 0x00)
+#define    RF_SB_PACKET_CRC_GET(p)                 		((p[p[0]-8]<<8) + p[p[0]-7]) //Note: here assume that the MSByte of CRC is received first
+#define    RF_SB_PACKET_RSSI_GET(p)                		(p[p[0]+2])
+#define    RF_TPLL_PACKET_TIMESTAMP_GET(p)         	 	(p[p[0]-4] | (p[p[0]-3]<<8) | (p[p[0]-2]<<16) | (p[p[0]-1]<<24))
+#define    RF_SB_PACKET_TIMESTAMP_GET(p)           		(p[p[0]-4] | (p[p[0]-3]<<8) | (p[p[0]-2]<<16) | (p[p[0]-1]<<24))
+
+
 static inline void rf_ble_tx_on ()
 {
 	write_reg8  (0x800f02, 0x45 | BIT(4));	// TX enable
@@ -411,9 +416,10 @@ static inline void rf_tx_acc_code_select(unsigned char pipe)
 {
     WRITE_REG8(0xf15, (READ_REG8(0xf15)&0xf8) | pipe); //Tx_Channel_man[2:0]
 }
-static inline void rf_nordic_shockburst(int len)
+
+static inline void rf_fix_payload_len_set(int len)
 {
-    WRITE_REG8(0x404, READ_REG8(0x404)|0x03); //select shockburst header mode
+    WRITE_REG8(0x404, READ_REG8(0x404)|0x03); //select private header mode
     WRITE_REG8(0x406, len);
 }
 

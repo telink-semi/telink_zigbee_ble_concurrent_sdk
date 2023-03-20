@@ -39,14 +39,16 @@ int main(void){
 	startup_state_e state = drv_platform_init();
 	u8 isRetention = (state == SYSTEM_DEEP_RETENTION) ? 1 : 0;
 	u16 voltage = 0;
+	bool powerOn = (state == SYSTEM_BOOT) ? 1 : 0;
 
 #if VOLTAGE_DETECT_ENABLE
 	/*
-	 * !!!recommend setting VOLTAGE_DETECT_ENABLE as 1 to get the stable/safe voltage
+	 * !!!in order to avoid error data written in flash,
+	 * recommend setting VOLTAGE_DETECT_ENABLE as 1 to get the stable/safe voltage
 	 */
 	bool pending = 1;
 	while(pending){
-		voltage = voltage_detect((state == SYSTEM_BOOT) ? 1 : 0);
+		voltage = voltage_detect(powerOn, VOLTAGE_SAFETY_THRESHOLD);
 		if(voltage > VOLTAGE_SAFETY_THRESHOLD){
 			pending = 0;
 		}
@@ -74,7 +76,7 @@ int main(void){
 #endif
 
 #if VOLTAGE_DETECT_ENABLE
-		voltage = voltage_detect(0);
+		voltage = voltage_detect(0, VOLTAGE_SAFETY_THRESHOLD);
 		if(voltage <= VOLTAGE_SAFETY_THRESHOLD){
 			continue;
 		}

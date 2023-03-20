@@ -69,7 +69,7 @@ void bootloader_with_ota_check(bool powerOn, u32 addr_load, u32 new_image_addr){
 	/*
 	 * !!!recommend setting VOLTAGE_DETECT_ENABLE as 1 to get the stable/safe voltage
 	 */
-	u16 voltage = voltage_detect(powerOn);
+	u16 voltage = voltage_detect(powerOn, VOLTAGE_SAFETY_THRESHOLD);
 	if(voltage > VOLTAGE_SAFETY_THRESHOLD)
 #endif
 	{

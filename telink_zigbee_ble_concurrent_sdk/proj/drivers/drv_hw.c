@@ -126,38 +126,38 @@ static void voltage_detect_init(u32 detectPin)
 #endif
 
 	drv_adc_enable(1);
+	WaitUs(100);
 }
 
 
 #if VOLTAGE_DETECT_ENABLE
 #define VOLTAGE_DEBOUNCE_NUM 	5
-u16 voltage_detect(bool powerOn)
+u16 voltage_detect(bool powerOn, u16 volThred)
 {
-	u16 vol_0 = drv_get_adc_data();
-	u16 vol_1 = 0; //drv_get_adc_data();
+	u16 voltage = drv_get_adc_data();
 	u32 curTick = clock_time();
 	s32 debounceNum = VOLTAGE_DEBOUNCE_NUM;
+	u16 v_min = 0;
 
-	if(powerOn){
-		WaitMs(10);
-		vol_1 = drv_get_adc_data();
+	//printf("VDD: %d\n", voltage);
+	if(powerOn || voltage <= volThred){
 		while(debounceNum > 0){
-			if(absSub(vol_1, vol_0) < 200){
+			WaitUs(100);
+			voltage = drv_get_adc_data();
+			if(voltage > volThred){
 				debounceNum--;
 			}else{
 				debounceNum = VOLTAGE_DEBOUNCE_NUM;
+				v_min = voltage;
 			}
-			vol_0 = vol_1;
-			vol_1 = drv_get_adc_data();
 
-			if(clock_time_exceed(curTick, 5 * 1000 * 1000)){
-				break;
+			if(clock_time_exceed(curTick, 1000 * 1000)){
+				return v_min;
 			}
 		}
-		return ((vol_0 + vol_1) / 2);
 	}
 
-	return vol_0;
+	return voltage;
 }
 #endif
 
@@ -237,18 +237,21 @@ startup_state_e drv_platform_init(void)
 #endif
 	}
 
+	/* Get calibration info to improve performance */
+	drv_calibration();
+
 #if VOLTAGE_DETECT_ENABLE
 	voltage_detect_init(VOLTAGE_DETECT_ADC_PIN);
 #endif
-
 	
+
 #if defined(MCU_CORE_8258)
 	if(flash_is_zb()){
 
 #if (!VOLTAGE_DETECT_ENABLE) || !defined(VOLTAGE_DETECT_ENABLE)
 		voltage_detect_init(VOLTAGE_DETECT_ADC_PIN);
-		flash_safe_voltage_set(VOLTAGE_SAFETY_THRESHOLD);
 #endif
+		flash_safe_voltage_set(VOLTAGE_SAFETY_THRESHOLD);
 		flash_unlock_mid13325e();  //add it for the flash which sr is expired
 	}
 #endif

@@ -183,6 +183,9 @@ extern "C" {
 #define APP_DIRECT_ADV_ENABLE				1
 
 #define BLE_APP_PM_ENABLE					1
+#define BLE_ACTIVE_BY_UI					1  /* 1: ui to active the ble after wakeup from sleep mode,
+                                                  0: active ble after wakeup from sleep mode
+                                               */
 /**********************************************************************
  * EV configuration
  */

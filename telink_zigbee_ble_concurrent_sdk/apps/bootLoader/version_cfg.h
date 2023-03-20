@@ -60,3 +60,5 @@
 #if !defined(BOOT_LOADER_MODE) || (BOOT_LOADER_MODE == 0)
 	#error "Please define BOOT_LOADER_MODE = 1"
 #endif
+
+#define	DEEPRETENTION_SECTION_USED          0

@@ -183,4 +183,13 @@ void sys_init(power_mode_e power_mode, vbat_type_e vbat_v);
 
 int write_reg_table(const tbl_cmd_set_t * pt, int size);
 
+/**
+ * @brief     this function servers to get calibration value from EFUSE.
+ * 			  Only the two-point calibration gain and offset of GPIO sampling are saved in the efuse of B91.
+ * @param[out]gain - gpio_calib_value.
+ * @param[out]offset - gpio_calib_value_offset.
+ * @return    1 means there is a calibration value in efuse, and 0 means there is no calibration value in efuse.
+ */
+unsigned char efuse_get_adc_calib_value(unsigned short* gain, signed char* offset);
+
 #endif

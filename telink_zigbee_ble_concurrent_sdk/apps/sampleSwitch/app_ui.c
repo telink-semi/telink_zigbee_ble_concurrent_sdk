@@ -259,10 +259,12 @@ void keyScan_keyPressedCB(kb_data_t *kbEvt){
 		g_switchAppCtx.state = APP_FACTORY_NEW_SET_CHECK;
 	}
 
+#if BLE_ACTIVE_BY_UI
 	if(APP_BLE_STATE_GET() == BLS_LINK_STATE_IDLE){
 		ble_task_restart();
 		ble_advertiseTickUpdate();
 	}
+#endif
 }
 
 

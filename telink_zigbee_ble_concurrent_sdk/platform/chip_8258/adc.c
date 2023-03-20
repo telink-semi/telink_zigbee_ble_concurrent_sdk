@@ -27,17 +27,22 @@
 #include "dfifo.h"
 #include "timer.h"
 #include "compiler.h"
-
+#include "utility.h"
 
 _attribute_data_retention_
-adc_vref_ctr_t adc_vref_cfg = {
-	.adc_vref 		= 1175, //default ADC ref voltage (unit:mV)
-	.adc_calib_en	= 1, 	//default enable
-};
+unsigned short adc_vref = 1175;//ADC gpio calibration value voltage (unit:mV)(used for gpio voltage sample).
+_attribute_data_retention_
+volatile signed char adc_vref_offset = 0;//ADC calibration value voltage offset (unit:mV).
+
+_attribute_data_retention_
+unsigned short adc_gpio_calib_vref = 1175;//ADC gpio calibration value voltage (unit:mV)(used for gpio voltage sample).
+_attribute_data_retention_
+signed char adc_gpio_calib_vref_offset = 0;//ADC gpio calibration value voltage offset (unit:mV)(used for gpio voltage sample).
 
 volatile unsigned short	adc_code;
 unsigned char  adc_pre_scale;
 unsigned short adc_ref_vol[2] = {600,900};
+unsigned short adc_sample_interval = 90;   //us
 
 const GPIO_PinTypeDef ADC_GPIO_tab[10] = {
 		GPIO_PB0,GPIO_PB1,
@@ -48,30 +53,57 @@ const GPIO_PinTypeDef ADC_GPIO_tab[10] = {
 };
 
 /**
- * @brief This function is used for IO port configuration of ADC supply voltage sampling.
+ * @brief This function is used for IO port configuration of ADC IO port voltage sampling.
+ *        This interface can be used to switch sampling IO without reinitializing the ADC.
  * @param[in]   pin - GPIO_PinTypeDef
  * @return none
  */
 void adc_base_pin_init(GPIO_PinTypeDef pin)
 {
+	unsigned char i;
+	unsigned char gpio_num=0;
 	//ADC GPIO Init
 	gpio_set_func(pin, AS_GPIO);
 	gpio_set_input_en(pin,0);
 	gpio_set_output_en(pin,0);
 	gpio_write(pin,0);
+
+	for(i=0;i<10;i++)
+	{
+		if(pin == ADC_GPIO_tab[i])
+		{
+			gpio_num = i+1;
+			break;
+		}
+	}
+	adc_set_ain_channel_differential_mode(ADC_MISC_CHN, gpio_num, GND);
 }
 
 /**
- * @brief This function is used for IO port configuration of ADC supply voltage sampling.
+ * @brief This function is used for IO port configuration of ADC IO port voltage sampling.
+ *        This interface can be used to switch sampling IO without reinitializing the ADC.
  * @param[in]  pin -  GPIO_PinTypeDef pin
  * @return none
  */
 void adc_vbat_pin_init(GPIO_PinTypeDef pin)
 {
+	unsigned char i;
+	unsigned char gpio_no=0;
 	gpio_set_func(pin, AS_GPIO);
 	gpio_set_input_en(pin,0);
 	gpio_set_output_en(pin,1);
 	gpio_write(pin,1);
+	//set channel mode and channel
+	for(i=0;i<10;i++)
+	{
+		if(pin == ADC_GPIO_tab[i])
+		{
+			gpio_no = i+1;
+			break;
+		}
+	}
+	adc_set_input_mode(ADC_MISC_CHN, DIFFERENTIAL_MODE);
+	adc_set_ain_channel_differential_mode(ADC_MISC_CHN, gpio_no, GND);
 }
 
 /**
@@ -95,7 +127,7 @@ void adc_set_ref_voltage(ADC_ChTypeDef ch_n, ADC_RefVolTypeDef v_ref)
 		//Vref buffer bias current trimming: 		100%
 		//Comparator preamp bias current trimming:  100%
 		analog_write( areg_ain_scale  , (analog_read( areg_ain_scale  )&(0xC0)) | 0x15 );
-		adc_vref_cfg.adc_vref=adc_ref_vol[v_ref];
+		adc_gpio_calib_vref=adc_ref_vol[v_ref];
 	}
 }
 
@@ -271,6 +303,42 @@ void adc_init(void){
 	adc_set_left_gain_bias(GAIN_STAGE_BIAS_PER100);
 	adc_set_right_gain_bias(GAIN_STAGE_BIAS_PER100);
 	dfifo_disable_dfifo2();//disable misc channel data dfifo
+	//Add 192K sample rate by jiarong.ji at 20220621
+	if(ADC_SAMPLE_RATE_SELECT==ADC_SAMPLE_RATE_23K)
+	{
+		adc_set_state_length(1023, 0, 15);  	//set R_max_mc=1023,R_max_s=15
+		adc_sample_interval = 90;
+	}
+	else if(ADC_SAMPLE_RATE_SELECT==ADC_SAMPLE_RATE_96K)
+	{
+		adc_set_state_length(240, 0, 10);  	//set R_max_mc=240,R_max_s=10
+		adc_sample_interval = 25;
+	}
+	else if(ADC_SAMPLE_RATE_SELECT==ADC_SAMPLE_RATE_192K)
+	{
+		adc_set_state_length(115, 0, 10);  	//set R_max_mc=115,R_max_s=10
+		adc_sample_interval = 11;
+	}
+}
+
+/**
+ * @brief This function is used to calib ADC 1.2V vref for GPIO.
+ * @param[in] data - GPIO sampling calibration value.
+ * @return none
+ */
+void adc_set_gpio_calib_vref(unsigned short data)
+{
+	adc_gpio_calib_vref = data;
+}
+
+/**
+ * @brief This function is used to calib ADC 1.2V vref offset for GPIO two-point.
+ * @param[in] offset - GPIO sampling two-point calibration value offset.
+ * @return none
+ */
+void adc_set_gpio_two_point_calib_offset(signed char offset)
+{
+	adc_gpio_calib_vref_offset = offset;
 }
 
 /**
@@ -280,36 +348,21 @@ void adc_init(void){
  */
 void adc_base_init(GPIO_PinTypeDef pin)
 {
-	unsigned char i;
-	unsigned char gpio_num=0;
 	adc_set_chn_enable_and_max_state_cnt(ADC_MISC_CHN, 2);//enable the mic channel and set max_state_cnt
 
-	if(ADC_SAMPLE_RATE_SELECT==ADC_SAMPLE_RATE_23K)
-	{
-		//This configure from Jianbo and Congqing. The purpose of this configuration is to prevent leakage
-		adc_set_state_length(1023, 0, 15);  	//set R_max_mc=240,R_max_s=15
-		//analog_write(areg_r_max_s, (analog_read(areg_r_max_s) & 0x3f) | 0xc0 );
-	}
-	else if(ADC_SAMPLE_RATE_SELECT==ADC_SAMPLE_RATE_96K)
-	{
-		adc_set_state_length(240, 0, 10);  	//set R_max_mc=240,R_max_s=10
-	}
+	/**
+	 * Add Vref calibrate operation.
+	 * add by jiarong.ji at 20201029.
+	*/
+	adc_vref = adc_gpio_calib_vref;//set adc_vref as adc_gpio_calib_vref
+	adc_vref_offset = adc_gpio_calib_vref_offset;//set adc_vref_offset as adc_gpio_calib_vref_offset
 
 	adc_set_ref_voltage(ADC_MISC_CHN, ADC_VREF_1P2V);//set channel Vref,
     // ADC_Vref = (unsigned char)ADC_VREF_1P2V;
 	adc_set_vref_vbat_divider(ADC_VBAT_DIVIDER_OFF);//set Vbat divider select,
 	//ADC_VBAT_Scale = VBAT_Scale_tab[ADC_VBAT_DIVIDER_OFF];
 
-	adc_base_pin_init(pin);		//ADC GPIO Init
-	for(i=0;i<10;i++)
-	{
-		if(pin == ADC_GPIO_tab[i])
-		{
-			gpio_num = i+1;
-			break;
-		}
-	}
-	adc_set_ain_channel_differential_mode(ADC_MISC_CHN, gpio_num, GND);
+	adc_base_pin_init(pin);
 	adc_set_resolution(ADC_MISC_CHN, RES14);
 	adc_set_tsample_cycle(ADC_MISC_CHN, SAMPLING_CYCLES_6);
 	adc_set_ain_pre_scaler(ADC_PRESCALER_1F8);//adc scaling factor is 1/8
@@ -323,26 +376,20 @@ void adc_base_init(GPIO_PinTypeDef pin)
  */
 void adc_vbat_init(GPIO_PinTypeDef pin)
 {
-	unsigned char i;
-	unsigned char gpio_no=0;
 	adc_set_chn_enable_and_max_state_cnt(ADC_MISC_CHN, 2);
-	adc_set_state_length(240, 0, 10);  	//set R_max_mc,R_max_c,R_max_s
 
 	//set Vbat divider select,
 	adc_set_vref_vbat_divider(ADC_VBAT_DIVIDER_OFF);
 	//ADC_VBAT_Scale = VBAT_Scale_tab[ADC_VBAT_DIVIDER_OFF];
-	//set channel mode and channel
+
+	/**
+	 * Add Vref calibrate operation.
+	 * add by jiarong.ji at 20201029.
+	*/
+	adc_vref = adc_gpio_calib_vref;//set adc_vref as adc_gpio_calib_vref
+	adc_vref_offset = adc_gpio_calib_vref_offset;//set adc_vref_offset as adc_gpio_calib_vref_offset
+
 	adc_vbat_pin_init(pin);
-	for(i=0;i<10;i++)
-	{
-		if(pin == ADC_GPIO_tab[i])
-		{
-			gpio_no = i+1;
-			break;
-		}
-	}
-	adc_set_input_mode(ADC_MISC_CHN, DIFFERENTIAL_MODE);
-	adc_set_ain_channel_differential_mode(ADC_MISC_CHN, gpio_no, GND);
 	adc_set_ref_voltage(ADC_MISC_CHN, ADC_VREF_1P2V);//set channel Vref ,must be ADC_VREF_1P2V
 	//ADC_Vref = (unsigned char)ADC_VREF_1P2V;
 	adc_set_resolution(ADC_MISC_CHN, RES14);//set resolution
@@ -354,7 +401,7 @@ void adc_vbat_init(GPIO_PinTypeDef pin)
 	adc_set_mode(ADC_NORMAL_MODE);
 }
 
-
+#if 0
 
 #define ADC_SAMPLE_NUM		8 //8 /4
 
@@ -363,7 +410,7 @@ void adc_vbat_init(GPIO_PinTypeDef pin)
  * @param[in]  none.
  * @return the result of sampling.
  */
-static _attribute_ram_code_ unsigned int adc_sample_and_get_result_op(char mode, unsigned int *d)
+_attribute_ram_code_ unsigned int adc_sample_and_get_result_op(char mode, unsigned int *d)
 {
 	unsigned short temp;
 	volatile signed int adc_data_buf[ADC_SAMPLE_NUM];  //size must 16 byte aligned(16/32/64...)
@@ -391,6 +438,10 @@ static _attribute_ram_code_ unsigned int adc_sample_and_get_result_op(char mode,
 	{
 		while(!clock_time_exceed(t0, 25));  //wait at least 2 sample cycle(f = 96K, T = 10.4us)
 	}
+	else if(ADC_SAMPLE_RATE_SELECT==ADC_SAMPLE_RATE_192K)
+	{
+		while(!clock_time_exceed(t0, 11));  //wait at least 2 sample cycle(f = 192K, T = 5.2us)
+	}
 //////////////// get adc sample data and sort these data ////////////////
 	for(i=0;i<ADC_SAMPLE_NUM;i++){
 		/*wait for new adc sample data, When the data is not zero and more than 1.5 sampling times (when the data is zero),
@@ -405,7 +456,11 @@ static _attribute_ram_code_ unsigned int adc_sample_and_get_result_op(char mode,
 		{
 			while(!clock_time_exceed(t0, 25));  //wait at least 2 sample cycle(f = 96K, T = 10.4us)
 		}
-
+		//Add 192K sample rate by jiarong.ji at 20220621
+		else if(ADC_SAMPLE_RATE_SELECT==ADC_SAMPLE_RATE_192K)
+		{
+			while(!clock_time_exceed(t0, 11));  //wait at least 2 sample cycle(f = 192K, T = 5.2us)
+		}
 		t0 = clock_time();
 		if(adc_data_buf[i] & BIT(13)){  //14 bit resolution, BIT(13) is sign bit, 1 means negative voltage in differential_mode
 			adc_sample[i] = 0;
@@ -439,25 +494,96 @@ static _attribute_ram_code_ unsigned int adc_sample_and_get_result_op(char mode,
 	adc_code=adc_result = adc_average;
 
 
-	 //////////////// adc sample data convert to voltage(mv) ////////////////
-	//                          (Vref, adc_pre_scale)   (BIT<12~0> valid data)
-	//			 =  adc_result * Vref * adc_pre_scale / 0x2000
-	//           =  adc_result * adc_pre_scale*Vref >>13
-
-	adc_vol_mv  = (adc_result * adc_pre_scale*adc_vref_cfg.adc_vref)>>13;
-
-	if(mode){
-		*d = (((adc_sample[ADC_SAMPLE_NUM-1] - adc_sample[0]) * adc_pre_scale*adc_vref_cfg.adc_vref)>>13);
+	//When the code value is 0, the returned voltage value should be 0.
+	if(adc_result == 0){
+		return 0;
 	}
+	else{
+		//////////////// adc sample data convert to voltage(mv) ////////////////
+		//                          (Vref, adc_pre_scale)   (BIT<12~0> valid data)
+		//			 =  adc_result * Vref * adc_pre_scale / 0x2000 + offset
+		//           =  adc_result * Vref * adc_pre_scale >>13 + offset
+		adc_vol_mv  = ((adc_result * adc_pre_scale * adc_vref)>>13) + adc_vref_offset;
+		if(mode){
+			*d = (((adc_sample[ADC_SAMPLE_NUM - 1] - adc_sample[0]) * adc_pre_scale * adc_vref)>>13);
+		}
+	}
+
 
 	return adc_vol_mv;
 }
+#endif
 
-unsigned int adc_sample_and_get_result(void){
-	unsigned int v;
-	return adc_sample_and_get_result_op(0, &v);
+/**
+ * @brief      This function serves to set adc sampling and get results in manual mode for Base and Vbat mode.
+ *             If you want to get the sampling results twice in succession,
+ *             Must ensure that the sampling interval is more than 2 times the sampling period.
+ * @param[in]  none.
+ * @return the result of sampling.
+ */
+static _attribute_ram_code_ unsigned short adc_sample_and_get_result_manual_mode(void)
+{
+	volatile unsigned char adc_misc_data_L;
+	volatile unsigned char adc_misc_data_H;
+	volatile unsigned short adc_misc_data;
+
+	analog_write(adc_data_sample_control,analog_read(adc_data_sample_control) | NOT_SAMPLE_ADC_DATA);
+	adc_misc_data_L = analog_read(areg_adc_misc_l);
+	adc_misc_data_H = analog_read(areg_adc_misc_h);
+	analog_write(adc_data_sample_control,analog_read(adc_data_sample_control) & (~NOT_SAMPLE_ADC_DATA));
+
+	adc_misc_data = (adc_misc_data_H<<8 | adc_misc_data_L);
+
+	if(adc_misc_data & BIT(13)){
+		adc_misc_data=0;
+	}
+	else{
+		adc_misc_data &= 0x1FFF;
+	}
+
+	unsigned short  adc_result = ((adc_misc_data*adc_pre_scale*adc_vref)>>13) + adc_vref_offset;
+	return adc_result;
 }
 
-_attribute_ram_code_ unsigned int adc_get_result_with_fluct(unsigned int *v){
-	return adc_sample_and_get_result_op(1, v);
+
+#define ADC_DBG_EN 0
+#if ADC_DBG_EN
+volatile unsigned short T_adcV[256] = {0};
+int adcCnt = 0;
+#endif
+_attribute_ram_code_ unsigned int adc_sample_and_get_result(void){
+	unsigned short  v= adc_sample_and_get_result_manual_mode();
+	return v;
 }
+
+_attribute_ram_code_ unsigned int adc_get_result_with_fluct(unsigned int *v_d){
+	unsigned short  v_c[2] = {0};
+	unsigned short  v_min = 0;
+	unsigned short  v_max = 0;
+
+	unsigned int t0 = clock_time();
+	while(!clock_time_exceed(t0, 500)){
+		v_c[0] = adc_sample_and_get_result_manual_mode();
+		WaitUs(adc_sample_interval);
+		v_c[1] = adc_sample_and_get_result_manual_mode();
+		WaitUs(adc_sample_interval);
+		v_min = min2(v_c[0], v_c[1]);
+		v_max = max2(v_c[0], v_c[1]);
+
+#if ADC_DBG_EN
+		T_adcV[(adcCnt++)&0xff] = v_c[0];
+		T_adcV[(adcCnt++)&0xff] = v_c[1];
+#endif
+	}
+
+	*v_d = v_max - v_min;
+
+#if ADC_DBG_EN
+	T_adcV[(adcCnt++)&0xff] = v_min;
+	T_adcV[(adcCnt++)&0xff] = v_max;
+	T_adcV[(adcCnt++)&0xff] = *v_d;
+#endif
+
+	return v_min;
+}
+

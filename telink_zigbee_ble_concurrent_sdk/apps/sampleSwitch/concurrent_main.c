@@ -54,6 +54,7 @@ static void app_bleStopRestart(void){
 int main(void){
 	startup_state_e state = drv_platform_init();
 	u8 isRetention = (state == SYSTEM_DEEP_RETENTION) ? 1 : 0;
+	bool powerOn = (state == SYSTEM_BOOT) ? 1 : 0;
 	u16 voltage = 0;
 
 	os_init(isRetention);
@@ -65,11 +66,12 @@ int main(void){
 
 #if VOLTAGE_DETECT_ENABLE
 	/*
-	 * !!!recommend setting VOLTAGE_DETECT_ENABLE as 1 to get the stable/safe voltage
+	 * !!!in order to avoid error data written in flash,
+	 * recommend setting VOLTAGE_DETECT_ENABLE as 1 to get the stable/safe voltage
 	 */
 	bool pending = 1;
 	while(pending){
-		voltage = voltage_detect((state == SYSTEM_BOOT) ? 1 : 0);
+		voltage = voltage_detect(powerOn, APP_VOLTAGE_THRESHOLD_CUTOFF);
 		if(voltage <= APP_VOLTAGE_THRESHOLD_CUTOFF){
 #if PM_ENABLE
 			/* !!!entering cut off mode is recommended */
@@ -89,7 +91,12 @@ int main(void){
 	if(CURRENT_SLOT_GET() == DUALMODE_SLOT_BLE){
 		ble_radio_init();
 	}else{
+#if !BLE_ACTIVE_BY_UI
+		ble_task_restart();
+		ble_advertiseTickUpdate();
+#else
 		switch_to_zb_context();
+#endif
 	}
 
 	drv_enable_irq();
@@ -105,7 +112,7 @@ int main(void){
 #endif
 
 #if (VOLTAGE_DETECT_ENABLE)
-		voltage = voltage_detect(0);
+		voltage = voltage_detect(0, APP_VOLTAGE_THRESHOLD_CUTOFF);
 		if(voltage <= APP_VOLTAGE_THRESHOLD_CUTOFF){
 #if PM_ENABLE
 			/* !!!entering cut off mode is recommended */

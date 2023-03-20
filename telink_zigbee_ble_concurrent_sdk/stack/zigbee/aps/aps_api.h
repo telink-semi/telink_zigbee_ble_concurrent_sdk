@@ -566,6 +566,20 @@ void aps_bindingTab_clear(void);
 
 
 /***********************************************************************//**
+ * @brief   restore the old format binding table for the sdk version earlier than 3.6.7.5
+ *
+ * @param   oldTbl, the temperate buffer used to restore the old binding table
+ *
+ * @param   tblSize, the size of the total old binding table
+ *
+ * @param   eleNum,  the number of old binding table number
+ * @return
+ *
+ **************************************************************************/
+void aps_userBindingTblRestore(void *oldTbl, u16 tblSize, u16 eleNum);
+
+
+/***********************************************************************//**
  * @brief   group table initialization(restore th table from NV)
  *
  * @param	none

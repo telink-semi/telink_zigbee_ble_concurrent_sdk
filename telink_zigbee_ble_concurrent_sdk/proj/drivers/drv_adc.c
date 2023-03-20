@@ -28,43 +28,6 @@
 #if	defined(MCU_CORE_826x)
 	#define ADC_VALUE_GET_WITH_BASE_MODE(v)		(3300 * (v - 128)/(16384 - 256))//Vref(mV) * (v - 128)/(2^14 - 2^8)
 	#define ADC_VALUE_GET_WITH_VBAT_MODE(v)		(3*(1428*(v - 128)/(16384 - 256)))
-#elif defined(MCU_CORE_B91)
-	#define ADC_DMA_CHN							DMA7
-	#define ADC_SAMPLE_NUM						8
-#endif
-
-#if defined(MCU_CORE_B91)
-/**
- * @brief This function serves to get adc sample code by dma and convert to voltage value.
- * @return 		adc_vol_mv_average 	- the average value of adc voltage value.
- */
-static u16 adc_get_voltage_dma(void)
-{
-	u16 adc_sample_buffer[ADC_SAMPLE_NUM] = {0};
-	u16 adc_code_average = 0;
-
-	adc_get_code_dma(adc_sample_buffer, ADC_SAMPLE_NUM);
-
-	/* insert sort and get average value */
-	u16 temp = 0;
-	s8 i, j;
-	for(i = 1; i < ADC_SAMPLE_NUM; i++){
-		if(adc_sample_buffer[i] < adc_sample_buffer[i - 1]){
-			temp = adc_sample_buffer[i];
-			adc_sample_buffer[i] = adc_sample_buffer[i - 1];
-			for(j = i - 1; j >= 0 && adc_sample_buffer[j] > temp; j--){
-				adc_sample_buffer[j + 1] = adc_sample_buffer[j];
-			}
-			adc_sample_buffer[j + 1] = temp;
-		}
-	}
-	/* get average value from raw data(abandon 1/4 small and 1/4 big data) */
-	for(i = ADC_SAMPLE_NUM >> 2; i < (ADC_SAMPLE_NUM - (ADC_SAMPLE_NUM >> 2)); i++){
-		adc_code_average += adc_sample_buffer[i] / (ADC_SAMPLE_NUM >> 1);
-	}
-
-	return adc_calculate_voltage(adc_code_average);
-}
 #endif
 
 /****
@@ -82,7 +45,6 @@ bool drv_adc_init(void)
 #elif defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
 	adc_init();
 #elif defined(MCU_CORE_B91)
-	adc_set_dma_config(ADC_DMA_CHN);
 #endif
 	return TRUE;
 }
@@ -104,10 +66,8 @@ u16 drv_get_adc_data(void)
 		tmpSum = 128;
 	}
 	return (u16)ADC_VALUE_GET_WITH_VBAT_MODE(tmpSum);
-#elif defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
+#elif defined(MCU_CORE_8258) || defined(MCU_CORE_8278) || defined(MCU_CORE_B91)
 	return (u16)adc_sample_and_get_result();
-#elif defined(MCU_CORE_B91)
-	return adc_get_voltage_dma();
 #endif
 }
 
@@ -138,6 +98,7 @@ void drv_adc_mode_pin_set(drv_adc_mode_t mode, GPIO_PinTypeDef pin)
 #elif defined(MCU_CORE_B91)
 void drv_adc_mode_pin_set(drv_adc_mode_t mode, adc_input_pin_def_e pin)
 {
+	/* DRV_ADC_BASE_MODE is recommended */
 	if(mode == DRV_ADC_BASE_MODE){
 		adc_gpio_sample_init(pin, ADC_VREF_1P2V, ADC_PRESCALE_1F4, ADC_SAMPLE_FREQ_96K);
 	}else if(mode == DRV_ADC_VBAT_MODE){

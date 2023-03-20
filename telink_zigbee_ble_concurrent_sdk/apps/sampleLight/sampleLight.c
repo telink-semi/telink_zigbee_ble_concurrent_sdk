@@ -292,6 +292,19 @@ static void sampleLightSysException(void)
 	//while(1);
 }
 
+#if APP_USER_BINDING_TABLE
+/*
+ * if you have changed the struct of "aps_binding_table_t", please use the "aps_userBindingTblRestore"
+ * to restore the old binding table.
+ * change "APS_BINDING_TABLE_NUM_V1" and the struct of "aps_binding_table_t"
+ * to let it same to the old binding table
+ *
+ * */
+aps_binding_table_t gOldBindingTbl;
+void app_userBindingTblRestore(void){
+	aps_userBindingTblRestore(&gOldBindingTbl, sizeof(aps_binding_table_t), APS_BINDING_TABLE_NUM_V1);
+}
+#endif
 /*********************************************************************
  * @fn      user_init
  *
@@ -313,6 +326,10 @@ void user_zb_init(bool isRetention)
 
 	/* Initialize Stack */
 	stack_init();
+
+#if APP_USER_BINDING_TABLE
+	app_userBindingTblRestore();
+#endif
 
 	/* Initialize user application */
 	user_app_init();

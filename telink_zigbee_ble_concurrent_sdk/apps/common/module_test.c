@@ -164,49 +164,159 @@ void moduleTest_forUart(void){
 #define MODULE_TEST_NV		0
 
 #if MODULE_TEST_NV
-volatile u8 T_nwkFrmCntError = 0;
-volatile u8 T_nwkFrmCntReadErr = 0;
-volatile u32 T_frameCnt = 0;
-volatile u32 T_readFrm = 0;
-volatile u8 T_bufCheck[256] = {0};
+
+#define TEST_826x		0
+#define TEST_8258		1
+#define TEST_8278		2
+#define TEST_B91		3
+
+#define TEST_MODULE		TEST_8258
+
+#if (TEST_MODULE == TEST_826x)
+	#define TEST_GPIO		GPIO_PB6
+#elif (TEST_MODULE == TEST_8258)
+	#define TEST_GPIO		GPIO_PA3
+#elif (TEST_MODULE == TEST_8278)
+	#define TEST_GPIO		GPIO_PA3
+#elif (TEST_MODULE == TEST_B91)
+	#define TEST_GPIO		GPIO_PB7
+#else
+	#error	"undefined TEST_MODULE"
+#endif
+
+enum{
+	TEST_ITEM0 = 0x30,
+	TEST_ITEM1,
+	TEST_ITEM2,
+};
+
+typedef struct{
+	u32 cnt;
+	u8 data[16];
+}nv_test_buf_t;
+
+nv_test_buf_t nv_test_buf =
+{
+	.cnt = 0,
+	.data = {0x00,0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,0xaa,0xbb,0xcc,0xdd,0xee,0xff},
+};
+
+u8 nv_test_buf_0[32] = {
+	0x00,0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,0xaa,0xbb,0xcc,0xdd,0xee,0xff,
+	0x01,0x12,0x23,0x34,0x45,0x56,0x67,0x78,0x89,0x9a,0xab,0xbc,0xcd,0xde,0xef,0xf0,
+};
+u8 nv_test_buf_1[200];
+u8 test_chk_buf[256];
+
+static void nv_dataStoreSet(void){
+	u16 flag = 0x5a5a;
+	flash_write(CFG_FACTORY_RST_CNT + 4, 2, (u8 *)&flag);
+}
+
+static bool nv_dataStoreCheck(void){
+	u16 flag = 0xffff;
+	flash_read(CFG_FACTORY_RST_CNT + 4, 2, (u8 *)&flag);
+	if(flag != 0xffff){
+		return TRUE;
+	}else{
+		return FALSE;
+	}
+}
+
+
+static void nv_frmcntStoreSet(void){
+	u16 flag = 0x5a5a;
+	flash_write(CFG_FACTORY_RST_CNT + 6, 2, (u8 *)&flag);
+}
+
+static bool nv_frmcntStoreCheck(void){
+	u16 flag = 0xffff;
+	flash_read(CFG_FACTORY_RST_CNT + 6, 2, (u8 *)&flag);
+	if(flag != 0xffff){
+		return TRUE;
+	}else{
+		return FALSE;
+	}
+}
+
+volatile u8 T_moduleTest_NV[8] = {0};
 void moduleTest_NV(void){
-	u8 *pData = (u8*)&g_zbInfo;
+	u32 frmCnt = 0;
+	drv_gpio_func_set(TEST_GPIO);
+	drv_gpio_output_en(TEST_GPIO, 1); 		//enable output
+	drv_gpio_input_en(TEST_GPIO, 0);		//disable input
+	drv_gpio_write(TEST_GPIO, 1);           //LED On
 
-	while(0){
-		T_readFrm = 0;
-		nv_nwkFrameCountSaveToFlash(T_frameCnt);
-		T_nwkFrmCntReadErr = nv_nwkFrameCountFromFlash((u32*)&T_readFrm);
-
-		if(T_readFrm != T_frameCnt){
-			T_nwkFrmCntError = 1;
+	nv_sts_t ret = nv_flashReadNew(1, NV_MODULE_APP, TEST_ITEM0, sizeof(nv_test_buf_0), test_chk_buf);
+	if(ret != NV_SUCC){
+		if(nv_dataStoreCheck()){
 			while(1);
 		}
-		T_frameCnt += 1;
+		if(nv_flashWriteNew(1, NV_MODULE_APP, TEST_ITEM0, sizeof(nv_test_buf_0), nv_test_buf_0) != NV_SUCC){
+			while(1);
+		}
+		nv_dataStoreSet();
+	}else{
+		if(memcmp(nv_test_buf_0, test_chk_buf, sizeof(nv_test_buf_0))){
+			while(1);
+		}
+	}
+
+	if(nv_frmcntStoreCheck()){
+		while(1);
 	}
 
 	while(1){
-		pData = (u8*)&g_zbInfo;
-		for(s32 i = 0; i < sizeof(zb_info_t); i++){
-			pData[i] = (i + T_frameCnt);
+		nv_test_buf.cnt++;
+		if(nv_flashWriteNew(1, NV_MODULE_APP, TEST_ITEM1, sizeof(nv_test_buf_t), (u8 *)&nv_test_buf) != NV_SUCC){
+			T_moduleTest_NV[0]++;
+			while(1);
 		}
 
-		nv_flashWriteNew(1, NV_MODULE_ZB_INFO, NV_ITEM_ZB_INFO, sizeof(zb_info_t), (u8*)&g_zbInfo);
-		nv_flashReadNew(1, NV_MODULE_ZB_INFO, NV_ITEM_ZB_INFO, sizeof(zb_info_t), (u8*)&T_bufCheck);
-		for(s32 i = 0; i < sizeof(zb_info_t); i++){
-			if(pData[i] != T_bufCheck[i]){
+		if(nv_flashReadNew(1, NV_MODULE_APP, TEST_ITEM1, sizeof(nv_test_buf_t), test_chk_buf) != NV_SUCC){
+			T_moduleTest_NV[1]++;
+			while(1);
+		}
+
+		if(memcmp((u8 *)&nv_test_buf, test_chk_buf, sizeof(nv_test_buf_t))){
+			T_moduleTest_NV[2]++;
+			while(1);
+		}
+
+		drv_generateRandomData(nv_test_buf_1, sizeof(nv_test_buf_1));
+		if(nv_flashWriteNew(1, NV_MODULE_APP, TEST_ITEM2, sizeof(nv_test_buf_1), nv_test_buf_1) != NV_SUCC){
+			T_moduleTest_NV[3]++;
+			while(1);
+		}
+
+		if(nv_flashReadNew(1, NV_MODULE_APP, TEST_ITEM2, sizeof(nv_test_buf_1), test_chk_buf) != NV_SUCC){
+			T_moduleTest_NV[4]++;
+			while(1);
+		}
+
+		if(memcmp(nv_test_buf_1, test_chk_buf, sizeof(nv_test_buf_1))){
+			T_moduleTest_NV[5]++;
+			while(1);
+		}
+
+		if(nv_nwkFrameCountFromFlash(&frmCnt) != NV_SUCC){
+			frmCnt = 0;
+			nv_nwkFrameCountSaveToFlash(frmCnt + 256);
+		}else{
+			nv_nwkFrameCountSaveToFlash(frmCnt + 256);
+		}
+
+		u32 frmCnt_new = 0;
+		if(nv_nwkFrameCountFromFlash(&frmCnt_new) == NV_SUCC){
+			if(absSub(frmCnt_new, frmCnt) > 1024){
+				nv_frmcntStoreSet();
 				while(1);
 			}
 		}
 
-		nv_flashWriteNew(1, NV_MODULE_ZB_INFO, 2, sizeof(nwk_nib_t), (u8*)&g_zbInfo.nwkNib);
-		nv_flashReadNew(1, NV_MODULE_ZB_INFO, 2, sizeof(nwk_nib_t), (u8*)&T_bufCheck);
-		pData = (u8*)&g_zbInfo.nwkNib;
-		for(s32 i = 0; i < sizeof(nwk_nib_t); i++){
-			if(pData[i] != T_bufCheck[i]){
-				while(1);
-			}
-		}
-		T_frameCnt += 1;
+
+		WaitMs(50);
+		gpio_toggle(TEST_GPIO);
 	}
 }
 #endif
