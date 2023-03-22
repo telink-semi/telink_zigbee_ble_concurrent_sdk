@@ -59,6 +59,10 @@ u8 APS_ACK_EXPIRY = 2;//seconds
 u8 ZB_BUF_POOL_SIZE = ZB_BUF_POOL_NUM;
 zb_buf_pool_t g_mPool;
 
+/* taskQ size */
+u8 ZB_TASKQ_USERUSE_SIZE = TL_ZBTASKQ_USERUSE_SIZE;  //ZB_TASKQ_USERUSE_SIZE must be (8 16, 32,...,2**(n))
+tl_zbtaskq_user_t taskQ_user;
+
 /* for indirect pending queue */
 u8 ZB_MAC_PENDING_TRANS_QUEUE_SIZE = ZB_MAC_PENDING_TRANS_QUEUE_NUM;
 u8 ZB_MAC_EXT_EXPEIRY_CNT = ZB_MAC_INTERNAL_EXPIRY_CNT;
@@ -144,7 +148,7 @@ aps_tx_cache_list_t aps_txCache_tbl[APS_TX_CACHE_TABLE_NUM];
 u8 RX_ZBBUF_OFFSET = TL_RXPRIMITIVEHDR;
 
 /* MAC layer TX Queue size */
-u8 MAC_TX_QUEUE_SIZE = TX_QUEUE_BN;
+u8 MAC_TX_QUEUE_SIZE = TX_QUEUE_BN;   //MAC_TX_QUEUE_SIZE must be (8, 16, 32,..., 2**(n))
 tx_data_queue g_txQueue[TX_QUEUE_BN];
 
 /* WWAH long up time threshold, (24 * 60 * 60) seconds. */
