@@ -1,3 +1,18 @@
+## V2.3.1.0
+### Bugs
+* rf settings should be recoveried after calling bls_ll_setAdvEnable() to avoid missing rf interrupt
+* fix buffer free issue for the case incoming count of the aps encrypted data doesn't match
+
+### Features
+* Normalizes the naming of content related to private schemas
+* BLE DLE is supported
+* binding table compatibility. the api “app_userBindingTblRestore” can be used to restore the binding table if the aps_binding_table_t is modified by user for the older SDK earlier than v2.2.0.0 .
+* add sample codes to support report for ZED device
+
+BREAKING CHANGES
+* None
+
+
 ## V2.3.0.0
 ### Bugs
 * need to add validation field and read back while writing operation to avoid the wrong data and firmware   being overwritten under extreme condition (drv_nv.c, drv_flash.c, ota.c)    
