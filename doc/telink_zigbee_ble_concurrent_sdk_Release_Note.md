@@ -12,6 +12,17 @@
 BREAKING CHANGES
 * None
 
+### Bugs
+* 调用bls_ll_setAdvEnable()之后需要恢复rf设置避免rf中断丢失
+* 修正aps加密数据的count不匹配时buffer未释放的问题
+
+### Features
+* 规范一些私有条目的命名
+* 绑定表兼容性问题，调用“app_userBindingTblRestore”用以恢复v2.2.0.0之前的SDK中的aps_binding_table_t结构体被修改的绑定表信息
+* ZED中添加支持report用例
+### BREAKING CHANGES
+* 无
+
 
 ## V2.3.0.0
 ### Bugs
