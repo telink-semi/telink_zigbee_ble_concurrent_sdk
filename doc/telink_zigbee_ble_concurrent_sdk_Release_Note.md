@@ -1,3 +1,26 @@
+## V2.3.2.0
+### Bugs
+* sync to Zigbee SDK v3.6.8.6
+
+### Features
+* scanning is supported during BLE ADV state
+* add sample codes for external rf PA
+* fix some misspellings
+
+BREAKING CHANGES
+* None
+
+### Bugs
+* 与Zigbee SDK v3.6.8.6同步
+
+### Features
+* BLE ADV状态下支持scanning功能
+* 添加支持外部RF PA用例代码
+* 纠正一些拼写错误
+### BREAKING CHANGES
+* 无
+
+
 ## V2.3.1.0
 ### Bugs
 * rf settings should be recoveried after calling bls_ll_setAdvEnable() to avoid missing rf interrupt
