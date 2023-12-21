@@ -284,8 +284,8 @@ int app_bleOtaWrite(u16 connHandle, void *p){
 	cmd_type <<= 8;
 	cmd_type |= req->dat[1] ;
 
-	extern int zb_ble_ci_cmd_handler(u16 clusterId, u8 len, u8 *payload);
-	zb_ble_ci_cmd_handler(cmd_type, len, &(req->dat[2]));
+	extern int zb_ble_hci_cmd_handler(u16 cmdId, u8 len, u8 *payload);
+	zb_ble_hci_cmd_handler(cmd_type, len, &(req->dat[2]));
 	return 0;
 }
 
@@ -534,6 +534,13 @@ void user_ble_normal_init(void)
 		app_own_address_type = OWN_ADDRESS_RANDOM;
 		blc_ll_setRandomAddr(mac_random_static);
 	#endif
+
+
+#if PA_ENABLE
+	/* external RF PA used */
+	g_ble_txPowerSet = ZB_RADIO_TX_0DBM;   //set to 0dBm
+	ble_rf_pa_init(0, PA_TX, PA_RX);
+#endif
 
 
 	//////////// Controller Initialization  Begin /////////////////////////

@@ -132,7 +132,7 @@ static void voltage_detect_init(u32 detectPin)
 
 #if VOLTAGE_DETECT_ENABLE
 #define VOLTAGE_DEBOUNCE_NUM 	5
-u16 voltage_detect(bool powerOn, u16 volThred)
+u16 voltage_detect(bool powerOn, u16 volThreshold)
 {
 	u16 voltage = drv_get_adc_data();
 	u32 curTick = clock_time();
@@ -140,11 +140,11 @@ u16 voltage_detect(bool powerOn, u16 volThred)
 	u16 v_min = 0;
 
 	//printf("VDD: %d\n", voltage);
-	if(powerOn || voltage <= volThred){
+	if(powerOn || voltage <= volThreshold){
 		while(debounceNum > 0){
 			WaitUs(100);
 			voltage = drv_get_adc_data();
-			if(voltage > volThred){
+			if(voltage > volThreshold){
 				debounceNum--;
 			}else{
 				debounceNum = VOLTAGE_DEBOUNCE_NUM;
@@ -171,9 +171,8 @@ static startup_state_e platform_wakeup_init(void)
 	cpu_wakeup_init(LDO_MODE, EXTERNAL_XTAL_24M);
 #elif defined(MCU_CORE_B91)
 	blc_pm_select_internal_32k_crystal();
-	sys_init(DCDC_1P4_DCDC_1P8,VBAT_MAX_VALUE_GREATER_THAN_3V6);
 	//reg_embase_addr = 0xc0000000;//default is 0xc0200000;
-	//sys_init(LDO_1P4_LDO_1P8, VBAT_MAX_VALUE_GREATER_THAN_3V6);
+	sys_init(DCDC_1P4_LDO_1P8, VBAT_MAX_VALUE_GREATER_THAN_3V6);
 #endif
 
 #if defined(MCU_CORE_826x)

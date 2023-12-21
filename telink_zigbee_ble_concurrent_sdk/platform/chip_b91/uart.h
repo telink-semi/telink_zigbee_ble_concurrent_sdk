@@ -4,9 +4,9 @@
  * @brief   This is the header file for B91
  *
  * @author  Driver Group
- * @date    2021
+ * @date    2019
  *
- * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * @par     Copyright (c) 2019, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
+ *
  *******************************************************************************************************/
-
 /**	@page UART
  *
  *	Introduction
@@ -566,7 +566,7 @@ extern void uart_cts_config(uart_num_e uart_num,uart_cts_pin_e cts_pin,unsigned 
 extern void uart_rts_config(uart_num_e uart_num,uart_rts_pin_e rts_pin,unsigned char rts_parity,unsigned char auto_mode_en);
 
 /**
- * @brief     This function serves to set uart rts trig lexel in auto mode.
+ * @brief     This function serves to set uart rts trig level in auto mode.
  * @param[in] uart_num - UART0 or UART1.
  * @param[in] level    - threshold of trig RTS pin's level toggle(only for auto mode).
  * @return    none

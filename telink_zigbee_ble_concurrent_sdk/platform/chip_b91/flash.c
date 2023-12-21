@@ -1,13 +1,12 @@
 /********************************************************************************************************
- * @file	flash.c
+ * @file    flash.c
  *
- * @brief	This is the source file for B91
+ * @brief   This is the source file for B91
  *
- * @author	Driver Group
- * @date	2019
+ * @author  Driver Group
+ * @date    2019
  *
  * @par     Copyright (c) 2019, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- *          All rights reserved.
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -22,7 +21,6 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-
 #include "flash.h"
 #include "mspi.h"
 #include "plic.h"
@@ -43,8 +41,8 @@
 unsigned int flash_support_mid[] = {0x146085,0x156085,0x166085};
 const unsigned int FLASH_CNT = sizeof(flash_support_mid)/sizeof(*flash_support_mid);
 
-_attribute_data_retention_sec_ flash_hander_t flash_read_page = flash_dread;
-_attribute_data_retention_sec_ flash_hander_t flash_write_page = flash_page_program;
+_attribute_data_retention_sec_ flash_handler_t flash_read_page = flash_dread;
+_attribute_data_retention_sec_ flash_handler_t flash_write_page = flash_page_program;
 
 _attribute_data_retention_sec_ static preempt_config_t s_flash_preempt_config =
 {
@@ -111,7 +109,7 @@ _attribute_ram_code_sec_noinline_ static void flash_send_addr(unsigned int addr)
 }
 
 /**
- * @brief     This function serves to wait flash done.(make this a asynchorous version).
+ * @brief     This function serves to wait flash done.(make this a asynchronous version).
  * @return    none.
  */
 _attribute_ram_code_sec_noinline_ static void flash_wait_done(void)
@@ -361,7 +359,7 @@ _attribute_text_sec_ static void flash_write(unsigned long addr, unsigned long l
  * @param[in]   buf		- the start address of the content needs to write into.
  * @return 		none.
  * @note        cmd:1x, addr:1x, data:1x
- * 				the funciton support cross-page writing,which means the len of buf can bigger than 256.
+ * 				the function support cross-page writing,which means the len of buf can bigger than 256.
  *
  *              Attention: Before calling the FLASH function, please check the power supply voltage of the chip.
  *              Only if the detected voltage is greater than the safe voltage value, the FLASH function can be called.
@@ -388,7 +386,7 @@ _attribute_text_sec_ void flash_page_program(unsigned long addr, unsigned long l
  * @param[in]   buf		- the start address of the content needs to write into.
  * @return 		none.
  * @note        cmd:1x, addr:1x, data:4x
- * 				the funciton support cross-page writing,which means the len of buf can bigger than 256.
+ * 				the function support cross-page writing,which means the len of buf can bigger than 256.
  *
  *              Attention: Before calling the FLASH function, please check the power supply voltage of the chip.
  *              Only if the detected voltage is greater than the safe voltage value, the FLASH function can be called.

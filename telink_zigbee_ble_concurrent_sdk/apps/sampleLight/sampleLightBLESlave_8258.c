@@ -1,6 +1,5 @@
 /********************************************************************************************************
- * @file    sampleLightBLESlave_8258.c
- *
+ * @file    sampleLightBLESlave_8258.c *
  * @brief   This is the source file for sampleLightBLESlave_8258
  *
  * @author  Zigbee Group
@@ -21,7 +20,6 @@
  *          limitations under the License.
  *******************************************************************************************************/
 
-#include "../../proj/tl_common.h"
 ///#include "drivers.h"
 #include <stack/ble/ble.h>
 #include "tl_common.h"
@@ -32,7 +30,7 @@
 
 #if (__PROJECT_TL_LIGHT__ && BLE_SLAVE_ROLE_ENABLE)
 
-extern int zb_ble_ci_cmd_handler(u16 clusterId, u8 len, u8 *payload);
+extern int zb_ble_hci_cmd_handler(u16 clusterId, u8 len, u8 *payload);
 
 static int app_bleOtaWrite(void *p);
 static int app_bleOtaRead(void *p);
@@ -281,7 +279,7 @@ volatile u8 T_final_MTU_size = 0;
 /*
  * functions
  * */
-
+#if 0
 static _attribute_ram_code_ int ble_rxfifo_empty(void){
 	if(blt_rxfifo.rptr == blt_rxfifo.wptr)    {
 		return 1;
@@ -289,6 +287,7 @@ static _attribute_ram_code_ int ble_rxfifo_empty(void){
 		return 0;
 	}
 }
+#endif
 
 static int app_bleOtaWrite(void *p){
 	rf_packet_att_data_t *req = (rf_packet_att_data_t*)p;
@@ -297,7 +296,7 @@ static int app_bleOtaWrite(void *p){
 	cmd_type <<= 8;
 	cmd_type |= req->dat[1] ;
 
-	zb_ble_ci_cmd_handler(cmd_type, len, &(req->dat[2]));
+	zb_ble_hci_cmd_handler(cmd_type, len, &(req->dat[2]));
 
 	return 0;
 }
@@ -428,10 +427,11 @@ static void blc_initMacAddress(int flash_addr, u8 *mac_public, u8 *mac_random_st
 	}
 }
 
-
+#if 0
 static bool ble_connection_doing(void){
 	return g_bleConnDoing;
 }
+#endif
 
 static int app_host_event_callback (u32 h, u8 *para, int n){
 	u8 event = h & 0xFF;
@@ -480,7 +480,7 @@ static int app_host_event_callback (u32 h, u8 *para, int n){
 	return 0;
 }
 
-
+#if 0
 static void app_bleAdvIntervalSwitch(u16 minInterval, u16 maxInterval){
 	bls_ll_setAdvParam( minInterval, maxInterval,
 						ADV_TYPE_CONNECTABLE_UNDIRECTED, app_own_address_type,
@@ -498,7 +498,15 @@ static void app_enter_ota_mode(void){
 
 	bls_ota_setTimeout(260 * 1000 * 1000); //set OTA timeout  120 seconds
 }
+#endif
 
+#if SCAN_IN_ADV_STATE
+#define DBG_ADV_REPORT_ON_RAM 				1     //just debug
+#if (DBG_ADV_REPORT_ON_RAM)  //debug adv report on ram
+	#define  RAM_ADV_MAX		32
+	u8 AA_advRpt[RAM_ADV_MAX][48];
+	u8 AA_advRpt_index = 0;
+#endif
 
 static int controller_event_callback (u32 h, u8 *p, int n){
 	if (h &HCI_FLAG_EVENT_BT_STD)		//ble controller hci event
@@ -527,9 +535,9 @@ static int controller_event_callback (u32 h, u8 *p, int n){
 			}
 		}
 	}
-
+	return 0;
 }
-
+#endif
 
 void user_ble_init(void){
 
@@ -547,6 +555,13 @@ void user_ble_init(void){
 		app_own_address_type = OWN_ADDRESS_RANDOM;
 		blc_ll_setRandomAddr(mac_random_static);
 	#endif
+
+
+#if PA_ENABLE
+	/* external RF PA used */
+	g_ble_txPowerSet = ZB_RADIO_TX_0DBM;   //set to 0dBm
+	ble_rf_pa_init(0, PA_TX, PA_RX);
+#endif
 
 	////// Controller Initialization  //////////
 	blc_ll_initBasicMCU();                      //mandatory

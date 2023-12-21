@@ -50,7 +50,7 @@
 
 
 
-//define smp database(keys/peer device informations ...)
+//define smp database(keys/peer device Information ...)
 #ifndef SMP_DATABASE_INFO_SOURCE
 #define SMP_DATABASE_INFO_SOURCE					SMP_INFO_STORAGE_IN_FLASH
 #endif
@@ -206,7 +206,7 @@ void blm_smp_registerSmpFinishCb (smp_finish_callback_t cb);
 extern u8 smpPkShftCnt;
 
 extern u32 smp_timeout_start_tick;
-extern u8 smpDistirbuteKeyOrder;
+extern u8 smpDistributeKeyOrder;
 extern smp_keyDistribution_t smp_DistributeKeyInit ;
 extern smp_keyDistribution_t smp_DistributeKeyResp ;
 
@@ -256,16 +256,16 @@ void 		blc_smp_setSecurityLevel(le_security_mode_level_t  mode_level);
 
 void 		blc_smp_setParingMethods (paring_methods_t  method);    //select paring methods
 
-void 		blc_smp_setSecurityParamters (  bonding_mode_t 		mode,
+void 		blc_smp_setSecurityParameter (  bonding_mode_t 		mode,
 											int 				MITM_en,
 											int 				OOB_en,
 											int				    keyPress_en,
-											io_capability_t 	ioCapablility);
+											io_capability_t 	ioCapability);
 
 void 		blc_smp_setBondingMode(bonding_mode_t mode);			   //set bonding_mode
 void 		blc_smp_enableAuthMITM (int MITM_en); 					   //enable authentication MITM protection
 void 		blc_smp_enableOobAuthentication (int OOB_en);    		   //enable OOB authentication
-void 		blc_smp_setIoCapability (io_capability_t  ioCapablility);  //set IO capability for passKey Entry/Numeric Comparison
+void 		blc_smp_setIoCapability (io_capability_t  ioCapability);  //set IO capability for passKey Entry/Numeric Comparison
 void 		blc_smp_enableKeypress (int keyPress_en);
 void 		blc_smp_setEcdhDebugMode(ecdh_keys_mode_t mode);
 
@@ -309,18 +309,18 @@ smp_keyDistribution_t blc_smp_setInitiatorKey (u8 LTK_distributeEn, u8 IRK_distr
 smp_keyDistribution_t blc_smp_setResponderKey (u8 LTK_distributeEn, u8 IRK_distributeEn, u8 CSRK_DistributeEn);
 
 
-int 		blc_stack_smp_setSecurityParamters (  bonding_mode_t 		mode,
+int 		blc_stack_smp_setSecurityParameter (  bonding_mode_t 		mode,
 											paring_methods_t 	method,
 											int 				MITM_en,
 											int 				OOB_en,
-											io_capability_t 	ioCapablility,
+											io_capability_t 	ioCapability,
 											int				    keyPress_en);
 
 void 		blc_stack_smp_setBondingMode(bonding_mode_t mode);
 void 		blc_stack_smp_setParingMethods (paring_methods_t  method);
 void 		blc_stack_smp_enableAuthMITM (int MITM_en);
 void 		blc_stack_smp_enableOobAuthentication (int OOB_en);
-void 		blc_stack_smp_setIoCapability (io_capability_t  ioCapablility);
+void 		blc_stack_smp_setIoCapability (io_capability_t  ioCapability);
 void 		blc_stack_smp_enableKeypress (int keyPress_en);
 
 u8* 		blc_smp_sc_handler(u16 conn, u8*p);

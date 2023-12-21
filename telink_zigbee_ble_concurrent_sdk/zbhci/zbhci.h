@@ -105,13 +105,13 @@ typedef enum{
 	ZBHCI_CMD_MGMT_NWK_UPDATE_NOTIFY		,//= 0x0035,
 
 	ZBHCI_CMD_NODES_JOINED_GET_REQ			= 0x0040,
-	ZBHCI_CMD_NODES_TOGLE_TEST_REQ			= 0x0041,
+	ZBHCI_CMD_NODES_TOGGLE_TEST_REQ			= 0x0041,
 	ZBHCI_CMD_TXRX_PERFORMANCE_TEST_REQ		= 0x0042,
 	ZBHCI_CMD_AF_DATA_SEND_TEST_REQ			= 0x0044,
 	ZBHCI_CMD_GET_LOCAL_NWK_INFO_REQ		= 0x0045,
 
 	ZBHCI_CMD_NODES_JOINED_GET_RSP			= 0x8040,
-	ZBHCI_CMD_NODES_TOGLE_TEST_RSP			= 0x8041,
+	ZBHCI_CMD_NODES_TOGGLE_TEST_RSP			= 0x8041,
 	ZBHCI_CMD_TXRX_PERFORMANCE_TEST_RSP		= 0x8042,
 	ZBHCI_CMD_NODES_DEV_ANNCE_IND			= 0x8043,
 	ZBHCI_CMD_AF_DATA_SEND_TEST_RSP			= 0x8044,
@@ -220,6 +220,8 @@ typedef enum{
     ZBHCI_OTA_IN_PROGRESS,
     ZBHCI_OTA_INCORRECT_OFFSET,
     ZBHCI_OTA_FILE_OVERSIZE,
+    ZBHCI_OTA_INCORRECT_DATA,
+    ZBHCI_OTA_MATCH_BOOT_FLAG,
 }zbhci_ota_status_e;
 
 typedef enum{
@@ -240,6 +242,11 @@ typedef enum{
 	ZBHCI_ADDRMODE_SHORTNOACK,
 	ZBHCI_ADDRMODE_IEEENOACK
 }zbhciTxMode_e;
+
+typedef enum{
+	ZBHCI_OTA_REMOTE_OTA_BIN,
+	ZBHCI_OTA_LOCAL_BIN
+}zbhciOtaType_e;
 
 #define ZB_LEBESWAP(ptr,len)								\
 	for(int i=0; i<(len>>1);i++){							\
@@ -373,22 +380,26 @@ typedef struct{
 }zbhci_app_data_confirm_t;
 
 typedef struct{
-	ev_timer_event_t *performaceTestTmrEvt;
+	ev_timer_event_t *performanceTestTmrEvt;
 	u16 sendTotalCnt;
 	u16 sendSuccessCnt;
 	u16 rcvTotalCnt;
 	u16 dstAddr;
 	u8	dstEp;
 	u8  dataApsCnt;
-	u8	performaceTest;
+	u8	performanceTest;
 }zbhci_afTestReq_t;
 
 typedef struct{
-	u32 ota_flash_addr_start;
-	u32 ota_file_total_size;
-	u32 ota_file_offset;
-	u8  ota_process_start;
-	u8  block_send_cnt;
+	u32 otaFlashAddrStart;
+	u32 otaFileTotalSize;
+	u32 otaFileOffset;
+	u32 otaCrcValue;
+	u8  otaBootFlag[4];
+	u8  otaFindBootFlag;
+	u8  otaProcessStart;
+	u8  blockRequestCnt;
+	zbhciOtaType_e binType;		//1--local bin, 0--remote OTA bin
 }hci_ota_info_t;
 
 extern zbhci_afTestReq_t g_afTestReq;

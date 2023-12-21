@@ -197,7 +197,7 @@
 //BIT<0:31>
 #if 1
 
-// feature below is conFiged by application layer
+// feature below is configured by application layer
 // LL_FEATURE_ENABLE_LE_2M_PHY
 // LL_FEATURE_ENABLE_LE_CODED_PHY
 // LL_FEATURE_ENABLE_LE_EXTENDED_ADVERTISING
@@ -410,7 +410,7 @@ typedef enum {
     HCI_ERR_MAC_CONN_FAILED                                        = 0x3F,
     HCI_ERR_COARSE_CLOCK_ADJUSTMENT_REJECT						   = 0x40,
     HCI_ERR_TYPE0_SUBMAP_NOT_DEFINED							   = 0x41,
-    HCI_ERR_UNKNOWN_ADV_INDENTIFIER								   = 0x42,
+    HCI_ERR_UNKNOWN_ADV_IDENTIFIER								   = 0x42,
     HCI_ERR_LIMIT_REACHED										   = 0x43,
     HCI_ERR_OP_CANCELLED_BY_HOST								   = 0x44,
     
@@ -436,7 +436,7 @@ typedef enum {
 	//GATT status
 	GATT_ERR_INVALID_PARAMETER 									   = 0xB0,
 	GATT_ERR_PREVIOUS_INDICATE_DATA_HAS_NOT_CONFIRMED,
-	GATT_ERR_SERVICE_DISCOVERY_TIEMOUT,
+	GATT_ERR_SERVICE_DISCOVERY_TIMEOUT,
 	GATT_ERR_NOTIFY_INDICATION_NOT_PERMITTED,
 	GATT_ERR_DATA_PENDING_DUE_TO_SERVICE_DISCOVERY_BUSY,
 	GATT_ERR_DATA_LENGTH_EXCEED_MTU_SIZE,
@@ -453,7 +453,7 @@ typedef enum {
 
 
 // l2cap pb flag type
-#define L2CAP_FRIST_PKT_H2C              0x00
+#define L2CAP_FIRST_PKT_H2C              0x00
 #define L2CAP_CONTINUING_PKT             0x01
 #define L2CAP_FIRST_PKT_C2H              0x02
 

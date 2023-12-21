@@ -287,7 +287,7 @@
 
 
 //BIT<0:31>
-// feature below is conFiged by application layer or HCI command
+// feature below is configured by application layer or HCI command
 // <8>  : LL_FEATURE_ENABLE_LE_2M_PHY
 // <11> : LL_FEATURE_ENABLE_LE_CODED_PHY
 // <12> : LL_FEATURE_ENABLE_LE_EXTENDED_ADVERTISING
@@ -315,7 +315,7 @@
 
 
 //BIT<32:63>
-// feature below is conFiged by application layer or HCI command
+// feature below is configured by application layer or HCI command
 // <32> :	LL_FEATURE_ENABLE_ISOCHRONOUS_CHANNELS
 #define LL_FEATURE_MASK_BASE1											0
 
@@ -413,11 +413,11 @@ typedef enum advChannelPDUType_e {
 	LL_TYPE_ADV_NONCONN_IND  = 0x02,
 	LL_TYPE_SCAN_REQ 		 = 0x03,		LL_TYPE_AUX_SCAN_REQ 	 = 0x03,
 	LL_TYPE_SCAN_RSP 		 = 0x04,
-	LL_TYPE_CONNNECT_REQ 	 = 0x05,		LL_TYPE_AUX_CONNNECT_REQ = 0x05,
+	LL_TYPE_CONNECT_REQ 	 = 0x05,		LL_TYPE_AUX_CONNECT_REQ = 0x05,
 	LL_TYPE_ADV_SCAN_IND 	 = 0x06,
 
 	LL_TYPE_ADV_EXT_IND		 = 0x07,		LL_TYPE_AUX_ADV_IND 	 = 0x07,	LL_TYPE_AUX_SCAN_RSP = 0x07,	LL_TYPE_AUX_SYNC_IND = 0x07,	LL_TYPE_AUX_CHAIN_IND = 0x07,
-	LL_TYPE_AUX_CONNNECT_RSP = 0x08,
+	LL_TYPE_AUX_CONNECT_RSP = 0x08,
 } advChannelPDUType_t;
 
 
@@ -451,7 +451,7 @@ typedef enum{
 /******************************************** L2CAP **************************************************************/
 
 // l2cap pb flag type
-#define L2CAP_FRIST_PKT_H2C              0x00
+#define L2CAP_FIRST_PKT_H2C              0x00
 #define L2CAP_CONTINUING_PKT             0x01
 #define L2CAP_FIRST_PKT_C2H              0x02
 
@@ -473,7 +473,7 @@ typedef enum{
 
 //Result values for the L2CAP_CREDIT_BASED_CONNECTION_RSP packet
 typedef enum{
-	L2CAP_ALL_CONN_SUCESSFULL=0,
+	L2CAP_ALL_CONN_SUCCESSFUL=0,
 	L2CAP_ALL_CONN_REFUSED_SPSM_NOT_SUPPORT=2,
 	L2CAP_SOME_CONN_REFUSED_INSUFFICIENT_RESOURCES_AVAILABLE=4,
 	L2CAP_ALL_CONN_REFUSED_INSUFFICIENT_AUTHENTICATION=5,

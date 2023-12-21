@@ -132,9 +132,16 @@ typedef enum{
 
 typedef enum{
 	SS_DEVKEYPAIR_SYNID_KEYATTR,
-	SS_DEVKEYPAIR_SYNID_INCOMMINGFRAMECNT,
+	SS_DEVKEYPAIR_SYNID_INCOMINGFRAMECNT,
 	SS_DEVKEYPAIR_SYNID_ALL
 }ss_devKeyPairSyn_id;
+
+typedef enum{
+	SS_GLB_LK_PRECONF        = 0,
+	SS_GLB_LK_TC_DEFAULT     = 1,
+	SS_GLB_LK_MASTER         = 2,
+	SS_GLB_LK_CERTIFICATION  = 3,
+}ss_glbLKId_e;
 
 typedef struct{
 	addrExt_t			device_address;
@@ -167,10 +174,19 @@ typedef struct{
 	ss_preconfiguredKey_e	preConfiguredKeyType;//pre-configured type, should be set during init state which used for ZDO auth
 	ss_tcPolicy_t			tcPolicy;									//10
 	u8						*touchLinkKey;
-	u8						*distibuteLinkKey;
+	u8						*distributeLinkKey;
 	u8						tcLinkKeyType;
 	u8						*tcLinkKey;									//13
 }ss_info_base_t;
+
+#define SSIB_GLK_FLAG_SET(v)   do{ \
+	                               ss_ib.resv1 = (v & 0x01);    \
+	                               ss_ib.reserved = (v >> 1) &0x01; \
+	                               }while(0)
+
+#define SSIB_GLK_FLAG_GET()   ((ss_ib.reserved << 1) | ss_ib.resv1)
+
+
 
 
 //Parameters for APSME-TRANSPORT-KEY.request primitive
@@ -183,7 +199,7 @@ typedef struct{
 	u8			relayByParent;
 	u8			keySeqNum;
 	addrExt_t	partnerAddr;  //for application key
-	u8			initatorFlag;
+	u8			initiatorFlag;
 	u8 			nwkSecurity;
 }ss_apsmeTransportKeyReq_t;
 
@@ -346,6 +362,10 @@ typedef struct{
 }ss_dev_keyPair_t;
 
 extern ss_info_base_t ss_ib;
+
+#if ZB_COORDINATOR_ROLE
+extern bool SS_ALLOW_REMOTE_TC_POLICY_CHANGE;
+#endif
 
 #define SS_IB()	ss_ib
 

@@ -175,12 +175,18 @@ extern "C" {
 #define APP_SECURITY_ENABLE      			1
 #define APP_DIRECT_ADV_ENABLE				1
 
+
 /*
- * ble role elect: master or slave (just for 8258, not supported by b91 till now)
+ * ble role elect: master or slave (master is just for 8258, not supported by b91 till now)
  * */
-#if defined(MCU_CORE_8258)
 #define	BLE_SLAVE_ROLE_ENABLE				1
 #define BLE_MASTER_ROLE_ENABLE				0
+
+#if BLE_MASTER_ROLE_ENABLE
+	#define BLE_HOST_SMP_ENABLE					0  //1 for standard security management,  0 for telink referenced paring&bonding(no security)
+	#define BLE_HOST_SIMPLE_SDP_ENABLE			1  //simple service discovery
+#else
+	#define SCAN_IN_ADV_STATE					0  //only for slave, add time slot for scan after ADV
 #endif
 
 /**********************************************************************

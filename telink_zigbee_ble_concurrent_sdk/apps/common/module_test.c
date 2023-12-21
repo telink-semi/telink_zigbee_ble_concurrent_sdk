@@ -31,7 +31,7 @@
 #define TEST_826x		0
 #define TEST_8258		1
 #define TEST_8278		2
-#define TEST_9518		3
+#define TEST_B91		3
 
 #define TEST_MODULE		TEST_8258
 
@@ -44,7 +44,7 @@
 #elif (TEST_MODULE == TEST_8278)
 	#define UART_TX_PIN		GPIO_PD7
 	#define UART_RX_PIN		GPIO_PA0
-#elif (TEST_MODULE == TEST_9518)
+#elif (TEST_MODULE == TEST_B91)
 	#define UART_TX_PIN		GPIO_PB2
 	#define UART_RX_PIN		GPIO_PB3
 #else
@@ -88,7 +88,7 @@ void module_test_uartRcvHandler(void){
 		drv_uart_tx_start(rxData->dataPayload, T_uartPktRecvLen);
 	}
 
-#if (TEST_MODULE == TEST_826x) || (TEST_MODULE == TEST_8258) || (TEST_MODULE == TEST_8278) || (TEST_MODULE == TEST_9518)
+#if (TEST_MODULE == TEST_826x) || (TEST_MODULE == TEST_8258) || (TEST_MODULE == TEST_8278) || (TEST_MODULE == TEST_B91)
 	if(T_uartPktRecvSeqNo == 0xBB){
 		drv_adc_enable(1);
 	}else{
@@ -111,7 +111,7 @@ void moduleTest_forUart(void){
 #elif (TEST_MODULE == TEST_8278)
 	//drv_adc_mode_pin_set(DRV_ADC_BASE_MODE, GPIO_PB3);
 	drv_adc_mode_pin_set(DRV_ADC_VBAT_MODE, GPIO_PB3);
-#elif (TEST_MODULE == TEST_9518)
+#elif (TEST_MODULE == TEST_B91)
 	drv_adc_mode_pin_set(DRV_ADC_BASE_MODE, ADC_GPIO_PB0);
 #endif
 
@@ -326,8 +326,8 @@ void moduleTest_NV(void){
 #if MODULE_TEST_PM
 
 #if (__PROJECT_TL_SWITCH__)
-#define PAD_WAKUPUP_TEST		1
-#define TIMER_WAKUPUP_TEST		1
+#define PAD_WAKEUP_TEST		1
+#define TIMER_WAKEUP_TEST		1
 
 extern drv_pm_pinCfg_t g_switchPmCfg[];
 extern void light_on(void);
@@ -348,14 +348,14 @@ void moduleTest_PM(void){
 
 	ZB_RADIO_DMA_HDR_BUILD(txPktForPm, 8);
 
-#if PAD_WAKUPUP_TEST
+#if PAD_WAKEUP_TEST
 	drv_pm_wakeupPinConfig(g_switchPmCfg, 2);
 
 	wakeupSrc |= PM_WAKEUP_SRC_PAD;
 #endif
 
 	u32 interval = 0;
-#if TIMER_WAKUPUP_TEST
+#if TIMER_WAKEUP_TEST
 	interval = 1000;
 	wakeupSrc |= PM_WAKEUP_SRC_TIMER;
 #endif
@@ -388,7 +388,7 @@ void moduleTest_PM(void){
 	}
 }
 #else
-	#error please compile the project of "sampleSwith"
+	#error please compile the project of "sampleSwitch"
 #endif
 #endif
 
@@ -436,7 +436,7 @@ u16 T_DBG_insCodeCRC;
  */
 u8 T_DBG_hashOut[16] = {0};
 
-void moudleTest_hash(void){
+void moduleTest_hash(void){
 	T_DBG_insCodeCRC = tl_bdbInstallCodeCRC16(T_DBG_installCode, 16);
 	T_DBG_installCode[16] = (u8)(T_DBG_insCodeCRC & 0xff);
 	T_DBG_installCode[17] = (u8)(T_DBG_insCodeCRC >> 8);
@@ -956,7 +956,7 @@ void moduleTest_gpioIrq(void)		//comment out user_init
 
 void moduleTest_start(void){
 #if MODULE_TEST_MMOHASH
-	moudleTest_hash();
+	moduleTest_hash();
 #endif
 
 #if MODULE_TEST_CCM

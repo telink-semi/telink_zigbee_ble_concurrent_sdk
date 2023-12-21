@@ -86,7 +86,7 @@
 #define SMP_INFO_STORAGE_OTHER_MCU	 				3
 /** @} end of group SMP info storage type */
 
-//define smp database(keys/peer device informations ...)
+//define smp database(keys/peer device Information ...)
 #ifndef SMP_DATABASE_INFO_SOURCE
 #define SMP_DATABASE_INFO_SOURCE					SMP_INFO_STORAGE_IN_FLASH
 #endif
@@ -117,8 +117,8 @@
 /** @addtogroup SMP encryption key size definition
  * @{
  */
-#define	ENCRYPRION_KEY_SIZE_MAXINUM					16
-#define	ENCRYPRION_KEY_SIZE_MINIMUN					7
+#define	ENCRYPRION_KEY_SIZE_MAXIMUM					16
+#define	ENCRYPRION_KEY_SIZE_MINIMUM					7
 /** @} end of group SMP encryption key size */
 
 
@@ -264,7 +264,7 @@ typedef union{
 
 typedef struct{
 	u8 code;  				//req = 0x01; rsp = 0x02;
-	u8 ioCapablity;
+	u8 ioCapability;
 	u8 oobDataFlag;
 	smp_authReq_t authReq;
 	u8 maxEncrySize;
@@ -354,7 +354,7 @@ typedef void (*smp_trigger_cb_t)(u16 conn_handle);
 
 
 extern u8 	smpPkShftCnt;
-extern u8 	smpDistirbuteKeyOrder;
+extern u8 	smpDistributeKeyOrder;
 extern u32 	smp_timeout_start_tick;
 extern u8 	smpParingOwnIRK[16];
 extern u8 	smpOwnRand_const[16];
@@ -415,13 +415,13 @@ void 		blc_stack_smp_setBondingMode(u8 mode); //'mode' type: bonding_mode_t
 void 		blc_stack_smp_setParingMethods(u8  method); //'method' type: paring_methods_t
 void 		blc_stack_smp_enableAuthMITM(int MITM_en);
 void 		blc_stack_smp_enableOobAuthentication(int OOB_en);
-void 		blc_stack_smp_setIoCapability(u8  ioCapablility); //'ioCapablility' type: io_capability_t
+void 		blc_stack_smp_setIoCapability(u8  ioCapability); //'ioCapability' type: io_capability_t
 void 		blc_stack_smp_enableKeypress(int keyPress_en);
 void 		blc_smp_setInitiatorKey(u8 LTK_distributeEn, u8 IRK_distributeEn, u8 CSRK_DistributeEn);
 void 		blc_smp_setResponderKey(u8 LTK_distributeEn, u8 IRK_distributeEn, u8 CSRK_DistributeEn);
-int 		blc_stack_smp_setSecurityParameters(u8 mode, u8 method, u8 MITM_en, u8 OOB_en, u8 ioCapablility, u8 keyPress_en); //'mode' type: bonding_mode_t; 'method' type: paring_methods_t
+int 		blc_stack_smp_setSecurityParameters(u8 mode, u8 method, u8 MITM_en, u8 OOB_en, u8 ioCapability, u8 keyPress_en); //'mode' type: bonding_mode_t; 'method' type: paring_methods_t
 #if(MCU_CORE_TYPE == MCU_CORE_825x || MCU_CORE_TYPE == MCU_CORE_827x)
-	#define  blc_stack_smp_setSecurityParamters			blc_stack_smp_setSecurityParameters
+	#define  blc_stack_smp_setSecurityParameter			blc_stack_smp_setSecurityParameters
 #endif
 /******************************* smp end *************************************************************************/
 

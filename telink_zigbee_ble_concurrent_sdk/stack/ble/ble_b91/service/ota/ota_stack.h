@@ -112,7 +112,7 @@ typedef struct{
 	u32 fw_crc_addr;
 
 	u32 firmware_size;
-	int flash_addr_mark;  //must be "s32", have special useage with "< 0"
+	int flash_addr_mark;  //must be "s32", have special usage with "< 0"
 	int cur_adr_index; //must be "s32"
 
 	u32 feedback_begin_tick;  //add a OTA feedback timeout control, prevent some extreme case which lead to OTA flow blocked

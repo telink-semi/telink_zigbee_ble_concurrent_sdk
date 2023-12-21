@@ -4,9 +4,9 @@
  * @brief   This is the header file for B91
  *
  * @author  Driver Group
- * @date    2021
+ * @date    2019
  *
- * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * @par     Copyright (c) 2019, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
+ *
  *******************************************************************************************************/
-
 /**	@page AUDIO
  *
  *	Introduction
@@ -191,13 +191,13 @@ typedef struct {
 	unsigned char  mic_input_mode_select;
 	unsigned char  dac_output_chn_select;
 	unsigned char  adc_wnf_mode_select;
-}aduio_i2s_codec_config_t;
+}audio_i2s_codec_config_t;
 
 
 typedef struct {
 	unsigned char  i2s_lr_clk_invert_select;
 	unsigned char  i2s_data_invert_select;
-}aduio_i2s_invert_config_t;
+}audio_i2s_invert_config_t;
 
 
 
@@ -709,7 +709,7 @@ void audio_codec_adc_config(i2s_codec_m_s_mode_e mode,audio_input_mode_e in_mode
  * but data output channel will be inverted,you can also set i2s_config_t->i2s_data_invert_select=1 to recovery it.
  * @return    none
  */
-void audio_i2s_config(i2s_mode_select_e i2s_format,i2s_data_select_e wl,  i2s_codec_m_s_mode_e m_s , aduio_i2s_invert_config_t * i2s_config_t);
+void audio_i2s_config(i2s_mode_select_e i2s_format,i2s_data_select_e wl,  i2s_codec_m_s_mode_e m_s , audio_i2s_invert_config_t * i2s_config_t);
 
 /**
  * @brief     This function serves to set i2s clock and audio sampling rate when i2s as master.

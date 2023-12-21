@@ -1,5 +1,5 @@
 /********************************************************************************************************
-0 * @file    app_cfg.h
+ * @file    app_cfg.h
  *
  * @brief   This is the header file for app_cfg
  *
@@ -19,6 +19,7 @@
  *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
+ *
  *******************************************************************************************************/
 
 #pragma once

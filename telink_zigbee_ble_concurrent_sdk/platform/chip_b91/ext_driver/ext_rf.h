@@ -1,12 +1,12 @@
 /********************************************************************************************************
  * @file     ext_rf.h
  *
- * @brief    This is the header file for b91 driver
+ * @brief   This is the header file for B91
  *
- * @author	 BLE GROUP
- * @date         12,2021
+ * @author  Driver Group
+ * @date    2019
  *
- * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * @par     Copyright (c) 2019, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
  *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
+ *
  *******************************************************************************************************/
 
 #ifndef DRIVERS_B91_DRIVER_EXT_EXT_RF_H_
@@ -32,7 +33,7 @@
 #define DMA_RFRX_OFFSET_RFLEN				5   // 826x: 13
 #define DMA_RFRX_OFFSET_DATA				6	// 826x: 14
 
-#define RF_TX_PAKET_DMA_LEN(rf_data_len)		(((rf_data_len)+3)/4)|(((rf_data_len) % 4)<<22)
+#define RF_TX_PACKET_DMA_LEN(rf_data_len)		(((rf_data_len)+3)/4)|(((rf_data_len) % 4)<<22)
 #define DMA_RFRX_OFFSET_CRC24(p)			(p[DMA_RFRX_OFFSET_RFLEN]+6)  //data len:3
 #define DMA_RFRX_OFFSET_TIME_STAMP(p)		(p[DMA_RFRX_OFFSET_RFLEN]+9)  //data len:4
 #define DMA_RFRX_OFFSET_FREQ_OFFSET(p)		(p[DMA_RFRX_OFFSET_RFLEN]+13) //data len:2
@@ -126,7 +127,7 @@ static inline void rf_set_ble_access_code_adv (void)
 
 
 /**
- * @brief   This function serves to triggle accesscode in coded Phy mode.
+ * @brief   This function serves to trigger accesscode in coded Phy mode.
  * @param   none.
  * @return  none.
  */

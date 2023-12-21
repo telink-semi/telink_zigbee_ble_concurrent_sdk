@@ -143,4 +143,4 @@ void app_key_handler(void){
 	}
 }
 
-#endif  /* __PROJECT_TL_DIMMABLE_LIGHT__ */
+#endif  /* __PROJECT_TL_LIGHT__ */

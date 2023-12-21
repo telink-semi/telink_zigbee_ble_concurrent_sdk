@@ -4,9 +4,9 @@
  * @brief   This is the header file for B91
  *
  * @author  Driver Group
- * @date    2021
+ * @date    2019
  *
- * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * @par     Copyright (c) 2019, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
+ *
  *******************************************************************************************************/
-
 #ifndef SPI_H
 #define SPI_H
 
@@ -87,9 +87,9 @@ typedef enum{
 } spi_io_mode_e;
 
 typedef enum{
-	SPI_NOMAL = 0,
+	SPI_NORMAL = 0,
     SPI_3LINE = 3,
-} spi_nomal_3line_mode_e;
+} spi_normal_3line_mode_e;
 
 typedef enum{
 	PSPI_SINGLE = 0,
@@ -109,14 +109,14 @@ typedef enum{
  * @brief  Define the SPI command & translate mode.
  */
 typedef enum{
-	SPI_MODE_WRITE_AND_READ = 0,//write and read at the same.must enbale CmdEn
+	SPI_MODE_WRITE_AND_READ = 0,//write and read at the same.must enable CmdEn
 	SPI_MODE_WRITE_ONLY,//write
-	SPI_MODE_READ_ONLY,// read must enbale CmdEn
+	SPI_MODE_READ_ONLY,// read must enable CmdEn
 	SPI_MODE_WRITE_READ,//write_ read
 	SPI_MODE_READ_WRITE,//read_write
 	SPI_MODE_WRITE_DUMMY_READ,//write_dummy_read
-	SPI_MODE_READ_DUMMY_WRITE,//read_ dummy_write must enbale CmdEn
-	SPI_MODE_NONE_DATA,//must enbale CmdEn
+	SPI_MODE_READ_DUMMY_WRITE,//read_ dummy_write must enable CmdEn
+	SPI_MODE_NONE_DATA,//must enable CmdEn
 	SPI_MODE_DUMMY_WRITE,//dummy_write
 	SPI_MODE_DUMMY_READ,//dummy_read
 	SPI_MODE_RESERVED,
@@ -128,12 +128,12 @@ typedef enum{
 }spi_wr_tans_mode_e;
 
 typedef enum{
-	SPI_MODE_RD_READ_ONLY  = 2,//must enbale CmdEn
+	SPI_MODE_RD_READ_ONLY  = 2,//must enable CmdEn
 	SPI_MODE_RD_DUMMY_READ = 9,//dummy_read
 }spi_rd_tans_mode_e;
 
 typedef enum{
-	SPI_MODE_WR_RD 		 = 3,//must enbale CmdEn
+	SPI_MODE_WR_RD 		 = 3,//must enable CmdEn
 	SPI_MODE_WR_DUMMY_RD = 5,//write_dummy_read
 }spi_wr_rd_tans_mode_e;
 
@@ -730,7 +730,7 @@ static inline void hspi_xip_stop(void)
 }
 
 /**
- * @brief 	This function servers to enable xip timeout that set hight level.
+ * @brief 	This function servers to enable xip timeout that set high level.
  * @return 	none
  */
 static inline void hspi_xip_timeout_mode_en(void)
@@ -790,7 +790,7 @@ static inline void spi_slave_ready_dis(spi_sel_e spi_sel)
 /**
  * @brief 		This function servers to read cmd from master for slave.
  * @param[in] 	spi_sel 	- the spi module.
- * @return  	cmd transferd by master.
+ * @return  	cmd transferred by master.
  */
 static inline unsigned char spi_slave_get_cmd(spi_sel_e spi_sel)
 {
@@ -836,7 +836,7 @@ static inline void spi_clr_irq_status(spi_sel_e spi_sel, spi_irq_status_e status
  * @brief 		This function servers to set irq mask.
  * @param[in] 	spi_sel - the spi module.
  * @param[in] 	mask 	- the irq mask.
- * @return  	cmd 	- transferd by master.
+ * @return  	cmd 	- transferred by master.
  */
 static inline void spi_set_irq_mask(spi_sel_e spi_sel, spi_irq_mask mask)
 {
@@ -847,7 +847,7 @@ static inline void spi_set_irq_mask(spi_sel_e spi_sel, spi_irq_mask mask)
  * @brief 		This function servers to clear irq mask.
  * @param[in] 	spi_sel - the spi module.
  * @param[in] 	mask 	- the irq mask.
- * @return  	cmd 	- transferd by master.
+ * @return  	cmd 	- transferred by master.
  */
 static inline void spi_clr_irq_mask(spi_sel_e spi_sel, spi_irq_mask mask)
 {
@@ -1038,10 +1038,10 @@ void spi_set_io_mode(spi_sel_e spi_sel, spi_io_mode_e mode);
 /**
  * @brief     	This function servers to config normal mode.
  * @param[in] 	spi_sel - the spi module.
- * @param[in] 	mode 	- nomal ,mode 3line.
+ * @param[in] 	mode 	- normal ,mode 3line.
  * @return  	none
  */
-void spi_master_config(spi_sel_e spi_sel, spi_nomal_3line_mode_e mode);
+void spi_master_config(spi_sel_e spi_sel, spi_normal_3line_mode_e mode);
 
 /**
  * @brief     	This function servers to config hspi special mode.

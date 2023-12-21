@@ -1,13 +1,12 @@
 /********************************************************************************************************
- * @file    random.h
+ * @file	random.h
  *
- * @brief   This is the header file for B85
+ * @brief	This is the header file for B85
  *
- * @author  Driver & Zigbee Group
- * @date    2021
+ * @author	Driver Group
+ * @date	2018
  *
- * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- *			All rights reserved.
+ * @par     Copyright (c) 2018, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -22,7 +21,6 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-
 #pragma once
 
 
@@ -41,10 +39,10 @@ void random_generator_init(void);
 unsigned int rand(void);
 
 /**
- * @brief      This function performs to get a serial of random number.
+ * @brief     This function performs to get a serial of random number.
  * @param[in]  len- the length of random number
  * @param[in]  data - the first address of buffer store random number in
- * @return     the result of a serial of random number..
+ * @return    the result of a serial of random number.
  */
 void generateRandomNum(int len, unsigned char *data);
 

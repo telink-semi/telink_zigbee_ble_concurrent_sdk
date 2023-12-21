@@ -22,6 +22,7 @@
  *******************************************************************************************************/
 
 #include "zb_common.h"
+#include "stack/ble/ble.h"
 #include "zigbee_ble_switch.h"
 
 extern void user_zb_init(bool isRetention);
@@ -49,14 +50,14 @@ int main(void){
 #endif
 	startup_state_e state = drv_platform_init();
 	u8 isRetention = (state == SYSTEM_DEEP_RETENTION) ? 1 : 0;
-	bool powerOn = (state == SYSTEM_BOOT) ? 1 : 0;
-	u16 voltage = 0;
 
 #if VOLTAGE_DETECT_ENABLE
 	/*
 	 * !!!in order to avoid error data written in flash,
 	 * recommend setting VOLTAGE_DETECT_ENABLE as 1 to get the stable/safe voltage
 	 */
+	bool powerOn = (state == SYSTEM_BOOT) ? 1 : 0;
+	u16 voltage = 0;
 	bool pending = 1;
 	while(pending){
 		voltage = voltage_detect(powerOn, VOLTAGE_SAFETY_THRESHOLD);
@@ -71,8 +72,14 @@ int main(void){
 	moduleTest_start();
 #endif
 
-	//init for ZB
 	os_init(isRetention);
+
+#if PA_ENABLE
+	/* external RF PA used */
+	rf_paInit(PA_TX, PA_RX);
+#endif
+
+	//init for ZB
 	user_zb_init(isRetention);
 
 	//init for BLE
@@ -99,7 +106,7 @@ int main(void){
 #endif
 		concurrent_mode_main_loop();
 
-		/* smaple code to restart/stop ble task */
+		/* sample code to restart/stop ble task */
 		app_bleStopRestart();
 
 	}

@@ -1,13 +1,12 @@
 /********************************************************************************************************
- * @file    flash.c
+ * @file	flash.c
  *
- * @brief   This is the source file for B85
+ * @brief	This is the source file for B85
  *
- * @author  Driver & Zigbee Group
- * @date    2021
+ * @author	Driver Group
+ * @date	2018
  *
- * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- *			All rights reserved.
+ * @par     Copyright (c) 2018, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -22,7 +21,6 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-
 #include "flash.h"
 #include "spi_i.h"
 #include "irq.h"
@@ -77,7 +75,7 @@ _attribute_ram_code_sec_noinline_ static void flash_send_addr(unsigned int addr)
 }
 
 /**
- * @brief     This function serves to wait flash done.(make this a asynchorous version).
+ * @brief     This function serves to wait flash done.(make this a asynchronous version).
  * @return    none.
  */
 _attribute_ram_code_sec_noinline_ static void flash_wait_done(void)
@@ -223,7 +221,7 @@ void flash_read_page(unsigned long addr, unsigned long len, unsigned char *buf)
  * @param[in]   len		- the length(in byte) of content needs to write into the flash.
  * @param[in]   buf		- the start address of the content needs to write into.
  * @return 		none.
- * @note        the funciton support cross-page writing,which means the len of buf can bigger than 256.
+ * @note        the function support cross-page writing,which means the len of buf can bigger than 256.
  *
  *              Attention: Before calling the FLASH function, please check the power supply voltage of the chip.
  *              Only if the detected voltage is greater than the safe voltage value, the FLASH function can be called.

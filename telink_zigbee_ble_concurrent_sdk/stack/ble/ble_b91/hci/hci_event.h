@@ -178,7 +178,7 @@ typedef struct {
 typedef enum {
 	LL_ROLE_MASTER 	= 0,
 	LL_ROLE_SLAVE 	= 1,
-} acl_conection_role_t;
+} acl_connection_role_t;
 
 /**
  *  @brief  Event Parameters for "7.7.65.2 LE Advertising Report event"
@@ -473,7 +473,7 @@ typedef struct {
 typedef struct {
 	u8         subEventCode;
 	u16        connHandle;
-	u8		   channel_selection_algotihm;
+	u8		   channel_selection_algorithm;
 } hci_le_chnSelectAlgorithmEvt_t;
 
 
@@ -522,7 +522,7 @@ typedef struct {
  */
 typedef struct {
 	u8        	subEventCode;
-	u8        	staus;
+	u8        	status;
 	u8			bigHandle;
 	u8        	bigSyncDly[3];
 	u8          transLatyBig[3];
@@ -554,7 +554,7 @@ typedef struct {
  */
 typedef struct {
 	u8        	subEventCode;
-	u8        	staus;
+	u8        	status;
 	u8			bigHandle;
 	u8          transLatyBig[3];
 	u8			nse;
@@ -590,10 +590,10 @@ int	 hci_le_cisEstablished_evt(u8 status, u16 cisHandle, u8 cigSyncDly[3], u8 ci
 		                      u8 phy_s2m, u8 nse, u8 bn_m2s, u8 bn_s2m, u8 ft_m2s, u8 ft_s2m, u16 maxPDU_m2s, u16 maxPDU_s2m, u16 isoIntvl );
 int  hci_le_cisReq_evt(u16 aclHandle, u16 cisHandle, u8 cigId, u8 cisId);
 
-int  hci_le_craeteBigComplete_evt(u8 staus, u8 bigHandle, u8 bigSyncDly[3], u8 transLatyBig[3], u8 phy, u8 nse,
+int  hci_le_creatBigComplete_evt(u8 status, u8 bigHandle, u8 bigSyncDly[3], u8 transLatyBig[3], u8 phy, u8 nse,
 								  u8 bn, u8 pto, u8 irc, u16 maxPDU, u16 isoIntvl, u8 numBis, u16* bisHandles);
 int  hci_le_terminateBigComplete_evt(u8 bigHandle, u8 reason);
-int  hci_le_bigSyncEstablished_evt(u8 staus, u8 bigHandle, u8 transLatyBig[3], u8 nse, u8 bn, u8 pto, u8 irc,
+int  hci_le_bigSyncEstablished_evt(u8 status, u8 bigHandle, u8 transLatyBig[3], u8 nse, u8 bn, u8 pto, u8 irc,
 		                          u16 maxPDU, u16 isoIntvl,  u8 numBis, u16* bisHandles);
 int  hci_le_bigSyncLost_evt(u8 bigHandle, u8 reason);
 
@@ -608,7 +608,7 @@ void hci_le_connectionUpdateComplete_evt(u8 status, u16 connHandle, u16 connInte
         									u16 connLatency, u16 supervisionTimeout);
 void hci_le_readRemoteFeaturesComplete_evt(u8 status, u16 connHandle, u8 * feature);
 
-void hci_le_chennel_selection_algorithm_evt(u16 connhandle, u8 channel_selection_alg);
+void hci_le_channel_selection_algorithm_evt(u16 connhandle, u8 channel_selection_alg);
 void hci_le_phyUpdateComplete_evt(u16 connhandle,u8 status, u8 new_phy);
 void hci_le_data_len_update_evt(u16 connhandle,u16 effTxOctets, u16 effRxOctets, u16 maxtxtime, u16 maxrxtime);
 

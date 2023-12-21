@@ -265,7 +265,7 @@ static u16 g_appBleLatency = 99;
 _attribute_data_retention_	own_addr_type_t 	app_own_address_type = OWN_ADDRESS_PUBLIC;
 
 /********************* ACL connection LinkLayer TX & RX data FIFO allocation, Begin ********************************/
-_attribute_data_retention_	u8	app_acl_rxfifo[ACL_RX_FIFO_SIZE * ACL_RX_FIFO_NUM] = {0};
+_attribute_data_retention_	u8	app_acl_rxfifo[ACL_RX_FIFO_SIZE * ACL_RX_FIFO_NUM+16] = {0};
 _attribute_data_retention_  u8	app_acl_txfifo[ACL_TX_FIFO_SIZE * ACL_TX_FIFO_NUM] = {0};
 /******************** ACL connection LinkLayer TX & RX data FIFO allocation, End ***********************************/
 
@@ -284,8 +284,8 @@ int app_bleOtaWrite(u16 connHandle, void *p){
 	cmd_type <<= 8;
 	cmd_type |= req->dat[1] ;
 
-	extern int zb_ble_ci_cmd_handler(u16 clusterId, u8 len, u8 *payload);
-	zb_ble_ci_cmd_handler(cmd_type, len, &(req->dat[2]));
+	extern int zb_ble_hci_cmd_handler(u16 clusterId, u8 len, u8 *payload);
+	zb_ble_hci_cmd_handler(cmd_type, len, &(req->dat[2]));
 	return 0;
 }
 
@@ -461,6 +461,46 @@ void blc_initMacAddress(int flash_addr, u8 *mac_public, u8 *mac_random_static)
 	}
 }
 
+#if SCAN_IN_ADV_STATE
+#define DBG_ADV_REPORT_ON_RAM 				1     //just debug
+#if (DBG_ADV_REPORT_ON_RAM)  //debug adv report on ram
+	#define  RAM_ADV_MAX		32
+	u8 AA_advRpt[RAM_ADV_MAX][48];
+	u8 AA_advRpt_index = 0;
+	u8 AA_advRpt_index1 = 0;
+#endif
+static int controller_event_callback (u32 h, u8 *p, int n){
+	AA_advRpt_index1++;
+	if (h &HCI_FLAG_EVENT_BT_STD)		//ble controller hci event
+	{
+		u8 evtCode = h & 0xff;
+
+		if(evtCode == HCI_EVT_LE_META)
+		{
+			u8 subEvt_code = p[0];
+			if (subEvt_code == HCI_SUB_EVT_LE_ADVERTISING_REPORT)	// ADV packet
+			{
+				//after controller is set to scan state, it will report all the adv packet it received by this event
+
+				event_adv_report_t *pa = (event_adv_report_t *)p;
+				s8 rssi = (s8)pa->data[pa->len];//rssi has already plus 110.
+
+				#if (DBG_ADV_REPORT_ON_RAM)
+					if(pa->len > 31){
+						pa->len = 31;
+					}
+					memcpy( (u8 *)AA_advRpt[AA_advRpt_index++],  p, pa->len + 11);
+					if(AA_advRpt_index >= RAM_ADV_MAX){
+						AA_advRpt_index = 0;
+					}
+				#endif
+			}
+		}
+	}
+	return 0;
+}
+#endif
+
 void user_ble_init(void){
 	//random number generator must be initiated here( in the beginning of user_init_nromal)
 	//when deepSleep retention wakeUp, no need initialize again
@@ -477,6 +517,11 @@ void user_ble_init(void){
 		blc_ll_setRandomAddr(mac_random_static);
 	#endif
 
+#if PA_ENABLE
+	/* external RF PA used */
+	g_ble_txPowerSet = ZB_RADIO_TX_0DBM;   //set to 0dBm
+	ble_rf_pa_init(0, PA_TX, PA_RX);
+#endif
 
 	//////////// Controller Initialization  Begin /////////////////////////
 	blc_ll_initBasicMCU();                      //mandatory
@@ -572,6 +617,26 @@ void user_ble_init(void){
 	bls_ll_setScanRspData( (u8 *)tbl_scanRsp, sizeof(tbl_scanRsp));
 
 	bls_ll_setAdvEnable(BLC_ADV_ENABLE);  //adv enable
+
+#if SCAN_IN_ADV_STATE
+	//scan setting
+	blc_ll_initScanning_module();
+	blc_hci_le_setEventMask_cmd(HCI_LE_EVT_MASK_ADVERTISING_REPORT);
+	blc_hci_registerControllerEventHandler(controller_event_callback);
+
+#if 1  //report all adv
+	blc_ll_setScanParameter(SCAN_TYPE_PASSIVE, SCAN_INTERVAL_100MS, SCAN_INTERVAL_100MS,
+							  OWN_ADDRESS_PUBLIC, SCAN_FP_ALLOW_ADV_ANY);
+#else //report adv only in whitelist
+	ll_whiteList_reset();
+	u8 test_adv[6] = {0x33, 0x33, 0x33, 0x33, 0x33, 0x33};
+	ll_whiteList_add(BLE_ADDR_PUBLIC, test_adv);
+	blc_ll_setScanParameter(SCAN_TYPE_PASSIVE, SCAN_INTERVAL_100MS, SCAN_INTERVAL_100MS,
+							  OWN_ADDRESS_PUBLIC, SCAN_FP_ALLOW_ADV_WL);
+
+#endif
+	blc_ll_addScanningInAdvState();  //add scan in adv state
+#endif
 
 	//set rf power index, user must set it after every suspend wakeup, cause relative setting will be reset in suspend
 	user_set_rf_power(0, 0, 0);

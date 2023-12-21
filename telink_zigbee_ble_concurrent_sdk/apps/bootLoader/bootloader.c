@@ -75,7 +75,7 @@ void bootloader_with_ota_check(bool powerOn, u32 addr_load, u32 new_image_addr){
 	{
 		if(new_image_addr != addr_load){
 			if(is_valid_fw_bootloader(new_image_addr)){
-				bool isNewImageVaild = FALSE;
+				bool isNewImageValid = FALSE;
 
 				u32 bufCache[256/4];  //align-4
 				u8 *buf = (u8 *)bufCache;
@@ -103,11 +103,11 @@ void bootloader_with_ota_check(bool powerOn, u32 addr_load, u32 new_image_addr){
 					}
 
 					if(curCRC == crcVal){
-						isNewImageVaild = TRUE;
+						isNewImageValid = TRUE;
 					}
 				}
 
-				if(isNewImageVaild){
+				if(isNewImageValid){
 					u8 readBuf[256];
 
 					for(int i = 0; i < fw_size; i += 256){

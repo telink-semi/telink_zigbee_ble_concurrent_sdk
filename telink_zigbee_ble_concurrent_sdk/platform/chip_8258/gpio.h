@@ -1,13 +1,12 @@
 /********************************************************************************************************
- * @file    gpio.h
+ * @file	gpio.h
  *
- * @brief   This is the header file for B85
+ * @brief	This is the header file for B85
  *
- * @author  Driver & Zigbee Group
- * @date    2021
+ * @author	Driver Group
+ * @date	2018
  *
- * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- *			All rights reserved.
+ * @par     Copyright (c) 2018, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -22,7 +21,6 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-
 #pragma once
 
 #include "register.h"
@@ -306,7 +304,7 @@ static inline void gpio_set_interrupt(GPIO_PinTypeDef pin, GPIO_PolTypeDef falli
 		BM_CLR(reg_gpio_pol(pin), bit);
 	}
 
-	/*clear gpio interrupt sorce (after setting gpio polarity,before enable interrupt)to avoid unexpected interrupt. confirm by minghai*/
+	/*clear gpio interrupt source (after setting gpio polarity,before enable interrupt)to avoid unexpected interrupt. confirm by minghai*/
 	reg_irq_src = FLD_IRQ_GPIO_EN;
 	reg_irq_mask |= FLD_IRQ_GPIO_EN;
 }
@@ -343,7 +341,7 @@ static inline void gpio_set_interrupt_risc0(GPIO_PinTypeDef pin, GPIO_PolTypeDef
 		BM_CLR(reg_gpio_pol(pin), bit);
 	}
 
-	/*clear gpio interrupt sorce (after setting gpio polarity,before enable interrupt)to avoid unexpected interrupt. confirm by minghai*/
+	/*clear gpio interrupt source (after setting gpio polarity,before enable interrupt)to avoid unexpected interrupt. confirm by minghai*/
 
 	reg_irq_src = FLD_IRQ_GPIO_RISC0_EN;
 	reg_irq_mask |= FLD_IRQ_GPIO_RISC0_EN;
@@ -383,7 +381,7 @@ static inline void gpio_set_interrupt_risc1(GPIO_PinTypeDef pin, GPIO_PolTypeDef
 		BM_CLR(reg_gpio_pol(pin), bit);
 	}
 
-	/*clear gpio interrupt sorce (after setting gpio polarity,before enable interrupt)to avoid unexpected interrupt. confirm by minghai*/
+	/*clear gpio interrupt source (after setting gpio polarity,before enable interrupt)to avoid unexpected interrupt. confirm by minghai*/
 	reg_irq_src = FLD_IRQ_GPIO_RISC1_EN;
 	reg_irq_mask |= FLD_IRQ_GPIO_RISC1_EN;
 }

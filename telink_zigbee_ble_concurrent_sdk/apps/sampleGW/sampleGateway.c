@@ -224,11 +224,6 @@ void user_zb_init(bool isRetention)
 	/* Initialize LEDs*/
 	led_init();
 
-#if PA_ENABLE
-	/* external RF PA used */
-	rf_paInit(PA_TX, PA_RX);
-#endif
-
 	/* Initialize Stack */
 	stack_init();
 

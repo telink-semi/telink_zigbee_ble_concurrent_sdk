@@ -1,13 +1,12 @@
 /********************************************************************************************************
- * @file	flash.h
+ * @file    flash.h
  *
- * @brief	This is the header file for B91
+ * @brief   This is the header file for B91
  *
- * @author	Driver Group
- * @date	2019
+ * @author  Driver Group
+ * @date    2019
  *
  * @par     Copyright (c) 2019, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- *          All rights reserved.
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -22,6 +21,24 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
+/**	@page FLASH
+ *
+ *	Introduction
+ *	===============
+ *	supports basic flash functions
+ *
+ *	API Reference
+ *	===============
+ *	Header File: flash.h
+ *
+ *	Attention
+ *	==============
+ *  -# the description of parameters addr contained on the interface:
+ *      - It is not necessary to add the base address 0x20000000, which ranges from 0 to the size of the flash storage space.
+ *  -# by default,the flash functions that call sub-functions(flash_mspi_read_ram/flash_mspi_write_ram) cannot be interrupted by interrupts,
+ *     if the function needs to be interrupted by a high priority interrupt during execution refer to flash_plic_preempt_config().
+ * 
+ */
 #pragma once
 
 #include "compiler.h"
@@ -105,9 +122,9 @@ typedef struct{
 	unsigned char  flash_read_cmd_line:1; 	/**< 0:single line;  1:the same to dat_line_h */
 }flash_xip_config_t;
 
-typedef void (*flash_hander_t)(unsigned long, unsigned long, unsigned char*);
-extern _attribute_data_retention_sec_ flash_hander_t flash_read_page;
-extern _attribute_data_retention_sec_ flash_hander_t flash_write_page;
+typedef void (*flash_handler_t)(unsigned long, unsigned long, unsigned char*);
+extern _attribute_data_retention_sec_ flash_handler_t flash_read_page;
+extern _attribute_data_retention_sec_ flash_handler_t flash_write_page;
 
 /*******************************************************************************************************************
  *												Primary interface
@@ -119,7 +136,7 @@ extern _attribute_data_retention_sec_ flash_hander_t flash_write_page;
  * @param[in]   write	- the write function.
  * @none
  */
-static inline void flash_change_rw_func(flash_hander_t read, flash_hander_t write)
+static inline void flash_change_rw_func(flash_handler_t read, flash_handler_t write)
 {
 	flash_read_page = read;
 	flash_write_page = write;
@@ -211,7 +228,7 @@ _attribute_text_sec_ void flash_4read(unsigned long addr, unsigned long len, uns
  * @param[in]   buf		- the start address of the content needs to write into.
  * @return 		none.
  * @note        cmd:1x, addr:1x, data:1x
- * 				the funciton support cross-page writing,which means the len of buf can bigger than 256.
+ * 				the function support cross-page writing,which means the len of buf can bigger than 256.
  *
  *              Attention: Before calling the FLASH function, please check the power supply voltage of the chip.
  *              Only if the detected voltage is greater than the safe voltage value, the FLASH function can be called.
@@ -235,7 +252,7 @@ _attribute_text_sec_ void flash_page_program(unsigned long addr, unsigned long l
  * @param[in]   buf		- the start address of the content needs to write into.
  * @return 		none.
  * @note        cmd:1x, addr:1x, data:4x
- * 				the funciton support cross-page writing,which means the len of buf can bigger than 256.
+ * 				the function support cross-page writing,which means the len of buf can bigger than 256.
  *
  *              Attention: Before calling the FLASH function, please check the power supply voltage of the chip.
  *              Only if the detected voltage is greater than the safe voltage value, the FLASH function can be called.

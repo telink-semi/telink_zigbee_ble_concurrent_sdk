@@ -49,7 +49,7 @@
 	#define	FIX_HW_CRC24_EN									0
 	#define HW_ECDH_EN                                      1
 	#define BLT_CONN_MASTER_EN								0
-	#define BLT_SCAN_EN										0
+	#define BLT_SCAN_EN										1
 	#define BLT_ADV_IN_CONN_SLAVE_EN						0
 	#define BLT_SCAN_IN_CONN_SLAVE_EN						0
 #else

@@ -100,7 +100,7 @@ typedef struct{
 typedef struct {
 	u32 smp_timeout_start_tick;//SMP ʱ
 
-	u16 smpDistirbuteKeyOrder; //Կ־
+	u16 smpDistributeKeyOrder; //Կ־
 	smp_keyDistribution_t smp_DistributeKeyInit; //master distribute key transmit
 	smp_keyDistribution_t smp_DistributeKeyResp; //slave distribute key transmit
 

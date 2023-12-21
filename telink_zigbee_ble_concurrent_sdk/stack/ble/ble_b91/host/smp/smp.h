@@ -50,12 +50,12 @@
 #define PAIRING_FAIL_REASON_CMD_NOT_SUPPORT			0x07 //-- core 4.2
 #define PAIRING_FAIL_REASON_UNSPECIFIED_REASON		0x08
 #define PAIRING_FAIL_REASON_REPEATED_ATTEMPT		0x09
-#define PAIRING_FAIL_REASON_INVAILD_PARAMETER		0x0A
+#define PAIRING_FAIL_REASON_INVALID_PARAMETER		0x0A
 #define PAIRING_FAIL_REASON_DHKEY_CHECK_FAIL		0x0B
 #define PAIRING_FAIL_REASON_NUMUERIC_FAILED			0x0C
 #define PAIRING_FAIL_REASON_BREDR_PAIRING			0x0D
 #define PAIRING_FAIL_REASON_CROSS_TRANSKEY_NOT_ALLOW	0x0E
-#define PAIRING_FAIL_REASON_PAIRING_TIEMOUT			0x80 //TLK defined
+#define PAIRING_FAIL_REASON_PAIRING_TIMEOUT			0x80 //TLK defined
 #define PAIRING_FAIL_REASON_CONN_DISCONNECT			0x81 //TLK defined
 #define PAIRING_FAIL_REASON_SUPPORT_NC_ONLY         0x82 //TLK defined
 
@@ -192,10 +192,10 @@ void 		blc_smp_enableOobAuthentication (int OOB_en);    		   //enable OOB authen
 
 /**
  * @brief      This function is used to set device's IO capability.
- * @param[in]  ioCapablility - The IO capability's value can refer to the structure 'io_capability_t'.
+ * @param[in]  ioCapability - The IO capability's value can refer to the structure 'io_capability_t'.
  * @return     none.
  */
-void 		blc_smp_setIoCapability (io_capability_t  ioCapablility);
+void 		blc_smp_setIoCapability (io_capability_t  ioCapability);
 
 
 /**
@@ -213,11 +213,11 @@ void 		blc_smp_enableKeypress (int keyPress_en);
  * @param[in]  MITM_en - 0: Disable MITM protection;  1: Enable MITM protection.
  * @param[in]  OOB_en - 0: Disable OOB authentication; 1: Enable OOB authentication.
  * @param[in]  keyPress_en - 0: Disable Keypress; 1: Enable Keypress.
- * @param[in]  ioCapablility - The IO capability's value can refer to the structure 'io_capability_t'.
+ * @param[in]  ioCapability - The IO capability's value can refer to the structure 'io_capability_t'.
  * @return     none.
  */
 void 		blc_smp_setSecurityParameters (bonding_mode_t mode, int MITM_en, int OOB_en,
-										  int keyPress_en, io_capability_t ioCapablility);
+										  int keyPress_en, io_capability_t ioCapability);
 
 
 /**
@@ -273,21 +273,21 @@ void		blc_smp_setNumericComparisonResult(bool YES_or_NO);
 #define PARING_FAIL_REASON_CMD_NOT_SUPPORT			PAIRING_FAIL_REASON_CMD_NOT_SUPPORT
 #define PARING_FAIL_REASON_UNSPECIFIED_REASON		PAIRING_FAIL_REASON_UNSPECIFIED_REASON
 #define PARING_FAIL_REASON_REPEATED_ATTEMPT			PAIRING_FAIL_REASON_REPEATED_ATTEMPT
-#define PARING_FAIL_REASON_INVAILD_PARAMETER		PAIRING_FAIL_REASON_INVAILD_PARAMETER
+#define PARING_FAIL_REASON_INVALID_PARAMETER		PAIRING_FAIL_REASON_INVALID_PARAMETER
 #define PARING_FAIL_REASON_DHKEY_CHECK_FAIL			PAIRING_FAIL_REASON_DHKEY_CHECK_FAIL
 #define PARING_FAIL_REASON_NUMUERIC_FAILED			PAIRING_FAIL_REASON_NUMUERIC_FAILED
 #define PARING_FAIL_REASON_BREDR_PARING				PAIRING_FAIL_REASON_BREDR_PAIRING
 #define PARING_FAIL_REASON_CROSS_TRANSKEY_NOT_ALLOW	PAIRING_FAIL_REASON_CROSS_TRANSKEY_NOT_ALLOW
-#define PARING_FAIL_REASON_PARING_TIEMOUT			PAIRING_FAIL_REASON_PAIRING_TIEMOUT
+#define PARING_FAIL_REASON_PARING_TIMEOUT			PAIRING_FAIL_REASON_PAIRING_TIMEOUT
 #define PARING_FAIL_REASON_CONN_DISCONNECT			PAIRING_FAIL_REASON_CONN_DISCONNECT
 #define PARING_FAIL_REASON_SUPPORT_NC_ONLY			PAIRING_FAIL_REASON_SUPPORT_NC_ONLY
 
-#define IO_CAPABLITY_DISPLAY_ONLY					0x00
-#define IO_CAPABLITY_DISPLAY_YESNO					0x01
-#define IO_CAPABLITY_KEYBOARD_ONLY					0x02
-#define IO_CAPABLITY_NO_IN_NO_OUT					0x03
-#define	IO_CAPABLITY_KEYBOARD_DISPLAY				0x04
+#define IO_CAPABILITY_DISPLAY_ONLY					0x00
+#define IO_CAPABILITY_DISPLAY_YESNO					0x01
+#define IO_CAPABILITY_KEYBOARD_ONLY					0x02
+#define IO_CAPABILITY_NO_IN_NO_OUT					0x03
+#define	IO_CAPABILITY_KEYBOARD_DISPLAY				0x04
 
-#define	blc_smp_setSecurityParamters				blc_smp_setSecurityParameters
+#define	blc_smp_setSecurityParameter				blc_smp_setSecurityParameters
 
 #endif /* BLE_SMP_H_ */

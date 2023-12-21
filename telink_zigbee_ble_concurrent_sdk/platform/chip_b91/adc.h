@@ -1,13 +1,12 @@
 /********************************************************************************************************
- * @file	adc.h
+ * @file    adc.h
  *
- * @brief	This is the header file for B91
+ * @brief   This is the header file for B91
  *
- * @author	Driver Group
- * @date	2019
+ * @author  Driver Group
+ * @date    2019
  *
  * @par     Copyright (c) 2019, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- *          All rights reserved.
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -62,7 +61,7 @@ typedef enum {
 	ADC_GPIO_PB7N = 0x08,
 	ADC_GPIO_PD0N = 0x09,
 	ADC_GPIO_PD1N = 0x0a,
-	ADC_TEMSENSORN_EE = 0x0e,
+	ADC_TEMPSENSORN_EE = 0x0e,
 	GND = 0x0f,
 }adc_input_nch_e;
 typedef enum {
@@ -77,7 +76,7 @@ typedef enum {
 	ADC_GPIO_PB7P = 0x08,
 	ADC_GPIO_PD0P = 0x09,
 	ADC_GPIO_PD1P = 0x0a,
-	ADC_TEMSENSORP_EE = 0x0e,
+	ADC_TEMPSENSORP_EE = 0x0e,
 	ADC_VBAT = 0x0f,
 }adc_input_pch_e;
 /**

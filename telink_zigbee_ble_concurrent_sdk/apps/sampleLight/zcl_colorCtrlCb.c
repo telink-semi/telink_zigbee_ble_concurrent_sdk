@@ -1097,4 +1097,4 @@ status_t sampleLight_colorCtrlCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, voi
 
 #endif	/* ZCL_LIGHT_COLOR_CONTROL */
 
-#endif  /* __PROJECT_TL_DIMMABLE_LIGHT__ */
+#endif  /* __PROJECT_TL_LIGHT__ */

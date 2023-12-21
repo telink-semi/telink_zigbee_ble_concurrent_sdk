@@ -62,7 +62,7 @@ enum{
 
 	//0x04
 	OTA_WRITE_FLASH_ERR,					//write OTA data to flash ERR
- 	OTA_DATA_UNCOMPLETE,					//lost last one or more OTA PDU
+ 	OTA_DATA_INCOMPLETE,					//lost last one or more OTA PDU
  	OTA_FLOW_ERR,		    				//peer device send OTA command or OTA data not in correct flow
  	OTA_FW_CHECK_ERR,						//firmware CRC check error
 
@@ -75,7 +75,7 @@ enum{
 	//0x0C
 	OTA_DATA_PACKET_TIMEOUT,	   			//time interval between two consequent packet exceed a value(user can adjust this value)
  	OTA_TIMEOUT,							//OTA flow total timeout
- 	OTA_FAIL_DUE_TO_CONNECTION_TERMIANTE,	//OTA fail due to current connection terminate(maybe connection timeout or local/peer device terminate connection)
+ 	OTA_FAIL_DUE_TO_CONNECTION_TERMINATE,	//OTA fail due to current connection terminate(maybe connection timeout or local/peer device terminate connection)
 };
 
 

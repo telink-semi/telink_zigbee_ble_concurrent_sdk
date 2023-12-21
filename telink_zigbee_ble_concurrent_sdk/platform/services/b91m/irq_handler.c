@@ -28,6 +28,7 @@ extern void rf_rx_irq_handler(void);
 extern void rf_tx_irq_handler(void);
 extern void irq_blt_sdk_handler(void);
 extern void switch_to_ble_context(void);
+extern bool zb_rfSwitchAllow(void);
 
 volatile u8 T_DBG_testIrq[16] = {0};
 volatile u8 T_taskBleStop = 0;

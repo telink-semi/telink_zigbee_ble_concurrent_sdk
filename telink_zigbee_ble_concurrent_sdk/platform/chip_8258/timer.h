@@ -1,13 +1,12 @@
 /********************************************************************************************************
- * @file    timer.h
+ * @file	timer.h
  *
- * @brief   This is the header file for B85
+ * @brief	This is the header file for B85
  *
- * @author  Driver & Zigbee Group
- * @date    2021
+ * @author	Driver Group
+ * @date	2018
  *
- * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- *			All rights reserved.
+ * @par     Copyright (c) 2018, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -22,7 +21,6 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-
 #ifndef TIMER_H_
 #define TIMER_H_
 
@@ -171,14 +169,14 @@ void timer_set_mode(TIMER_TypeDef type, TIMER_ModeTypeDef mode);
 void timer_gpio_init(TIMER_TypeDef type, GPIO_PinTypeDef pin, GPIO_PolTypeDef pol);
 
 /**
- * @brief     the specifed timer start working.
+ * @brief     the specified timer start working.
  * @param[in] type - select the timer to start.
  * @return    none
  */
 void timer_start(TIMER_TypeDef type);
 
 /**
- * @brief     the specifed timer stop working.
+ * @brief     the specified timer stop working.
  * @param[in] type - select the timer to stop.
  * @return    none
  */

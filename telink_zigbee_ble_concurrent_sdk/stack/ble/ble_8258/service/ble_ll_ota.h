@@ -85,7 +85,7 @@ enum{
 	OTA_PACKET_LOSS,     //lost one or more OTA PDU
 	OTA_DATA_CRC_ERR,     //data CRC err
 	OTA_WRITE_FLASH_ERR,  //write OTA data to flash ERR
- 	OTA_DATA_UNCOMPLETE,  //lost last one or more OTA PDU
+ 	OTA_DATA_INCOMPLETE,  //lost last one or more OTA PDU
  	OTA_TIMEOUT, 		  //
  	OTA_FW_CHECK_ERR,
 };

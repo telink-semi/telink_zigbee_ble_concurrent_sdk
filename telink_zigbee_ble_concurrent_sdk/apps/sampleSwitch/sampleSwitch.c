@@ -231,10 +231,6 @@ void user_zb_init(bool isRetention)
 	/* Initialize LEDs*/
 	led_init();
 
-#if PA_ENABLE
-	rf_paInit(PA_TX, PA_RX);
-#endif
-
 #if ZBHCI_EN
 	zbhciInit();
 #endif

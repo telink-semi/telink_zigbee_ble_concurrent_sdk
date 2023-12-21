@@ -1,13 +1,12 @@
 /********************************************************************************************************
- * @file    dma.h
+ * @file	dma.h
  *
- * @brief   This is the header file for B85
+ * @brief	This is the header file for B85
  *
- * @author  Driver & Zigbee Group
- * @date    2021
+ * @author	Driver Group
+ * @date	2018
  *
- * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- *			All rights reserved.
+ * @par     Copyright (c) 2018, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -22,7 +21,6 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-
 #ifndef DMA_H_
 #define DMA_H_
 
@@ -58,7 +56,7 @@ typedef enum{
 	DMA5_AES_CODE,
 	DMA6,
 	DMA7_PWM,
-}DMA_chn_Typdef; 
+}DMA_chn_Typedef; 
 
 /**
  * @brief     This function resets the DMA module.
@@ -91,7 +89,7 @@ static inline void dma_irq_disable(unsigned int msk)
 }
 
 /**
- * @brief     This function performs to enable DMA chnnel.
+ * @brief     This function performs to enable DMA channel.
  * @param[in] en - en: 1 enable. 0 disable.
  * @return    none.
  */
@@ -153,7 +151,7 @@ static inline unsigned char dma_chn_irq_status_get(void)
  * @param[in]  size - select tx or rx irq. caution: max size = 2048
  * @return     none
  */
-static inline void dma_set_buff_size(DMA_chn_Typdef chn,unsigned int size)
+static inline void dma_set_buff_size(DMA_chn_Typedef chn,unsigned int size)
 {
 	reg_dma_size(chn) = (unsigned char)(size/16);
 }

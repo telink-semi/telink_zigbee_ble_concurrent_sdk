@@ -37,6 +37,7 @@
 #if PM_ENABLE
 
 extern volatile bool g_bleConnDoing;
+extern u32 blt_pm_proc(void);
 /**
  *  @brief Definition for wakeup source and level for PM
  */

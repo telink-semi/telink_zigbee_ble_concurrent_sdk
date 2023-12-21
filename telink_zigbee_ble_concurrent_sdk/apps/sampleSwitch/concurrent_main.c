@@ -54,8 +54,6 @@ static void app_bleStopRestart(void){
 int main(void){
 	startup_state_e state = drv_platform_init();
 	u8 isRetention = (state == SYSTEM_DEEP_RETENTION) ? 1 : 0;
-	bool powerOn = (state == SYSTEM_BOOT) ? 1 : 0;
-	u16 voltage = 0;
 
 	os_init(isRetention);
 
@@ -69,6 +67,9 @@ int main(void){
 	 * !!!in order to avoid error data written in flash,
 	 * recommend setting VOLTAGE_DETECT_ENABLE as 1 to get the stable/safe voltage
 	 */
+	bool powerOn = (state == SYSTEM_BOOT) ? 1 : 0;
+	u16 voltage = 0;
+
 	bool pending = 1;
 	while(pending){
 		voltage = voltage_detect(powerOn, APP_VOLTAGE_THRESHOLD_CUTOFF);
@@ -85,6 +86,9 @@ int main(void){
 
 	//extern void moduleTest_start(void);
 	//moduleTest_start();
+#if PA_ENABLE
+	rf_paInit(PA_TX, PA_RX);
+#endif
 
 	user_zb_init(isRetention);
 	user_ble_init(isRetention);
@@ -132,7 +136,7 @@ int main(void){
 		concurrent_mode_main_loop();
 		app_key_handler();
 
-		/* smaple code to restart/stop ble task */
+		/* sample code to restart/stop ble task */
 		app_bleStopRestart();
 
 #if PM_ENABLE

@@ -179,4 +179,4 @@ status_t sampleLight_sceneCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *c
 	return ZCL_STA_SUCCESS;
 }
 
-#endif  /* __PROJECT_TL_DIMMABLE_LIGHT__ */
+#endif  /* __PROJECT_TL_LIGHT__ */

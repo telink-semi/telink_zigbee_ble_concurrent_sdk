@@ -31,17 +31,16 @@
 extern void user_zb_init(bool isRetention);
 extern void user_ble_init(void);
 
-
 int main(void){
 #if VOLTAGE_DETECT_ENABLE
 	u32 tick = 0;
 #endif
 	startup_state_e state = drv_platform_init();
 	u8 isRetention = (state == SYSTEM_DEEP_RETENTION) ? 1 : 0;
-	u16 voltage = 0;
-	bool powerOn = (state == SYSTEM_BOOT) ? 1 : 0;
 
 #if VOLTAGE_DETECT_ENABLE
+	u16 voltage = 0;
+	bool powerOn = (state == SYSTEM_BOOT) ? 1 : 0;
 	/*
 	 * !!!in order to avoid error data written in flash,
 	 * recommend setting VOLTAGE_DETECT_ENABLE as 1 to get the stable/safe voltage
@@ -55,8 +54,13 @@ int main(void){
 	}
 #endif
 
-	/* init for zigbee */
 	os_init(isRetention);
+
+#if PA_ENABLE
+	/* external RF PA used */
+	rf_paInit(PA_TX, PA_RX);
+#endif
+	/* init for zigbee */
 	user_zb_init(isRetention);
 
 	/* init for BLE */

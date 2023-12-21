@@ -67,7 +67,7 @@ s32 sampleSwitch_bdbNetworkJoinDirect(void *arg){
 	return 0;
 }
 
-int zb_ble_ci_cmd_handler(u16 cmdId, u8 len, u8 *payload){
+int zb_ble_hci_cmd_handler(u16 cmdId, u8 len, u8 *payload){
 	int ret = 0;
 	if(cmdId == APP_BLE_CMD_ZB_NETWORK_JOIN){
 		bdb_networkSteerStart();
@@ -89,5 +89,5 @@ int zb_ble_ci_cmd_handler(u16 cmdId, u8 len, u8 *payload){
 	return ret;
 }
 
-#endif  /* __PROJECT_TL_DIMMABLE_LIGHT__ */
+#endif  /* __PROJECT_TL_SWITCH__ */
 

@@ -4,9 +4,9 @@
  * @brief   This is the header file for B91
  *
  * @author  Driver Group
- * @date    2021
+ * @date    2019
  *
- * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * @par     Copyright (c) 2019, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
+ *
  *******************************************************************************************************/
-
 #ifndef _AES_REG_H_
 #define _AES_REG_H_
 
@@ -30,7 +30,7 @@
 #define reg_aes_mode     			REG_ADDR32(0x1600b0)
 enum{
 	FLD_AES_START	=	BIT(0),
-	FLD_AES_MODE	=	BIT(1),   /**< 0-ciher  1-deciher */
+	FLD_AES_MODE	=	BIT(1),   /**< 0-cipher  1-decipher */
 };
 
 #define reg_embase_addr     		REG_ADDR32(0x140b04)

@@ -160,7 +160,7 @@ typedef void (*blt_event_callback_t)(u8 e, u8 *p, int n);
 #define 		EVENT_MASK_DATA_LEN_UPDATE			BIT(BLT_EV_FLAG_DATA_LENGTH_EXCHANGE)
 
 
-#define 		EVENT_MASK_CHN_SELECTION_ALGOTITHM	BIT(31)  //no event, only mask here
+#define 		EVENT_MASK_CHN_SELECTION_ALGORITHM	BIT(31)  //no event, only mask here
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -282,6 +282,19 @@ typedef 	int (*ll_conn_terminate_handler_t)(u16 conn, u8 *p);
 void 		blc_ll_registerConnectionCompleteHandler(ll_conn_complete_handler_t  handler);
 void 		blc_ll_registerConnectionTerminateHandler(ll_conn_terminate_handler_t  handler);
 
+/**
+ * @brief		if the callback for allowing to enter low power mode is valid
+ * @param[in]	none
+ * @return
+ */
+bool bls_pm_conditionCbIsValid(void);
+
+void bls_pm_conditionCbRegister(ble_lowpowerCond_t cb);
+
+void bls_pm_conditionCbUnregister(void);
+
+bool bls_pm_conditionCbIsValid(void);
+
 int blc_ll_getRandomNumber (u8* randomNumber);
 
 typedef int (*blt_LTK_req_callback_t)(u16 handle, u8* rand, u16 ediv);
@@ -345,9 +358,9 @@ bool 		blc_ll_isBrxBusy (void);
 void 		blc_ll_init_max_md_nums(u8 num);
 
 
-static inline void  blc_ll_set_CustomedAdvScanAccessCode(u32 accss_code)
+static inline void  blc_ll_set_CustomedAdvScanAccessCode(u32 access_code)
 {
-	bltParam.custom_access_code = accss_code;
+	bltParam.custom_access_code = access_code;
 }
 
 
@@ -361,7 +374,7 @@ ble_sts_t 		blc_hci_le_getLocalSupportedFeatures(u8 *features);
 ble_sts_t 		blc_hci_le_readBufferSize_cmd(u8 *pData);
 
 
-int 			blc_ll_encrypted_data(u8*key, u8*plaintextData, u8* encrypteTextData);
+int 			blc_ll_encrypted_data(u8*key, u8*plaintextData, u8* encryptTextData);
 
 //core4.2 data extension
 void 			blc_ll_initDataLengthExtension (void);
@@ -482,7 +495,7 @@ Link Layer pak format(BLE4.2 spec):
 |             |                   |  Header(2B) | payload(0~255B) |                   |
 *-------------*-------------------*-------------------------------*-------------------*
 1.ADV Channel, payload:0~37bytes = 6bytes AdvAdd + [maximum 31bytes adv packet payload]
-2.Data Channel, payload:0~255bytes = 0~251bytes + 4bytes MIC(may include MIC feild)[The payload in ble4.2 can reach 251 bytes].
+2.Data Channel, payload:0~255bytes = 0~251bytes + 4bytes MIC(may include MIC field)[The payload in ble4.2 can reach 251 bytes].
   Protocol overhead: 10bytes(preamble\Access Address\Header\CRC) + L2CAP header 4bytes = 14bytes, all LL data contains 14 bytes of overhead,
   For att, opCode is also needed, 1bytes + handle 2bytes = 3bytes, 251-4-3=[final 247-3bytes available to users].
 ******
@@ -492,7 +505,7 @@ Link Layer pak format(BLE4.0\4.1 spec):
 |             |                   |  Header(2B) | payload(0~37B)  |                   |
 *-------------*-------------------*-------------------------------*-------------------*
 1.ADV Channel, payload:0~37bytes = 6bytes AdvAdd + [maximum 31bytes adv packet payload]
-2.Data Channel, payload:0~31bytes = 0~27bytes + 4bytes MIC(may include MIC feild)[The payload in ble4.0/4.1 is 27 bytes].
+2.Data Channel, payload:0~31bytes = 0~27bytes + 4bytes MIC(may include MIC field)[The payload in ble4.0/4.1 is 27 bytes].
   Protocol overhead: 10bytes(preamble\Access Address\Header\CRC) + L2CAP header 4bytes = 14bytes,all LL data contains 14 bytes of overhead,
   For att, opCode is also needed, 1bytes + handle 2bytes = 3bytes, 27-4-3=[final 23-3bytes available to users]This is why the default mtu size is 23 in the ble4.0 protocol.
 **********************************************************************************************************************/

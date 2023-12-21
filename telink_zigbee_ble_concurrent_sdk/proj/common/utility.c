@@ -178,7 +178,7 @@ void freeTimerTask(void **arg)
 
 
 
-// general swap/endianess utils
+// general swap/endianness utils
 
 void swapN(unsigned char *p, int n)
 {

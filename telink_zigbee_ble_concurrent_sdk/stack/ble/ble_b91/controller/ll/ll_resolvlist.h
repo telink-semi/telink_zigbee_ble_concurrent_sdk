@@ -128,7 +128,7 @@ ble_sts_t  		ll_resolvingList_getPeerResolvableAddr (u8 peerIdAddrType, u8* peer
 ble_sts_t  		ll_resolvingList_getLocalResolvableAddr(u8 peerIdAddrType, u8* peerIdAddr, u8* LocalResolvableAddr); //not available now
 ble_sts_t  		ll_resolvingList_setAddrResolutionEnable (u8 resolutionEn);
 ble_sts_t  		ll_resolvingList_setResolvablePrivateAddrTimer (u16 timeout_s);   //not available now
-ble_sts_t  		ll_resolvingList_setPrivcyMode(u8 peerIdAddrType, u8* peerIdAddr, u8 privMode);
+ble_sts_t  		ll_resolvingList_setPrivacyMode(u8 peerIdAddrType, u8* peerIdAddr, u8 privMode);
 
 u16				blc_ll_resolvGetRpaTmo(void);
 int				blc_ll_resolvPeerRpaResolvedAny(const u8* rpa);

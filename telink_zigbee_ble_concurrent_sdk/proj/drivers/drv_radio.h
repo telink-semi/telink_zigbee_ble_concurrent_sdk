@@ -83,10 +83,10 @@
 /* disable rx */
 #define ZB_RADIO_RX_DISABLE								RFDMA_RX_DISABLE
 
-/* clear mask bit to disable tx irq */
+/* clear mask to disable irq */
 #define ZB_RADIO_IRQ_MASK_CLR							irq_clr_mask(FLD_IRQ_ZB_RT_EN)
 
-/* clear mask bit to disable tx irq */
+/* set mask to enable irq */
 #define ZB_RADIO_IRQ_MASK_SET							irq_set_mask(FLD_IRQ_ZB_RT_EN)
 
 /* trx status get */
@@ -95,13 +95,16 @@
 /* rx buffer configure */
 #define ZB_RADIO_RX_BUF_SET(addr)						RF_rx_buffer_reconfig(addr)
 
+/* rx max length limit */
+#define ZB_RADIO_RX_MAX_LEN_SET(len)
+
 /* rx buffer clear */
 #define ZB_RADIO_RX_BUF_CLEAR(p)						do{ \
 															p[12] = 0;		\
 															*((u32*)p) = 0; \
 														}while(0)
 
-/* set rx mode, maxium receiver buffer size, enable Rx/Tx interrupt */
+/* set rx mode, maximum receiver buffer size, enable Rx/Tx interrupt */
 #define ZB_RADIO_TRX_CFG(size)							do{	\
 															/* disable SRX timeout interrupt */\
 															write_reg8(0xf03, read_reg8(0xf03) & 0xfb);	\
@@ -244,10 +247,10 @@
 /* disable rx */
 #define ZB_RADIO_RX_DISABLE								RFDMA_RX_DISABLE
 
-/* clear mask bit to disable tx irq */
+/* clear mask to disable irq */
 #define ZB_RADIO_IRQ_MASK_CLR							irq_clr_mask(FLD_IRQ_ZB_RT_EN)
 
-/* clear mask bit to disable tx irq */
+/* set mask to enable irq */
 #define ZB_RADIO_IRQ_MASK_SET							irq_set_mask(FLD_IRQ_ZB_RT_EN)
 
 /* trx status get */
@@ -256,13 +259,16 @@
 /* rx buffer configure */
 #define ZB_RADIO_RX_BUF_SET(addr)						rf_rx_buffer_reconfig(addr)
 
+/* rx max length limit */
+#define ZB_RADIO_RX_MAX_LEN_SET(len)
+
 /* rx buffer clear */
 #define ZB_RADIO_RX_BUF_CLEAR(p)						do{ \
 															p[0] = 0;		\
 															p[4] = 0;		\
 														}while(0)
 
-/* set rx mode, maxium receiver buffer size, enable Rx/Tx interrupt */
+/* set rx mode, maximum receiver buffer size, enable Rx/Tx interrupt */
 #define ZB_RADIO_TRX_CFG(size)							do{ \
 															/* disable SRX timeout interrupt */\
 															write_reg8(0xf03, read_reg8(0xf03) & 0xfb);	\
@@ -406,10 +412,10 @@
 /* disable rx */
 #define ZB_RADIO_RX_DISABLE								RFDMA_RX_DISABLE
 
-/* clear mask bit to disable tx irq */
+/* clear mask to disable irq */
 #define ZB_RADIO_IRQ_MASK_CLR							irq_clr_mask(FLD_IRQ_ZB_RT_EN)
 
-/* clear mask bit to disable tx irq */
+/* set mask to enable irq */
 #define ZB_RADIO_IRQ_MASK_SET							irq_set_mask(FLD_IRQ_ZB_RT_EN)
 
 /* trx status get */
@@ -418,13 +424,16 @@
 /* rx buffer configure */
 #define ZB_RADIO_RX_BUF_SET(addr)						rf_rx_buffer_reconfig(addr)
 
+/* rx max length limit */
+#define ZB_RADIO_RX_MAX_LEN_SET(len)
+
 /* rx buffer clear */
 #define ZB_RADIO_RX_BUF_CLEAR(p)						do{ \
 															p[0] = 0;		\
 															p[4] = 0;		\
 														}while(0)
 
-/* set rx mode, maxium receiver buffer size, enable Rx/Tx interrupt */
+/* set rx mode, maximum receiver buffer size, enable Rx/Tx interrupt */
 #define ZB_RADIO_TRX_CFG(size)							do{	\
 															/* disable SRX timeout interrupt */\
 															write_reg8(0xf03, read_reg8(0xf03) & 0xfb);	\
@@ -522,14 +531,14 @@
  */
 static inline void rf_drv_cap(unsigned long addr)
 {
-	unsigned char freqency_offset_value = 0xff;
+	unsigned char frequency_offset_value = 0xff;
 
-	flash_read_page(addr, 1, &freqency_offset_value);
-	if(0xff != freqency_offset_value)
+	flash_read_page(addr, 1, &frequency_offset_value);
+	if(0xff != frequency_offset_value)
 	{
-//		rf_update_internal_cap(freqency_offset_value);
+//		rf_update_internal_cap(frequency_offset_value);
 		unsigned char val;
-		val = (freqency_offset_value&0x3f);
+		val = (frequency_offset_value&0x3f);
 		analog_write_reg8(0x8a,analog_read_reg8(0x8a)&0x7f);
 		analog_write_reg8(0x8a,(analog_read_reg8(0x8a)&0xc0)|val);
 	}
@@ -589,10 +598,10 @@ static inline void rf_drv_cap(unsigned long addr)
 /* disable rx */
 #define ZB_RADIO_RX_DISABLE								dma_chn_dis(DMA1)//todo: Doesn't seem to work
 
-/* clear mask bit to disable tx irq */
+/* clear mask to disable irq */
 #define ZB_RADIO_IRQ_MASK_CLR							rf_clr_irq_mask(FLD_RF_IRQ_TX)
 
-/* clear mask bit to disable tx irq */
+/* set mask to enable irq */
 #define ZB_RADIO_IRQ_MASK_SET							rf_set_irq_mask(FLD_RF_IRQ_TX)
 
 /* trx status get */
@@ -601,13 +610,16 @@ static inline void rf_drv_cap(unsigned long addr)
 /* rx buffer configure */
 #define ZB_RADIO_RX_BUF_SET(addr)						rf_set_rx_buffer(addr)
 
+/* rx max length limit */
+#define ZB_RADIO_RX_MAX_LEN_SET(len)					rf_set_rx_maxlen(len)
+
 /* rx buffer clear */
 #define ZB_RADIO_RX_BUF_CLEAR(p)						do{ \
 															p[0] = 0;		\
 															p[4] = 0;		\
 														}while(0)
 
-/* set Rx mode, maxium receiver buffer size, enable Rx/Tx interrupt */
+/* set Rx mode, maximum receiver buffer size, enable Rx/Tx interrupt */
 #define ZB_RADIO_TRX_CFG(size)							do{ \
 															/* disable SRX timeout interrupt */\
 															write_reg8(0x140a03, read_reg8(0x140a03) & 0xfb);	\
@@ -638,7 +650,7 @@ static inline void rf_drv_cap(unsigned long addr)
 #define ZB_RADIO_RX_HDR_LEN								5
 
 /* delay after switch to Tx mode, and then start sending */
-#define ZB_TX_WAIT_US									85
+#define ZB_TX_WAIT_US									120
 
 /* get real payload length */
 #define ZB_RADIO_ACTUAL_PAYLOAD_LEN(p)					rf_zigbee_get_payload_len(p)

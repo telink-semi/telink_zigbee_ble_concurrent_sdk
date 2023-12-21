@@ -75,7 +75,7 @@ void ev_timer_init(void);
 /**
  * @brief       Process EV timer events
  *
- * @param[in]   None
+ * @param[in]   det - Detect if an timer event is being executed
  *
  * @return      None
  */
@@ -136,7 +136,7 @@ ev_timer_event_t *ev_timer_taskPost(ev_timer_callback_t func, void *arg, u32 t_m
 /**
   * @brief       cancel timer task from task list
   *
-  * @param[in]   te - the pointer to the the timer event pointer
+  * @param[in]   evt - the pointer to the the timer event pointer
   *
   * @return      the status
   */

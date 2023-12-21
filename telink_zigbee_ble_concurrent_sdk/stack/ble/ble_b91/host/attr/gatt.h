@@ -59,7 +59,7 @@ ble_sts_t	blc_gatt_pushHandleValueIndicate(u16 connHandle, u16 attHandle, u8 *p,
  * @param[in]  len - data byte number
  * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
-ble_sts_t 	blc_gatt_pushWriteComand (u16 connHandle, u16 attHandle, u8 *p, int len);
+ble_sts_t 	blc_gatt_pushWriteCommand (u16 connHandle, u16 attHandle, u8 *p, int len);
 
 
 /**

@@ -113,7 +113,7 @@ typedef enum{
 }aps_dst_addr_mode;
 
 typedef enum{
-	APS_SHORT_SRCADDR_WITHEP = 0x02,			/* for unicasting with nwk address, with Endpoint */
+	APS_SHORT_SRCADDR_WITHEP = 0x02,	/* for unicasting with nwk address, with Endpoint */
 	APS_LONG_SRCADDR_WITHEP,			/* for unicasting with ieee address, with Endpoint */
 	APS_LONG_SRCADDR_NOEP				/* for unicasting with ieee address, without Endpoint */
 }aps_src_addr_mode;
@@ -531,7 +531,6 @@ aps_status_t aps_search_dst_from_bind_tbl(aps_data_req_t *apsreq, bind_dst_list_
  *
  **************************************************************************/
 aps_binding_entry_t *aps_bindingTblEntryGet(void);
-u8 aps_bindingTblEntryNum(void);
 
 /***********************************************************************//**
  * @brief   get binding table number
@@ -541,7 +540,7 @@ u8 aps_bindingTblEntryNum(void);
  * @return	the number of the valid binding table
  *
  **************************************************************************/
-u8 aps_bindingTblNum(void);
+u8 aps_bindingTblEntryNum(void);
 
 /***********************************************************************//**
  * @brief   delete bind information searched by destination address
@@ -551,18 +550,7 @@ u8 aps_bindingTblNum(void);
  * @return
  *
  **************************************************************************/
-void aps_delete_bind_by_dst(u16 dst_addr_ref);
 void aps_bindingTblEntryDelByDstExtAddr(addrExt_t extAddr);
-
-/***********************************************************************//**
- * @brief   clear all binding table information
- *
- * @param
- *
- * @return
- *
- **************************************************************************/
-void aps_bindingTab_clear(void);
 
 
 /***********************************************************************//**
@@ -577,6 +565,18 @@ void aps_bindingTab_clear(void);
  *
  **************************************************************************/
 void aps_userBindingTblRestore(void *oldTbl, u16 tblSize, u16 eleNum);
+
+
+
+/***********************************************************************//**
+ * @brief   clear all binding table information
+ *
+ * @param
+ *
+ * @return
+ *
+ **************************************************************************/
+void aps_bindingTab_clear(void);
 
 
 /***********************************************************************//**

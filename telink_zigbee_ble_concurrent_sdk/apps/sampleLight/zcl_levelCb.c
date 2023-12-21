@@ -350,4 +350,4 @@ status_t sampleLight_levelCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *c
 
 #endif	/* ZCL_LEVEL_CTRL */
 
-#endif  /* __PROJECT_TL_DIMMABLE_LIGHT__ */
+#endif  /* __PROJECT_TL_LIGHT__ */

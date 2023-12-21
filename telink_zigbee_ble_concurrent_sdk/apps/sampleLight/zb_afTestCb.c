@@ -143,4 +143,4 @@ void afTest_dataSendConfirm(void *arg)
 }
 
 #endif	/* AF_TEST_ENABLE */
-#endif  /* __PROJECT_TL_DIMMABLE_LIGHT__ */
+#endif  /* __PROJECT_TL_LIGHT__ */

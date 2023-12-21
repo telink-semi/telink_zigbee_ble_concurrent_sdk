@@ -108,7 +108,7 @@ typedef struct {
 	u8		conn_terminate_pending;   // terminate_pending = master_terminate || slave_terminate
 	u8		remote_version;
 	u8		connParaUpReq_pending;
-	u8		conn_sn; // softwre rcrd sn to filter retry rx data
+	u8		conn_sn; // software rcrd sn to filter retry rx data
 
 
 	u8 		conn_btx_not_working;;
@@ -122,7 +122,7 @@ typedef struct {
 	u8		macAddress_random[6];   //host may set this
 
 
-	bb_msts_t blm_bb;// hardware rcrd sn nesn ect.
+	bb_msts_t blm_bb;// hardware rcrd sn nesn etc.
 
 	u32 	ll_remoteFeature; 	 //feature mask <0:31>
 	//u32   ll_remoteFeature_2;  //feature mask <32:63> for future use
@@ -150,7 +150,7 @@ typedef struct {
 	ble_crypt_para_t	crypt;
 
 #if(BQB_5P0_TEST_ENABLE)
-	u32		master_teminate_time;
+	u32		master_terminate_time;
 #endif
 } st_ll_conn_master_t;
 

@@ -154,7 +154,7 @@ typedef struct {
 
 #if 0
 /* Command Callback Function Type */
-typedef u8 (*zcl_armCb_t)(apsdeDataInd_t *pApsdeInd, arm_t *pArm);
+typedef u8 (*zcl_armCb_t)(apsdeDataInd_t *pApsdeInd, arm_t *pAram);
 typedef void (*zcl_bypassCb_t)(apsdeDataInd_t *pApsdeInd, bypass_t *pBypass);
 typedef void (*zcl_emergencyCb_t)(apsdeDataInd_t *pApsdeInd);
 typedef void (*zcl_fireCb_t)(apsdeDataInd_t *pApsdeInd);
@@ -214,7 +214,7 @@ status_t zcl_iasAce_bypassResp(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefault
 
 status_t zcl_iasAce_getZoneStatusResp(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, getZoneStatusRsp_t *pGetZoneStatusRsp);
 
-status_t zcl_iasAce_arm(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, arm_t *pArm);
+status_t zcl_iasAce_arm(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, arm_t *pAram);
 #define zcl_iasAce_armCmd(a,b,c,d)	(zcl_iasAce_arm((a), (b), (c), ZCL_SEQ_NUM, (d)))
 
 status_t zcl_iasAce_bypass(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, bypass_t *pBypass);

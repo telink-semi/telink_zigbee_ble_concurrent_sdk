@@ -190,7 +190,7 @@ ble_sts_t  host_att_discoveryService (u16 handle, att_db_uuid16_t *p16, int n16,
 		att_req_read_by_type (dat, s, 0xffff, (u8 *)&uuid, 2);
 		if (host_att_service_wait_event(handle, dat, 1000000))
 		{
-			return  GATT_ERR_SERVICE_DISCOVERY_TIEMOUT;			//timeout
+			return  GATT_ERR_SERVICE_DISCOVERY_TIMEOUT;			//timeout
 		}
 
 		// process response data
@@ -246,7 +246,7 @@ ble_sts_t  host_att_discoveryService (u16 handle, att_db_uuid16_t *p16, int n16,
 			att_req_find_info (dat, p16->handle, 0xffff);
 			if (host_att_service_wait_event(handle, dat, 1000000))
 			{
-				return  GATT_ERR_SERVICE_DISCOVERY_TIEMOUT;			//timeout
+				return  GATT_ERR_SERVICE_DISCOVERY_TIMEOUT;			//timeout
 			}
 
 			att_findInfoRsp_t *p_rsp = (att_findInfoRsp_t *) dat;
@@ -269,7 +269,7 @@ ble_sts_t  host_att_discoveryService (u16 handle, att_db_uuid16_t *p16, int n16,
 						att_req_read (dat, pd[0]);
 						if (host_att_service_wait_event(handle, dat, 1000000))
 						{
-								return  GATT_ERR_SERVICE_DISCOVERY_TIEMOUT;			//timeout
+								return  GATT_ERR_SERVICE_DISCOVERY_TIMEOUT;			//timeout
 						}
 
 						att_readRsp_t *pr = (att_readRsp_t *) dat;
@@ -330,7 +330,7 @@ man_pair_t blm_manPair;
 /* define pair slave max num,
    if exceed this max num, two methods to process new slave pairing
    method 1: overwrite the oldest one(telink use this method)
-   method 2: not allow paring unness unpair happend  */
+   method 2: not allow paring unness unpair happened  */
 #define	USER_PAIR_SLAVE_MAX_NUM       1  //telink use max 1
 
 
@@ -343,7 +343,7 @@ typedef struct {
 
 typedef struct {
 	u32 bond_flash_idx[USER_PAIR_SLAVE_MAX_NUM];  //mark paired slave mac address in flash
-	macAddr_t bond_device[USER_PAIR_SLAVE_MAX_NUM];  //macAddr_t alreay defined in ble stack
+	macAddr_t bond_device[USER_PAIR_SLAVE_MAX_NUM];  //macAddr_t already defined in ble stack
 	u8 curNum;
 } user_salveMac_t;
 
@@ -1245,7 +1245,7 @@ int app_l2cap_handler (u16 conn_handle, u8 *raw_pkt)
 			if( interval_us < 200000 && long_suspend_us < 20000000 && (long_suspend_us*2<=timeout_us) )
 			{
 				//when master host accept slave's conn param update req, should send a conn param update response on l2cap
-				//with CONN_PARAM_UPDATE_ACCEPT; if not accpet,should send  CONN_PARAM_UPDATE_REJECT
+				//with CONN_PARAM_UPDATE_ACCEPT; if not accept,should send  CONN_PARAM_UPDATE_REJECT
 				blc_l2cap_SendConnParamUpdateResponse(conn_handle, req->id, CONN_PARAM_UPDATE_ACCEPT);  //send SIG Connection Param Update Response
 
 
@@ -1354,6 +1354,12 @@ void user_ble_init(void)
 	blc_initMacAddress(CFG_MAC_ADDRESS, mac_public, mac_random_static);
 
 
+#if PA_ENABLE
+	/* external RF PA used */
+	g_ble_txPowerSet = ZB_RADIO_TX_0DBM;   //set to 0dBm
+	ble_rf_pa_init(0, PA_TX, PA_RX);
+#endif
+
 	////// Controller Initialization  //////////
 	blc_ll_initBasicMCU();
 	blc_ll_initStandby_module(mac_public);				//mandatory
@@ -1398,7 +1404,7 @@ void user_ble_init(void)
 
 		//SMP trigger by master
 		blm_host_smp_setSecurityTrigger(MASTER_TRIGGER_SMP_FIRST_PAIRING | MASTER_TRIGGER_SMP_AUTO_CONNECT);
-	#else  //TeLink referenced paring&bonding without standard paring in BLE spec
+	#else  //referenced paring&bonding without standard paring in BLE spec
 		blc_smp_setSecurityLevel(No_Security);
 
 		user_master_host_pairing_management_init();

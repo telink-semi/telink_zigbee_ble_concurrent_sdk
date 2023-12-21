@@ -37,6 +37,7 @@
 												u8 value;			\
 												u8 len;				\
 												ZB_RADIO_INIT();	\
+												ZB_RADIO_RX_MAX_LEN_SET(RF_PKT_BUFF_LEN);	\
 												tl_zbMacAttrGet(MAC_PHY_ATTR_CURRENT_CHANNEL, &value, &len); \
 												ZB_TRANSCEIVER_SET_CHANNEL(value);							 \
 											}while(0)

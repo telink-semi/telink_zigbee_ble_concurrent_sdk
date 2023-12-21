@@ -4,9 +4,9 @@
  * @brief   This is the header file for B91
  *
  * @author  Driver Group
- * @date    2021
+ * @date    2019
  *
- * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * @par     Copyright (c) 2019, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
+ *
  *******************************************************************************************************/
-
 #pragma once
 
 #include "../sys.h"
@@ -51,7 +51,7 @@ enum{
 #define reg_mspi_config	    REG_ADDR32(0x140104)
 #define reg_mspi_set_l		REG_ADDR8(0x140104)
 enum{
-	FLD_MSPI_MULTIBOOT_ADDR_OFFSET	=  BIT_RNG(0,2),/**<mutiboot address offset option, 0:0k;  1:128k;  2:256k;  4:256k*/
+	FLD_MSPI_MULTIBOOT_ADDR_OFFSET	=  BIT_RNG(0,2),/**<multiboot address offset option, 0:0k;  1:128k;  2:256k;  4:256k*/
 };
 
 #define reg_mspi_set_h   	REG_ADDR8(0x140105)

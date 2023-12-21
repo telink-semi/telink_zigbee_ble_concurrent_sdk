@@ -65,7 +65,7 @@ void blc_ota_initOtaServer_module(void);
 	 * 							 supported by MCU
 	 * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
 	 */
-	ble_sts_t blc_ota_setNewFirmwwareStorageAddress(multi_boot_addr_e new_fw_addr);
+	ble_sts_t blc_ota_setNewFirmwareStorageAddress(multi_boot_addr_e new_fw_addr);
 
 #elif (MCU_CORE_TYPE == MCU_CORE_825x || MCU_CORE_TYPE == MCU_CORE_827x)
 	/**

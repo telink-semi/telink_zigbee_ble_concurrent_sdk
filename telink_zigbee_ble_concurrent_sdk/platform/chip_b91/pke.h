@@ -4,9 +4,9 @@
  * @brief   This is the header file for B91
  *
  * @author  Driver Group
- * @date    2021
+ * @date    2019
  *
- * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * @par     Copyright (c) 2019, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
  *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
+ *
  *******************************************************************************************************/
 
 #pragma once
@@ -35,7 +36,7 @@
 #define reg_pke_a_ram(a)		 	((volatile unsigned long *)(PKE_BASE+0x0400+(a)*(0x24)))
 #define reg_pke_b_ram(b)		 	((volatile unsigned long *)(PKE_BASE+0x1000+(b)*(0x24)))
 
-/********* oprand length *********/
+/********* operand length *********/
 #define PKE_OPERAND_MAX_WORD_LEN	(0x08)
 #define PKE_OPERAND_MAX_BIT_LEN		(0x100)
 #define ECC_MAX_WORD_LEN			PKE_OPERAND_MAX_WORD_LEN
@@ -273,7 +274,7 @@ unsigned int div2n_u32(unsigned int a[], signed int aWordLen, unsigned int n);
  * @brief		load the pre-calculated mont parameters H(R^2 mod modulus) and
  * 				n1( - modulus ^(-1) mod 2^w ).
  * @param[in] 	H 	  	- R^2 mod modulus.
- * @param[in] 	n1 	  	- modulus ^(-1) mod 2^w, here w is 32 acutally.
+ * @param[in] 	n1 	  	- modulus ^(-1) mod 2^w, here w is 32 actually.
  * @param[in] 	wordLen - word length of modulus or H.
  * @return: 	none.
  */

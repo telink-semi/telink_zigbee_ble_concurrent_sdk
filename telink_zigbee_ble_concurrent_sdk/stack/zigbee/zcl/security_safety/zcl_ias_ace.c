@@ -235,18 +235,18 @@ _CODE_ZCL_ status_t zcl_iasAce_getZoneStatusResp(u8 srcEp, epInfo_t *pDstEpInfo,
 	return ZCL_STA_SUCCESS;
 }
 
-_CODE_ZCL_ status_t zcl_iasAce_arm(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, arm_t *pArm)
+_CODE_ZCL_ status_t zcl_iasAce_arm(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, arm_t *pAram)
 {
 	u8 buf[11];
 	bu *pBuf = buf;
 
-	*pBuf++ = pArm->armMode;
-	*pBuf++ = pArm->code.strLen;
-	if(pArm->code.strLen){
-		memcpy(pBuf, pArm->code.pStr, pArm->code.strLen);
-		pBuf += pArm->code.strLen;
+	*pBuf++ = pAram->armMode;
+	*pBuf++ = pAram->code.strLen;
+	if(pAram->code.strLen){
+		memcpy(pBuf, pAram->code.pStr, pAram->code.strLen);
+		pBuf += pAram->code.strLen;
 	}
-	*pBuf++ = pArm->zoneId;
+	*pBuf++ = pAram->zoneId;
 
 	return zcl_sendCmd(srcEp, pDstEpInfo, ZCL_CLUSTER_SS_IAS_ACE, ZCL_CMD_ARM, TRUE,
 					ZCL_FRAME_CLIENT_SERVER_DIR, disableDefaultRsp, 0, seqNo, pBuf - buf, buf);

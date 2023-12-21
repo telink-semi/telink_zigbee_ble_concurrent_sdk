@@ -65,7 +65,7 @@ s32 sampleLight_bdbNetworkJoinDirect(void *arg){
 	return 0;
 }
 
-int zb_ble_ci_cmd_handler(u16 clusterId, u8 len, u8 *payload){
+int zb_ble_hci_cmd_handler(u16 clusterId, u8 len, u8 *payload){
 	u8 cmdId = payload[0];
 	u8 *pCmd = &payload[1];
 
@@ -87,6 +87,7 @@ int zb_ble_ci_cmd_handler(u16 clusterId, u8 len, u8 *payload){
 	}else if(clusterId == ZCL_CLUSTER_GEN_LEVEL_CONTROL){
 		sampleLight_levelCb(NULL, cmdId, pCmd);
 	}else if(clusterId == APP_BLE_CMD_INTERVAL_SET){
+		extern void app_bleConnIntervalSet(u8 interval, u16 latency);
 		app_bleConnIntervalSet(payload[0], ((payload[1] << 8) | payload[2]));
 	}else if(clusterId == APP_BLE_CMD_ZB_NETWORK_JOIN_DIRECT){
 		if(gLightCtx.timerSteering){
@@ -103,5 +104,5 @@ int zb_ble_ci_cmd_handler(u16 clusterId, u8 len, u8 *payload){
 	return ret;
 }
 
-#endif  /* __PROJECT_TL_DIMMABLE_LIGHT__ */
+#endif  /* __PROJECT_TL_LIGHT__ */
 

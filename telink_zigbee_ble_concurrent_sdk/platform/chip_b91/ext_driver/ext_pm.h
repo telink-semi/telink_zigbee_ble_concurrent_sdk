@@ -1,12 +1,12 @@
 /********************************************************************************************************
  * @file     ext_pm.h
  *
- * @brief    This is the header file for b91 driver
+ * @brief   This is the header file for B91
  *
- * @author	 BLE GROUP
- * @date         12,2021
+ * @author  Driver Group
+ * @date    2019
  *
- * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * @par     Copyright (c) 2019, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
  *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
+ *
  *******************************************************************************************************/
 
 #ifndef DRIVERS_B91_DRIVER_EXT_EXT_PM_H_
@@ -93,7 +94,7 @@ extern  _attribute_aligned_(4) misc_para_t 				blt_miscParam;
 void bls_pm_registerFuncBeforeSuspend (suspend_handler_t func );
 
 /**
- * @brief analog register below can store infomation when MCU in deepsleep mode
+ * @brief analog register below can store Information when MCU in deepsleep mode
  * 	      store your information in these ana_regs before deepsleep by calling analog_write function
  * 	      when MCU wakeup from deepsleep, read the information by by calling analog_read function
  * 	      Reset these analog registers only by power cycle

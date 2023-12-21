@@ -1,5 +1,5 @@
 /********************************************************************************************************
- * @file    board_9518_dongle.h
+ * @file    board_b91_dongle.h
  *
  * @brief   This is the header file for board_9518_dongle
  *
@@ -19,6 +19,7 @@
  *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
+ *
  *******************************************************************************************************/
 
 #pragma once

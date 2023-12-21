@@ -85,6 +85,11 @@ u8 NWK_NEIGHBOR_SEND_OUTGOING_THRESHOLD = 5;
 /* whether add src ieee address in nwk header for the data from higher level */
 bool NWK_HEADER_SRC_IEEE_INCLUDE = FALSE;
 
+/* whether a node on the nwk that transmits a Mgmt_permit_join is allowed */
+#if ZB_COORDINATOR_ROLE
+bool SS_ALLOW_REMOTE_TC_POLICY_CHANGE = TRUE;//FALSE;
+#endif
+
 /* address mapping table */
 u16 TL_ZB_NWK_ADDR_MAP_SIZE = TL_ZB_NWK_ADDR_MAP_NUM;
 tl_zb_addr_map_t g_nwkAddrMap;
@@ -130,6 +135,9 @@ bool AUTO_QUICK_DATA_POLL_ENABLE = TRUE;
 u32 AUTO_QUICK_DATA_POLL_INTERVAL = POLL_RATE_QUARTERSECONDS;//ms
 u8 AUTO_QUICK_DATA_POLL_TIMES = 3;
 #endif
+
+/* choose the previous parent first when rejoin. */
+bool PRE_PARENT_FIRST_WHEN_REJOIN = TRUE;
 
 /* binding table */
 u8 APS_BINDING_TABLE_SIZE = APS_BINDING_TABLE_NUM;
@@ -221,7 +229,7 @@ const nwk_nib_t nwkNibDefault = {
 	.maxBroadcastRetries = NWK_MAX_BROADCAST_RETRIES,
 	.passiveAckTimeout = 15000, //NWK_PASSIVE_ACK_TIMEOUT,
 	.nwkBroadcastDeliveryTime = NWK_BROADCAST_DELIVERY_TIME,
- 	.linkStatusPeriod = ZB_NWK_LINK_STATUS_PEROID_DEFAULT,//45
+ 	.linkStatusPeriod = ZB_NWK_LINK_STATUS_PERIOD_DEFAULT,//45
 	.routerAgeLimit = 3,
 	.maxSourceRoute = NWK_MAX_SOURCE_ROUTE,
 	.concentratorRadius = 0,

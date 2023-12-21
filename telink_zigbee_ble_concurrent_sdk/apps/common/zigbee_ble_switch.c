@@ -45,9 +45,9 @@ app_dualModeInfo_t g_dualModeInfo = {
 extern u8 g_ble_txPowerSet;
 
 _attribute_ram_code_ void switch_to_zb_context(void){
-	ZB_RADIO_RX_DISABLE;
-
 	backup_ble_rf_context();
+
+	ZB_RADIO_RX_DISABLE;
 
 	restore_zb_rf_context();
 	//switch tx power for zb mode
@@ -139,7 +139,26 @@ void zb_ble_switch_proc(void){
 		  *
 		  * */
 
+#if SCAN_IN_ADV_STATE
+		 /* add scan functionality after advertising during ADV state, just for slave mode */
+		 do{
+			 /* disable pm during scan */
+	#if PM_ENABLE
+			 if(BLE_BLT_STATE_GET() == BLS_LINK_STATE_ADV){
+				 bls_pm_setSuspendMask (SUSPEND_DISABLE);
+			 }
+	#endif
+			 blt_sdk_main_loop();
+		 }while((BLE_BLT_STATE_GET() == BLS_LINK_STATE_ADV) && blc_scan_busy_in_adv(g_dualModeInfo.bleTaskTick,2));//MY_ADV_INTERVAL*3/4
+
+		 /* enable pm after scan */
+	#if PM_ENABLE
+		 bls_pm_setSuspendMask (SUSPEND_ADV | SUSPEND_CONN);
+	#endif
+
+#else
 		 blt_sdk_main_loop();
+#endif
 
 		 DBG_ZIGBEE_STATUS(0x30);
 

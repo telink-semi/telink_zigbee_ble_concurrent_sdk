@@ -1,7 +1,7 @@
 /********************************************************************************************************
- * @file    zcl_sampleGwBLESlave_8258.c
+ * @file    sampleGwBLESlave_8258.c
  *
- * @brief   This is the source file for zcl_sampleGwBLESlave_8258
+ * @brief   This is the source file for sampleGwBLESlave_8258
  *
  * @author  Zigbee Group
  * @date    2021
@@ -20,8 +20,6 @@
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
  *******************************************************************************************************/
-
-
 #include "../../proj/tl_common.h"
 ///#include "drivers.h"
 #include <stack/ble/ble.h>
@@ -115,7 +113,7 @@ typedef struct{
 
 static int app_bleOtaWrite(void *p);
 static int app_bleOtaRead(void *p);
-extern int zb_ble_ci_cmd_handler(u16 cmdId, u8 len, u8 * payload);
+extern int zb_ble_hci_cmd_handler(u16 cmdId, u8 len, u8 * payload);
 
 const u16 clientCharacterCfgUUID = GATT_UUID_CLIENT_CHAR_CFG;
 
@@ -291,7 +289,7 @@ static int app_bleOtaWrite(void *p){
 	cmd_type <<= 8;
 	cmd_type |= req->dat[1] ;
 
-	zb_ble_ci_cmd_handler(cmd_type, len, &(req->dat[2]));
+	zb_ble_hci_cmd_handler(cmd_type, len, &(req->dat[2]));
 	return 0;
 }
 
@@ -471,6 +469,13 @@ void user_ble_init(void){
 		app_own_address_type = OWN_ADDRESS_RANDOM;
 		blc_ll_setRandomAddr(mac_random_static);
 	#endif
+
+
+#if PA_ENABLE
+	/* external RF PA used */
+	g_ble_txPowerSet = ZB_RADIO_TX_0DBM;   //set to 0dBm
+	ble_rf_pa_init(0, PA_TX, PA_RX);
+#endif
 
 	////// Controller Initialization  //////////
 	blc_ll_initBasicMCU();                      //mandatory

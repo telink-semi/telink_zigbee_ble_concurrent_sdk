@@ -73,9 +73,9 @@ volatile u8 rf_busyFlag = 0;
 volatile s8 soft_rssi;
 volatile s32 sum_rssi, cnt_rssi = 1;
 
-u8 fPaEn;
-u32 rf_pa_txen_pin;
-u32 rf_pa_rxen_pin;
+u8 fPaEn = 0;
+u32 rf_pa_txen_pin = 0;
+u32 rf_pa_rxen_pin = 0;
 
 u8 fPtaEn = 0;
 u32 rf_pta_priority_pin = 0;
@@ -183,7 +183,7 @@ void rf_reset(void)
     rf_setChannel(g_zbMacPib.phyChannelCur);
 
 	if(rf_rxBuf){
-		rf_setRxBuf(rf_rxBuf);
+		rf_setRxBuf((u8 *)rf_rxBuf);
 	}else{
 		rf_setRxBuf(tl_getRxBuf());
 	}
@@ -253,7 +253,7 @@ void rf_setRxBuf(u8 *pBuf)
 {
     rf_rxBuf = pBuf;
     ZB_RADIO_RX_BUF_CLEAR(rf_rxBuf);
-    ZB_RADIO_RX_BUF_SET(rf_rxBuf);//todo: 826x/8258 need fix rf driver
+    ZB_RADIO_RX_BUF_SET((u16)((u32)rf_rxBuf));//todo: 826x/8258 need fix rf driver
 }
 
 /*********************************************************************
@@ -408,7 +408,7 @@ u8 rf_lqi2cost(u8 lqi)
 }
 
 /*********************************************************************
- * @fn      rf_startED
+ * @fn      rf_startEDScan
  *
  * @brief   Start ED detect
  *
@@ -416,7 +416,7 @@ u8 rf_lqi2cost(u8 lqi)
  *
  * @return  none
  */
-void rf_startED(void)
+void rf_startEDScan(void)
 {
 #ifndef WIN32
     soft_rssi = -110;
@@ -429,7 +429,7 @@ void rf_startED(void)
 }
 
 /*********************************************************************
- * @fn      rf_stopED
+ * @fn      rf_stopEDScan
  *
  * @brief   Stop Energy Detect
  *
@@ -437,7 +437,7 @@ void rf_startED(void)
  *
  * @return  ED result
  */
-u8 rf_stopED(void)
+u8 rf_stopEDScan(void)
 {
 #ifndef WIN32
     u8 ed;
@@ -557,6 +557,7 @@ void rf_paInit(u32 TXEN_pin, u32 RXEN_pin)
     drv_gpio_write(rf_pa_rxen_pin, 1);
 
     fPaEn = 1;
+    g_zb_txPowerSet = ZB_RADIO_TX_0DBM;   //chip PA is set as 0dBm
 }
 #endif
 
@@ -618,7 +619,7 @@ _attribute_ram_code_ bool isWLANActive(void)
  */
 _attribute_ram_code_ __attribute__((optimize("-Os"))) void rf_rx_irq_handler(void)
 {
-    u8 *p = rf_rxBuf;
+    u8 *p = (u8 *)rf_rxBuf;
     u8 fAck = 0;
     u8 fDrop = 0;
     s32 txTime = 0;
@@ -694,7 +695,7 @@ _attribute_ram_code_ __attribute__((optimize("-Os"))) void rf_rx_irq_handler(voi
 	/* Use the backup buffer to receive next packet */
 	rf_rxBuf = rxNextBuf;
 	ZB_RADIO_RX_BUF_CLEAR(rf_rxBuf);
-	ZB_RADIO_RX_BUF_SET(rf_rxBuf);
+	ZB_RADIO_RX_BUF_SET((u16)((u32)rf_rxBuf));
 
     /*----------------------------------------------------------
 	 *  Send ACK
@@ -759,7 +760,7 @@ _attribute_ram_code_ __attribute__((optimize("-Os"))) void rf_rx_irq_handler(voi
 #endif
 
 	/* zb_mac_receive_data handler */
-	zb_macDataRecvHander(p, macPld, len, fAck, ZB_RADIO_TIMESTAMP_GET(p), ZB_RADION_PKT_RSSI_GET(p) - 110);
+	zb_macDataRecvHandler(p, macPld, len, fAck, ZB_RADIO_TIMESTAMP_GET(p), ZB_RADION_PKT_RSSI_GET(p) - 110);
 }
 
 
@@ -780,7 +781,7 @@ _attribute_ram_code_ __attribute__((optimize("-Os"))) void rf_tx_irq_handler(voi
 
     ZB_SWITCH_TO_RXMODE();
 
-    zb_macDataSendHander();
+    zb_macDataSendHandler();
 }
 
 
@@ -801,7 +802,7 @@ void restore_zb_rf_context(void){
 
 	ZB_RADIO_INIT();
 	ZB_RADIO_TRX_CFG((RF_PKT_BUFF_LEN));
-	ZB_RADIO_RX_BUF_SET(rf_rxBuf);
+	ZB_RADIO_RX_BUF_SET((u16)((u32)rf_rxBuf));
 
 	rf_setChannel(rf_getChannel());
 	rf_setTrxState(RF_STATE_RX);

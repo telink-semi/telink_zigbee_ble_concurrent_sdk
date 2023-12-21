@@ -97,7 +97,7 @@ SECTIONS
      ASSERT((_end_bss_ * __PM_DEEPRETENTION_EN < 0x848000), "RETENTION OVERFOLWN!!!!!") 
      /* i) in default, the .bss and .data will be allocated in RETENTION area, 
         and they will be restored after retention deep sleep, 
-        ii) the other various can be allocated at ¡°custom_data¡±, and they will clear after retention deep sleep   */
+        ii) the other various can be allocated at ï¿½ï¿½custom_dataï¿½ï¿½, and they will clear after retention deep sleep   */
     
      . = (((. + 3) / 4)*4);
     PROVIDE(_custom_stored_ = _dstored_ + _end_data_ - _start_data_);
@@ -130,8 +130,8 @@ SECTIONS
     PROVIDE(_bin_size_div_16 = ( _bin_size_ + 15 ) / 16 );
     PROVIDE(_ictag_start_ = 0x840000 + _ramcode_size_align_256_);
     PROVIDE(_ictag_end_ = 0x840000 + _ramcode_size_align_256_ + 0x100);
-    
-    /*  stack size: 0x1000(4K) , user can modify it, but must ensure _stack_end_ < 0x850000 */
+
+    /* stack size: 0x1000(4K), user can modify it, nut must ensure _stack_end_ < 0x850000 */
     PROVIDE(_stack_end_ = (((_end_custom_bss_ + SIZEOF(.sdk_version) + 0x1000) + 255) / 256 ) * 256);
     
     ASSERT((_stack_end_ < 0x850000), "STACK OVERFOLWN!!!!!")

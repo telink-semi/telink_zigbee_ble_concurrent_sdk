@@ -262,7 +262,7 @@ bool 		blc_ll_isBrxBusy (void);
 
 
 
-void  blc_ll_set_CustomedAdvScanAccessCode(u32 accss_code);
+void  blc_ll_set_CustomedAdvScanAccessCode(u32 access_code);
 
 
 #if (MCU_CORE_TYPE == MCU_CORE_9518)

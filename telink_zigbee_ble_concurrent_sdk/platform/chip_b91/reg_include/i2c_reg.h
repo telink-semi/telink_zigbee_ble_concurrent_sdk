@@ -4,9 +4,9 @@
  * @brief   This is the header file for B91
  *
  * @author  Driver Group
- * @date    2021
+ * @date    2019
  *
- * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * @par     Copyright (c) 2019, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
+ *
  *******************************************************************************************************/
-
 #ifndef I2C_REG_H_
 #define I2C_REG_H_
 #include "../sys.h"
@@ -59,7 +59,7 @@ enum{
  * BIT[0] means i2c bus whether busy.
  * BIT[1] means that a start signal is coming, it is 1, and an end signal is coming it will be 0.
  * BIT[2] Indicates the status of master send and receive,bit[2]=1,means have not ability to send or receivebit[2]=0,means have ability to send or receive.
- * BIT_RNG[3:5] Indicate what state the i2c is in when it acts as master, BIT_RNG[3:5] defaule value is 0x06 it means master's state is IDLE.
+ * BIT_RNG[3:5] Indicate what state the i2c is in when it acts as master, BIT_RNG[3:5] default value is 0x06 it means master's state is IDLE.
  * BIT_RNG[6:7] Indicate what state the i2c is in when it acts as slave.
  */
 #define reg_i2c_mst				    REG_ADDR8(REG_I2C_BASE+0x02)
@@ -75,7 +75,7 @@ enum{
 /**
  * This shows the status control register of i2c
  * BIT[0] i2c master enable.
- * BIT[1] clk stretch enable: suspend transimission by pulling SCL down to low level,and continue transmission after SCL is pelesed to hign level.
+ * BIT[1] clk stretch enable: suspend transmission by pulling SCL down to low level,and continue transmission after SCL is pelesed to high level.
  * BIT[2] rx interrupt enable.RX is related to rx_irq_trig_lev function (this function is always present and does not need any setting to enable).
  *        fifo_data_cnt> = rx_irq_trig_lev generates an interrupt.
  * BIT[3] tx interrupt enable.Related to tx_irq_trig_lev function,(This function is always present and does not require any setting to enable).
@@ -144,13 +144,13 @@ enum{
 
 /**
  * This register is to configure the slave stretch function.
- * BIT[0] slave auto stretch clk eanble,open this function, use slave to receive data,when data buffer is full, scl bus will be low to stop receive data.
- * BIT[1] slave manul stretch clk enable,open this function, use slave to receive data,when data buffer is full, scl bus will be low to stop receive data.
+ * BIT[0] slave auto stretch clk enable,open this function, use slave to receive data,when data buffer is full, scl bus will be low to stop receive data.
+ * BIT[1] slave manual stretch clk enable,open this function, use slave to receive data,when data buffer is full, scl bus will be low to stop receive data.
  * BIT[2] clear slave stretch.
  * BIT[6] in high speed mode,when open slave auto stretch clk function,Suddenly data came over, to meet the requirements of time setting.
  * BIT[7] in fast speed mode,when open slave auto stretch clk function,Suddenly data came over, to meet the requirements of time setting.
  */
-#define reg_i2c_slave_strech_en	    REG_ADDR8(REG_I2C_BASE+0x07)
+#define reg_i2c_slave_stretch_en	    REG_ADDR8(REG_I2C_BASE+0x07)
 enum{
 	FLD_I2C_R_CLK_STRETCH_SEN       = BIT(0),
 	FLD_I2C_R_MANUAL_STRETCH        = BIT(1),

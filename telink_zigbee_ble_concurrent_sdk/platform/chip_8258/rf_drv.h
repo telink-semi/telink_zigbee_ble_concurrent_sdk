@@ -1,13 +1,13 @@
 /********************************************************************************************************
- * @file    rf_drv.h
+ * @file	rf_drv.h
  *
- * @brief   This is the header file for B85
+ * @brief	This is the header file for B85
  *
- * @author  Driver & Zigbee Group
- * @date    2021
+ * @author	Driver Group
+ * @date	2018
  *
- * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
-*           All rights reserved.
+ * @par     Copyright (c) 2018, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
  *          You may obtain a copy of the License at
@@ -19,8 +19,8 @@
  *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
+ *
  *******************************************************************************************************/
-
 #ifndef _RF_DRV_H_
 #define _RF_DRV_H_
 
@@ -355,6 +355,7 @@ static inline void rf_stop_trx (void)
 void	rf_send_packet (void* addr);
 
 void  rf_rx_buffer_set(unsigned char *  RF_RxAddr, int size, unsigned char  PingpongEn);
+void  rf_pn_disable();
 
 void  rf_rx_cfg(int size, unsigned char  PingpongEn);
 
