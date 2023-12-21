@@ -43,7 +43,7 @@
 #endif
 
 #ifndef NWK_BRC_TRANSTBL_NUM
-	#define NWK_BRC_TRANSTBL_NUM 			48//12//8
+	#define NWK_BRC_TRANSTBL_NUM 			12//8
 #endif
 #endif
 
