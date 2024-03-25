@@ -67,12 +67,12 @@ int main(void){
 	}
 #endif
 
+	os_init(isRetention);
+
 #if 0
 	extern void moduleTest_start(void);
 	moduleTest_start();
 #endif
-
-	os_init(isRetention);
 
 #if PA_ENABLE
 	/* external RF PA used */

@@ -361,9 +361,13 @@ void 	ble_exception_data_abandom(u8 e,u8 *p, int n){
 
 _attribute_ram_code_ void	user_set_rf_power (u8 e, u8 *p, int n){
 	rf_set_power_level_index (g_ble_txPowerSet);
-	//rf_set_power_level_index (0);
 }
 
+
+_attribute_ram_code_ void	app_exitSuspendCb (u8 e, u8 *p, int n){
+	rf_set_power_level_index (g_ble_txPowerSet);
+	secondClockRun();
+}
 
 
 void task_connect (u8 e, u8 *p, int n){
@@ -590,7 +594,7 @@ void user_ble_normal_init(void){
 
 	//set rf power index, user must set it after every suspend wakeup, cause relative setting will be reset in suspend
 	user_set_rf_power(0, 0, 0);
-	bls_app_registerEventCallback (BLT_EV_FLAG_SUSPEND_EXIT, &user_set_rf_power);
+	bls_app_registerEventCallback (BLT_EV_FLAG_SUSPEND_EXIT, &app_exitSuspendCb);
 
 
 

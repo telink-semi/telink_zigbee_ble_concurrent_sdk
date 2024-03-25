@@ -56,7 +56,14 @@ drv_pm_pinCfg_t g_switchPmCfg[] = {
 bool app_zigbeeIdle(void){
 	bool ret = 0;
 	
-	ret = bdb_isIdle() && !tl_stackBusy() && zb_isTaskDone() && !ev_timer_process(1);
+	ret = bdb_isIdle() && !tl_stackBusy() && zb_isTaskDone();
+	if(ret){
+		apsCleanToStopSecondClock();
+		ret &= !ev_timer_process(1);
+		if(!ret){
+			secondClockRun();
+		}
+	}
 
 	return ret;
 }
@@ -127,6 +134,7 @@ void app_pm_task(void){
 				drv_pm_sleep(sleepMode, wakeupSrc, get_ble_next_event_tick());
 			}
 		}
+		secondClockRun();
 	}
 
 	return;

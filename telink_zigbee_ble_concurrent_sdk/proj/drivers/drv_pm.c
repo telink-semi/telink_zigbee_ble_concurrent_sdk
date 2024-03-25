@@ -386,6 +386,9 @@ void drv_pm_lowPowerEnter(void)
 		drv_pm_longSleep(sleepMode, wakeupSrc, sleepTime);
 	}
 
+#if !defined(__PROJECT_TL_BOOT_LOADER__) && !defined(__PROJECT_TL_SNIFFER__)
+	secondClockRun();
+#endif
 	drv_restore_irq(r);
 }
 

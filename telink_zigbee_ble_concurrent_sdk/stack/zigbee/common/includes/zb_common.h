@@ -407,6 +407,8 @@ void os_init(u8 isRetention);
 
 bool tl_stackBusy(void);
 
+void secondClockRun(void);
+
 #if ZB_ROUTER_ROLE
 u32 brcTransRecordTblSizeGet(void);
 nwk_brcTransRecordEntry_t *brcTransRecordEntryGet(u8 idx);
