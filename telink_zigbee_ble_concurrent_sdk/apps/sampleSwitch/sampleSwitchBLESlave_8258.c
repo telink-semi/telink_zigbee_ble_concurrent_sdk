@@ -24,6 +24,7 @@
 #include "../../proj/tl_common.h"
 ///#include "drivers.h"
 #include "../../ble/ble.h"
+#include "app_pm.h"
 
 //#include "vendor/common/blt_led.h"
 //#include "vendor/common/blt_common.h"
@@ -487,6 +488,11 @@ int app_host_event_callback (u32 h, u8 *para, int n){
 	return 0;
 }
 
+_attribute_ram_code_ void  ble_remote_set_sleep_wakeup (u8 e, u8 *p, int n)
+{
+	app_pm_wakeupPinCfg();
+	bls_pm_setWakeupSource(PM_WAKEUP_PAD);  //gpio pad wakeup suspend/deepsleep
+}
 
 void user_ble_normal_init(void){
 
@@ -613,7 +619,7 @@ void user_ble_normal_init(void){
 #if(BLE_APP_PM_ENABLE)
 	//blc_ll_initPowerManagement_module();
 	bls_pm_setSuspendMask (SUSPEND_ADV | SUSPEND_CONN);
-	//bls_app_registerEventCallback (BLT_EV_FLAG_SUSPEND_ENTER, &ble_remote_set_sleep_wakeup);
+	bls_app_registerEventCallback (BLT_EV_FLAG_SUSPEND_ENTER, &ble_remote_set_sleep_wakeup);
 #else
 	bls_pm_setSuspendMask (SUSPEND_DISABLE);
 #endif

@@ -95,7 +95,6 @@ void app_pm_task(void){
 	 * */
 	if(APP_BLE_STATE_GET() == BLS_LINK_STATE_CONN || g_bleConnDoing){
 		if(!bls_pm_conditionCbIsValid()){
-			bls_pm_setWakeupSource(PM_WAKEUP_PAD);
 			bls_pm_conditionCbRegister(app_zigbeeIdle);   //register it to enable ble suspend mode
 		}
 		return;

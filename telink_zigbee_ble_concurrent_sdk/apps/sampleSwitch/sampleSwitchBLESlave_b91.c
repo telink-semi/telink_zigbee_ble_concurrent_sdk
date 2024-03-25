@@ -25,6 +25,7 @@
 ///#include "drivers.h"
 #include "ble.h"
 #include "tl_common.h"
+#include "app_pm.h
 #include "zb_api.h"
 #include "zcl_include.h"
 #include "sampleSwitch.h"
@@ -411,6 +412,7 @@ _attribute_ram_code_ void	app_exitSuspendCb (u8 e, u8 *p, int n){
 _attribute_ram_code_ void  ble_remote_set_sleep_wakeup (u8 e, u8 *p, int n)
 {
 	if( blc_ll_getCurrentState() == BLS_LINK_STATE_CONN && ((u32)(bls_pm_getSystemWakeupTick() - clock_time())) > 80 * SYSTEM_TIMER_TICK_1MS){  //suspend time > 30ms.add gpio wakeup
+		app_pm_wakeupPinCfg();
 		bls_pm_setWakeupSource(PM_WAKEUP_PAD);  //gpio pad wakeup suspend/deepsleep
 	}
 }
