@@ -25,7 +25,7 @@
 ///#include "drivers.h"
 #include "ble.h"
 #include "tl_common.h"
-#include "app_pm.h
+#include "app_pm.h"
 #include "zb_api.h"
 #include "zcl_include.h"
 #include "sampleSwitch.h"
