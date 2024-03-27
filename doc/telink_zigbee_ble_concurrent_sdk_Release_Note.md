@@ -1,3 +1,23 @@
+## V2.3.2.1
+### Bugs
+* buffer overflown issue under SCAN_IN_ADV_STATE mode 
+
+### Features
+* Optimized power consumption during ble connection state 
+
+BREAKING CHANGES
+* None
+
+### Bugs
+* SCAN_IN_ADV_STATE模式下，buffer发生溢出问题
+
+### Features
+* 优化ble连接状态的功耗
+
+### BREAKING CHANGES
+* 无
+
+
 ## V2.3.2.0
 ### Bugs
 * sync to Zigbee SDK v3.6.8.6
