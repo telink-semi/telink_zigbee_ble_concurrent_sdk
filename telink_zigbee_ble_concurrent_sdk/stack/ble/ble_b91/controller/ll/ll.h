@@ -121,7 +121,7 @@ static inline u8 blc_ll_get_connEffectiveMaxTxOctets(void)
 }
 
 
-#if (MCU_CORE_TYPE == MCU_CORE_9518)
+#if (MCU_CORE_TYPE == MCU_CORE_B91)
 /**
  * @brief	This function is used to obtain the effective maximum RX data length
  * @param	none
@@ -265,7 +265,7 @@ bool 		blc_ll_isBrxBusy (void);
 void  blc_ll_set_CustomedAdvScanAccessCode(u32 access_code);
 
 
-#if (MCU_CORE_TYPE == MCU_CORE_9518)
+#if (MCU_CORE_TYPE == MCU_CORE_B91)
 /**
  * @brief      this function is used check if any controller buffer initialized by application incorrect.
  * 			   attention: this function must be called at the end of BLE LinkLayer Initialization.

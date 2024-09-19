@@ -7,6 +7,7 @@
  * @date    2021
  *
  * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *			All rights reserved.
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -19,6 +20,7 @@
  *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
+ *
  *******************************************************************************************************/
 
 #if (__PROJECT_TL_SWITCH__)
@@ -718,19 +720,16 @@ static status_t sampleSwitch_zclPollCtrlChkInRspCmdHandler(zcl_chkInRsp_t *pCmd)
 			}
 
 			fastPollTimeoutCnt = pCmd->fastPollTimeout;
+		}else{
+			fastPollTimeoutCnt = pPollCtrlAttr->fastPollTimeout;
+		}
 
+		if(fastPollTimeoutCnt){
+			sampleSwitch_zclSetFastPollMode(TRUE);
+			
 			if(zclFastPollTimeoutTimerEvt){
 				TL_ZB_TIMER_CANCEL(&zclFastPollTimeoutTimerEvt);
 			}
-		}else{
-			if(!zclFastPollTimeoutTimerEvt){
-				fastPollTimeoutCnt = pPollCtrlAttr->fastPollTimeout;
-			}
-		}
-
-		if(!zclFastPollTimeoutTimerEvt && fastPollTimeoutCnt){
-			sampleSwitch_zclSetFastPollMode(TRUE);
-			
 			zclFastPollTimeoutTimerEvt = TL_ZB_TIMER_SCHEDULE(sampleSwitch_zclFastPollTimeoutCb, NULL, fastPollTimeoutCnt * POLL_RATE_QUARTERSECONDS);
 		}
 	}else{

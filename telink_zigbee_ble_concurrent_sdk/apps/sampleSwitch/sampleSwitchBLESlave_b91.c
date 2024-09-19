@@ -22,7 +22,6 @@
  *******************************************************************************************************/
 
 #include "tl_common.h"
-///#include "drivers.h"
 #include "ble.h"
 #include "tl_common.h"
 #include "app_pm.h"
@@ -59,8 +58,8 @@
 #define 	MY_ADV_INTERVAL_MIN			ADV_INTERVAL_30MS
 #define 	MY_ADV_INTERVAL_MAX			ADV_INTERVAL_35MS
 
-#define 	ADV_IDLE_ENTER_DEEP_TIME			5  //60 s
-#define 	CONN_IDLE_ENTER_DEEP_TIME			5  //60 s
+#define 	ADV_IDLE_ENTER_DEEP_TIME			60  //60 s
+#define 	CONN_IDLE_ENTER_DEEP_TIME			60  //60 s
 
 #define 	MY_DIRECT_ADV_TMIE					2000000
 
@@ -285,6 +284,7 @@ int app_bleOtaWrite(u16 connHandle, void *p){
 	cmd_type <<= 8;
 	cmd_type |= req->dat[1] ;
 
+	latest_user_event_tick = clock_time();
 	extern int zb_ble_hci_cmd_handler(u16 cmdId, u8 len, u8 *payload);
 	zb_ble_hci_cmd_handler(cmd_type, len, &(req->dat[2]));
 	return 0;
@@ -411,7 +411,7 @@ _attribute_ram_code_ void	app_exitSuspendCb (u8 e, u8 *p, int n){
 #if (1 || BLE_APP_PM_ENABLE)
 _attribute_ram_code_ void  ble_remote_set_sleep_wakeup (u8 e, u8 *p, int n)
 {
-	if( blc_ll_getCurrentState() == BLS_LINK_STATE_CONN && ((u32)(bls_pm_getSystemWakeupTick() - clock_time())) > 80 * SYSTEM_TIMER_TICK_1MS){  //suspend time > 30ms.add gpio wakeup
+	if(((u32)(bls_pm_getSystemWakeupTick() - clock_time())) > 80 * SYSTEM_TIMER_TICK_1MS){  //suspend time > 80ms.add gpio wakeup
 		app_pm_wakeupPinCfg();
 		bls_pm_setWakeupSource(PM_WAKEUP_PAD);  //gpio pad wakeup suspend/deepsleep
 	}
@@ -514,7 +514,7 @@ int app_host_event_callback (u32 h, u8 *para, int n)
 		break;
 		case GAP_EVT_ATT_EXCHANGE_MTU:
 		{
-			gap_gatt_mtuSizeExchangeEvt_t *pEvt = (gap_gatt_mtuSizeExchangeEvt_t *)para;
+//			gap_gatt_mtuSizeExchangeEvt_t *pEvt = (gap_gatt_mtuSizeExchangeEvt_t *)para;
 			//final_MTU_size = pEvt->effective_MTU;
 			//mtuExchange_started_flg = 1;   //set MTU size exchange flag here
 		}

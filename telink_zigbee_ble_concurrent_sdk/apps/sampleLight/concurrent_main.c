@@ -45,9 +45,6 @@ static void app_bleStopRestart(void){
 
 
 int main(void){
-#if VOLTAGE_DETECT_ENABLE
-	u32 tick = 0;
-#endif
 	startup_state_e state = drv_platform_init();
 	u8 isRetention = (state == SYSTEM_DEEP_RETENTION) ? 1 : 0;
 
@@ -71,6 +68,7 @@ int main(void){
 
 #if 0
 	extern void moduleTest_start(void);
+	CURRENT_SLOT_SET(DUALMODE_SLOT_ZIGBEE);
 	moduleTest_start();
 #endif
 

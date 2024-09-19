@@ -33,7 +33,7 @@
  * @param	   none
  * @return     none
  */
-#if (MCU_CORE_TYPE == MCU_CORE_9518)
+#if (MCU_CORE_TYPE == MCU_CORE_B91)
 void 		blc_ll_initScanning_module(void);
 #elif (MCU_CORE_TYPE == MCU_CORE_825x || MCU_CORE_TYPE == MCU_CORE_827x)
 void 		blc_ll_initScanning_module(u8 *public_adr);

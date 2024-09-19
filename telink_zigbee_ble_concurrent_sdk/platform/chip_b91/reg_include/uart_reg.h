@@ -25,9 +25,9 @@
 #define UART_REG_H
 #include "../sys.h"
 
-/*******************************      uart0 registers: 0x140080   *******************************/
-/*******************************      uart1 registers: 0x1400c0      ******************************/
-#define reg_uart_data_buf_adr(i)  (0x140080+(i)*0x40)  //uart(i)
+/*******************************      uart0 registers: 0x80140080   *******************************/
+/*******************************      uart1 registers: 0x801400c0      ******************************/
+#define reg_uart_data_buf_adr(i)  (0x80140080+(i)*0x40)  //uart(i)
 
 #define reg_uart_data_buf(i,j)    REG_ADDR8(reg_uart_data_buf_adr(i)+(j)) //uart(i)_buf(j)
 #define reg_uart_data_hword_buf(i,j)  REG_ADDR16(reg_uart_data_buf_adr(i)+(j)*2)
@@ -126,8 +126,10 @@ enum{
 //state machine use for IC debug
 #define reg_uart_state(i)       REG_ADDR8(0x14008f+0x40*(i))
 enum{
-	FLD_UART_TSTATE_i   	=  BIT_RNG(0,2),//only for dma default 1.
+	FLD_UART_TSTATE_i   	=  BIT_RNG(0,2),
 	FLD_UART_RSTATE_i   	=  BIT_RNG(4,7),
+	FLD_UART_CLR_TXDONE     =  BIT(7),
+
 };
 
 /*******************************      7816 registers: 0x1401f0     ******************************/

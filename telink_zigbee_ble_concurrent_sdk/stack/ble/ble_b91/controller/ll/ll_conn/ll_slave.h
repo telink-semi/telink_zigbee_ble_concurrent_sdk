@@ -99,9 +99,9 @@ ble_sts_t 	bls_hci_mod_setEventMask_cmd(u32 evtMask);
 	void		bls_ll_restoreConnBrxEvent(void);
 #endif
 
-#if (MCU_CORE_TYPE == MCU_CORE_9518)
+#if (MCU_CORE_TYPE == MCU_CORE_B91)
 	#define blc_ll_disconnect(conn, reason)     	bls_ll_terminateConnection(reason)
 #endif
 
-
+void bls_set_enc_dec_busy(int flag);
 #endif /* LL_SLAVE_H_ */

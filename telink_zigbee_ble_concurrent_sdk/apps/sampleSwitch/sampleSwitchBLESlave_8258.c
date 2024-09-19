@@ -22,7 +22,6 @@
  *******************************************************************************************************/
 
 #include "../../proj/tl_common.h"
-///#include "drivers.h"
 #include "../../ble/ble.h"
 #include "app_pm.h"
 
@@ -34,8 +33,8 @@
 
 #define MTU_SIZE_SETTING 						64
 
-#define ADV_IDLE_ENTER_DEEP_TIME			    5  //60 s
-#define CONN_IDLE_ENTER_DEEP_TIME			    5  //60 s
+#define ADV_IDLE_ENTER_DEEP_TIME			    60 //s
+#define CONN_IDLE_ENTER_DEEP_TIME			    60 //s
 
 #define MY_DIRECT_ADV_TMIE					2000000
 
@@ -367,6 +366,7 @@ _attribute_ram_code_ void	user_set_rf_power (u8 e, u8 *p, int n){
 
 _attribute_ram_code_ void	app_exitSuspendCb (u8 e, u8 *p, int n){
 	rf_set_power_level_index (g_ble_txPowerSet);
+	extern void secondClockRun(void);
 	secondClockRun();
 }
 
@@ -490,8 +490,10 @@ int app_host_event_callback (u32 h, u8 *para, int n){
 
 _attribute_ram_code_ void  ble_remote_set_sleep_wakeup (u8 e, u8 *p, int n)
 {
-	app_pm_wakeupPinCfg();
-	bls_pm_setWakeupSource(PM_WAKEUP_PAD);  //gpio pad wakeup suspend/deepsleep
+	if(((u32)(bls_pm_getSystemWakeupTick() - clock_time())) > 80 * CLOCK_16M_SYS_TIMER_CLK_1MS){  //suspend time > 80ms.add gpio wakeup
+		app_pm_wakeupPinCfg();
+		bls_pm_setWakeupSource(PM_WAKEUP_PAD);  //gpio pad wakeup suspend/deepsleep
+	}
 }
 
 void user_ble_normal_init(void){

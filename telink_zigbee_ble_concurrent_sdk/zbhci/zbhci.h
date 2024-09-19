@@ -109,6 +109,8 @@ typedef enum{
 	ZBHCI_CMD_TXRX_PERFORMANCE_TEST_REQ		= 0x0042,
 	ZBHCI_CMD_AF_DATA_SEND_TEST_REQ			= 0x0044,
 	ZBHCI_CMD_GET_LOCAL_NWK_INFO_REQ		= 0x0045,
+	ZBHCI_CMD_GET_CHILD_NODES_REQ           = 0x0046,
+	ZBHCI_CMD_REMOVE_ALL_CHILD_NODES_REQ    = 0x0047,
 
 	ZBHCI_CMD_NODES_JOINED_GET_RSP			= 0x8040,
 	ZBHCI_CMD_NODES_TOGGLE_TEST_RSP			= 0x8041,
@@ -116,6 +118,7 @@ typedef enum{
 	ZBHCI_CMD_NODES_DEV_ANNCE_IND			= 0x8043,
 	ZBHCI_CMD_AF_DATA_SEND_TEST_RSP			= 0x8044,
 	ZBHCI_CMD_GET_LOCAL_NWK_INFO_RSP		= 0x8045,
+	ZBHCI_CMD_GET_CHILD_NODES_RSP           = 0x8046,
 
 	ZBHCI_CMD_ZCL_ATTR_READ					= 0x0100,
 	ZBHCI_CMD_ZCL_ATTR_WRITE				,//= 0x0101,
@@ -222,6 +225,7 @@ typedef enum{
     ZBHCI_OTA_FILE_OVERSIZE,
     ZBHCI_OTA_INCORRECT_DATA,
     ZBHCI_OTA_MATCH_BOOT_FLAG,
+	ZBHCI_OTA_BOOT_ADDR_ERROR,
 }zbhci_ota_status_e;
 
 typedef enum{
@@ -286,7 +290,7 @@ typedef struct{
 
 typedef struct{
 	u16 cmdId;
-	u16 resv;
+	u16 payloadLen;
 	u8  payload[1];
 }zbhci_cmdHandler_t;
 
@@ -304,19 +308,19 @@ typedef struct{
  * @brief  the hci response command carryin  the MAC address of the nodes which have joined the network
  *
  * */
-typedef struct{
+typedef struct _attribute_packed_{
 	u16 totalCnt;				/*!	the total count of the joined nodes */
 	u16 startIndex;				/*!	the start index */
 	u8  listCnt;				/*!	the count of the mac address list */
 	u8  status;					/*!	the status */
 }zbhci_mgmt_nodesJoined_rsp_hdr_t;
 
-typedef struct{
+typedef struct _attribute_packed_{
 	addrExt_t macAddr;		// /*!	the mac address list */
 	u16 nwkAddr;
 }zbhci_mgmt_nodesJoined_info_t;
 
-typedef struct{
+typedef struct _attribute_packed_{
 	zbhci_mgmt_nodesJoined_rsp_hdr_t hdr;
 	zbhci_mgmt_nodesJoined_info_t addrList[5];		//[5];	/*!	the mac address list */
 }zbhci_mgmt_nodesJoined_rsp_t;
@@ -369,7 +373,7 @@ typedef struct{
 	addrExt_t	macAddr;
 }zbhci_nodeLeaveInd_t;
 
-typedef struct{
+typedef struct _attribute_packed_{
 	u8 dstMode;
 	tl_zb_addr_t dstAddr; //addrMode = APS_DSTADDR_EP_NOTPRESETNT
 	u8 srcEp;			//
@@ -399,8 +403,12 @@ typedef struct{
 	u8  otaFindBootFlag;
 	u8  otaProcessStart;
 	u8  blockRequestCnt;
-	zbhciOtaType_e binType;		//1--local bin, 0--remote OTA bin
+	u8  binType;//zbhciOtaType_e, 1--local bin, 0--remote OTA bin
 }hci_ota_info_t;
+
+typedef struct{
+	u8 startIdx;             /*! start of the child table index */
+}zbhci_childNodeGetReq_t;
 
 extern zbhci_afTestReq_t g_afTestReq;
 

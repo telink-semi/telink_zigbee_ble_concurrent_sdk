@@ -272,7 +272,7 @@ u8 *ev_buf_getTail(u8 *pd, int offsetToTail)
 	return (u8*)(pd - 8 + size[index] - offsetToTail);
 }
 
-u8 is_ev_buf(void *arg){
+_always_inline u8 is_ev_buf(void *arg){
 	 if( ((u32)arg >= (u32)(size_0_mem) && (u32)arg <= ((u32)(size_0_mem) + sizeof(size_0_mem))) ||
 		 ((u32)arg >= (u32)(size_1_mem) && (u32)arg <= ((u32)(size_1_mem) + sizeof(size_1_mem))) ||
 		 ((u32)arg >= (u32)(size_2_mem) && (u32)arg <= ((u32)(size_2_mem) + sizeof(size_2_mem))) ||

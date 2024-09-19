@@ -27,8 +27,8 @@
 #include "platform.h"
 #include "tl_common.h"
 
-#define MCU_CORE_9518    0x02
-#define MCU_CORE_TYPE	MCU_CORE_9518
+//#define MCU_CORE_B91    0x01
+#define MCU_CORE_TYPE	MCU_CORE_B91
 
 #if(MCU_CORE_TYPE == MCU_CORE_825x || MCU_CORE_TYPE == MCU_CORE_827x)
 	#define  MAX_DEV_NAME_LEN 				18
@@ -45,7 +45,7 @@
 #elif (MCU_CORE_TYPE == MCU_CORE_827x)
 	#define	FIX_HW_CRC24_EN									0
 	#define HW_ECDH_EN                                      1
-#elif (MCU_CORE_TYPE == MCU_CORE_9518)
+#elif (MCU_CORE_TYPE == MCU_CORE_B91)
 	#define	FIX_HW_CRC24_EN									0
 	#define HW_ECDH_EN                                      1
 	#define BLT_CONN_MASTER_EN								0
@@ -320,7 +320,7 @@
 #define	log_tick(en,id)
 
 //1-byte (000_id-5bits)
-#define	log_event(en,id)
+//#define	log_event(en,id)
 
 //1-byte (01x_id-5bits) 1-bit data: id0 & id1 reserved for hardware
 #define	log_task(en,id,b)

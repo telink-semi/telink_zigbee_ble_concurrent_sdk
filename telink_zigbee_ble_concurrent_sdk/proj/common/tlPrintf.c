@@ -24,7 +24,7 @@
  *******************************************************************************************************/
 
 #include "../drivers/drv_putchar.h"
-#if defined(MCU_CORE_B91)
+#if defined(MCU_CORE_B91) || defined(MCU_CORE_TL321X)
 	#include <stdarg.h>
 #else
 	typedef char *va_list;
@@ -42,13 +42,16 @@
 
 
 
-#if defined(MCU_CORE_B91)
+#if defined(MCU_CORE_B91) || defined(MCU_CORE_TL321X)
 __attribute__((used)) int _write(int fd, const unsigned char *buf, int size){
 	(void)fd;
-    int i;
+    int i = 0;
+#if (TLKAPI_DEBUG_ENABLE)
+
     for(i = 0; i < size; i++){
     	drv_putchar(buf[i]);
     }
+#endif
     return i;
 }
 #else

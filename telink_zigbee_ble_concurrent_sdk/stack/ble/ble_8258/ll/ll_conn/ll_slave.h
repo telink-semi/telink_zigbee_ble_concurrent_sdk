@@ -164,7 +164,7 @@ void		bls_ll_disableConnBrxEvent(void);
 void		bls_ll_restoreConnBrxEvent(void);
 
 
-
+void bls_set_enc_dec_busy(int flag);
 
 
 //ble module event

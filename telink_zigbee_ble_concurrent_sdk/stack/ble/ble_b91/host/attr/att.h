@@ -81,7 +81,7 @@
 
 
 
-#if (MCU_CORE_TYPE == MCU_CORE_9518)
+#if (MCU_CORE_TYPE == MCU_CORE_B91)
 	typedef int (*att_readwrite_callback_t)(u16 connHandle, void* p);
 #elif (MCU_CORE_TYPE == MCU_CORE_825x || MCU_CORE_TYPE == MCU_CORE_827x)
 	typedef int (*att_readwrite_callback_t)(void* p);

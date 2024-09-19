@@ -20,7 +20,6 @@
  *          limitations under the License.
  *******************************************************************************************************/
 
-///#include "drivers.h"
 #include <stack/ble/ble.h>
 #include "tl_common.h"
 #include "zb_api.h"
@@ -255,8 +254,8 @@ _attribute_data_retention_	u32	interval_update_tick;
 _attribute_data_retention_	u8	sendTerminate_before_enterDeep = 0;
 _attribute_data_retention_	u32	latest_user_event_tick;
 
-static u8  g_appBleInterval = 8;
-static u16 g_appBleLatency = 99;
+static u8  g_appBleInterval = 40;
+static u16 g_appBleLatency = 19;
 
 static u32  mtuExchange_started_flg = 0;
 

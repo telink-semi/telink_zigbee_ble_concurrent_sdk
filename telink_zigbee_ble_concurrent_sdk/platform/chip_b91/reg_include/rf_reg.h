@@ -384,7 +384,7 @@ enum{
 };
 #endif
 
-#define	   reg_rf_rxdma_adr			 0x140880
+#define	   reg_rf_rxdma_adr			 0x80140880
 #define    reg_rf_rxdma_fifo0        REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x80)
 enum{
 	FLD_RF_RXDMA_FIFO0           =	BIT_RNG(0,7),
@@ -408,7 +408,7 @@ enum{
 	FLD_RF_RXDMA_FIFO3           =	BIT_RNG(0,7),
 };
 
-#define	   reg_rf_txdma_adr			0x140884
+#define	   reg_rf_txdma_adr			0x80140884
 #define    reg_rf_txdma_fifo0        REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x84)
 enum{
 	FLD_RF_TXDMA_FIFO0           =	BIT_RNG(0,7),

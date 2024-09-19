@@ -25,17 +25,22 @@
 
 #include "drv_putchar.h"
 
-
-#if UART_PRINTF_MODE
+#if (TLKAPI_DEBUG_ENABLE)
 _attribute_ram_code_ void soft_uart_putc(unsigned char byte)
 {
 	u8 j = 0;
 	u32 t1 = 0, t2 = 0;
 
+#if defined(MCU_CORE_TL321X)
+	u16 tmp_bit0 = (DEBUG_INFO_TX_PIN & 0xff)<<8;
+	u16 tmp_bit1 = DEBUG_INFO_TX_PIN & 0xff;
+	u16 bit[10] = {0};
+#else
 	u8 tmp_bit0 = TX_PIN_OUTPUT_REG & (~(DEBUG_INFO_TX_PIN & 0xff));
 	u8 tmp_bit1 = TX_PIN_OUTPUT_REG | (DEBUG_INFO_TX_PIN & 0xff);
-
 	u8 bit[10] = {0};
+#endif
+
 	bit[0] = tmp_bit0;
 	bit[1] = (byte & 0x01) ? tmp_bit1 : tmp_bit0;
 	bit[2] = ((byte >> 1) & 0x01) ? tmp_bit1 : tmp_bit0;
@@ -86,9 +91,9 @@ static int hw_usb_putc(unsigned char c)
 
 #endif
 
-void drv_putchar(unsigned char byte)
+_attribute_ram_code_ void drv_putchar(unsigned char byte)
 {
-#if UART_PRINTF_MODE
+#if (TLKAPI_DEBUG_ENABLE)
 	soft_uart_putc(byte);
 #elif USB_PRINTF_MODE
 	hw_usb_putc(byte);

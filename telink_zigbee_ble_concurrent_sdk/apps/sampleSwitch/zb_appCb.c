@@ -7,6 +7,7 @@
  * @date    2021
  *
  * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *			All rights reserved.
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -19,6 +20,7 @@
  *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
+ *
  *******************************************************************************************************/
 
 #if (__PROJECT_TL_SWITCH__)
@@ -71,13 +73,15 @@ ota_callBack_t sampleSwitch_otaCb =
 };
 #endif
 
-
+ev_timer_event_t *switchRejoinBackoffTimerEvt = NULL;
+static bool ota_processing = FALSE;
 /**********************************************************************
  * FUNCTIONS
  */
 s32 sampleSwitch_bdbNetworkSteerStart(void *arg){
 	bdb_networkSteerStart();
 
+	g_switchAppCtx.timerSteering = NULL;
 	return -1;
 }
 
@@ -91,7 +95,6 @@ s32 sampleSwitch_bdbFindAndBindStart(void *arg){
 }
 #endif
 
-ev_timer_event_t *switchRejoinBackoffTimerEvt = NULL;
 s32 sampleSwitch_rejoinBacckoff(void *arg){
 	if(zb_isDeviceFactoryNew()){
 		switchRejoinBackoffTimerEvt = NULL;
@@ -140,7 +143,11 @@ void zbdemo_bdbInitCb(u8 status, u8 joinedNetwork){
 			do{
 				jitter = zb_random() % 0x0fff;
 			}while(jitter == 0);
-			TL_ZB_TIMER_SCHEDULE(sampleSwitch_bdbNetworkSteerStart, NULL, jitter);
+
+			if(g_switchAppCtx.timerSteering){
+				TL_ZB_TIMER_CANCEL(&g_switchAppCtx.timerSteering);
+			}
+			g_switchAppCtx.timerSteering = TL_ZB_TIMER_SCHEDULE(sampleSwitch_bdbNetworkSteerStart, NULL, jitter);
 		}
 	}else{
 		if(joinedNetwork){
@@ -170,7 +177,22 @@ void zbdemo_bdbCommissioningCb(u8 status, void *arg){
 		case BDB_COMMISSION_STA_SUCCESS:
 			light_blink_start(2, 200, 200);
 
-			zb_setPollRate(POLL_RATE * 3);
+			if(!ota_processing){
+				zb_setPollRate(POLL_RATE * 3);
+			}else{
+				zb_setPollRate(QUEUE_POLL_RATE);
+			}
+
+			if(g_switchAppCtx.timerSteering){
+				TL_ZB_TIMER_CANCEL(&g_switchAppCtx.timerSteering);
+			}
+
+			if(switchRejoinBackoffTimerEvt){
+				TL_ZB_TIMER_CANCEL(&switchRejoinBackoffTimerEvt);
+			}
+			if(!g_zbNwkCtx.joined){
+				zb_rejoinReq(zb_apsChannelMaskGet(), g_bdbAttrs.scanDuration);
+			}
 
 #ifdef ZCL_POLL_CTRL
 			sampleSwitch_zclCheckInStart();
@@ -184,9 +206,6 @@ void zbdemo_bdbCommissioningCb(u8 status, void *arg){
 				g_switchAppCtx.bdbFBTimerEvt = TL_ZB_TIMER_SCHEDULE(sampleSwitch_bdbFindAndBindStart, NULL, 50);
 			}
 #endif
-			if(switchRejoinBackoffTimerEvt){
-				TL_ZB_TIMER_CANCEL(&switchRejoinBackoffTimerEvt);
-			}
 			break;
 		case BDB_COMMISSION_STA_IN_PROGRESS:
 			break;
@@ -200,7 +219,11 @@ void zbdemo_bdbCommissioningCb(u8 status, void *arg){
 				do{
 					jitter = zb_random() % 0x0fff;
 				}while(jitter == 0);
-				TL_ZB_TIMER_SCHEDULE(sampleSwitch_bdbNetworkSteerStart, NULL, jitter);
+
+				if(g_switchAppCtx.timerSteering){
+					TL_ZB_TIMER_CANCEL(&g_switchAppCtx.timerSteering);
+				}
+				g_switchAppCtx.timerSteering = TL_ZB_TIMER_SCHEDULE(sampleSwitch_bdbNetworkSteerStart, NULL, jitter);
 			}
 			break;
 		case BDB_COMMISSION_STA_FORMATION_FAILURE:
@@ -265,8 +288,10 @@ void zbdemo_bdbFindBindSuccessCb(findBindDst_t *pDstInfo){
 void sampleSwitch_otaProcessMsgHandler(u8 evt, u8 status)
 {
 	//printf("sampleSwitch_otaProcessMsgHandler: status = %x\n", status);
+	ota_processing = FALSE;
 	if(evt == OTA_EVT_START){
 		if(status == ZCL_STA_SUCCESS){
+			ota_processing = TRUE;
 			zb_setPollRate(QUEUE_POLL_RATE);
 		}else{
 
@@ -279,6 +304,8 @@ void sampleSwitch_otaProcessMsgHandler(u8 evt, u8 status)
 		}else{
 			ota_queryStart(OTA_PERIODIC_QUERY_INTERVAL);
 		}
+	}else if(evt == OTA_EVT_IMAGE_DONE){
+		zb_setPollRate(POLL_RATE * 3);
 	}
 }
 #endif
@@ -296,6 +323,10 @@ void sampleSwitch_leaveCnfHandler(nlme_leave_cnf_t *pLeaveCnf)
 {
     if(pLeaveCnf->status == SUCCESS){
     	//SYSTEM_RESET();
+
+		if(switchRejoinBackoffTimerEvt){
+			TL_ZB_TIMER_CANCEL(&switchRejoinBackoffTimerEvt);
+		}
     }
 }
 

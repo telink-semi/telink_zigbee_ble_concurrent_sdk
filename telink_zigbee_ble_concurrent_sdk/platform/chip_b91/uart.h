@@ -286,7 +286,7 @@ void uart_cal_div_and_bwpc(unsigned int baudrate, unsigned int sysclk, unsigned 
  * @param[in]	mul	     - mul.
  * @return 		none
  */
-void uart_set_dma_rx_timeout(uart_num_e uart_num,unsigned char bwpc, unsigned char bit_cnt, uart_timeout_mul_e mul);
+void uart_set_rx_timeout(uart_num_e uart_num,unsigned char bwpc, unsigned char bit_cnt, uart_timeout_mul_e mul);
 
 /**
  * @brief     This function serves to config the number level setting the irq bit of status register.

@@ -1,7 +1,7 @@
 /********************************************************************************************************
  * @file    concurrent_main.c
  *
- * @brief   This is the source file for concurrent_main.c
+ * @brief   This is the source file for concurrent_main
  *
  * @author  Zigbee Group
  * @date    2021
@@ -32,9 +32,6 @@ extern void user_zb_init(bool isRetention);
 extern void user_ble_init(void);
 
 int main(void){
-#if VOLTAGE_DETECT_ENABLE
-	u32 tick = 0;
-#endif
 	startup_state_e state = drv_platform_init();
 	u8 isRetention = (state == SYSTEM_DEEP_RETENTION) ? 1 : 0;
 

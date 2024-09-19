@@ -2,7 +2,7 @@
 <?fileVersion 4.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
 	<storageModule moduleId="org.eclipse.cdt.core.settings">
 		<cconfiguration id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520">
-			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520" moduleId="org.eclipse.cdt.core.settings" name="sampleGW_b91">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520" moduleId="org.eclipse.cdt.core.settings" name="comcurrent_sampleGW_b91">
 				<externalSettings>
 					<externalSetting>
 						<entry flags="BUILTIN|RESOLVED" kind="macro" name="__ATOMIC_ACQ_REL" value="4"/>
@@ -18,7 +18,7 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactExtension="elf" artifactName="${ConfigName}" buildArtefactType="nds.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=nds.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" description="Coordinator-b91" id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520" name="sampleGW_b91" parent="config.nds32le-elf-mculib-v5f.exe.debug" postbuildStep="&quot;../../../tools/tl_check_fw.sh&quot; ${ConfigName} riscv" prebuildStep="&quot;../../../tools/tl_link_load.sh&quot; &quot;../../../platform/boot/b91/boot_b91.link&quot; &quot;${workspace_loc:/${ProjName}}/boot.link&quot;">
+				<configuration artifactExtension="elf" artifactName="${ConfigName}" buildArtefactType="nds.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=nds.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" description="Coordinator-b91" id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520" name="comcurrent_sampleGW_b91" parent="config.nds32le-elf-mculib-v5f.exe.debug" postbuildStep="&quot;../../../tools/tl_check_fw.sh&quot; ${ConfigName} riscv" prebuildStep="&quot;../../../tools/tl_link_load.sh&quot; &quot;../../../platform/boot/b91/boot_b91.link&quot; &quot;${workspace_loc:/${ProjName}}/boot.link&quot;">
 					<folderInfo id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520." name="/" resourcePath="">
 						<toolChain id="nds.nds32le-elf-mculib-v5f.exe.debug.619005439" name="nds32le-elf-mculib-v5f" superClass="nds.nds32le-elf-mculib-v5f.exe.debug">
 							<option id="nds32le-elf-mculib-v5f.managedbuild.option.toolchain.RSE_CONNECT.468329742" name="RSE_CONNECT" superClass="nds32le-elf-mculib-v5f.managedbuild.option.toolchain.RSE_CONNECT" value="ICE" valueType="string"/>
@@ -84,8 +84,8 @@
 									<listOptionValue builtIn="false" value="drivers_b91"/>
 								</option>
 								<option id="nds.c.link.option.paths.1204703390" name="Library search path (-L)" superClass="nds.c.link.option.paths" valueType="libPaths">
-									<listOptionValue builtIn="false" value="../../../stack/zigbee/lib/riscv"/>
 									<listOptionValue builtIn="false" value="../../../stack/ble/lib"/>
+									<listOptionValue builtIn="false" value="../../../stack/zigbee/lib/riscv_gcc7_b91"/>
 									<listOptionValue builtIn="false" value="../../../platform/lib"/>
 								</option>
 								<inputType id="tool.nds.c.linker.input.1056792558" superClass="tool.nds.c.linker.input">
@@ -115,14 +115,14 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="apps/sampleGW/sampleGwBLESlave_8258.c|apps/common/main.c|apps/bootLoader|apps/sampleContactSensor|apps/sampleSwitch|apps/sampleLight" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="stack/ble/ble_multi|apps/sampleGW/sampleGatewayMultiBLE.c|apps/sampleGW/sampleGwBLESlave_8258.c|apps/common/main.c|apps/bootLoader|apps/sampleContactSensor|apps/sampleSwitch|apps/sampleLight" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
 		</cconfiguration>
 		<cconfiguration id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520.2070989666">
-			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520.2070989666" moduleId="org.eclipse.cdt.core.settings" name="sampleLight_b91">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520.2070989666" moduleId="org.eclipse.cdt.core.settings" name="concurrent_sampleLight_b91">
 				<externalSettings>
 					<externalSetting>
 						<entry flags="BUILTIN|RESOLVED" kind="macro" name="__ATOMIC_ACQ_REL" value="4"/>
@@ -138,7 +138,7 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactExtension="elf" artifactName="${ConfigName}" buildArtefactType="nds.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=nds.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" description="Router-b91" id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520.2070989666" name="sampleLight_b91" parent="config.nds32le-elf-mculib-v5f.exe.debug" postbuildStep="&quot;../../../tools/tl_check_fw.sh&quot; ${ConfigName} riscv" prebuildStep="&quot;../../../tools/tl_link_load.sh&quot; &quot;../../../platform/boot/b91/boot_b91.link&quot; &quot;${workspace_loc:/${ProjName}}/boot.link&quot;">
+				<configuration artifactExtension="elf" artifactName="${ConfigName}" buildArtefactType="nds.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=nds.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" description="Router-b91" id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520.2070989666" name="concurrent_sampleLight_b91" parent="config.nds32le-elf-mculib-v5f.exe.debug" postbuildStep="&quot;../../../tools/tl_check_fw.sh&quot; ${ConfigName} riscv" prebuildStep="&quot;../../../tools/tl_link_load.sh&quot; &quot;../../../platform/boot/b91/boot_b91.link&quot; &quot;${workspace_loc:/${ProjName}}/boot.link&quot;">
 					<folderInfo id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520.2070989666." name="/" resourcePath="">
 						<toolChain id="nds.nds32le-elf-mculib-v5f.exe.debug.1963758122" name="nds32le-elf-mculib-v5f" superClass="nds.nds32le-elf-mculib-v5f.exe.debug">
 							<option id="nds32le-elf-mculib-v5f.managedbuild.option.toolchain.RSE_CONNECT.168895470" name="RSE_CONNECT" superClass="nds32le-elf-mculib-v5f.managedbuild.option.toolchain.RSE_CONNECT" value="ICE" valueType="string"/>
@@ -204,8 +204,8 @@
 									<listOptionValue builtIn="false" value="drivers_b91"/>
 								</option>
 								<option id="nds.c.link.option.paths.32872337" name="Library search path (-L)" superClass="nds.c.link.option.paths" valueType="libPaths">
-									<listOptionValue builtIn="false" value="../../../stack/zigbee/lib/riscv"/>
 									<listOptionValue builtIn="false" value="../../../stack/ble/lib"/>
+									<listOptionValue builtIn="false" value="../../../stack/zigbee/lib/riscv_gcc7_b91"/>
 									<listOptionValue builtIn="false" value="../../../platform/lib"/>
 								</option>
 								<inputType id="tool.nds.c.linker.input.1408934581" superClass="tool.nds.c.linker.input">
@@ -258,14 +258,14 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="apps/sampleLight/sampleLightBLESlave_8258.c|apps/sampleLight/sampleLightBLEMaster_8258.c|apps/common/main.c|apps/bootLoader|apps/sampleContactSensor|apps/sampleSwitch|apps/sampleGW" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="stack/ble/ble_multi|apps/sampleLight/sampleLightMultiBLE.c|apps/sampleLight/sampleLightBLESlave_8258.c|apps/sampleLight/sampleLightBLEMaster_8258.c|apps/common/main.c|apps/bootLoader|apps/sampleContactSensor|apps/sampleSwitch|apps/sampleGW" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
 		</cconfiguration>
 		<cconfiguration id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520.2070989666.1686655720">
-			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520.2070989666.1686655720" moduleId="org.eclipse.cdt.core.settings" name="sampleSwitch_b91">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520.2070989666.1686655720" moduleId="org.eclipse.cdt.core.settings" name="concurrent_sampleSwitch_b91">
 				<externalSettings>
 					<externalSetting>
 						<entry flags="BUILTIN|RESOLVED" kind="macro" name="__ATOMIC_ACQ_REL" value="4"/>
@@ -281,7 +281,7 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactExtension="elf" artifactName="${ConfigName}" buildArtefactType="nds.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=nds.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" description="EndDevice-b91" id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520.2070989666.1686655720" name="sampleSwitch_b91" parent="config.nds32le-elf-mculib-v5f.exe.debug" postbuildStep="&quot;../../../tools/tl_check_fw.sh&quot; ${ConfigName} riscv" prebuildStep="&quot;../../../tools/tl_link_load.sh&quot; &quot;../../../platform/boot/b91/boot_b91.link&quot; &quot;${workspace_loc:/${ProjName}}/boot.link&quot;">
+				<configuration artifactExtension="elf" artifactName="${ConfigName}" buildArtefactType="nds.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=nds.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" description="EndDevice-b91" id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520.2070989666.1686655720" name="concurrent_sampleSwitch_b91" parent="config.nds32le-elf-mculib-v5f.exe.debug" postbuildStep="&quot;../../../tools/tl_check_fw.sh&quot; ${ConfigName} riscv" prebuildStep="&quot;../../../tools/tl_link_load.sh&quot; &quot;../../../platform/boot/b91/boot_b91.link&quot; &quot;${workspace_loc:/${ProjName}}/boot.link&quot;">
 					<folderInfo id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520.2070989666.1686655720." name="/" resourcePath="">
 						<toolChain id="nds.nds32le-elf-mculib-v5f.exe.debug.1914761163" name="nds32le-elf-mculib-v5f" superClass="nds.nds32le-elf-mculib-v5f.exe.debug">
 							<option id="nds32le-elf-mculib-v5f.managedbuild.option.toolchain.RSE_CONNECT.110314990" name="RSE_CONNECT" superClass="nds32le-elf-mculib-v5f.managedbuild.option.toolchain.RSE_CONNECT" value="ICE" valueType="string"/>
@@ -346,8 +346,8 @@
 									<listOptionValue builtIn="false" value="drivers_b91"/>
 								</option>
 								<option id="nds.c.link.option.paths.1472546405" name="Library search path (-L)" superClass="nds.c.link.option.paths" valueType="libPaths">
-									<listOptionValue builtIn="false" value="../../../stack/zigbee/lib/riscv"/>
 									<listOptionValue builtIn="false" value="../../../stack/ble/lib"/>
+									<listOptionValue builtIn="false" value="../../../stack/zigbee/lib/riscv_gcc7_b91"/>
 									<listOptionValue builtIn="false" value="../../../platform/lib"/>
 								</option>
 								<inputType id="tool.nds.c.linker.input.1524319148" superClass="tool.nds.c.linker.input">
@@ -400,7 +400,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="apps/sampleSwitch/sampleSwitchBLESlave_8258.c|apps/common/main.c|apps/bootLoader|apps/sampleContactSensor|apps/sampleGW|apps/sampleLight" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="stack/ble/ble_multi|apps/sampleSwitch/sampleSwitchMultiBLE.c|apps/sampleSwitch/sampleSwitchBLESlave_8258.c|apps/common/main.c|apps/bootLoader|apps/sampleContactSensor|apps/sampleGW|apps/sampleLight" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -536,7 +536,7 @@
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
 		</cconfiguration>
 		<cconfiguration id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520.2070989666.862728624">
-			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520.2070989666.862728624" moduleId="org.eclipse.cdt.core.settings" name="sampleLight_bootload_b91">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520.2070989666.862728624" moduleId="org.eclipse.cdt.core.settings" name="concurrent_sampleLight_bootload_b91">
 				<externalSettings>
 					<externalSetting>
 						<entry flags="BUILTIN|RESOLVED" kind="macro" name="__ATOMIC_ACQ_REL" value="4"/>
@@ -552,7 +552,7 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactExtension="elf" artifactName="${ConfigName}" buildArtefactType="nds.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=nds.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" description="route-b91 bootload mode" id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520.2070989666.862728624" name="sampleLight_bootload_b91" parent="config.nds32le-elf-mculib-v5f.exe.debug" postbuildStep="&quot;../../../tools/tl_check_fw.sh&quot; ${ConfigName} riscv" prebuildStep="&quot;../../../tools/tl_link_load.sh&quot; &quot;../../../platform/boot/b91/boot_b91.link&quot; &quot;${workspace_loc:/${ProjName}}/boot.link&quot;">
+				<configuration artifactExtension="elf" artifactName="${ConfigName}" buildArtefactType="nds.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=nds.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" description="route-b91 bootload mode" id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520.2070989666.862728624" name="concurrent_sampleLight_bootload_b91" parent="config.nds32le-elf-mculib-v5f.exe.debug" postbuildStep="&quot;../../../tools/tl_check_fw.sh&quot; ${ConfigName} riscv" prebuildStep="&quot;../../../tools/tl_link_load.sh&quot; &quot;../../../platform/boot/b91/boot_b91.link&quot; &quot;${workspace_loc:/${ProjName}}/boot.link&quot;">
 					<folderInfo id="config.nds32le-elf-mculib-v5f.exe.debug.1574064407.897070520.2070989666.862728624." name="/" resourcePath="">
 						<toolChain id="nds.nds32le-elf-mculib-v5f.exe.debug.62935920" name="nds32le-elf-mculib-v5f" superClass="nds.nds32le-elf-mculib-v5f.exe.debug">
 							<option id="nds32le-elf-mculib-v5f.managedbuild.option.toolchain.RSE_CONNECT.680112451" name="RSE_CONNECT" superClass="nds32le-elf-mculib-v5f.managedbuild.option.toolchain.RSE_CONNECT" value="ICE" valueType="string"/>
@@ -618,8 +618,8 @@
 									<listOptionValue builtIn="false" value="drivers_b91"/>
 								</option>
 								<option id="nds.c.link.option.paths.1164542994" name="Library search path (-L)" superClass="nds.c.link.option.paths" valueType="libPaths">
-									<listOptionValue builtIn="false" value="../../../stack/zigbee/lib/riscv"/>
 									<listOptionValue builtIn="false" value="../../../stack/ble/lib"/>
+									<listOptionValue builtIn="false" value="../../../stack/zigbee/lib/riscv_gcc7_b91"/>
 									<listOptionValue builtIn="false" value="../../../platform/lib"/>
 								</option>
 								<inputType id="tool.nds.c.linker.input.886278113" superClass="tool.nds.c.linker.input">
@@ -672,7 +672,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="apps/sampleLight/sampleLightBLESlave_8258.c|apps/sampleLight/sampleLightBLEMaster_8258.c|apps/common/main.c|apps/bootLoader|apps/sampleContactSensor|apps/sampleSwitch|apps/sampleGW" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="stack/ble/ble_multi|apps/sampleLight/sampleLightMultiBLE.c|apps/sampleLight/sampleLightBLESlave_8258.c|apps/sampleLight/sampleLightBLEMaster_8258.c|apps/common/main.c|apps/bootLoader|apps/sampleContactSensor|apps/sampleSwitch|apps/sampleGW" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

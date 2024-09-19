@@ -21,7 +21,6 @@
  *          limitations under the License.
  *******************************************************************************************************/
 #include "../../proj/tl_common.h"
-///#include "drivers.h"
 #include <stack/ble/ble.h>
 
 /*
@@ -110,6 +109,9 @@ typedef struct{
 	/** Connection Timeout (0x000A - 0x0C80 * 10 ms) */
 	u16 timeout;
 } gap_periConnectParams_t;
+
+static u16 g_appBleInterval = CONN_INTERVAL_50MS;
+static u16 g_appBleLatency = 19;
 
 static int app_bleOtaWrite(void *p);
 static int app_bleOtaRead(void *p);
@@ -361,7 +363,7 @@ void task_connect (u8 e, u8 *p, int n){
 	 * lantency:	(n+1)*8*1.25 ms
 	 * timeout:     n*10 ms
 	 * */
-	bls_l2cap_requestConnParamUpdate (8, 8, 99, 400);
+	bls_l2cap_requestConnParamUpdate (g_appBleInterval, g_appBleInterval, g_appBleLatency, 400);  // 1 S
 	//bls_l2cap_requestConnParamUpdate (160, 160, 0, 400);  // 200 mS
 
 	latest_user_event_tick = clock_time();

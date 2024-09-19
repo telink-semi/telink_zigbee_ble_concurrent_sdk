@@ -182,6 +182,7 @@ ev_timer_event_t *ev_timer_add(ev_timer_callback_t func, void *arg, u32 timeout)
 
 	timerEvt->cb = func;
 	timerEvt->data = arg;
+	timerEvt->isBusy = 0;
 
 	ev_on_timer(timerEvt, timeout);
 
@@ -203,11 +204,14 @@ ev_timer_event_t *ev_timer_taskPost(ev_timer_callback_t func, void *arg, u32 t_m
 
 u8 ev_timer_taskCancel(ev_timer_event_t **evt)
 {
-	u8 ret = NO_TIMER_AVAIL;
 	ev_timer_event_t *timerEvt = *evt;
 
 	if(!timerEvt || !timerEvt->used){
-		return ret;
+		return NO_TIMER_AVAIL;
+	}
+
+	if(timerEvt->isBusy){
+		return TIMER_CANCEL_NOT_ALLOWED;
 	}
 
 	ev_unon_timer(timerEvt);
@@ -217,16 +221,24 @@ u8 ev_timer_taskCancel(ev_timer_event_t **evt)
 	return SUCCESS;
 }
 
+extern u32 prevSleepTick;
 void ev_timer_update(u32 updateTime)
 {
-	u32 updateTimeMs = 0;
-	u32 curSysTick = clock_time();
-
 	if(updateTime == 0){
 		return;
 	}
-
 	u32 r = drv_disable_irq();
+
+#if PM_ENABLE
+#if defined(MCU_CORE_826x) || defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
+	prevSleepTick = pm_get_32k_tick();
+#elif defined(MCU_CORE_B91) || defined(MCU_CORE_TL321X)
+	prevSleepTick = clock_get_32k_tick();
+#endif
+#endif
+
+	u32 updateTimeMs = 0;
+	u32 curSysTick = clock_time();
 
 	ev_timer_event_t *timerEvt = ev_timer.timer_head;
 
@@ -263,6 +275,9 @@ static bool ev_timer_executeCB(bool det)
 			if(det){
 				return 1;
 			}
+
+			timerEvt->isBusy = 1;
+
 			s32 t = timerEvt->cb(timerEvt->data);
 
 			if(t < 0){
@@ -273,6 +288,9 @@ static bool ev_timer_executeCB(bool det)
 				timerEvt->period = (u32)t;
 				timerEvt->timeout = timerEvt->period;
 			}
+
+			/* callback function execution ended */
+			timerEvt->isBusy = 0;
 
 			if(prev_head != ev_timer.timer_head){
 				timerEvt = ev_timer.timer_head;
@@ -311,8 +329,9 @@ bool ev_timer_process(bool det)
 		/* more than 1 ms. */
 		if(updateTime){
 			ev_timer_update(updateTime);
-			evtReady = ev_timer_executeCB(det);
 		}
+
+		evtReady = ev_timer_executeCB(det);
 	}
 
 	return evtReady;

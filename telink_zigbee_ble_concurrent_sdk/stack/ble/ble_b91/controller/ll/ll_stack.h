@@ -66,7 +66,7 @@
 
 	#define			LL_MASTER_TX_STL_2M				86
 	#define			LL_MASTER_TX_STL_CODED			119
-#elif(MCU_CORE_TYPE == MCU_CORE_9518)
+#elif(MCU_CORE_TYPE == MCU_CORE_B91)
 	#if RF_RX_SHORT_MODE_EN//open rx dly
 		//TX settle time
 		#define			LL_ADV_TX_SETTLE								84
@@ -134,7 +134,7 @@
 
 
 
-#if (MCU_CORE_TYPE == MCU_CORE_9518)
+#if (MCU_CORE_TYPE == MCU_CORE_B91)
 	#define			STOP_RF_STATE_MACHINE						( REG_ADDR8(0x80140a00) = 0x80 )
 #elif (MCU_CORE_TYPE == MCU_CORE_825x || MCU_CORE_TYPE == MCU_CORE_827x)
 	#define			STOP_RF_STATE_MACHINE						( REG_ADDR8(0xf00) = 0x80 )
@@ -152,7 +152,7 @@
 
 
 
-#if (MCU_CORE_TYPE == MCU_CORE_9518)
+#if (MCU_CORE_TYPE == MCU_CORE_B91)
 typedef	struct {
 	u16		size;
 	u8		rsvd;
@@ -195,7 +195,7 @@ typedef struct {
 	u8		adv_version;
 	u8		adv_hci_cmd;
 
-#if (MCU_CORE_TYPE == MCU_CORE_9518)
+#if (MCU_CORE_TYPE == MCU_CORE_B91)
   	u8		ll_aclRxFifo_set;
   	u8		ll_aclTxFifo_set;
   	u8		acl_master_en;
@@ -221,7 +221,7 @@ typedef struct {
 	u8		peer_chSel;
 	u8		u8_rsvd;
 
-#if (MCU_CORE_TYPE == MCU_CORE_9518)
+#if (MCU_CORE_TYPE == MCU_CORE_B91)
   	u8		maxRxOct;
   	u8		maxTxOct;
   	u8		u_rsvd[2];
@@ -273,7 +273,7 @@ extern _attribute_aligned_(4) bb_sts_t	blt_bb;
 typedef ble_sts_t (*ll_SetExtAdv_Enable_callback_t)(int en);
 extern ll_SetExtAdv_Enable_callback_t pFunc_ll_SetAdv_Enable;
 
-#if (MCU_CORE_TYPE == MCU_CORE_9518)
+#if (MCU_CORE_TYPE == MCU_CORE_B91)
 extern u8   adv_rx_buff[];
 #endif
 extern u32	blc_tlkEvent_pending;
@@ -320,7 +320,7 @@ void 		blc_ll_registerConnectionTerminateHandler(ll_conn_terminate_handler_t  ha
 /////////////////////// SN/NESN /////////////////////////////////////////////////////
 static inline void	blt_save_snnesn()
 {
-#if (MCU_CORE_TYPE == MCU_CORE_9518)
+#if (MCU_CORE_TYPE == MCU_CORE_B91)
 								// SN									NESN
 	blt_bb.sn_nesn = ((REG_ADDR8(0x80140a22) & BIT(0)) << 4) | ((REG_ADDR8(0x80140a23) & BIT(4)) << 1);
 #elif (MCU_CORE_TYPE == MCU_CORE_825x || MCU_CORE_TYPE == MCU_CORE_827x)
@@ -338,7 +338,7 @@ static inline void	blt_restore_snnesn()
 /////////////////////// DMA Tx fifo rptr /////////////////////////////////////////////
 static inline void	blt_save_dma_tx_rptr()
 {
-#if (MCU_CORE_TYPE == MCU_CORE_9518)
+#if (MCU_CORE_TYPE == MCU_CORE_B91)
 	//TX Fifo: 0x100501[0:4] means rptr, 0 ~ 31
 	blt_bb.blt_dma_tx_rptr = reg_dma_tx_rptr & FLD_DMA_RPTR_MASK;  //
 #elif (MCU_CORE_TYPE == MCU_CORE_825x || MCU_CORE_TYPE == MCU_CORE_827x)
@@ -349,7 +349,7 @@ static inline void	blt_save_dma_tx_rptr()
 
 static inline void	blt_restore_dma_tx_rptr()
 {
-#if (MCU_CORE_TYPE == MCU_CORE_9518)
+#if (MCU_CORE_TYPE == MCU_CORE_B91)
 	//pay attention: FLD_DMA_RPTR_SET
 	reg_dma_tx_rptr = (FLD_DMA_RPTR_SET | blt_bb.blt_dma_tx_rptr);//restore tx_rptr
 #elif (MCU_CORE_TYPE == MCU_CORE_825x || MCU_CORE_TYPE == MCU_CORE_827x)
@@ -358,7 +358,7 @@ static inline void	blt_restore_dma_tx_rptr()
 #endif
 }
 
-#if (MCU_CORE_TYPE == MCU_CORE_9518)
+#if (MCU_CORE_TYPE == MCU_CORE_B91)
 
 static inline void	blt_save_dma_tx_wptr()
 {
@@ -382,7 +382,7 @@ static inline void	blt_restore_dma_tx_ptr()
 	reg_dma_tx_rptr = (FLD_DMA_RPTR_SET | blt_bb.blt_dma_tx_rptr);//restore tx_rptr
 	reg_dma_tx_wptr = blt_bb.blt_dma_tx_wptr & FLD_DMA_RPTR_MASK; //restore tx_wptr
 }
-#endif ///ending of "#if (MCU_CORE_TYPE == MCU_CORE_9518)"
+#endif ///ending of "#if (MCU_CORE_TYPE == MCU_CORE_B91)"
 
 
 
@@ -405,7 +405,7 @@ void 			blc_ll_registerRpaTmoMainloopCallback (ll_rpa_tmo_mainloop_callback_t cb
 void 			blc_ll_registerHostMainloopCallback (ll_host_mainloop_callback_t cb);
 void 			blc_ll_registerConnectionEncryptionDoneCallback(ll_enc_done_callback_t  cb);
 
-#if (MCU_CORE_TYPE == MCU_CORE_9518)
+#if (MCU_CORE_TYPE == MCU_CORE_B91)
 u8  			blt_ll_getRealTxFifoNumber (void);
 #endif
 
@@ -459,7 +459,7 @@ static inline int  blc_ll_isEncryptionBusy(void)
 
 static inline void blt_ll_set_ble_access_code_adv(void)
 {
-#if (MCU_CORE_TYPE == MCU_CORE_9518)
+#if (MCU_CORE_TYPE == MCU_CORE_B91)
 	write_reg32 (0x80140808, bltParam.custom_access_code ? bltParam.custom_access_code : 0xd6be898e);
 #elif (MCU_CORE_TYPE == MCU_CORE_825x || MCU_CORE_TYPE == MCU_CORE_827x)
 	write_reg32 (0x800408, bltParam.custom_access_code ? bltParam.custom_access_code : 0xd6be898e);
@@ -791,7 +791,7 @@ extern _attribute_aligned_(4) st_ll_pm_t  bltPm;
 
 
 
-#if (MCU_CORE_TYPE == MCU_CORE_9518)
+#if (MCU_CORE_TYPE == MCU_CORE_B91)
 	#define 	IRK_REVERT_TO_SAVE_AES_TMIE_ENABLE				0
 #else
 	#define 	IRK_REVERT_TO_SAVE_AES_TMIE_ENABLE				1

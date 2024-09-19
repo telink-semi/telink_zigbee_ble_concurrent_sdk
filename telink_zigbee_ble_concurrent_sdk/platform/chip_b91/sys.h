@@ -36,7 +36,7 @@
 #define SYS_H_
 #include "bit.h"
 #include "reg_include/stimer_reg.h"
-
+#include "compiler.h"
 
 /**********************************************************************************************************************
  *                                         global constants                                                           *
@@ -118,12 +118,25 @@
  *********************************************************************************************************************/
 
 /**
+ * @brief:	External 24M crystal using internal or external capacitors
+ * @note:	If the software configuration and hardware board does not match,
+ *          it may lead to the following problems:
+ *          crystal clock frequency is not allowed,  slow crystal vibration caused by the chip reset, etc.
+ */
+typedef enum{
+	INTERNAL_CAP_XTAL24M = 0, /**<    Use the chip's internal crystal capacitors,
+	                             <p>  hardware boards can not have 24M crystal matching capacitors */
+	EXTERNAL_CAP_XTAL24M = 1, /**<    Use an external crystal capacitor,
+	                             <p>  the hardware board needs to have a matching capacitor for the 24M crystal,
+	                             <p>  the program will turn off the chip's internal capacitor */
+}cap_typedef_e;
+
+/**
  * @brief 	Power type for different application
  */
 typedef enum{
 	LDO_1P4_LDO_1P8 	= 0x00,	/**< 1.4V-LDO & 1.8V-LDO mode */
 	DCDC_1P4_LDO_1P8	= 0x01,	/**< 1.4V-DCDC & 1.8V-LDO mode */
-	DCDC_1P4_DCDC_1P8	= 0x03,	/**< 1.4V-DCDC & 1.8V-DCDC mode */
 }power_mode_e;
 
 /**
@@ -161,17 +174,15 @@ extern unsigned int g_chip_version;
  * @brief      This function reboot mcu.
  * @return     none
  */
-static inline void sys_reboot(void)
-{
-	write_reg8(0x1401ef, 0x20);
-}
+_attribute_text_sec_ void sys_reboot(void);
+
 /**
  * @brief   	This function serves to initialize system.
  * @param[in]	power_mode - power mode(LDO/DCDC/LDO_DCDC)
  * @param[in]	vbat_v		- vbat voltage type: 0 vbat may be greater than 3.6V,  1 vbat must be below 3.6V.
  * @return  	none
  */
-void sys_init(power_mode_e power_mode, vbat_type_e vbat_v);
+void sys_init(power_mode_e power_mode, vbat_type_e vbat_v, cap_typedef_e cap);
 
 /**
  * @brief      This function performs a series of operations of writing digital or analog registers
@@ -191,5 +202,12 @@ int write_reg_table(const tbl_cmd_set_t * pt, int size);
  * @return    1 means there is a calibration value in efuse, and 0 means there is no calibration value in efuse.
  */
 unsigned char efuse_get_adc_calib_value(unsigned short* gain, signed char* offset);
+
+/**
+ * @brief     this function servers to manual set crystal.
+ * @return    none.
+ * @note	  This function can only used when cclk is 24M RC cause the function execution process will power down the 24M crystal.
+ */
+_attribute_ram_code_sec_optimize_o2_ void crystal_manual_settle(void);
 
 #endif

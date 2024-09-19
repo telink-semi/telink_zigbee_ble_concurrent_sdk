@@ -22,7 +22,6 @@
  *******************************************************************************************************/
 
 #include "../../proj/tl_common.h"
-///#include "drivers.h"
 #include <stack/ble/ble.h>
 #include "tl_common.h"
 #include "zb_api.h"

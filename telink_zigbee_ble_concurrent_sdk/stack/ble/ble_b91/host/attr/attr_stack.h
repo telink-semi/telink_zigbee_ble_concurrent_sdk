@@ -72,7 +72,7 @@ u8 			blc_gatt_requestServiceAccess(u16 connHandle, int gatt_perm);
 
 
 
-#if (MCU_CORE_TYPE == MCU_CORE_9518)
+#if (MCU_CORE_TYPE == MCU_CORE_B91)
 int			blt_att_sendMtuRequest (u16 connHandle);
 #endif
 

@@ -25,6 +25,10 @@
 
 #pragma once
 
+#if defined(MCU_CORE_B91) || defined(MCU_CORE_TL321X)
+#include <stdbool.h>
+#endif
+
 #if 0
 typedef signed char int8_t;
 typedef unsigned char uint8_t;
@@ -43,7 +47,7 @@ typedef signed char s8;
 
 typedef unsigned short u16;
 typedef signed short s16;
-
+//typedef int 		s32;
 typedef unsigned int u32;
 typedef signed int s32;
 
@@ -55,6 +59,14 @@ typedef void (*fn_ptr)(u8*);
 
 typedef u32  u24;
 typedef s32	 s24;
+
+typedef unsigned char 		uint8_t;
+typedef unsigned short 		uint16_t;
+
+typedef unsigned char		 uint08;
+typedef unsigned short		 uint16;
+typedef unsigned int		 uint32;
+typedef unsigned long long	 uint64;
 
 // Generic Status return
 typedef u8 status_t;
@@ -165,9 +177,9 @@ typedef struct {
 
 // There is no way to directly recognise whether a typedef is defined
 // http://stackoverflow.com/questions/3517174/how-to-check-if-a-datatype-is-defined-with-typedef
-#ifdef __GNUC__
-typedef	u16	wchar_t;		
-#endif
+//#ifdef __GNUC__
+//typedef	u16	wchar_t;
+//#endif
 
 #ifndef WIN32
 typedef u32 size_t;
@@ -195,6 +207,7 @@ typedef u32 size_t;
 #define NV_OPER_FAILED            0x0A
 #define INVALID_MEM_SIZE          0x0B
 #define NV_BAD_ITEM_LEN           0x0C
+#define TIMER_CANCEL_NOT_ALLOWED  0x0D
 
 
 #define ADDR_MODE_NONE				0        //!< Address not present

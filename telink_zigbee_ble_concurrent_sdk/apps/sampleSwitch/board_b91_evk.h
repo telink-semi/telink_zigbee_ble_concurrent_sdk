@@ -83,13 +83,15 @@ extern "C" {
 
 #define	PM_WAKEUP_LEVEL		  		PM_WAKEUP_LEVEL_HIGH
 
+#define VOLTAGE_DETECT_PIN			ADC_GPIO_PB0
+
 // UART
 #if ZBHCI_UART
 	#error please configurate uart PIN!!!!!!
 #endif
 
 // DEBUG
-#if UART_PRINTF_MODE
+#if (TLKAPI_DEBUG_ENABLE)
 	#define	DEBUG_INFO_TX_PIN	    GPIO_PC7//print
 #endif
 

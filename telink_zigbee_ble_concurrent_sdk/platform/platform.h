@@ -7,6 +7,7 @@
  * @date    2021
  *
  * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *          All rights reserved.
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -19,6 +20,7 @@
  *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
+ *
  *******************************************************************************************************/
 
 #pragma once
@@ -37,5 +39,9 @@
 #include "chip_b91/driver_b91.h"
 #include "chip_b91/gpio_default.h"
 #include "chip_b91/ext_driver/driver_ext.h"
+#elif defined (MCU_CORE_TL321X)
+#include "chip_tl321x/driver.h"
+#include "chip_tl321x/gpio_default.h"
+#include "chip_tl321x/ext_driver/driver_ext.h"
 #endif
 

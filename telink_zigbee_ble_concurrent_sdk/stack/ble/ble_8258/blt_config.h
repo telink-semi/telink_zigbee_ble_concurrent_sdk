@@ -149,7 +149,7 @@ static inline void blc_app_loadCustomizedParameters(void)
 
 //conn param update/map update
 #ifndef	BLS_PROC_MASTER_UPDATE_REQ_IN_IRQ_ENABLE
-#define BLS_PROC_MASTER_UPDATE_REQ_IN_IRQ_ENABLE			0
+#define BLS_PROC_MASTER_UPDATE_REQ_IN_IRQ_ENABLE			1
 #endif
 
 

@@ -161,7 +161,7 @@ ble_sts_t blc_hci_le_setPhy(hci_le_setPhyCmd_param_t* para);
 
 
 /******************************* phy_test start *************************************************************************/
-#if (MCU_CORE_TYPE == MCU_CORE_9518)
+#if (MCU_CORE_TYPE == MCU_CORE_B91)
 	int 	  blt_phyTest_main_loop(void);
 	int 	  blt_phytest_cmd_handler (u8 *p, int n);
 

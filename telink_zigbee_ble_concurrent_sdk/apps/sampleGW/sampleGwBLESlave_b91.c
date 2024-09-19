@@ -22,7 +22,6 @@
  *******************************************************************************************************/
 
 #include "tl_common.h"
-///#include "drivers.h"
 #include "ble.h"
 #include "tl_common.h"
 #include "zb_api.h"
@@ -214,7 +213,8 @@ static const u16 userdesc_UUID		= GATT_UUID_CHAR_USER_DESC;
 u32	 	my_OtaData 		= 0x00;
 const u8  my_OtaName[] = {'O', 'T', 'A'};
 
-
+static u16 g_appBleInterval = CONN_INTERVAL_50MS;
+static u16 g_appBleLatency = 19;
 
 // TM : to modify
 const attribute_t my_Attributes[] = {
@@ -320,12 +320,8 @@ void app_switch_to_indirect_adv(u8 e, u8 *p, int n){
  * @return     none
  */
 void	task_connect (u8 e, u8 *p, int n){
-//	bls_l2cap_requestConnParamUpdate (8, 8, 19, 200);  // 200mS
-	bls_l2cap_requestConnParamUpdate (8, 8, 99, 400);  // 1 S
-//	bls_l2cap_requestConnParamUpdate (8, 8, 149, 600);  // 1.5 S
-//	bls_l2cap_requestConnParamUpdate (8, 8, 199, 800);  // 2 S
-//	bls_l2cap_requestConnParamUpdate (8, 8, 249, 800);  // 2.5 S
-//	bls_l2cap_requestConnParamUpdate (8, 8, 299, 800);  // 3 S
+//	bls_l2cap_requestConnParamUpdate (8, 8, 99, 400);  // 1 S
+	bls_l2cap_requestConnParamUpdate (g_appBleInterval, g_appBleInterval, g_appBleLatency, 400);  // 1 S
 
 	latest_user_event_tick = clock_time();
 

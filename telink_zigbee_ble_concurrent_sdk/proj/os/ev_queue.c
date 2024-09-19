@@ -56,7 +56,7 @@ ev_queue_sts_t ev_queue_rawPush( ev_queue_t* q, queue_item_t* newElement )
         newElement->next = NULL;
         q->curNum++;
         drv_restore_irq(r);
-        return (ev_queue_sts_t)SUCCESS;
+        return QUEUE_SUCC;
     }
     /* find a place for insertion */
     previous = NULL;
@@ -90,7 +90,7 @@ ev_queue_sts_t ev_queue_rawPush( ev_queue_t* q, queue_item_t* newElement )
     q->curNum++;
 
     drv_restore_irq(r);
-    return (ev_queue_sts_t)SUCCESS;
+    return QUEUE_SUCC;
 }
 
 /*********************************************************************
@@ -158,7 +158,7 @@ ev_queue_sts_t ev_queue_rawDelete(ev_queue_t* q, queue_item_t* delElement)
         }
         q->curNum--;
         drv_restore_irq(r);
-        return (ev_queue_sts_t)SUCCESS;
+        return QUEUE_SUCC;
     }
 
     /* find the to be delete node */
@@ -186,7 +186,7 @@ ev_queue_sts_t ev_queue_rawDelete(ev_queue_t* q, queue_item_t* delElement)
     }
 
     drv_restore_irq(r);
-    return (ev_queue_sts_t)SUCCESS;
+    return QUEUE_SUCC;
 }
 
 
@@ -210,7 +210,7 @@ ev_queue_sts_t ev_queue_init( ev_queue_t *q, ev_priFunc_t priFunc)
 
     memset((u8*)q, 0 , sizeof(ev_queue_t));
     q->priFunc = priFunc;
-    return (ev_queue_sts_t)SUCCESS;
+    return QUEUE_SUCC;
 }
 
 
@@ -289,7 +289,109 @@ ev_queue_sts_t ev_queue_freeQ( ev_queue_t *q )
         ev_buf_free(buffer_ptr);
     }
 
-    return (ev_queue_sts_t)SUCCESS;
+    return (ev_queue_sts_t)QUEUE_SUCC;
 }
+
+/*********************************************************************
+  * @fn          queue_insert
+  * @brief       Insert an element into the specified queue, usually
+  *              used when iterating over elements in a Queue
+  * @param[in]   pQueue - The queue that a new element need to push to
+  * @param[in]   pItem  - The new element to be inserted
+  * @param[in]   pPrev  - The element in the queue before the new element to be inserted.
+  * 					  Note: if the pPrev is NULL, the pItem is the 1st element in queue.
+  * @return      Status
+  */
+//_attribute_ram_code_
+ev_queue_sts_t		ev_queue_insert(ev_queue_t *pQueue, void *item, void *prev)
+{
+	queue_item_t *pItem = (queue_item_t*) item;
+	queue_item_t *pPrev = (queue_item_t*) prev;
+	#if (1) //Can be optimized
+		if(pQueue == NULL || pItem == NULL) {
+			return QUEUE_INVALID_PARAMETER;
+		}
+	#else
+		assert(pQueue != NULL);
+		assert(pItem != NULL);
+	#endif
+
+	u32 r = irq_disable();
+
+	/* if the queue was empty or pPrev was at tail */
+	if(pQueue->head == NULL || pPrev == pQueue->tail) {
+		ev_queue_rawPush(pQueue, pItem);
+		/* in the API: queue_enq, pQueue->curNum has already ++. */
+	}
+	/* if pPrev was empty, inserting pItem at head */
+	else if (pPrev == NULL){
+		/* inserting element to head of the queue */
+		pItem->next = pQueue->head;
+		/* if the queue was empty, inserting new element at tail */
+		if (pQueue->head == NULL){
+			pQueue->tail = pItem;
+		}
+		/* update queue head */
+		pQueue->head = pItem;
+		pQueue->curNum++;
+	}
+	/* inserting new element in middle of the queue */
+	else{
+		pItem->next = pPrev->next;
+		pPrev->next = pItem;
+		pQueue->curNum++;
+	}
+
+	irq_restore(r);
+	return QUEUE_SUCC;
+}
+
+/*********************************************************************
+  * @fn          queue_insert
+  * @brief       Remove an element from the specified queue, usually
+  *              used when iterating over elements in a Queue
+  * @param[in]   pQueue - The queue that a target element need to be removed
+  * @param[in]   pItem  - The target element to be removed
+  * @param[in]   pPrev  - The element in the queue before the target element
+  *                       to be removed. Note: if the pPrev is NULL, which
+  *                       means the pItem is the 1st element in queue
+  * @return      Status
+  */
+//_attribute_ram_code_
+ev_queue_sts_t		queue_remove(ev_queue_t *pQueue, void *item, void *prev)
+{
+	queue_item_t *pItem = (queue_item_t*) item;
+	queue_item_t *pPrev = (queue_item_t*) prev;
+	#if (1) //Can be optimized
+		if(pQueue == NULL || pQueue->head == NULL || pItem == NULL) {
+			return QUEUE_INVALID_PARAMETER;
+		}
+	#else
+		assert(pQueue != NULL);
+		assert(pQueue->head != NULL);
+		assert(pItem != NULL);
+	#endif
+
+	u32 r = irq_disable();
+
+	/* if the 1st element, remove from head of queue*/
+	if(pQueue->head == pItem) {
+		pQueue->head = pItem->next;
+	}
+	/* removing the element in middle of the queue */
+	else if (pPrev != NULL){
+		pPrev->next = pItem->next;
+	}
+	/* if the removing element is last element */
+	if(pQueue->tail == pItem){
+		/* update queue tail */
+		pQueue->tail  = pPrev;
+	}
+
+	pQueue->curNum--;
+	irq_restore(r);
+	return QUEUE_SUCC;
+}
+
 
 

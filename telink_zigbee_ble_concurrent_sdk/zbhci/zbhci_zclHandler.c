@@ -45,16 +45,16 @@ const zbhciTxMode_e zbhciConvertSet[] = {
 
 
 void zbhciTxClusterCmdAddrResolve(epInfo_t *dstEpInfo, u8 *srcEp, u8 **payload){
-	memset((u8 *)dstEpInfo,0,sizeof(*dstEpInfo));
+	memset((u8 *)dstEpInfo, 0, sizeof(*dstEpInfo));
 
-	zbhciTxMode_e apsTxMode = **payload;
+	zbhciTxMode_e apsTxMode = (zbhciTxMode_e)(**payload);
 	(*payload)++;
 
 	if((apsTxMode < ZBHCI_ADDRMODE_BRC) && (apsTxMode != ZBHCI_ADDRMODE_GROUP)){
 		dstEpInfo->txOptions |= APS_TX_OPT_ACK_TX;
 	}
 	dstEpInfo->profileId = 0x0104;//HA_PROFILE_ID
-	dstEpInfo->dstAddrMode = zbhciConvertSet[apsTxMode];
+	dstEpInfo->dstAddrMode = (u8)zbhciConvertSet[apsTxMode];
 	if(dstEpInfo->dstAddrMode == APS_LONG_DSTADDR_WITHEP){
 		ZB_IEEE_ADDR_REVERT(dstEpInfo->dstAddr.extAddr,*payload);
 		(*payload) += EXT_ADDR_LEN;
@@ -346,7 +346,6 @@ void zbhci_clusterGroupHandle(void *arg){ //u16 cmdId, u8 *pCmd){
 		u8 groupName[8];
 		memcpy(groupName, pCmd, 8);
 		zcl_group_addCmd(srcEp, &dstEpInfo, FALSE, groupID, groupName);
-//		ev_buf_free(groupName);
 	}else if(cmdId == ZBHCI_CMD_ZCL_GROUP_VIEW){
 		u16 groupID;
 		COPY_BUFFERTOU16_BE(groupID, pCmd);
@@ -504,15 +503,13 @@ void cust_ota_start_req(epInfo_t *dstEpInfo,u8 srcEp,u8 **payload)
 {
 //	u32 image_length;
 	ota_hdrFields_t ota_hdr;
-	u32 ota_start_addr = 0;
-	if(mcuBootAddrGet() == 0)//boot from 0
-	{
-		ota_start_addr = FLASH_ADDR_OF_OTA_IMAGE;
+	u32 ota_start_addr = mcuBootAddrGet();
+
+	if(ota_start_addr == 0xFFFFFFFF){
+		return;
 	}
-	else		//boot from 0x40000
-	{
-		ota_start_addr = 0;
-	}
+
+	ota_start_addr = (ota_start_addr) ? 0 : FLASH_ADDR_OF_OTA_IMAGE;
 
 	flash_read(ota_start_addr,sizeof(ota_hdrFields_t),(u8*)&ota_hdr);
 //	image_length = ota_hdr.totalImageSize;

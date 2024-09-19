@@ -7,6 +7,7 @@
  * @date    2021
  *
  * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *			All rights reserved.
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -19,6 +20,7 @@
  *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
+ *
  *******************************************************************************************************/
 
 #pragma once
@@ -63,6 +65,8 @@ extern "C" {
 #define LED_POWER					LED_R
 #define LED_PERMIT					LED_G
 
+#define VOLTAGE_DETECT_PIN			GPIO_PC5
+
 // UART
 #if ZBHCI_UART
 	#define UART_TX_PIN         	UART_TX_PB1
@@ -72,7 +76,7 @@ extern "C" {
 #endif
 
 // DEBUG
-#if UART_PRINTF_MODE
+#if (TLKAPI_DEBUG_ENABLE)
 	#define	DEBUG_INFO_TX_PIN	    GPIO_PC4//print
 #endif
 /*******************************************************************************************************
@@ -109,6 +113,8 @@ extern "C" {
 #define LED_POWER					LED_R
 #define LED_PERMIT					LED_G
 
+#define VOLTAGE_DETECT_PIN			GPIO_PC5
+
 // UART
 #if ZBHCI_UART
 	#define UART_TX_PIN         	UART_TX_PD7
@@ -124,7 +130,7 @@ extern "C" {
 #endif
 
 // DEBUG
-#if UART_PRINTF_MODE
+#if (TLKAPI_DEBUG_ENABLE)
 	#define	DEBUG_INFO_TX_PIN	    GPIO_PC6//print
 #endif
 /*******************************************************************************************************

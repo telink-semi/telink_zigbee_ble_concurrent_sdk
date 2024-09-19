@@ -29,7 +29,12 @@
 
 #include "macro_trick.h"
 
+#if defined(MCU_CORE_8258) || defined(MCU_CORE_B91)
 #define BIT(n)                  		( 1<<(n) )
+#elif defined(MCU_CORE_TL321X)
+#define BIT(n)                  		( 1ULL<<(n) )
+#endif
+
 
 // BITSx  are internal used macro, please use BITS instead
 #define BITS1(a)                 		BIT(a)
@@ -182,6 +187,27 @@ BFN_SET(attr2, x, ATTR2_PRIO);
 #define FLIP_FLD(x, mask)    			BM_FLIP(x, mask)
 
 #define GET_FLD(x, mask)    			BM_MASK_FLD(x, mask)
+
+#define SET_FLD_V(...) 					VARARG(SET_FLD_V, __VA_ARGS__)
+
+
+
+#define SET_FLD_FULL_V3(x, m, v)											((x) = MASK_VAL2(m,v))
+#define SET_FLD_FULL_V5(x, m1, v1, m2, v2)  								((x) = MASK_VAL4(m1,v1,m2,v2))
+#define SET_FLD_FULL_V7(x, m1, v1, m2, v2, m3, v3)  						((x) = MASK_VAL6(m1,v1,m2,v2,m3,v3))
+#define SET_FLD_FULL_V9(x, m1, v1, m2, v2, m3, v3, m4, v4)    				((x) = MASK_VAL8(m1,v1,m2,v2,m3,v3,m4,v4))
+#define SET_FLD_FULL_V11(x, m1, v1, m2, v2, m3, v3, m4, v4, m5, v5)    		((x) = MASK_VAL10(m1,v1,m2,v2,m3,v3,m4,v4,m5,v5))
+#define SET_FLD_FULL_V13(x, m1, v1, m2, v2, m3, v3, m4, v4, m5, v5, m6, v6) ((x) = MASK_VAL12(m1,v1,m2,v2,m3,v3,m4,v4,m5,v5,m6,v6))
+#define SET_FLD_FULL_V(...) 			VARARG(SET_FLD_FULL_V, __VA_ARGS__)
+
+////////////////////////////////////////////////////////////////////////
+#define BIT8_IFY(y)      ( \
+							((y&0x0000000FLU)?1:0)  + ((y&0x000000F0LU)? 2:0) + ((y&0x00000F00LU)? 4:0) + \
+							((y&0x0000F000LU)?8:0)  + ((y&0x000F0000LU)?16:0) + ((y&0x00F00000LU)?32:0) + \
+							((y&0x0F000000LU)?64:0) + ((y&0xF0000000LU)?128:0) \
+                         )
+
+#define HEX_X(i) 			(0x##i##LU)
 
 #ifndef WIN32
 // warning SET_FLD_Vn  are internal used macro, please use SET_FLD_V instead

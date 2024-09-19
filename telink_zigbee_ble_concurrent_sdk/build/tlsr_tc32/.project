@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>tl_zigbee_ble_concurrent_sdk_8258</name>
+	<name>telink_zigbee_ble_concurrent_sdk_8258</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -145,16 +145,6 @@
 			<name>platform/chip_8258</name>
 			<type>2</type>
 			<locationURI>PARENT-2-PROJECT_LOC/platform/chip_8258</locationURI>
-		</link>
-		<link>
-			<name>platform/chip_826x</name>
-			<type>2</type>
-			<locationURI>PARENT-2-PROJECT_LOC/platform/chip_826x</locationURI>
-		</link>
-		<link>
-			<name>platform/chip_8278</name>
-			<type>2</type>
-			<locationURI>PARENT-2-PROJECT_LOC/platform/chip_8278</locationURI>
 		</link>
 		<link>
 			<name>platform/firmware_encrypt.h</name>

@@ -26,6 +26,14 @@
 #include "nds_intrinsic.h"
 #include "sys.h"
 
+#ifdef STD_GCC
+#define DISABLE_BTB __asm__("csrci %0,8" :: "i" (mmisc_ctl))
+#define ENABLE_BTB  __asm__("csrsi %0,8" :: "i" (mmisc_ctl))
+#else
+#define DISABLE_BTB __asm__("csrci mmisc_ctl,8")
+#define ENABLE_BTB  __asm__("csrsi mmisc_ctl,8")
+#endif
+
 #define  read_csr(reg)		         __nds__csrr(reg)
 #define  write_csr(reg, val)	      __nds__csrw(val, reg)
 #define  swap_csr(reg, val)	          __nds__csrrw(val, reg)
@@ -102,4 +110,30 @@ static inline void core_interrupt_enable(void)
 	set_csr(NDS_MIE,1<<11 | 1 << 7 | 1 << 3);
 
 }
+
+/**
+ * @brief     This function performs to get cclk tick.
+ * @return    cclk timer tick value.
+ */
+__attribute__((always_inline)) static inline unsigned long long rdmcycle(void)
+{
+#if __riscv_xlen == 32
+	do {
+		unsigned long hi = read_csr(NDS_MCYCLEH);
+		unsigned long lo = read_csr(NDS_MCYCLE);
+
+		if (hi == read_csr(NDS_MCYCLEH))
+			return ((unsigned long long)hi << 32) | lo;
+	} while(1);
+#else
+	return read_csr(NDS_MCYCLE);
+#endif
+}
+
+/**
+ * @brief       This function performs to set delay time by cclk tick.
+ * @param[in]   core_cclk_tick - Number of ticks in cclk
+ * @return      none
+ */
+__attribute__((noinline)) __attribute__((section(".ram_code"))) __attribute__((optimize("O2"))) __attribute__((no_execit)) void core_cclk_delay_tick(unsigned long long core_cclk_tick);
 #endif

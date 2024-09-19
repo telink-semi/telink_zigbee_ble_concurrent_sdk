@@ -88,7 +88,7 @@ ble_sts_t blc_phy_setPhyTestEnable (u8 en);
 bool 	  blc_phy_isPhyTestEnable(void);
 
 
-#if (MCU_CORE_TYPE == MCU_CORE_9518)
+#if (MCU_CORE_TYPE == MCU_CORE_B91)
 	/**
 	 * @brief      uart RX data process for PHY test 2 wire UART mode
 	 * @param      none

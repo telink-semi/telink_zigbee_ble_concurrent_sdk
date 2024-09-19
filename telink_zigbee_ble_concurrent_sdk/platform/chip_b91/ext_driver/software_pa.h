@@ -27,7 +27,7 @@
 
 #include "../gpio.h"
 
-
+#if 0
 #ifndef PA_ENABLE
 #define PA_ENABLE                           0
 #endif
@@ -41,7 +41,7 @@
 #ifndef PA_RXEN_PIN
 #define PA_RXEN_PIN                         GPIO_PB3
 #endif
-
+#endif
 
 
 #define PA_TYPE_OFF							0

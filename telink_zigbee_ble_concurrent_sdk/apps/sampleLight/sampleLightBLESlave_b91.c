@@ -259,8 +259,8 @@ const attribute_t my_Attributes[] = {
 
 };
 
-static u8  g_appBleInterval = 8;
-static u16 g_appBleLatency = 99;
+static u8  g_appBleInterval = 40;
+static u16 g_appBleLatency = 19;
 
 _attribute_data_retention_	own_addr_type_t 	app_own_address_type = OWN_ADDRESS_PUBLIC;
 

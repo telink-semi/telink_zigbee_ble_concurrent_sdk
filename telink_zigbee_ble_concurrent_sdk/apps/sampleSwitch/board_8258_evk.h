@@ -7,6 +7,7 @@
  * @date    2021
  *
  * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *			All rights reserved.
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -19,6 +20,7 @@
  *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
+ *
  *******************************************************************************************************/
 
 #pragma once
@@ -52,7 +54,11 @@ extern "C" {
 #define PD4_OUTPUT_ENABLE			1
 #define PD4_INPUT_ENABLE			0
 
+#define LED_POWER					LED1
+
 #define	PM_WAKEUP_LEVEL		  		PM_WAKEUP_LEVEL_LOW
+
+#define VOLTAGE_DETECT_PIN			GPIO_PC5
 
 // UART
 #if ZBHCI_UART
@@ -60,7 +66,7 @@ extern "C" {
 #endif
 
 // DEBUG
-#if UART_PRINTF_MODE
+#if (TLKAPI_DEBUG_ENABLE)
 	#define	DEBUG_INFO_TX_PIN	    GPIO_PC7//print
 #endif
 

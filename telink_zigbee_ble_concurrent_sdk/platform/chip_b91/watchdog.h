@@ -25,6 +25,7 @@
 #define WATCHDOG_H_
 #include "analog.h"
 #include "gpio.h"
+#include "clock.h"
 
 /**
  * @brief     start watchdog.

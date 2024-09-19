@@ -31,6 +31,7 @@
 #include "app/usbmouse.h"
 #include "app/usbkb.h"
 #include "app/usbvendor.h"
+#include "myudb.h"
 #if (__PROJECT_TL_SNIFFER__)
 #include "app/usbsniffer.h"
 #endif

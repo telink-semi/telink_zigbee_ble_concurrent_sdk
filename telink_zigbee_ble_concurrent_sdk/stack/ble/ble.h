@@ -34,6 +34,9 @@
 #include "ble_b91/ble.h"
 #define BLE_BLT_STATE_GET()    bltParam.blt_state
 
+#elif defined (MCU_CORE_TL321X)
+#include "ble_multi/ble.h"
+#define BLE_BLT_STATE_GET()    (!blc_ll_isBleTaskIdle())
 #endif
 
 void ble_rf_pa_init(bool ioset_need, u32 TXEN_pin, u32 RXEN_pin);

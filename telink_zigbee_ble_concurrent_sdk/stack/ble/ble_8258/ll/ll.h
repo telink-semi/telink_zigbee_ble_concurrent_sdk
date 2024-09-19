@@ -458,7 +458,7 @@ static inline void blt_ll_set_ble_access_code_adv(void)
 volatile void  smemset(unsigned char * dest, unsigned int val, unsigned int len);
 volatile void * smemcpy(unsigned char * out, unsigned char * in, unsigned int len);
 #else
-volatile void  smemset(register char * dest,register int val,register unsigned int len);
+volatile void * smemset(register char * dest,register int val,register unsigned int len);
 volatile void * smemcpy(register char * out, register char * in, register unsigned int len);
 #endif
 /****************************** (ble1m,2m,500k,125k)RF RX/TX packet format ********************************************

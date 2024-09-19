@@ -253,7 +253,7 @@ void rf_setRxBuf(u8 *pBuf)
 {
     rf_rxBuf = pBuf;
     ZB_RADIO_RX_BUF_CLEAR(rf_rxBuf);
-    ZB_RADIO_RX_BUF_SET((u16)((u32)rf_rxBuf));//todo: 826x/8258 need fix rf driver
+    ZB_RADIO_RX_BUF_SET(rf_rxBuf);
 }
 
 /*********************************************************************
@@ -265,7 +265,7 @@ void rf_setRxBuf(u8 *pBuf)
  *
  * @return  state
  */
-u8 rf_TrxStateGet(void)
+_always_inline u8 rf_TrxStateGet(void)
 {
 	return rfMode;
 }
@@ -347,7 +347,7 @@ void rf_setChannel(u8 chn)
  *
  * @return  chn
  */
-inline u8 rf_getChannel(void)
+_always_inline u8 rf_getChannel(void)
 {
 	return	g_zbMacPib.phyChannelCur;
 }
@@ -479,10 +479,9 @@ _attribute_ram_code_ u8 rf_performCCA(void)
 		return PHY_CCA_BUSY;
 	}
 
-	if(rf_TrxStateGet() != RF_STATE_RX){
-		rf_setTrxState(RF_STATE_RX);
-		WaitUs(100);
-	}
+	rf_setTrxState(RF_STATE_OFF);
+	rf_setTrxState(RF_STATE_RX);
+	WaitUs(85);
 
 	rssi_cur = ZB_RADIO_RSSI_GET();
 	rssiSum += rssi_cur;
@@ -512,13 +511,16 @@ _attribute_ram_code_ u8 rf_performCCA(void)
 
 
 
-void rf802154_tx_ready(u8 *buf, u8 len)
+_always_inline void rf802154_tx_ready(u8 *buf, u8 len)
 {
   	/* Fill the telink RF header */
 	ZB_RADIO_DMA_HDR_BUILD(rf_tx_buf, len);
 
   	rf_tx_buf[4] = len + 2;
-  	memcpy(rf_tx_buf + 5, buf, len);
+//  	memcpy(rf_tx_buf + 5, buf, len);
+  	for(u8 i=0; i<len; i++){
+  		rf_tx_buf[i+5] = buf[i];
+  	}
 }
 
 _attribute_ram_code_ void rf802154_tx(void)
@@ -617,7 +619,12 @@ _attribute_ram_code_ bool isWLANActive(void)
  *
  * @return  none
  */
-_attribute_ram_code_ __attribute__((optimize("-Os"))) void rf_rx_irq_handler(void)
+#if defined(MCU_CORE_826x) || defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
+_attribute_ram_code_ __attribute__((optimize("-Os")))
+#else
+_attribute_ram_code_
+#endif
+void rf_rx_irq_handler(void)
 {
     u8 *p = (u8 *)rf_rxBuf;
     u8 fAck = 0;
@@ -695,7 +702,7 @@ _attribute_ram_code_ __attribute__((optimize("-Os"))) void rf_rx_irq_handler(voi
 	/* Use the backup buffer to receive next packet */
 	rf_rxBuf = rxNextBuf;
 	ZB_RADIO_RX_BUF_CLEAR(rf_rxBuf);
-	ZB_RADIO_RX_BUF_SET((u16)((u32)rf_rxBuf));
+	ZB_RADIO_RX_BUF_SET(rf_rxBuf);
 
     /*----------------------------------------------------------
 	 *  Send ACK
@@ -729,8 +736,10 @@ _attribute_ram_code_ __attribute__((optimize("-Os"))) void rf_rx_irq_handler(voi
 #endif
 
 		txDelayUs = (clock_time() - txTime) / S_TIMER_CLOCK_1US;
+		u32 curTick = clock_time();
 		if(txDelayUs < ZB_TX_WAIT_US){
-			WaitUs(ZB_TX_WAIT_US - txDelayUs);
+//			WaitUs(ZB_TX_WAIT_US - txDelayUs);
+			while(!clock_time_exceed(curTick, (ZB_TX_WAIT_US - txDelayUs)));
 		}
 
 		/* wait until tx done,
@@ -763,7 +772,6 @@ _attribute_ram_code_ __attribute__((optimize("-Os"))) void rf_rx_irq_handler(voi
 	zb_macDataRecvHandler(p, macPld, len, fAck, ZB_RADIO_TIMESTAMP_GET(p), ZB_RADION_PKT_RSSI_GET(p) - 110);
 }
 
-
 /*********************************************************************
  * @fn      rf_tx_irq_handler
  *
@@ -773,7 +781,12 @@ _attribute_ram_code_ __attribute__((optimize("-Os"))) void rf_rx_irq_handler(voi
  *
  * @return  none
  */
-_attribute_ram_code_ __attribute__((optimize("-Os"))) void rf_tx_irq_handler(void)
+#if defined(MCU_CORE_826x) || defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
+_attribute_ram_code_ __attribute__((optimize("-Os")))
+#else
+_attribute_ram_code_
+#endif
+void rf_tx_irq_handler(void)
 {
 	rf_busyFlag &= ~TX_BUSY;//Clear TX busy flag after receive TX done signal
 
@@ -794,7 +807,11 @@ inline bool zb_rfTxDoing(void){
 }
 
 void restore_zb_rf_context(void){
+#if defined(MCU_CORE_TL321X)
+	rf_reset_register_value();
+#else
 	rf_baseband_reset();
+#endif
 
 	ZB_RADIO_RX_BUF_CLEAR(rf_rxBuf);
 	CLEAR_ALL_RFIRQ_STATUS;
@@ -802,7 +819,7 @@ void restore_zb_rf_context(void){
 
 	ZB_RADIO_INIT();
 	ZB_RADIO_TRX_CFG((RF_PKT_BUFF_LEN));
-	ZB_RADIO_RX_BUF_SET((u16)((u32)rf_rxBuf));
+	ZB_RADIO_RX_BUF_SET(rf_rxBuf);
 
 	rf_setChannel(rf_getChannel());
 	rf_setTrxState(RF_STATE_RX);

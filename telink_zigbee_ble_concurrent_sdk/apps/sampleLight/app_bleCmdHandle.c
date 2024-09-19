@@ -83,9 +83,11 @@ int zb_ble_hci_cmd_handler(u16 clusterId, u8 len, u8 *payload){
 
 		zb_mgmtNwkUpdateReq(dstAddr, &req, &sn, NULL);
 	}else if(clusterId == ZCL_CLUSTER_GEN_ON_OFF){
-		sampleLight_onOffCb(NULL, cmdId, pCmd);
+		sampleLight_onoff(cmdId);
 	}else if(clusterId == ZCL_CLUSTER_GEN_LEVEL_CONTROL){
-		sampleLight_levelCb(NULL, cmdId, pCmd);
+		if(cmdId == ZCL_CMD_LEVEL_MOVE_TO_LEVEL){
+			sampleLight_moveToLevelProcess(cmdId, (moveToLvl_t *)pCmd);
+		}
 	}else if(clusterId == APP_BLE_CMD_INTERVAL_SET){
 		extern void app_bleConnIntervalSet(u8 interval, u16 latency);
 		app_bleConnIntervalSet(payload[0], ((payload[1] << 8) | payload[2]));

@@ -43,7 +43,7 @@
 
 #define 		FW_MIN_SIZE											0x04000	 //16K
 
-#if (MCU_CORE_TYPE == MCU_CORE_9518)
+#if (MCU_CORE_TYPE == MCU_CORE_B91)
 #define 		FW_MAX_SIZE											0x3F000	 //256K(0x40000) - 4K = 252K
 #endif
 

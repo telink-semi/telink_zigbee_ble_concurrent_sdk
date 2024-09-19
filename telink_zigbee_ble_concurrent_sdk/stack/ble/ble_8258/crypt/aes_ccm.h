@@ -80,5 +80,5 @@ u8 aes_att_decryption_packet(u8 *key, u8 *iv, u8 *mic, u8 mic_len, u8 *ps, u8 le
 void aes_ll_c1(u8 * key, u8 * r, u8 *p1, u8 *p2, u8 * result);
 void aes_ll_s1(u8 * key, u8 * r1, u8 * r2, u8 * result);
 
-volatile void  smemset(register char * dest,register int val,register unsigned int len);
+volatile void * smemset(register char * dest,register int val,register unsigned int len);
 volatile void * smemcpy(register char * out, register char * in, register unsigned int len);

@@ -39,7 +39,7 @@
 #define SIMPLE_MULTI_MAC_EN					0
 #endif
 
-#if (MCU_CORE_TYPE == MCU_CORE_9518)
+#if (MCU_CORE_TYPE == MCU_CORE_B91)
 	#define FLASH_SMP_PARAM_READ_BY_API			1
 #else
 

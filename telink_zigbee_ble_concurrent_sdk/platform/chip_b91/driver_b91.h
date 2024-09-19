@@ -32,7 +32,6 @@
 #include "i2c.h"
 #include "spi.h"
 #include "pwm.h"
-#include "pm.h"
 #include "timer.h"
 #include "flash.h"
 #include "usbhw.h"
@@ -41,8 +40,6 @@
 #include "nds_intrinsic.h"
 #include "mdec.h"
 
-#include "trng.h"
-#include "npe.h"
 #include "sys.h"
 #include "pke.h"
 #include "plic.h"
@@ -54,10 +51,8 @@
 
 #include "lpc.h"
 #include "clock.h"
-#include "emi.h"
 
 #include "mspi.h"
 #include "adc.h"
-#include "swire.h"
 
 #include "flash/flash_type.h"

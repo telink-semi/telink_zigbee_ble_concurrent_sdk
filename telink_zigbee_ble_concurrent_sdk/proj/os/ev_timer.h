@@ -48,7 +48,8 @@ typedef struct ev_timer_event_t {
     u32 timeout;             		//!< In millisecond
     u32 period;      				//!< Used internal
     u32 curSysTick;					//!< Used internal, system tick when registering
-	u8 resv[2];
+	u8 resv;
+	u8 isBusy;						//!< Used internal
 	u8 isRunning;					//!< Used internal
     u8 used;						//!< Used internal
 } ev_timer_event_t;

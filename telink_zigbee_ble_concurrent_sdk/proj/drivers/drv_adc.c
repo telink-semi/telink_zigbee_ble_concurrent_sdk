@@ -28,6 +28,46 @@
 #if	defined(MCU_CORE_826x)
 	#define ADC_VALUE_GET_WITH_BASE_MODE(v)		(3300 * (v - 128)/(16384 - 256))//Vref(mV) * (v - 128)/(2^14 - 2^8)
 	#define ADC_VALUE_GET_WITH_VBAT_MODE(v)		(3*(1428*(v - 128)/(16384 - 256)))
+#elif defined(MCU_CORE_B91) || defined(MCU_CORE_TL321X)
+	#define ADC_SAMPLE_NUM						1	//fixed
+	#define ADC_SAMPLE_FREQ						ADC_SAMPLE_FREQ_96K
+	#define ADC_SAMPLE_NDMA_DELAY_TIME			((1000 / ( 6 * (2 << (ADC_SAMPLE_FREQ)))) + 1)//delay 2 sample cycle
+	#define ADC_PRESCALE						ADC_PRESCALE_1F4
+#endif
+
+#if defined(MCU_CORE_TL321X)
+/**
+ * @brief This function serves to get adc sample code by manual and convert to voltage value.
+ * @return 		adc_vol_mv_average 	- the average value of adc voltage value.
+ */
+static u16 adc_get_voltage(void)
+{
+	u16 adc_sample_data = 0;
+
+	/* get adc sample data */
+	adc_start_sample_nodma();
+
+	while (1)
+	{
+		u8 sample_cnt = adc_get_rxfifo_cnt();
+		if (sample_cnt > 0)
+		{
+			adc_sample_data= adc_get_code();
+			break;
+		}
+	}
+	adc_stop_sample_nodma();
+
+	if(adc_sample_data & BIT(11)){
+		//12 bit resolution, BIT(11) is sign bit, 1 means negative voltage in differential_mode
+		adc_sample_data = 0;
+	}else{
+		//BIT(10..0) is valid adc code
+		adc_sample_data &= 0x7FF;
+	}
+
+	return adc_calculate_voltage(ADC_M_CHANNEL, adc_sample_data);
+}
 #endif
 
 /****
@@ -45,6 +85,9 @@ bool drv_adc_init(void)
 #elif defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
 	adc_init();
 #elif defined(MCU_CORE_B91)
+
+#elif defined(MCU_CORE_TL321X)
+	adc_init(NDMA_M_CHN);
 #endif
 	return TRUE;
 }
@@ -68,6 +111,10 @@ u16 drv_get_adc_data(void)
 	return (u16)ADC_VALUE_GET_WITH_VBAT_MODE(tmpSum);
 #elif defined(MCU_CORE_8258) || defined(MCU_CORE_8278) || defined(MCU_CORE_B91)
 	return (u16)adc_sample_and_get_result();
+#elif defined(MCU_CORE_TL321X)
+	return (u16)adc_get_voltage();
+#else
+	return 0;
 #endif
 }
 
@@ -78,7 +125,7 @@ u16 drv_get_adc_data(void)
 * @return
 */
 #if defined(MCU_CORE_826x)
-void drv_adc_mode_pin_set(drv_adc_mode_t mode, ADC_InputPTypeDef pin)
+void drv_adc_mode_pin_set(drv_adc_mode_e mode, ADC_InputPTypeDef pin)
 {
 	if(mode == DRV_ADC_BASE_MODE){
 		ADC_ParamSetting(pin, SINGLEEND, RV_AVDD, RES14, S_3);
@@ -87,7 +134,7 @@ void drv_adc_mode_pin_set(drv_adc_mode_t mode, ADC_InputPTypeDef pin)
 	}
 }
 #elif defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
-void drv_adc_mode_pin_set(drv_adc_mode_t mode, GPIO_PinTypeDef pin)
+void drv_adc_mode_pin_set(drv_adc_mode_e mode, GPIO_PinTypeDef pin)
 {
 	if(mode == DRV_ADC_BASE_MODE){
 		adc_base_init(pin);
@@ -96,11 +143,11 @@ void drv_adc_mode_pin_set(drv_adc_mode_t mode, GPIO_PinTypeDef pin)
 	}
 }
 #elif defined(MCU_CORE_B91)
-void drv_adc_mode_pin_set(drv_adc_mode_t mode, adc_input_pin_def_e pin)
+void drv_adc_mode_pin_set(drv_adc_mode_e mode, adc_input_pin_def_e pin)
 {
 	/* DRV_ADC_BASE_MODE is recommended */
 	if(mode == DRV_ADC_BASE_MODE){
-		adc_gpio_sample_init(pin, ADC_VREF_1P2V, ADC_PRESCALE_1F4, ADC_SAMPLE_FREQ_96K);
+		adc_gpio_sample_init(pin, ADC_VREF_1P2V, ADC_PRESCALE, ADC_SAMPLE_FREQ);
 	}else if(mode == DRV_ADC_VBAT_MODE){
 		/* The battery voltage sample range is 1.8~3.5V,
 		 * and must set sys_init() function with the mode for battery voltage less than 3.6V.
@@ -108,6 +155,22 @@ void drv_adc_mode_pin_set(drv_adc_mode_t mode, adc_input_pin_def_e pin)
 		 */
 		(void)pin;
 		adc_battery_voltage_sample_init();
+	}
+}
+#elif defined(MCU_CORE_TL321X)
+void drv_adc_mode_pin_set(drv_adc_mode_e mode, adc_input_pin_e pin)
+{
+	if(mode == DRV_ADC_BASE_MODE){
+		adc_gpio_cfg_t adc_gpio_cfg_m;
+		adc_gpio_cfg_m.v_ref = ADC_VREF_1P2V;
+		adc_gpio_cfg_m.pre_scale = ADC_PRESCALE;
+		adc_gpio_cfg_m.sample_freq = ADC_SAMPLE_FREQ;
+		adc_gpio_cfg_m.pin = pin;
+
+		adc_gpio_sample_init(ADC_M_CHANNEL, adc_gpio_cfg_m);
+	}else if(mode == DRV_ADC_VBAT_MODE){
+		(void)pin;
+		adc_vbat_sample_init(ADC_M_CHANNEL);
 	}
 }
 #endif
@@ -127,9 +190,13 @@ void drv_adc_enable(bool enable)
 	}
 #elif defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
 	adc_power_on_sar_adc((unsigned char)enable);
-#elif defined(MCU_CORE_B91)
+#elif defined(MCU_CORE_B91) || defined(MCU_CORE_TL321X)
 	if(enable){
 		adc_power_on();
+
+#if defined(MCU_CORE_TL321X)
+		delay_us(30);//Wait >30us after adc_power_on() for ADC to be stable.
+#endif
 	}else{
 		adc_power_off();
 	}

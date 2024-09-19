@@ -164,6 +164,8 @@ enum{
 	FLD_STANDBY_EX        	=	BIT(3),
 };
 
+#define reg_pwdn_en					REG_ADDR8(SC_BASE_ADDR+0x2f)
+
 #define reg_dmic_clk_set			REG_ADDR8(SC_BASE_ADDR+0x33)
 
 

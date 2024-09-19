@@ -57,6 +57,12 @@ int main(void){
 
 	os_init(isRetention);
 
+#if 0
+	extern void moduleTest_start(void);
+	CURRENT_SLOT_SET(DUALMODE_SLOT_ZIGBEE);
+	moduleTest_start();
+#endif
+
 #if PM_ENABLE
     g_switchAppCtx.keyPressDebounce = 3;
 	app_pm_init();
@@ -84,23 +90,22 @@ int main(void){
 	}
 #endif
 
-	//extern void moduleTest_start(void);
-	//moduleTest_start();
 #if PA_ENABLE
 	rf_paInit(PA_TX, PA_RX);
 #endif
 
 	user_zb_init(isRetention);
+
+	ble_radio_init();
 	user_ble_init(isRetention);
-	if(CURRENT_SLOT_GET() == DUALMODE_SLOT_BLE){
-		ble_radio_init();
-	}else{
-#if !BLE_ACTIVE_BY_UI
+
+	if(CURRENT_SLOT_GET() == DUALMODE_SLOT_ZIGBEE){
+	#if !BLE_ACTIVE_BY_UI
 		ble_task_restart();
 		ble_advertiseTickUpdate();
-#else
+	#else
 		switch_to_zb_context();
-#endif
+	#endif
 	}
 
 	drv_enable_irq();

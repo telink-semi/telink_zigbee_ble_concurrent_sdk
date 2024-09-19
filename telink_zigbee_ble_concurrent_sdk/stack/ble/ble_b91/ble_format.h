@@ -402,7 +402,7 @@ typedef struct{
 	u8 data[1];
 }rf_packet_l2cap_t;
 
-#if (MCU_CORE_TYPE == MCU_CORE_9518)
+#if (MCU_CORE_TYPE == MCU_CORE_B91)
 typedef struct{
 	rf_data_head_t	header;
 	u8  rf_len;
@@ -549,7 +549,7 @@ typedef struct{
 }rf_packet_l2cap_connParaUpRsp_t;
 
 
-#if (MCU_CORE_TYPE == MCU_CORE_9518)
+#if (MCU_CORE_TYPE == MCU_CORE_B91)
 typedef struct{
 	u8	type;
 	u8  rf_len;

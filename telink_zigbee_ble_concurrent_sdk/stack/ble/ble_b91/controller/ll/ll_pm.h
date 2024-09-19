@@ -92,7 +92,7 @@ void 		bls_pm_setWakeupSource(u8 source);
  */
 u32 		bls_pm_getSystemWakeupTick(void);
 
-#if (MCU_CORE_TYPE == MCU_CORE_9518)
+#if (MCU_CORE_TYPE == MCU_CORE_B91)
 /**
  * @brief	for user to get low power mode next connect event wake up time
  * @param	none

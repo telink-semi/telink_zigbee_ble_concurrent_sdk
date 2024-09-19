@@ -1475,7 +1475,7 @@ _CODE_BDB_ static u8 bdb_topLevelCommissiongConfirm(void){
 _CODE_BDB_ static u8 bdb_topLevelCommissioning(u8 target){
 	/* restore 	persistent ZigBee data */
 
-	if(BDB_STATE_GET() != BDB_STATE_IDLE || g_bdbAttrs.commissioningStatus == BDB_COMMISSION_STA_IN_PROGRESS){
+	if(BDB_STATE_GET() != BDB_STATE_IDLE || !zdo_ifZdoNwkManagerIdle() || g_bdbAttrs.commissioningStatus == BDB_COMMISSION_STA_IN_PROGRESS){
 		return BDB_STATE_COMMISSIONING_BUSY;
 	}
 
@@ -1679,7 +1679,7 @@ _CODE_BDB_ u8 bdb_init(af_simple_descriptor_t *simple_desc, bdb_commissionSettin
 _CODE_BDB_ u8 bdb_join_direct(u8 channel, u16 panId, u16 shortAddr, u8 *extPanId, u8 *nwkKey, u8 type, u8 inited, u8 *tcAddr){
 	u8 ret = FAILURE;
 
-	if(BDB_STATE_GET() == BDB_STATE_IDLE){
+	if((BDB_STATE_GET() == BDB_STATE_IDLE) && (!g_bdbAttrs.nodeIsOnANetwork)){
 		g_bdbCtx.forceJoin = 1;
         ss_securityModeSet(type);
 		zb_joinAFixedNetwork(channel,  panId, shortAddr, extPanId, nwkKey, tcAddr);

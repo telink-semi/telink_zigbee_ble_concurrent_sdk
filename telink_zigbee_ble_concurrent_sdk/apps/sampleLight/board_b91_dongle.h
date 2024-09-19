@@ -102,16 +102,17 @@ extern "C" {
 #define LED_PERMIT					LED_G
 #endif
 
+#define VOLTAGE_DETECT_PIN			ADC_GPIO_PB6
+
 // UART
 #if ZBHCI_UART
 	#error please configurate uart PIN!!!!!!
 #endif
 
 // DEBUG
-#if UART_PRINTF_MODE
+#if (TLKAPI_DEBUG_ENABLE)
 	#define	DEBUG_INFO_TX_PIN	    GPIO_PC1//print
 #endif
-
 
 enum{
 	VK_SW1 = 0x01,

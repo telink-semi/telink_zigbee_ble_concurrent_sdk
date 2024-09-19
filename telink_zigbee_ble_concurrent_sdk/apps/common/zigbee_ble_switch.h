@@ -21,11 +21,8 @@
  *          limitations under the License.
  *******************************************************************************************************/
 
-
-#if 1
-
-#define  ZIGBEE_AFTER_TIME    (16 * 1000 * 4)	//4ms
-#define  BLE_IDLE_TIME   	  (16 * 1000 * 4)	//5ms
+#define  ZIGBEE_AFTER_TIME    (S_TIMER_CLOCK_1US * 1000 * 4)	//4ms
+#define  BLE_IDLE_TIME   	  (S_TIMER_CLOCK_1US * 1000 * 4)	//5ms
 
 typedef enum{
 	DUALMODE_SLOT_BLE = 0,
@@ -49,14 +46,21 @@ typedef struct{
 extern app_dualModeInfo_t g_dualModeInfo;
 #define CURRENT_SLOT_GET()			 g_dualModeInfo.slot
 #define CURRENT_SLOT_SET(s)			 g_dualModeInfo.slot = s
+
+
+#if defined(MCU_CORE_8258) || defined(MCU_CORE_B91)
 #define APP_BLE_STATE_SET(state)	 g_dualModeInfo.bleState = state
 #define APP_BLE_STATE_GET()			 g_dualModeInfo.bleState
+#define APP_BLE_STATE_IDLE() 		 (APP_BLE_STATE_GET() == BLS_LINK_STATE_IDLE)
+#elif defined(MCU_CORE_TL321X)
+#define APP_BLE_STATE_IDLE() 		 blc_ll_isBleTaskIdle()
+#endif
 
 #define ZB_RF_ISR_RECOVERY		do{  \
 									if(CURRENT_SLOT_GET() == DUALMODE_SLOT_ZIGBEE) rf_set_irq_mask(FLD_RF_IRQ_RX|FLD_RF_IRQ_TX);  \
 								}while(0)
 
-_attribute_ram_code_ void switch_to_zb_context(void);
+void switch_to_zb_context(void);
 
 _attribute_ram_code_ void switch_to_ble_context(void);
 
@@ -77,4 +81,3 @@ void ble_master_serviceCbRegister(master_service_t cb);
 void ble_master_updateIndCbRegister(master_update_t cb);
 #endif
 
-#endif

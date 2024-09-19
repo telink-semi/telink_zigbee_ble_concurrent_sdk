@@ -58,7 +58,7 @@ void blc_ota_initOtaServer_module(void);
 
 
 
-#if (MCU_CORE_TYPE == MCU_CORE_9518)
+#if (MCU_CORE_TYPE == MCU_CORE_B91)
 	/**
 	 * @brief      This function is used to set OTA new firmware storage address on Flash.
 	 * @param[in]  new_fw_addr - new firmware storage address, can only choose from multiple boot address
@@ -155,7 +155,7 @@ ble_sts_t blc_ota_setOtaDataPacketTimeout(int timeout_second);
 
 
 
-#if (MCU_CORE_TYPE == MCU_CORE_9518)
+#if (MCU_CORE_TYPE == MCU_CORE_B91)
 	extern int otaWrite(u16 connHandle, void * p);
 #elif (MCU_CORE_TYPE == MCU_CORE_825x || MCU_CORE_TYPE == MCU_CORE_827x)
 	extern int otaWrite(void * p);

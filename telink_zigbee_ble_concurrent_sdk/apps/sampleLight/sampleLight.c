@@ -7,6 +7,7 @@
  * @date    2021
  *
  * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *			All rights reserved.
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -19,6 +20,7 @@
  *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
+ *
  *******************************************************************************************************/
 #if (__PROJECT_TL_LIGHT__)
 
@@ -203,17 +205,17 @@ void user_app_init(void)
 	/* Register ZCL specific cluster information */
 	zcl_register(SAMPLE_LIGHT_ENDPOINT, SAMPLELIGHT_CB_CLUSTER_NUM, (zcl_specClusterInfo_t *)g_sampleLightClusterList);
 
-#ifdef ZCL_GREEN_POWER
+#if ZCL_GP_SUPPORT
 	/* Initialize GP */
-	gp_init();
+	gp_init(SAMPLE_LIGHT_ENDPOINT);
 #endif
 
-#ifdef ZCL_OTA
+#if ZCL_OTA_SUPPORT
 	/* Initialize OTA */
     ota_init(OTA_TYPE_CLIENT, (af_simple_descriptor_t *)&sampleLight_simpleDesc, &sampleLight_otaInfo, &sampleLight_otaCb);
 #endif
 
-#ifdef ZCL_WWAH
+#if ZCL_WWAH_SUPPORT
     /* Initialize WWAH server */
     wwah_init(WWAH_TYPE_SERVER, (af_simple_descriptor_t *)&sampleLight_simpleDesc);
 #endif
@@ -287,9 +289,12 @@ static void sampleLightSysException(void)
 	zcl_levelAttr_save();
 	zcl_colorCtrlAttr_save();
 
+#if 1
 	SYSTEM_RESET();
-	//led_on(LED_POWER);
-	//while(1);
+#else
+	led_on(LED_POWER);
+	while(1);
+#endif
 }
 
 #if APP_USER_BINDING_TABLE

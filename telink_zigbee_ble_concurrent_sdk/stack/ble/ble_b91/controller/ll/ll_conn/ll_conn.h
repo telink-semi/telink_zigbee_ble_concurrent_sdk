@@ -44,7 +44,7 @@
  */
 void		blc_ll_initConnection_module(void);
 
-#if (MCU_CORE_TYPE == MCU_CORE_9518)
+#if (MCU_CORE_TYPE == MCU_CORE_B91)
 /**
  * @brief      for user to initialize LinkLayer TX FIFO.
  * 			   notice that: size*(number - 1)<= 0xFFF

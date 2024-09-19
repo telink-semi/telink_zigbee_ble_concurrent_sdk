@@ -7,6 +7,7 @@
  * @date    2021
  *
  * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *			All rights reserved.
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -19,6 +20,7 @@
  *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
+ *
  *******************************************************************************************************/
 #if (__PROJECT_TL_LIGHT__)
 
@@ -95,6 +97,7 @@ static s32 heartTimerCb(void *arg){
 s32 sampleLight_bdbNetworkSteerStart(void *arg){
 	bdb_networkSteerStart();
 
+	gLightCtx.timerSteering = NULL;
 	return -1;
 }
 
@@ -118,6 +121,8 @@ s32 sampleLight_bdbFindAndBindStart(void *arg){
  * @return  None
  */
 void zbdemo_bdbInitCb(u8 status, u8 joinedNetwork){
+//	printf("bdbInitCb: sta = %x, joined = %x\n", status, joinedNetwork);
+
 	if(status == BDB_INIT_STATUS_SUCCESS){
 		/*
 		 * start bdb commissioning
@@ -136,7 +141,11 @@ void zbdemo_bdbInitCb(u8 status, u8 joinedNetwork){
 			do{
 				jitter = zb_random() % 0x0fff;
 			}while(jitter == 0);
-			TL_ZB_TIMER_SCHEDULE(sampleLight_bdbNetworkSteerStart, NULL, jitter);
+
+			if(gLightCtx.timerSteering){
+				TL_ZB_TIMER_CANCEL(&gLightCtx.timerSteering);
+			}
+			gLightCtx.timerSteering = TL_ZB_TIMER_SCHEDULE(sampleLight_bdbNetworkSteerStart, NULL, jitter);
 #endif
 		}
 	}else{
@@ -185,6 +194,10 @@ void zbdemo_bdbCommissioningCb(u8 status, void *arg){
 
 			light_blink_start(2, 200, 200);
 
+			if(gLightCtx.timerSteering){
+				TL_ZB_TIMER_CANCEL(&gLightCtx.timerSteering);
+			}
+
 #ifdef ZCL_OTA
 	    	ota_queryStart(OTA_PERIODIC_QUERY_INTERVAL);
 #endif
@@ -208,7 +221,11 @@ void zbdemo_bdbCommissioningCb(u8 status, void *arg){
 				do{
 					jitter = zb_random() % 0x2710;
 				}while(jitter < 5000);
-				TL_ZB_TIMER_SCHEDULE(sampleLight_bdbNetworkSteerStart, NULL, jitter);
+
+				if(gLightCtx.timerSteering){
+					TL_ZB_TIMER_CANCEL(&gLightCtx.timerSteering);
+				}
+				gLightCtx.timerSteering = TL_ZB_TIMER_SCHEDULE(sampleLight_bdbNetworkSteerStart, NULL, jitter);
 			}
 			break;
 		case BDB_COMMISSION_STA_FORMATION_FAILURE:
@@ -236,9 +253,9 @@ void zbdemo_bdbCommissioningCb(u8 status, void *arg){
 
 
 
-extern void sampleLight_zclIdentifyCmdHandler(u8 endpoint, u16 srcAddr, u16 identifyTime);
 void zbdemo_bdbIdentifyCb(u8 endpoint, u16 srcAddr, u16 identifyTime){
 #if FIND_AND_BIND_SUPPORT
+	extern void sampleLight_zclIdentifyCmdHandler(u8 endpoint, u16 srcAddr, u16 identifyTime);
 	sampleLight_zclIdentifyCmdHandler(endpoint, srcAddr, identifyTime);
 #endif
 }
@@ -307,7 +324,7 @@ void sampleLight_leaveIndHandler(nlme_leave_ind_t *pLeaveInd)
 
 }
 
-u8 sampleLight_nwkUpdateIndicateHandler(nwkCmd_nwkUpdate_t *pNwkUpdate){
+bool sampleLight_nwkUpdateIndicateHandler(nwkCmd_nwkUpdate_t *pNwkUpdate){
 	return FAILURE;
 }
 

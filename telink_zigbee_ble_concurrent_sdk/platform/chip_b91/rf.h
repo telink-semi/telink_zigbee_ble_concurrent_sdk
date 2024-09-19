@@ -611,6 +611,29 @@ static inline void rf_set_ptx_pid(unsigned char pipe_pid)
 	reg_rf_ll_ctrl_1 |= (pipe_pid << 6);
 }
 
+/**
+ * @brief        This function is used to set whether or not to use the rx DCOC software calibration in rf_mode_init();
+ * @param[in]     en:This value is used to set whether or not rx DCOC software calibration is performed.
+ *                -#1:enable the DCOC software calibration;
+ *                -#0:disable the DCOC software calibration;
+ * @return         none.
+ * @note        Attention:
+ *                 1.Driver default enable to solve the problem of poor receiver sensitivity performance of some chips with large DC offset
+ *                 2.The following conditions should be noted when using this function:
+ *                   If you use the RX function, it must be enabled, otherwise it will result in a decrease in RX sensitivity.
+ *                   If you only use tx and not rx, and want to save code execution time for rf_mode_init(), you can disable it
+ */
+void rf_set_rx_dcoc_cali_by_sw(unsigned char en);
+
+/**
+ * @brief        This function is used to update the rx DCOC calibration value.
+ * @param[in]   calib_code - Value of iq_code after calibration.(The code is a combination value,you need to fill in the combined iq value)
+ *                 <0> is used to control the switch of bypass dcoc calibration iq code, the value should be 1;
+ *                 <6-1>:the value of I code, the range of value is 1~62;
+ *                 <12-7>:the value of Q code, the range of value is 1~62.
+ * @return         none.
+ */
+void rf_update_rx_dcoc_calib_code(unsigned short calib_code);
 
 /**
  * @brief      This function serves to initiate information of RF.

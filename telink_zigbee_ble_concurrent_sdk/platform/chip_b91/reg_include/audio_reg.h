@@ -25,7 +25,7 @@
 #define AUDIO_REG_H
 #include "../sys.h"
 
-#define 	REG_AUDIO_AHB_BASE		    0x120000
+#define 	REG_AUDIO_AHB_BASE		    0x80120000
 #define 	REG_CODEC_BASE_ADDR		    0x120200
 #define 	REG_AUDIO_APB_BASE		    0x140500
 #define 	reg_fifo_buf_adr(i) 		REG_AUDIO_AHB_BASE+(i)*0x40

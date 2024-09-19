@@ -7,6 +7,7 @@
  * @date    2021
  *
  * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *			All rights reserved.
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -19,6 +20,7 @@
  *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
+ *
  *******************************************************************************************************/
 
 #pragma once
@@ -64,8 +66,20 @@ extern "C" {
 #define PD3_OUTPUT_ENABLE			1
 #define PD3_INPUT_ENABLE			0
 
+#define LED_B     					GPIO_PD2
+#define PD2_FUNC					AS_GPIO
+#define PD2_OUTPUT_ENABLE			1
+#define PD2_INPUT_ENABLE			0
+
+#define LED_W     					GPIO_PD4
+#define PD4_FUNC					AS_GPIO
+#define PD4_OUTPUT_ENABLE			1
+#define PD4_INPUT_ENABLE			0
+
 #define LED_POWER					LED_R
 #define LED_PERMIT					LED_G
+
+#define VOLTAGE_DETECT_PIN			GPIO_PC5
 
 // UART
 #if ZBHCI_UART
@@ -102,8 +116,8 @@ enum{
 #define	KB_MAP_NUM		KB_MAP_NORMAL
 #define	KB_MAP_FN		KB_MAP_NORMAL
 
-#define KB_DRIVE_PINS  {GPIO_PB2,  GPIO_PB3}
-#define KB_SCAN_PINS   {GPIO_PB4,  GPIO_PB5}
+#define KB_DRIVE_PINS	{GPIO_PB2, GPIO_PB3}
+#define KB_SCAN_PINS	{GPIO_PB4, GPIO_PB5}
 
 
 #define	KB_LINE_MODE		0

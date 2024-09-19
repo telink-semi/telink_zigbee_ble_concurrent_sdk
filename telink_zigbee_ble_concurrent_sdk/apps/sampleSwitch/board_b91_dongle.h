@@ -1,12 +1,13 @@
 /********************************************************************************************************
  * @file    board_b91_dongle.h
  *
- * @brief   This is the header file for board_9518_dongle
+ * @brief   This is the header file for board_b91_dongle
  *
  * @author  Zigbee Group
  * @date    2021
  *
  * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *			All rights reserved.
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -81,13 +82,15 @@ extern "C" {
 
 #define	PM_WAKEUP_LEVEL		  		PM_WAKEUP_LEVEL_LOW
 
+#define VOLTAGE_DETECT_PIN			ADC_GPIO_PB6
+
 // UART
 #if ZBHCI_UART
 	#error please configurate uart PIN!!!!!!
 #endif
 
 // DEBUG
-#if UART_PRINTF_MODE
+#if (TLKAPI_DEBUG_ENABLE)
 	#define	DEBUG_INFO_TX_PIN	    GPIO_PC1//print
 #endif
 

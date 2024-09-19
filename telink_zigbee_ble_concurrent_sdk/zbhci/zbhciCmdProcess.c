@@ -175,6 +175,7 @@ static void zbhciNodeDescRspMsgPush(void* arg){
 
 	ZB_LEBESWAP(((u8 *)&(rsp->node_descriptor.max_in_tr_size)), 2);
 	ZB_LEBESWAP(((u8 *)&(rsp->node_descriptor.max_out_tr_size)), 2);
+	ZB_LEBESWAP(((u8 *)&(rsp->node_descriptor.server_mask)), 2);
 
 	u8* ptr = ev_buf_allocate(p->length + 2);	//src_addr
 	u8 i = 0;
@@ -727,7 +728,7 @@ static void zbhci_bindCmdHandler(void *arg){
 	ev_buf_free(arg);
 }
 
-
+#if ZB_COORDINATOR_ROLE
 s32 node_toggle_unicast_test(void *arg){
 	u32 mode = (u32)arg;
 
@@ -808,7 +809,7 @@ s32 node_toggle_broadcast_test(void *arg){
 	onOff ^= 1;
 	return 0;
 }
-
+#endif
 
 s32 rxtx_performance_test(void *arg){
 	txrx_performce_test_req_t *txrxTest = (txrx_performce_test_req_t *)arg;
@@ -980,7 +981,31 @@ s32 zbhci_nodeManageCmdHandler(void *arg){
 		ZB_IEEE_ADDR_REVERT(pBuf, NIB_IEEE_ADDRESS());
 		pBuf += 8;
 
+		*pBuf++ = MAC_IB().phyChannelCur;
+
 		zbhciTx(ZBHCI_CMD_GET_LOCAL_NWK_INFO_RSP, (u8)(pBuf-temp), temp);
+	}else if(cmdID == ZBHCI_CMD_GET_CHILD_NODES_REQ){
+		zbhci_childNodeGetReq_t *ng = (zbhci_childNodeGetReq_t *)p;
+		nwk_childTableInfo_t *rsp = (nwk_childTableInfo_t*) ev_buf_allocate(sizeof(nwk_childTableInfo_t));
+		if(rsp){
+			tl_childNodesListGet(ng->startIdx, rsp);
+			addrExt_t tExtAddr;
+			u16 tNwkAddr;
+			for(s32 m = 0; m < rsp->info.childNodesNum; m++){
+				ZB_IEEE_ADDR_REVERT((u8 *)tExtAddr, (u8 *)(rsp->list[m].extAddr));
+				memcpy((u8 *)(rsp->list[m].extAddr), tExtAddr, 8);
+				ZB_16BIT_REVERT((u8 *)&tNwkAddr, (u8 *)&rsp->list[m].nwkAddr);
+				memcpy(&rsp->list[m].nwkAddr, &tNwkAddr, 2);
+			}
+			zbhciTx(ZBHCI_CMD_GET_CHILD_NODES_RSP, sizeof(nwk_childNodesInfo_t)+rsp->info.childNodesNum*sizeof(nwk_childNodesList_t), (u8 *)rsp);
+			ev_buf_free((u8 *)rsp);
+		}else{
+			nwk_childNodesInfo_t trsp = {0};
+			trsp.status = MSG_BUFFER_NOT_AVAIL;                  /*! status, 0: success, 1: failure */
+			zbhciTx(ZBHCI_CMD_GET_CHILD_NODES_RSP, sizeof(nwk_childNodesInfo_t), (u8 *)&trsp);
+		}
+	}else if(cmdID == ZBHCI_CMD_REMOVE_ALL_CHILD_NODES_REQ){
+		tl_allChildNodesRemove();
 	}
 
 	ev_buf_free(arg);
@@ -1038,8 +1063,14 @@ void uart_send_ota_end(u8 status){
 			ota_loadImageInfo(NULL);
 		}
 	}
+
+#if FLASH_PROTECT_ENABLE
+	flash_lock();
+#endif
+
 	memset(&ota_info, 0, sizeof(hci_ota_info_t));
 }
+
 s32 recv_ota_block_response_cb(void *arg){
 	if(ota_info.blockRequestCnt++ < HCI_OTA_BLOCK_REQUEST_RETRY_CNT_MAX){
 		uart_send_ota_block_request();
@@ -1052,26 +1083,42 @@ s32 recv_ota_block_response_cb(void *arg){
 }
 
 s32 local_ota_reboot_delay(void *arg){
+	bool reboot = 0;
 	u8 flashInfo = 0x4b;
 
-	u32 newAddr = (mcuBootAddrGet()) ? 0 : FLASH_ADDR_OF_OTA_IMAGE;
-	if(!ota_newImageValid(newAddr)){
-		g_hciOtaTimer = NULL;
-		return -1;
-	}
-	if(flash_writeWithCheck((newAddr + FLASH_TLNK_FLAG_OFFSET), 1, &flashInfo) != TRUE){
-		g_hciOtaTimer = NULL;
+	g_hciOtaTimer = NULL;//cancel timer
+
+	u32 bootAddr = mcuBootAddrGet();
+	if(bootAddr == 0xFFFFFFFF){
 		return -1;
 	}
 
-	flashInfo = 0;
-	u32 baseAddr = (mcuBootAddrGet()) ? FLASH_ADDR_OF_OTA_IMAGE : 0;
-	if(flash_writeWithCheck((baseAddr + FLASH_TLNK_FLAG_OFFSET), 1, &flashInfo) != TRUE){
-		g_hciOtaTimer = NULL;
+	u32 newAddr = (bootAddr) ? 0 : FLASH_ADDR_OF_OTA_IMAGE;
+	if(!ota_newImageValid(newAddr)){
 		return -1;
 	}
-	g_hciOtaTimer = NULL;
-	SYSTEM_RESET();
+
+#if FLASH_PROTECT_ENABLE
+	flash_unlock();
+#endif
+
+	if(flash_writeWithCheck((newAddr + FLASH_TLNK_FLAG_OFFSET), 1, &flashInfo) == TRUE){
+#if (!BOOT_LOADER_MODE)
+		flashInfo = 0;
+		u32 baseAddr = (bootAddr) ? FLASH_ADDR_OF_OTA_IMAGE : 0;
+		flash_write((baseAddr + FLASH_TLNK_FLAG_OFFSET), 1, &flashInfo);//disable boot-up flag
+#endif
+		reboot = 1;
+	}
+
+#if FLASH_PROTECT_ENABLE
+	flash_lock();
+#endif
+
+	if(reboot){
+		SYSTEM_RESET();
+	}
+
 	return -1;
 }
 
@@ -1088,27 +1135,42 @@ void zbhci_uartOTAHandle(void *arg){
 	u8 *p = cmdInfo->payload;
 	if(cmdId == ZBHCI_CMD_OTA_START_REQUEST){
 		u8 start_status = ZBHCI_OTA_SUCCESS;
-		ota_info.binType = *p++;
-		if(ota_info.otaProcessStart == 0){
-			ota_info.otaFlashAddrStart = (mcuBootAddrGet()) ? 0 : FLASH_ADDR_OF_OTA_IMAGE;
-			COPY_BUFFERTOU32_BE(ota_info.otaFileTotalSize, p);
 
-			if(ota_info.otaFileTotalSize < FLASH_OTA_IMAGE_MAX_SIZE){
-				ota_info.otaFileOffset = 0;
-				ota_info.otaProcessStart = 1;
-				u16 sectorNumUsed = ota_info.otaFileTotalSize / FLASH_SECTOR_SIZE + 1;
-				for(u16 i = 0; i < sectorNumUsed; i++){
-					flash_erase(ota_info.otaFlashAddrStart + i * FLASH_SECTOR_SIZE);
-				}
-				ota_info.otaFindBootFlag = 0;
-				ota_info.blockRequestCnt = 0;
-				ota_info.otaCrcValue = 0xffffffff;
-				if(g_hciOtaTimer){
-					TL_ZB_TIMER_CANCEL(&g_hciOtaTimer);
-				}
-				g_hciOtaTimer = TL_ZB_TIMER_SCHEDULE(recv_ota_block_response_cb, NULL, HCI_OTA_BLOCK_INTERVAL_NORMAL);
+		if(ota_info.otaProcessStart == 0){
+			u32 bootAddr = mcuBootAddrGet();
+			if(bootAddr == 0xFFFFFFFF){
+				start_status = ZBHCI_OTA_BOOT_ADDR_ERROR;
 			}else{
-				start_status = ZBHCI_OTA_FILE_OVERSIZE;
+				ota_info.otaFlashAddrStart = (bootAddr) ? 0 : FLASH_ADDR_OF_OTA_IMAGE;
+				COPY_BUFFERTOU32_BE(ota_info.otaFileTotalSize, p);
+				p += 4;
+				if(ota_info.otaFileTotalSize < FLASH_OTA_IMAGE_MAX_SIZE){
+					ota_info.binType = ZBHCI_OTA_REMOTE_OTA_BIN;
+					if(cmdInfo->payloadLen > 4){
+						ota_info.binType = *p;
+					}
+
+					ota_info.otaFileOffset = 0;
+					ota_info.otaProcessStart = 1;
+					u16 sectorNumUsed = ota_info.otaFileTotalSize / FLASH_SECTOR_SIZE + 1;
+
+#if FLASH_PROTECT_ENABLE
+					flash_unlock();
+#endif
+
+					for(u16 i = 0; i < sectorNumUsed; i++){
+						flash_erase(ota_info.otaFlashAddrStart + i * FLASH_SECTOR_SIZE);
+					}
+					ota_info.otaFindBootFlag = 0;
+					ota_info.blockRequestCnt = 0;
+					ota_info.otaCrcValue = 0xffffffff;
+					if(g_hciOtaTimer){
+						TL_ZB_TIMER_CANCEL(&g_hciOtaTimer);
+					}
+					g_hciOtaTimer = TL_ZB_TIMER_SCHEDULE(recv_ota_block_response_cb, NULL, HCI_OTA_BLOCK_INTERVAL_NORMAL);
+				}else{
+					start_status = ZBHCI_OTA_FILE_OVERSIZE;
+				}
 			}
 		}else{
 			start_status = ZBHCI_OTA_IN_PROGRESS;
@@ -1184,7 +1246,7 @@ void zbhci_uartOTAHandle(void *arg){
 				u8 finalStatus = ZBHCI_OTA_SUCCESS;
 				if(ota_info.binType == ZBHCI_OTA_LOCAL_BIN){
 					u32 crcRecv;
-					flash_read(ota_info.otaFileTotalSize - 4, 4, (u8 *)&crcRecv);
+					flash_read(ota_info.otaFlashAddrStart + ota_info.otaFileTotalSize - 4, 4, (u8 *)&crcRecv);
 					if((crcRecv == ota_info.otaCrcValue) && (is_valid_fw_flag(ota_info.otaFlashAddrStart))){
 						g_hciOtaTimer = TL_ZB_TIMER_SCHEDULE(local_ota_reboot_delay, NULL, 3000);
 					}else{
@@ -1199,6 +1261,7 @@ void zbhci_uartOTAHandle(void *arg){
 	}
 	ev_buf_free(arg);
 }
+
 void zbhciCmdHandler(u16 msgType, u16 msgLen, u8 *p){
 	u8 ret[4] = {0,0,0,0};
 	u8 seqNum = 0;//pdu tx seq num
@@ -1252,6 +1315,8 @@ void zbhciCmdHandler(u16 msgType, u16 msgLen, u8 *p){
 			case ZBHCI_CMD_TXRX_PERFORMANCE_TEST_REQ:
 			case ZBHCI_CMD_AF_DATA_SEND_TEST_REQ:
 			case ZBHCI_CMD_GET_LOCAL_NWK_INFO_REQ:
+			case ZBHCI_CMD_GET_CHILD_NODES_REQ:
+			case ZBHCI_CMD_REMOVE_ALL_CHILD_NODES_REQ:
 				TL_ZB_TIMER_SCHEDULE(zbhci_nodeManageCmdHandler, cmdInfo, 100);
 				break;
 
@@ -1320,6 +1385,7 @@ void zbhciCmdHandler(u16 msgType, u16 msgLen, u8 *p){
 
 			case ZBHCI_CMD_OTA_START_REQUEST:
 			case ZBHCI_CMD_OTA_BLOCK_RESPONSE:
+				cmdInfo->payloadLen = msgLen;
 				TL_SCHEDULE_TASK(zbhci_uartOTAHandle, cmdInfo);
 				break;
 

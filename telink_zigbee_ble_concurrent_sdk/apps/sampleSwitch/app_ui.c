@@ -7,6 +7,7 @@
  * @date    2021
  *
  * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *			All rights reserved.
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -19,6 +20,7 @@
  *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
+ *
  *******************************************************************************************************/
 
 #if (__PROJECT_TL_SWITCH__)
@@ -62,18 +64,17 @@ void led_off(u32 pin)
 
 void light_on(void)
 {
-	led_on(LED1);
+	led_on(LED_POWER);
 }
 
 void light_off(void)
 {
-	led_off(LED1);
+	led_off(LED_POWER);
 }
 
 void light_init(void)
 {
-	led_off(LED1);
-
+	led_off(LED_POWER);
 }
 
 s32 zclLightTimerCb(void *arg)
@@ -260,7 +261,7 @@ void keyScan_keyPressedCB(kb_data_t *kbEvt){
 	}
 
 #if BLE_ACTIVE_BY_UI
-	if(APP_BLE_STATE_GET() == BLS_LINK_STATE_IDLE){
+	if(APP_BLE_STATE_IDLE()){
 		ble_task_restart();
 		ble_advertiseTickUpdate();
 	}

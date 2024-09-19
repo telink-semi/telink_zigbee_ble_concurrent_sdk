@@ -7,6 +7,7 @@
  * @date    2021
  *
  * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *			All rights reserved.
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -19,6 +20,7 @@
  *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
+ *
  *******************************************************************************************************/
 
 #if (__PROJECT_TL_GW__)
@@ -156,7 +158,7 @@ s32 brc_toggleCb(void *arg)
 	dstEpInfo.radius = 0;
 
 	//zcl_onOff_toggleCmd(SAMPLE_GW_ENDPOINT, &dstEpInfo, FALSE);
-	toggle = ~toggle;
+	toggle = !toggle;
 	if(toggle){
 		zcl_onOff_onCmd(SAMPLE_GW_ENDPOINT, &dstEpInfo, FALSE);
 	}else{
@@ -166,7 +168,7 @@ s32 brc_toggleCb(void *arg)
 	return 0;
 }
 
-void brc_toggle()
+void brc_toggle(void)
 {
 	if(!brc_toggleEvt){
 		brc_toggleEvt = TL_ZB_TIMER_SCHEDULE(brc_toggleCb, NULL, 1000);

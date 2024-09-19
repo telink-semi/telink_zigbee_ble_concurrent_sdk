@@ -80,6 +80,8 @@ extern "C" {
 #define LED_POWER					LED_R
 #define LED_PERMIT					LED_G
 
+#define VOLTAGE_DETECT_PIN			ADC_GPIO_PB0
+
 // UART
 #if ZBHCI_UART
 	#define UART_TX_PIN         	UART0_TX_PB2
@@ -89,7 +91,7 @@ extern "C" {
 #endif
 
 // DEBUG
-#if UART_PRINTF_MODE
+#if (TLKAPI_DEBUG_ENABLE)
 	#define	DEBUG_INFO_TX_PIN	    GPIO_PC7//print
 #endif
 

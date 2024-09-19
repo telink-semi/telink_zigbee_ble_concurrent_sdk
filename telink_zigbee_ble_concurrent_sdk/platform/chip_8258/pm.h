@@ -1,10 +1,10 @@
 /********************************************************************************************************
- * @file	pm.h
+ * @file    pm.h
  *
- * @brief	This is the header file for B85
+ * @brief   This is the header file for B85
  *
- * @author	Driver Group
- * @date	2018
+ * @author  Driver Group
+ * @date    2018
  *
  * @par     Copyright (c) 2018, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
@@ -25,7 +25,7 @@
 
 #include "bit.h"
 #include "gpio.h"
-
+#include "compiler.h"
 
 
 #define PM_XTAL_DELAY_DURATION      		500
@@ -342,5 +342,16 @@ void soft_reboot_dly13ms_use24mRC(void);
 
 void start_reboot(void);
 
-
+/**
+ * @brief   	This function is used to determine the stability of the crystal oscillator.
+ * 				To judge the stability of the crystal oscillator, xo_ready_ana is invalid, and use an alternative solution to judge.
+ * 				Alternative principle: Because the clock source of the stimer is the crystal oscillator,
+ * 				if the crystal oscillator does not vibrate, the tick value of the stimer does not increase or increases very slowly (when there is interference).
+ * 				So first use 24M RC to run the program and wait for a fixed time, calculate the number of ticks that the stimer should increase during this time,
+ * 				and then read the tick value actually increased by the stimer.
+ * 				When it reaches 50% of the calculated value, it proves that the crystal oscillator has started.
+ * 				If it is not reached for a long time, the system will reboot.
+ * @return  	none.
+ */
+_attribute_ram_code_sec_noinline_ void pm_wait_xtal_ready(void);
 

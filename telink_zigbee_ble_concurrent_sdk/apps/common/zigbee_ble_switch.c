@@ -41,10 +41,13 @@ app_dualModeInfo_t g_dualModeInfo = {
 		.bleState = BLS_LINK_STATE_IDLE,
 };
 
+volatile u8 switch_to_ble = 0;
+
 
 extern u8 g_ble_txPowerSet;
+extern int blt_sdk_main_loop(void);
 
-_attribute_ram_code_ void switch_to_zb_context(void){
+void switch_to_zb_context(void){
 	backup_ble_rf_context();
 
 	ZB_RADIO_RX_DISABLE;
@@ -121,12 +124,12 @@ void zb_task(void){
 
 }
 
-
 void zb_ble_switch_proc(void){
 	u32 r = 0;
 
+#if defined(MCU_CORE_8258) || defined(MCU_CORE_B91)
 	APP_BLE_STATE_SET(BLE_BLT_STATE_GET()); //bltParam.blt_state);
-
+#endif
 	//zb_task();
 	//blt_sdk_main_loop();
 	//return;
@@ -164,8 +167,7 @@ void zb_ble_switch_proc(void){
 
 		 r = drv_disable_irq();
 
-		 if(((get_ble_event_state() && is_switch_to_zigbee()) || APP_BLE_STATE_GET() == BLS_LINK_STATE_IDLE)
-			 ){
+		 if(((get_ble_event_state() && is_switch_to_zigbee()) || APP_BLE_STATE_IDLE()) && (!switch_to_ble)){
 			 /*
 			  * ready to switch to ZIGBEE mode
 			  *
@@ -190,7 +192,7 @@ void zb_ble_switch_proc(void){
 
 		 r = drv_disable_irq();
 
-		 if(!zb_rfTxDoing() && is_switch_to_ble() && APP_BLE_STATE_GET() != BLS_LINK_STATE_IDLE){
+		 if(!zb_rfTxDoing() && ((is_switch_to_ble() && !APP_BLE_STATE_IDLE()) || switch_to_ble)){
 			 /*
 			  * ready to switch to BLE mode
 			  *
@@ -202,7 +204,6 @@ void zb_ble_switch_proc(void){
 			 drv_restore_irq(r);
 			 return;
 		 }
-
 		 drv_restore_irq(r);
 		 DBG_ZIGBEE_STATUS(0x35);
 		 zb_task();
@@ -210,6 +211,12 @@ void zb_ble_switch_proc(void){
 }
 
 void concurrent_mode_main_loop(void){
+#if defined(MCU_CORE_TL321X)
+#if (TLKAPI_DEBUG_ENABLE)
+	tlkapi_debug_handler();
+#endif
+#endif
+
 	zb_ble_switch_proc();
 
 #if BLE_MASTER_ROLE_ENABLE
@@ -222,8 +229,8 @@ void concurrent_mode_main_loop(void){
 
 u8 ble_task_stop(void){
 	u32 r = drv_disable_irq();
-
 	ble_sts_t ret = BLE_SUCCESS;
+#if defined(MCU_CORE_8258) || defined(MCU_CORE_B91)
 	if(APP_BLE_STATE_GET() == BLS_LINK_STATE_CONN){
 		ret = bls_ll_terminateConnection(HCI_ERR_OP_CANCELLED_BY_HOST);//cut any ble connections
 	}else{
@@ -236,15 +243,30 @@ u8 ble_task_stop(void){
 			ZB_RF_ISR_RECOVERY;
 		}
 	}
-
+#elif defined(MCU_CORE_TL321X)
+	if(!APP_BLE_STATE_IDLE()){
+		ble_sts_t ret1 = BLE_SUCCESS;
+		ret = blc_ll_setAdvEnable(BLC_ADV_DISABLE);
+		ret = blc_ll_setScanEnable (BLC_SCAN_DISABLE, DUP_FILTER_DISABLE);
+		for(u8 i = 0; i < DEVICE_CHAR_INFO_MAX_NUM; i++){
+			if(conn_dev_list[i].conn_state == 1){
+				blc_ll_disconnect(conn_dev_list[i].conn_handle, HCI_ERR_REMOTE_USER_TERM_CONN);
+			}
+		}
+		ret = ret & ret1;
+	}
+#endif
 	drv_restore_irq(r);
 	return ret;
 }
 
 u8 ble_task_restart(void){
 	u32 r = drv_disable_irq();
-
+#if defined(MCU_CORE_8258) || defined(MCU_CORE_B91)
 	ble_sts_t ret = bls_ll_setAdvEnable(1);
+#elif defined(MCU_CORE_TL321X)
+	ble_sts_t ret = blc_ll_setAdvEnable(1);
+#endif
 	/* rf irq is cleared in the "bls_ll_setAdvEnable",
 	 * so that the rf tx/rx interrupt will be missed if the "bls_ll_setAdvEnable" is called in Zigbee mode
 	 */
