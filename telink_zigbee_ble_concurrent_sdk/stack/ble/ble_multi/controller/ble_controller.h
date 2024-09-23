@@ -69,9 +69,8 @@
 
 #include "stack/ble/ble_multi/debug/debug.h"
 
-#include "stack/ble/ble_multi/algorithm/algorithm.h"
-
 /*********************************************************/
+
 
 
 
