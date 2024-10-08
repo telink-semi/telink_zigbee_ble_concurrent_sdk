@@ -1,6 +1,6 @@
-##V2.4.0.0
+## V2.4.0.0
 
-###Version
+### Version
 * Chips
   - TC32: TLSR8258
   - RISCV: TLSR921x(B91), TL321x
