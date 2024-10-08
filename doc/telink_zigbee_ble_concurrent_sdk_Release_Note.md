@@ -1,4 +1,5 @@
 ##V2.4.0.0
+
 ###Version
 * Chips
   - TC32: TLSR8258
@@ -27,7 +28,7 @@
 ### Performance
 * Optimized power consumption during ble connection state 
 * Double-detect start flag when OTA
-BREAKING CHANGES
+### BREAKING CHANGES
 * None
 ### CodeSize
 * Units: KBytes
@@ -66,7 +67,7 @@ BREAKING CHANGES
 ### Performance
 * 优化BLE连接状态下功耗.
 * OTA时双重检查固件有效标志.
-BREAKING CHANGES
+### BREAKING CHANGES
 * None
 
 ## V2.3.2.1
@@ -381,7 +382,7 @@ BREAKING CHANGES
 
 ### Bugs
 * ble处于idle时，system timer中断仍然工作
-* zigbee模式下调用task_restart/ble_task_stop�?导致rf中断mask位被清除
+* zigbee模式下调用task_restart/ble_task_stop?导致rf中断mask位被清除
 * 入网过程中buffer释放异常
 
 ### Feautures
@@ -389,11 +390,11 @@ BREAKING CHANGES
 * ble ADV状态添加scan功能
 
 ### BREAKING CHANGES
-* �?
+* ?
 ## V1.5.2
 
 ### Bugs
-*  add usb_dp_pullup_en in lib/libdrivers_8258.a, or compile error while enable "ZBHCI_USB_CDC"�?now usb cdc works
+*  add usb_dp_pullup_en in lib/libdrivers_8258.a, or compile error while enable "ZBHCI_USB_CDC"?now usb cdc works
 *  system ram exception will occur if the "ZB_BUF_POOL_NUM" or“APS_BINDING_TABLE_NUM”is modified in sdk
 *  nib.ieeeAddress didn't set after touch link，so that the address information is wrong when doing binding
 *  binding address table shouldn't be updated after group binding 
@@ -408,17 +409,17 @@ BREAKING CHANGES
 * None
 
 ### Bugs
-* 在lib/libdrivers_8258.a里，添加“usb_dp_pullup_en“函数，否则打开”ZBHCI_USB_CDC"编译出错，CDC可工�?* SDK里修�?ZB_BUF_POOL_NUM" or“APS_BINDING_TABLE_NUM”会导致内存异常
-* touchlink结束后，nib.ieeeAddress没有正确赋值，导致绑定时地址出现异常�?* 组绑定后，绑定地址表不应该更新
+* 在lib/libdrivers_8258.a里，添加“usb_dp_pullup_en“函数，否则打开”ZBHCI_USB_CDC"编译出错，CDC可工?* SDK里修?ZB_BUF_POOL_NUM" or“APS_BINDING_TABLE_NUM”会导致内存异常
+* touchlink结束后，nib.ieeeAddress没有正确赋值，导致绑定时地址出现异常?* 组绑定后，绑定地址表不应该更新
 
 ###Feautures
 * mac重传由mac-pib.frameRetryNum控制
 * ZC 遵循tc policy
 * 宏改为变量，可有用户配置
-* 开�?aps_group.c
+* 开?aps_group.c
 
 ### BREAKING CHANGES
-* �?
+* ?
 
 ## V1.5.1
 
@@ -429,9 +430,9 @@ BREAKING CHANGES
 * None
 
 ### Bugs
-* Ble/Zigbee使用不同的Rf Tx power(zb: 10dBm, ble: 3dBm); 模式切换时，tx power应该设回相应的�?
+* Ble/Zigbee使用不同的Rf Tx power(zb: 10dBm, ble: 3dBm); 模式切换时，tx power应该设回相应的?
 ### BREAKING CHANGES
-* �?
+* ?
 
 
 ## V1.5.0
@@ -454,10 +455,10 @@ BREAKING CHANGES
 ### Features
 * 设备离网，bindList清除
 * 对于Route/Coordinator，使能Green Power
-* 更新rssi转化到Lqi的折算公�?* 入网时tranport key超时时间可由用户层控�?
+* 更新rssi转化到Lqi的折算公?* 入网时tranport key超时时间可由用户层控?
 ### Bug Fixes
-* 修复终端节点orphan join回连时父节点的neighbor table没有有效更新的问题�?* mac ack回复慢的问题
+* 修复终端节点orphan join回连时父节点的neighbor table没有有效更新的问题?* mac ack回复慢的问题
 * scene table保存、恢复的问题
 
 ### BREAKING CHANGES
-* �?
+* ?
