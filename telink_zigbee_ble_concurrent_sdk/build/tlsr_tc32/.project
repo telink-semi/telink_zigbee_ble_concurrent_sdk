@@ -167,16 +167,6 @@
 			<locationURI>PARENT-2-PROJECT_LOC/platform/boot/8258</locationURI>
 		</link>
 		<link>
-			<name>platform/boot/826x</name>
-			<type>2</type>
-			<locationURI>PARENT-2-PROJECT_LOC/platform/boot/826x</locationURI>
-		</link>
-		<link>
-			<name>platform/boot/8278</name>
-			<type>2</type>
-			<locationURI>PARENT-2-PROJECT_LOC/platform/boot/8278</locationURI>
-		</link>
-		<link>
 			<name>platform/boot/link_cfg.S</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/platform/boot/link_cfg.S</locationURI>
