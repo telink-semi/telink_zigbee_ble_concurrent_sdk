@@ -26,21 +26,17 @@
 #include "../tl_common.h"
 
 void drv_pwm_init(void){
-#if defined(MCU_CORE_826x)
-	pwm_Init(0);
-#elif defined(MCU_CORE_B91) || defined(MCU_CORE_TL321X)
+#if defined(MCU_CORE_B91) || defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
 	pwm_set_clk(0);
 #endif
 }
 
 void drv_pwm_cfg(u8 pwmId, u16 cmp_tick, u16 cycle_tick){
-#if defined(MCU_CORE_826x)
-	pwm_Open(pwmId, NORMAL, 0, cmp_tick, cycle_tick, 0x2fff);
-#elif defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
+#if defined(MCU_CORE_8258)
 	pwm_set_mode(pwmId, PWM_NORMAL_MODE);
 	pwm_set_phase(pwmId, 0);   //no phase at pwm beginning
 	pwm_set_cycle_and_duty(pwmId, cycle_tick, cmp_tick);
-#elif defined(MCU_CORE_B91) || defined(MCU_CORE_TL321X)
+#elif defined(MCU_CORE_B91) || defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
 	pwm_set_tcmp(pwmId, cmp_tick);
 	pwm_set_tmax(pwmId, cycle_tick);
 #endif

@@ -21,7 +21,7 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-#if defined(MCU_CORE_TL321X)
+#if defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
 #include "tl_common.h"
 #include "stack/ble/ble.h"
 #include "tlkapi_debug.h"
@@ -298,7 +298,7 @@ int tlk_printf(const char *format, ...)
 	u8 *pd =  tlkapi_print_fifo->p + (tlkapi_print_fifo->wptr & (tlkapi_print_fifo->num - 1)) * tlkapi_print_fifo->size;
 	int ret;
 
-#if ((MCU_CORE_TYPE == MCU_CORE_B91) || (MCU_CORE_TYPE == MCU_CORE_TL321X))
+#if ((MCU_CORE_TYPE == MCU_CORE_B91) || (MCU_CORE_TYPE == MCU_CORE_TL321X) || (MCU_CORE_TYPE == MCU_CORE_TL721X))
 	va_list args;
 	va_start( args, format );
 

@@ -34,7 +34,7 @@
 #include "ble_b91/ble.h"
 #define BLE_BLT_STATE_GET()    bltParam.blt_state
 
-#elif defined (MCU_CORE_TL321X)
+#elif defined (MCU_CORE_TL321X) || defined (MCU_CORE_TL721X)
 #include "ble_multi/ble.h"
 #define BLE_BLT_STATE_GET()    (!blc_ll_isBleTaskIdle())
 #endif

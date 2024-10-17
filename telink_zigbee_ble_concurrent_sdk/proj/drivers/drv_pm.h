@@ -52,11 +52,7 @@ typedef struct{
 }drv_pm_pinCfg_t;
 
 /* Initialize 32K for timer wakeup. */
-#if defined(MCU_CORE_826x)
-	#define PM_CLOCK_INIT()					do{ rc_32k_cal(); }while(0)
-
-	#define PM_NORMAL_SLEEP_MAX				(100 * 1000)//100s, (0xC0000000 / 32)
-#elif defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
+#if defined(MCU_CORE_8258)
 #if CLOCK_32K_EXT_CRYSTAL
 	#define PM_CLOCK_INIT()					do{ \
 												clock_32k_init(CLK_32K_XTAL);			\
@@ -71,7 +67,7 @@ typedef struct{
 											}while(0)
 #endif
 	#define PM_NORMAL_SLEEP_MAX				(230 * 1000)//230s, (0xE0000000 / 16)
-#elif defined(MCU_CORE_B91) || defined(MCU_CORE_TL321X)
+#elif defined(MCU_CORE_B91) || defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
 	/* 24M RC is inaccurate, and it is greatly affected by temperature, so real-time calibration is required
 	 * The 24M RC needs to be calibrated before the pm_sleep_wakeup function,
 	 * because this clock will be used to kick 24m xtal start after wake up.
@@ -92,7 +88,7 @@ typedef struct{
 #endif
 #if defined(MCU_CORE_B91)
 	#define PM_NORMAL_SLEEP_MAX				(230 * 1000)//230s, (0xE0000000 / 16)
-#elif defined(MCU_CORE_TL321X)
+#elif defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
 	#define PM_NORMAL_SLEEP_MAX				(156 * 1000)//156s, (0xE0000000 / 24)
 #endif
 #endif

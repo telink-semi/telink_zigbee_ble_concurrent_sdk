@@ -35,17 +35,15 @@
 #define APP_NEW_IMAGE_ADDR				FLASH_ADDR_OF_OTA_IMAGE
 
 /* SRAM address */
-#if defined(MCU_CORE_826x)
-	#define MCU_RAM_START_ADDR			0x808000
-#elif defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
+#if defined(MCU_CORE_8258)
 	#define MCU_RAM_START_ADDR			0x840000
-#elif defined(MCU_CORE_B91) || defined(MCU_CORE_TL321X)
+#elif defined(MCU_CORE_B91) || defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
 	#define MCU_RAM_START_ADDR			0x0000
 #endif
 
-#if defined(MCU_CORE_826x) || defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
+#if defined(MCU_CORE_8258)
 	#define REBOOT()					WRITE_REG8(0x602, 0x88)
-#elif defined(MCU_CORE_B91) || defined(MCU_CORE_TL321X)
+#elif defined(MCU_CORE_B91) || defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
 	#define REBOOT()					((void(*)(void))(FLASH_R_BASE_ADDR + APP_IMAGE_ADDR))()
 #endif
 

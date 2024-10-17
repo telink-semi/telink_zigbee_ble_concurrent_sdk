@@ -66,7 +66,7 @@ enum{
 extern kb_data_t kb_event;
 
 
-#if defined(MCU_CORE_826x) || defined(MCU_CORE_8258) || defined(MCU_CORE_8278) || defined(MCU_CORE_B91)
+#if defined(MCU_CORE_8258) || defined(MCU_CORE_B91)
 static inline unsigned int gpio_read_cache(u32 pin, u8 *p){
 	return p[pin>>8] & (pin & 0xff);
 }

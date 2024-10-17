@@ -44,6 +44,17 @@ typedef enum {
 
 
 
+typedef enum {
+    WFI_DISABLE            = 0,
+    WFI_LEG_ADV            = BIT(0),
+    WFI_EXT_ADV            = BIT(1),
+
+    WFI_ACL_PERIPHR        = BIT(2),
+    WFI_ACL_CENTRAL        = BIT(3),
+
+}wfi_mask_t;
+
+
 /**
  *  @brief
  */

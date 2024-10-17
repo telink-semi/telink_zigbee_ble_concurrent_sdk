@@ -363,7 +363,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="apps/common/tlkapi_debug.c|apps/common/device_manage.c|stack/ble/ble_multi|apps/sampleLight/sampleLightMultiBLE.c|apps/sampleLight/sampleLightBLESlave_8258.c|apps/common/main.c|apps/sampleLight/sampleLightBLEMaster_8258.c|stack/ble/ble_8258|apps/bootLoader|apps/sampleContactSensor|apps/sampleSwitch|apps/sampleGW" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="apps/sampleLight/sampleLightMultiBLEAdv.c|apps/common/tlkapi_debug.c|apps/common/device_manage.c|stack/ble/ble_multi|apps/sampleLight/sampleLightMultiBLE.c|apps/sampleLight/sampleLightBLESlave_8258.c|apps/common/main.c|apps/sampleLight/sampleLightBLEMaster_8258.c|stack/ble/ble_8258|apps/bootLoader|apps/sampleContactSensor|apps/sampleSwitch|apps/sampleGW" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -542,7 +542,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="apps/common/tlkapi_debug.c|apps/common/device_manage.c|stack/ble/ble_multi|apps/sampleSwitch/sampleSwitchMultiBLE.c|apps/sampleSwitch/sampleSwitchBLESlave_8258.c|apps/common/main.c|stack/ble/ble_8258|apps/bootLoader|apps/sampleContactSensor|apps/sampleGW|apps/sampleLight" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="apps/sampleSwitch/sampleSwitchMultiBLEAdv.c|apps/common/tlkapi_debug.c|apps/common/device_manage.c|stack/ble/ble_multi|apps/sampleSwitch/sampleSwitchMultiBLE.c|apps/sampleSwitch/sampleSwitchBLESlave_8258.c|apps/common/main.c|stack/ble/ble_8258|apps/bootLoader|apps/sampleContactSensor|apps/sampleGW|apps/sampleLight" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -884,7 +884,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="apps/common/tlkapi_debug.c|apps/common/device_manage.c|stack/ble/ble_multi|apps/sampleLight/sampleLightMultiBLE.c|apps/sampleLight/sampleLightBLESlave_8258.c|apps/common/main.c|apps/sampleLight/sampleLightBLEMaster_8258.c|stack/ble/ble_8258|apps/bootLoader|apps/sampleContactSensor|apps/sampleSwitch|apps/sampleGW" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="apps/sampleLight/sampleLightMultiBLEAdv.c|apps/common/tlkapi_debug.c|apps/common/device_manage.c|stack/ble/ble_multi|apps/sampleLight/sampleLightMultiBLE.c|apps/sampleLight/sampleLightBLESlave_8258.c|apps/common/main.c|apps/sampleLight/sampleLightBLEMaster_8258.c|stack/ble/ble_8258|apps/bootLoader|apps/sampleContactSensor|apps/sampleSwitch|apps/sampleGW" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

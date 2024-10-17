@@ -130,9 +130,9 @@ void zb_ble_switch_proc(void){
 #if defined(MCU_CORE_8258) || defined(MCU_CORE_B91)
 	APP_BLE_STATE_SET(BLE_BLT_STATE_GET()); //bltParam.blt_state);
 #endif
-	//zb_task();
-	//blt_sdk_main_loop();
-	//return;
+//	zb_task();
+//	blt_sdk_main_loop();
+//	return;
 
 	if(CURRENT_SLOT_GET() == DUALMODE_SLOT_BLE){
 		 g_dualModeInfo.bleTaskTick = clock_time();
@@ -211,7 +211,7 @@ void zb_ble_switch_proc(void){
 }
 
 void concurrent_mode_main_loop(void){
-#if defined(MCU_CORE_TL321X)
+#if defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
 #if (TLKAPI_DEBUG_ENABLE)
 	tlkapi_debug_handler();
 #endif
@@ -243,7 +243,7 @@ u8 ble_task_stop(void){
 			ZB_RF_ISR_RECOVERY;
 		}
 	}
-#elif defined(MCU_CORE_TL321X)
+#elif defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
 	if(!APP_BLE_STATE_IDLE()){
 		ble_sts_t ret1 = BLE_SUCCESS;
 		ret = blc_ll_setAdvEnable(BLC_ADV_DISABLE);
@@ -264,7 +264,7 @@ u8 ble_task_restart(void){
 	u32 r = drv_disable_irq();
 #if defined(MCU_CORE_8258) || defined(MCU_CORE_B91)
 	ble_sts_t ret = bls_ll_setAdvEnable(1);
-#elif defined(MCU_CORE_TL321X)
+#elif defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
 	ble_sts_t ret = blc_ll_setAdvEnable(1);
 #endif
 	/* rf irq is cleared in the "bls_ll_setAdvEnable",

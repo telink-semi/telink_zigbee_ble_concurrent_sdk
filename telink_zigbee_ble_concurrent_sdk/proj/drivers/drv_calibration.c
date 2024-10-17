@@ -137,7 +137,7 @@ static void drv_calib_rf_rx_dcoc(void)
 		rf_update_rx_dcoc_calib_code(flash_iq_code);
 	}
 }
-#elif defined(MCU_CORE_TL321X)
+#elif defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
 static void drv_calib_freq_offset(void)
 {
 	u8 freq_offset_value = 0xff;
@@ -167,6 +167,13 @@ void drv_calibration(void)
 		drv_calib_adc_verf();
 		drv_calib_freq_offset();
 		drv_calib_rf_rx_dcoc();
+	}
+#elif defined(MCU_CORE_TL721X)
+	u32 flash_mid = 0;
+	u8 flash_uid[16] = {0};
+
+	if(flash_read_mid_uid_with_check_with_device_num(SLAVE0, &flash_mid, flash_uid)){
+		drv_calib_freq_offset();
 	}
 #elif defined(MCU_CORE_TL321X)
 	u32 flash_mid = 0;

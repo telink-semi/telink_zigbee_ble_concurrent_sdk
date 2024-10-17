@@ -94,7 +94,7 @@
 #define ZDO_REJOIN_BACKOFF_ITERATION				8
 /******************************************************************************************************************************/
 
-#if defined(MCU_CORE_8258) || defined(MCU_CORE_8278) || defined(MCU_CORE_B91) || defined(MCU_CORE_TL321X)
+#if defined(MCU_CORE_8258) || defined(MCU_CORE_B91) || defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
 #if ZB_ROUTER_ROLE
 #if ZB_COORDINATOR_ROLE
 	#define NWK_ROUTE_RECORD_TABLE_NUM				127//300
@@ -102,7 +102,7 @@
 	#define TL_ZB_NWK_ADDR_MAP_NUM					128//301
 	#define ROUTING_TABLE_NUM						48//250
 #endif
-#elif defined (MCU_CORE_826x)
+#else
 #if ZB_ROUTER_ROLE
 #if ZB_COORDINATOR_ROLE
 	#define NWK_ROUTE_RECORD_TABLE_NUM				64
@@ -142,16 +142,14 @@
 #endif
 
 //default TX power idx.
-#if defined (MCU_CORE_826x)
-	#define ZB_DEFAULT_TX_POWER_IDX					RF_POWER_7dBm
-#elif defined(MCU_CORE_8258)
+#if defined(MCU_CORE_8258)
 	#define ZB_DEFAULT_TX_POWER_IDX					RF_POWER_P10p46dBm
-#elif defined(MCU_CORE_8278)
-	#define ZB_DEFAULT_TX_POWER_IDX					RF_POWER_INDEX_P11p26dBm
 #elif defined(MCU_CORE_B91)
 	#define ZB_DEFAULT_TX_POWER_IDX					RF_POWER_INDEX_P9p11dBm
 #elif defined(MCU_CORE_TL321X)
 	#define ZB_DEFAULT_TX_POWER_IDX					RF_POWER_INDEX_P10p78dBm
+#elif defined(MCU_CORE_TL721X)
+	#define ZB_DEFAULT_TX_POWER_IDX					RF_POWER_INDEX_P9p06dBm
 #else
 	#define ZB_DEFAULT_TX_POWER_IDX					0/* idx = 0, means MAX TX power. */
 #endif

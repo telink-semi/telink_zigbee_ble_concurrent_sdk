@@ -67,13 +67,11 @@
 
 
 /* Chip IDs */
-#define TLSR_8267							0x00
-#define TLSR_8269							0x01
-#define TLSR_8258_512K						0x02
-#define TLSR_8258_1M						0x03
-#define TLSR_8278							0x04
-#define TLSR_B91							0x05
-#define TLSR_TL321X							0x06
+#define TLSR_8258_512K						0x01
+#define TLSR_8258_1M						0x02
+#define TLSR_B91							0x03
+#define TLSR_TL321X							0x04
+#define TLSR_TL721X							0x05
 
 /* Image types */
 #if (BOOT_LOADER_MODE)

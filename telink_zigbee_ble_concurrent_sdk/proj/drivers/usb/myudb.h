@@ -24,7 +24,7 @@
 #ifndef		__MYUDB_H__
 #define		__MYUDB_H__
 
-#if defined(MCU_CORE_TL321X)
+#if defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
 #pragma once
 
 #include "types.h"
@@ -128,5 +128,8 @@ void 	usb_send_str_u32s (char *str, u32 d0, u32 d1, u32 d2, u32 d3);
 #define	log_b16_irq(en,id,d)	 if(VCD_EN && en) {log_uart(0xc0|(id));log_uart(d);log_uart((d)>>8);}
 #define	log_b16_byte_irq(en,id,high_b,low_b)	 if(VCD_EN && en) {log_uart(0xc0|(id));log_uart(low_b);log_uart(high_b);}
 
+#elif defined(MCU_CORE_B91)
+#define my_dump_str_u32s(en,s,d0,d1,d2,d3)
 #endif
+
 #endif

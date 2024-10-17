@@ -26,12 +26,12 @@
 #pragma once
 
 
-#if defined(MCU_CORE_826x) || defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
+#if defined(MCU_CORE_8258)
 	#define SPI_CLOCK_SOURCE			CLOCK_SYS_CLOCK_HZ
 #elif defined(MCU_CORE_B91)
 	/* PCLK provides clock source for PSPI module. */
 	#define SPI_CLOCK_SOURCE			(sys_clk.pclk * 1000 * 1000)
-#elif defined(MCU_CORE_TL321X)
+#elif defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
 	#define SPI_CLOCK_SOURCE			(sys_clk.pll_clk * 1000 * 1000)
 #endif
 
@@ -68,15 +68,11 @@ void drv_spi_slave_init(drv_spi_mode_e mode);
  * @param[in] Pin Group or Pins
  * @return    none
  */
-#if	defined(MCU_CORE_826x)
-void drv_spi_master_pin_select(SPI_PinTypeDef pinGroup);
-#elif defined(MCU_CORE_8258)
+#if	defined(MCU_CORE_8258)
 void drv_spi_master_pin_select(SPI_GPIO_GroupTypeDef pinGroup);
-#elif defined(MCU_CORE_8278)
-void drv_spi_master_pin_select(SPI_GPIO_SclkTypeDef sclk_pin, SPI_GPIO_CsTypeDef cs_pin, SPI_GPIO_SdoTypeDef sdo_pin, SPI_GPIO_SdiTypeDef sdi_pin);
 #elif defined(MCU_CORE_B91)
 void drv_spi_master_pin_select(pspi_clk_pin_def_e sclk_pin, pspi_csn_pin_def_e cs_pin, pspi_mosi_io0_pin_def_e mosi_pin, pspi_miso_io1_pin_def_e miso_pin);
-#elif defined(MCU_CORE_TL321X)
+#elif defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
 void drv_spi_master_pin_select(gpio_pin_e sclk_pin, gpio_pin_e cs_pin, gpio_pin_e mosi_pin, gpio_pin_e miso_pin);
 #endif
 
@@ -85,15 +81,11 @@ void drv_spi_master_pin_select(gpio_pin_e sclk_pin, gpio_pin_e cs_pin, gpio_pin_
  * @param[in] Pin Group or Pins
  * @return    none
  */
-#if	defined(MCU_CORE_826x)
-void drv_spi_slave_pin_select(SPI_PinTypeDef pinGroup);
-#elif defined(MCU_CORE_8258)
+#if	defined(MCU_CORE_8258)
 void drv_spi_slave_pin_select(SPI_GPIO_GroupTypeDef pinGroup);
-#elif defined(MCU_CORE_8278)
-void drv_spi_slave_pin_select(SPI_GPIO_SclkTypeDef sclk_pin, SPI_GPIO_CsTypeDef cs_pin, SPI_GPIO_SdoTypeDef sdo_pin, SPI_GPIO_SdiTypeDef sdi_pin);
 #elif defined(MCU_CORE_B91)
 void drv_spi_slave_pin_select(pspi_clk_pin_def_e sclk_pin, pspi_csn_pin_def_e cs_pin, pspi_mosi_io0_pin_def_e mosi_pin, pspi_miso_io1_pin_def_e miso_pin);
-#elif defined(MCU_CORE_TL321X)
+#elif defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
 void drv_spi_slave_pin_select(gpio_pin_e sclk_pin, gpio_pin_e cs_pin, gpio_pin_e mosi_pin, gpio_pin_e miso_pin);
 #endif
 

@@ -24,7 +24,7 @@
 #ifndef DEVICE_MANAGE_H_
 #define DEVICE_MANAGE_H_
 
-#if defined(MCU_CORE_TL321X)
+#if defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
 #include "stack/ble/ble_multi/ble_common.h"
 #include "stack/ble/ble_multi/hci/hci_event.h"
 

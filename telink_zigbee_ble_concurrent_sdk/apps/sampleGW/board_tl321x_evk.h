@@ -87,7 +87,7 @@ extern "C" {
 #define VOLTAGE_DETECT_PIN			ADC_GPIO_PB4
 
 // UART
-#if UART_ENABLE
+#if ZBHCI_UART
 	#define UART_TX_PIN         	GPIO_PC4
 	#define UART_RX_PIN         	GPIO_PC5
 

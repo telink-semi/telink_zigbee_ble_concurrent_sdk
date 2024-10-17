@@ -24,7 +24,7 @@
 #pragma once
 
 
-#include "platform.h"
+//#include "platform.h"
 #include "tl_common.h"
 
 //#define MCU_CORE_B91    0x01

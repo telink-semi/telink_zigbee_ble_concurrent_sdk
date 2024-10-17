@@ -216,7 +216,7 @@ void user_zb_init(bool isRetention)
 {
 	(void)isRetention;
 
-#if defined(MCU_CORE_8258) || defined(MCU_CORE_8278) || defined(MCU_CORE_B91)
+#if defined(MCU_CORE_8258) || defined(MCU_CORE_B91)
 	extern u8 firmwareCheckWithUID(void);
 	if(firmwareCheckWithUID()){
 		while(1);

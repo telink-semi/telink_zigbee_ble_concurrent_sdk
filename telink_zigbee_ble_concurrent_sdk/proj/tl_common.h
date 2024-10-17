@@ -29,7 +29,7 @@
 #include "app_cfg.h"
 #include "platform.h"
 
-#if defined(MCU_CORE_TL321X)
+#if defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
 #include "apps/common/device_manage.h"
 #include "apps/common/tlkapi_debug.h"
 #endif

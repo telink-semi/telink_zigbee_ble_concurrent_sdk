@@ -139,7 +139,7 @@ void app_pm_task(void){
 
 	return;
 }
-#elif defined(MCU_CORE_TL321X)
+#elif defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
 void app_pm_task(void){
 	/*
 	 * 2 low power mode

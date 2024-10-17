@@ -24,7 +24,7 @@
 #ifndef TLKAPI_DEBUG_H_
 #define TLKAPI_DEBUG_H_
 
-#if defined(MCU_CORE_TL321X)
+#if defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
 
 /**
  * @brief	Telink debug log enable or disable

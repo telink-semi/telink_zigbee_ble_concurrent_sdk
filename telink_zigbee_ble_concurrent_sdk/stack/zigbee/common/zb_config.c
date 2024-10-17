@@ -204,7 +204,7 @@ const tl_zb_mac_pib_t macPibDefault = {
 	.maxBe = 8,
 	.beaconOrder = 15,
 	.superframeOrder = 0,
-	.maxCsmaBackoffs = 5, //4,
+	.maxCsmaBackoffs = 4,
 	.associationPermit = 0,
 	.coordShortAddress = 0xffff,
 #if ZB_ED_ROLE
@@ -286,7 +286,9 @@ u32 brcTransRecordTblSizeGet(void){
 }
 #endif
 
-
+/*
+ * @brief:		get the entry of the mapping table of the binding list
+ */
 aps_binding_entry_t *bindTblEntryGet(void){
 	return &g_apsBindingTbl[0];
 }
@@ -297,7 +299,6 @@ aps_binding_entry_t *bindTblEntryGet(void){
 u32 zbBufferSizeGet(void){
 	return (sizeof(g_mPool));
 }
-
 
 /*
  * @brief:		get the size of the neighbor table

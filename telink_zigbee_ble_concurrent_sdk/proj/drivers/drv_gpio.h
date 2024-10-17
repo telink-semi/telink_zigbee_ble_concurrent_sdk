@@ -25,8 +25,7 @@
 
 #pragma once
 
-#if defined(MCU_CORE_826x) || defined(MCU_CORE_8258) || defined(MCU_CORE_8278) || \
-	defined(MCU_CORE_B91)
+#if defined(MCU_CORE_8258) || defined(MCU_CORE_B91) || defined(MCU_CORE_TL721X)
 typedef enum{
 	GPIO_IRQ_INVALID,
 	GPIO_IRQ_MODE,
@@ -55,8 +54,7 @@ typedef void (*irq_callback)(void);
 */
 int drv_gpio_irq_config(drv_gpioIrqMode_e mode, u32 pin, drv_gpioPoll_e polarity, irq_callback gpio_irq_callback);
 
-#if defined(MCU_CORE_826x) || defined(MCU_CORE_8258) || defined(MCU_CORE_8278) || \
-	defined(MCU_CORE_B91)
+#if defined(MCU_CORE_8258) || defined(MCU_CORE_B91) || defined(MCU_CORE_TL721X)
 void drv_gpio_irq_handler(void);
 #elif defined(MCU_CORE_TL321X)
 void drv_gpio_irq_handler(gpio_irq_num_e irq);

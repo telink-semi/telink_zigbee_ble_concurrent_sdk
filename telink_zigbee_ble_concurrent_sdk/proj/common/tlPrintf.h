@@ -25,17 +25,17 @@
 
 #pragma once
 
-#if defined(MCU_CORE_B91) || defined(MCU_CORE_TL321X)
+#if defined(MCU_CORE_B91) || defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
 #include <stdio.h>
 #endif
 
-#if defined(MCU_CORE_826x) || defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
+#if defined(MCU_CORE_8258)
 int Tl_printf(const char *format, ...);
 #endif
 
 
 #if (TLKAPI_DEBUG_ENABLE)
-#if defined(MCU_CORE_826x) || defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
+#if defined(MCU_CORE_8258)
 	#define printf										Tl_printf
 #endif
 
@@ -56,7 +56,7 @@ int Tl_printf(const char *format, ...);
 															}															\
 														}while(0)
 #else
-#if defined(MCU_CORE_826x) || defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
+#if defined(MCU_CORE_8258)
 	#define printf
 #endif
 

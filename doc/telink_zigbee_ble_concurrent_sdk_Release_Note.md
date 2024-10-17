@@ -3,67 +3,80 @@
 ### Version
 * Chips
   - TC32: TLSR8258
-  - RISCV: TLSR921x(B91), TL321x
+  - RISCV: TLSR921x(B91), TL321x, TL721x
 * Driver Version
-  - tl_platform_sdk V3.2.0(TL321x)
+  - tl_platform_sdk V3.2.0(TL321x, TL721x)
 * BLE Version
-  - tl_ble_sdk V4.0.4.2(TL321x)
+  - tl_ble_sdk V4.0.4.2(TL321x, TL721x)
 * Zigbee Version
   - telink_zigbee_sdk V3.7.1.0
 * Toolchain Version
   - TLSR8258: TC32 ELF GCC4.3
   - TLSR921x(B91): TL32 ELF MCULIB V5F GCC7.4
   - TL321x: TL32 ELF MCULIB V5 GCC12.2
+  - TL721x: TL32 ELF MCULIB V5F GCC12.2
 * IDE Version
   - Telink IDE: [Telink IDE](https://wiki.telink-semi.cn/tools_and_sdk/Tools/IDE/Telink_IDE.zip)
   - Telink V323 RDS: [telink_v323_rds](https://wiki.telink-semi.cn/tools_and_sdk/Tools/IDE/telink_v323_rds_official_windows.zip)
   - Telink IoT Studio: [TelinkIoTStudio_V2024.8](http://wiki.telink-semi.cn/tools_and_sdk/Tools/IoTStudio/TelinkIoTStudio_V2024.8.zip)
 ### Features
-* Support TL321x platform. 
-* Support flash protection.
-* Update TLSR8258 and TLSR921x driver for known issues.
+* Support TL321x platform
+* Support TL721x platform
+* Support flash protection
+* Update TLSR8258 and TLSR921x driver for known issues
+* Add new dual-mode demo that only support BLE advertise for TL321x and TL721x
+* Remove the unused platform information
 ### Bug Fixes
-* Protect the AES process from interruption.
-* Fix the issue of CRC check failure during local upgrade through HCI.
+* Protect the AES process from interruption
+* Fix the issue of CRC check failure during local upgrade through HCI
+* Check inter-pan packet length
+* Use the correct address range when checking if it is a ev_buffer
 ### Performance
 * Optimized power consumption during ble connection state 
 * Double-detect start flag when OTA
 ### BREAKING CHANGES
 * None
 ### CodeSize
-* Units: KBytes
+* Units: KBytes(RAM/FLASH Size)
 
-|   chip   | concurrent_sampleGW (RAM/FLASH) | concurrent_sampleLight (RAM/FLASH) | concurrent_sampleSwitch (RAM/FLASH) |
-| :------- | :-----------------------------: | :--------------------------------: | :---------------------------------: |
-| TLSR8258 | 44 / 210                        | 41 / 213                           | 32 / 171                            |
-| TLSR921x | 48 / 192                        | 45 / 196                           | 38 / 159                            |
-| TL321x   | 76 / 229                        | 73 / 234                           | 69 / 199                            |
+|   chip   | concurrent_sampleGW | concurrent_sampleLight | concurrent_sampleSwitch | concurrent_sampleLightAdv | concurrent_sampleSwitchAdv |
+| :------- | :-----------------: | :--------------------: | :---------------------: | :-----------------------: | :------------------------: |
+| TLSR8258 | 44 / 210            | 41 / 213               | 32 / 171                |  \				     	| \	                         |
+| TLSR921x | 48 / 193            | 45 / 197               | 38 / 159                |  \						| \                          |
+| TL321x   | 76 / 229            | 73 / 234               | 69 / 199                | 46 / 186	                | 48 / 151                   |
+| TL721x   | 77 / 229            | 74 / 235               | 70 / 200                | 47 / 187                  | 48 / 152                   |
 
 ###版本
 * 芯片
   - TC32: TLSR8258
-  - RISCV: TLSR921x(B91), TL321x
+  - RISCV: TLSR921x(B91), TL321x, TL721x
 * 驱动版本
-  - tl_platform_sdk V3.2.0(TL321x)
+  - tl_platform_sdk V3.2.0(TL321x, TL721x)
 * BLE版本
-  - tl_ble_sdk V4.0.4.2(TL321x)
+  - tl_ble_sdk V4.0.4.2(TL321x, TL721x)
 * Zigbee版本
   - telink_zigbee_sdk V3.7.1.0
 * 工具链版本
   - TLSR8258: TC32 ELF GCC4.3
   - TLSR921x(B91): TL32 ELF MCULIB V5F GCC7.4
   - TL321x: TL32 ELF MCULIB V5 GCC12.2
+  - TL721x: TL32 ELF MCULIB V5F GCC12.2
 * IDE版本
   - Telink IDE: [Telink IDE](https://wiki.telink-semi.cn/tools_and_sdk/Tools/IDE/Telink_IDE.zip)
   - Telink V323 RDS: [telink_v323_rds](https://wiki.telink-semi.cn/tools_and_sdk/Tools/IDE/telink_v323_rds_official_windows.zip)
   - Telink IoT Studio: [TelinkIoTStudio_V2024.8](http://wiki.telink-semi.cn/tools_and_sdk/Tools/IoTStudio/TelinkIoTStudio_V2024.8.zip)
 ### Features
 * 支持TL321x 平台. 
+* 支持TL721x 平台.
 * 增加flash操作保护.
 * 更新TLSR8258和TLSR921x驱动，针对发现的已知问题.
+* 增加新的只支持BLE广播模式是双模示例，针对TL321x和TL721x平台.
+* 移除用不到的平台信息
 ### Bug Fixes
-* 保护AES处理流程不被中断打断.
-* 在通过HCI更新本地固件时，从正确flash地址获取固件CRC.
+* 保护AES处理流程不被中断打断
+* 在通过HCI更新本地固件时，从正确flash地址获取固件CRC
+* 检查inter-pan数据包长度
+* 更正地址检查范围当检查地址是否是ev_buffer时
 ### Performance
 * 优化BLE连接状态下功耗.
 * OTA时双重检查固件有效标志.

@@ -88,7 +88,7 @@ int drv_gpio_irq_config(drv_gpioIrqMode_e mode, u32 pin, drv_gpioPoll_e polarity
 		listAdd(gpioIrqHandlerQ, (void *)list_node);
 	}
 
-#if defined(MCU_CORE_826x) || defined(MCU_CORE_8258) || defined(MCU_CORE_8278) || defined(MCU_CORE_B91)
+#if defined(MCU_CORE_8258) || defined(MCU_CORE_B91) || defined(MCU_CORE_TL721X)
 	if(mode == GPIO_IRQ_MODE){
 		drv_gpio_irq_set(pin, polarity);
 	}else if(mode == GPIO_IRQ_RISC0_MODE){
@@ -125,7 +125,7 @@ static void drv_gpio_irq_process(drv_gpioIrqMode_e mode)
 	}
 }
 
-#if defined(MCU_CORE_826x) || defined(MCU_CORE_8258) || defined(MCU_CORE_8278) || defined(MCU_CORE_B91)
+#if defined(MCU_CORE_8258) || defined(MCU_CORE_B91) || defined(MCU_CORE_TL721X)
 void drv_gpio_irq_handler(void)
 {
 	drv_gpio_irq_process(GPIO_IRQ_MODE);
@@ -149,54 +149,54 @@ void drv_gpio_irq_handler(gpio_irq_num_e irq)
 
 void drv_gpio_func_set(u32 pin)
 {
-#if defined(MCU_CORE_826x) || defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
+#if defined(MCU_CORE_8258)
 	gpio_set_func(pin, AS_GPIO);
-#elif defined(MCU_CORE_B91) || defined(MCU_CORE_TL321X)
+#elif defined(MCU_CORE_B91) || defined(MCU_CORE_TL721X) || defined(MCU_CORE_TL321X)
 	gpio_function_en(pin);
 #endif
 }
 
 void drv_gpio_output_en(u32 pin, bool enable)
 {
-#if defined(MCU_CORE_826x) || defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
+#if defined(MCU_CORE_8258)
 	gpio_set_output_en(pin, enable);
-#elif defined(MCU_CORE_B91) || defined(MCU_CORE_TL321X)
+#elif defined(MCU_CORE_B91) || defined(MCU_CORE_TL721X) || defined(MCU_CORE_TL321X)
 	gpio_set_output(pin, enable);
 #endif
 }
 
 void drv_gpio_input_en(u32 pin, bool enable)
 {
-#if defined(MCU_CORE_826x) || defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
+#if defined(MCU_CORE_8258)
 	gpio_set_input_en(pin, enable);
-#elif defined(MCU_CORE_B91) || defined(MCU_CORE_TL321X)
+#elif defined(MCU_CORE_B91) || defined(MCU_CORE_TL721X) || defined(MCU_CORE_TL321X)
 	gpio_set_input(pin, enable);
 #endif
 }
 
 void drv_gpio_up_down_resistor(u32 pin, u8 res)
 {
-#if defined(MCU_CORE_826x) || defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
+#if defined(MCU_CORE_8258)
 	gpio_setup_up_down_resistor(pin, res);
-#elif defined(MCU_CORE_B91) || defined(MCU_CORE_TL321X)
+#elif defined(MCU_CORE_B91) || defined(MCU_CORE_TL721X) || defined(MCU_CORE_TL321X)
 	gpio_set_up_down_res(pin, res);
 #endif
 }
 
 void drv_gpio_write(u32 pin, bool value)
 {
-#if defined(MCU_CORE_826x) || defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
+#if defined(MCU_CORE_8258)
 	gpio_write(pin, value);
-#elif defined(MCU_CORE_B91) || defined(MCU_CORE_TL321X)
+#elif defined(MCU_CORE_B91) || defined(MCU_CORE_TL721X) || defined(MCU_CORE_TL321X)
 	gpio_set_level(pin, value);
 #endif
 }
 
 bool drv_gpio_read(u32 pin)
 {
-#if defined(MCU_CORE_826x) || defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
+#if defined(MCU_CORE_8258)
 	return gpio_read(pin);
-#elif defined(MCU_CORE_B91) || defined(MCU_CORE_TL321X)
+#elif defined(MCU_CORE_B91) || defined(MCU_CORE_TL721X) || defined(MCU_CORE_TL321X)
 	return gpio_get_level(pin);
 #else
 	return 0;
@@ -205,18 +205,18 @@ bool drv_gpio_read(u32 pin)
 
 void drv_gpio_read_all(u8 *p)
 {
-#if defined(MCU_CORE_826x) || defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
+#if defined(MCU_CORE_8258)
 	gpio_read_all(p);
-#elif defined(MCU_CORE_B91) || defined(MCU_CORE_TL321X)
+#elif defined(MCU_CORE_B91) || defined(MCU_CORE_TL721X) || defined(MCU_CORE_TL321X)
 	gpio_get_level_all(p);
 #endif
 }
 
 void drv_gpio_irq_set(u32 pin, drv_gpioPoll_e polarity)
 {
-#if defined(MCU_CORE_826x) || defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
+#if defined(MCU_CORE_8258)
 	gpio_set_interrupt(pin, polarity);
-#elif defined(MCU_CORE_B91)
+#elif defined(MCU_CORE_B91) || defined(MCU_CORE_TL721X)
 	gpio_set_irq(pin, polarity);
 #elif defined(MCU_CORE_TL321X)
 	if(listLength(gpioIrqHandlerQ)){
@@ -234,18 +234,18 @@ void drv_gpio_irq_set(u32 pin, drv_gpioPoll_e polarity)
 
 void drv_gpio_irq_risc0_set(u32 pin, drv_gpioPoll_e polarity)
 {
-#if defined(MCU_CORE_826x) || defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
+#if defined(MCU_CORE_8258)
 	gpio_set_interrupt_risc0(pin, polarity);
-#elif defined(MCU_CORE_B91)
+#elif defined(MCU_CORE_B91) || defined(MCU_CORE_TL721X)
 	gpio_set_gpio2risc0_irq(pin, polarity);
 #endif
 }
 
 void drv_gpio_irq_risc1_set(u32 pin, drv_gpioPoll_e polarity)
 {
-#if defined(MCU_CORE_826x) || defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
+#if defined(MCU_CORE_8258)
 	gpio_set_interrupt_risc1(pin, polarity);
-#elif defined(MCU_CORE_B91)
+#elif defined(MCU_CORE_B91) || defined(MCU_CORE_TL721X)
 	gpio_set_gpio2risc1_irq(pin, polarity);
 #endif
 }
@@ -257,10 +257,12 @@ void drv_gpio_irq_risc1_set(u32 pin, drv_gpioPoll_e polarity)
 */
 void drv_gpio_irq_en(u32 pin)
 {
-#if defined(MCU_CORE_826x) || defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
+#if defined(MCU_CORE_8258)
 	gpio_en_interrupt(pin, 1);
 #elif defined(MCU_CORE_B91)
 	plic_interrupt_enable(IRQ25_GPIO);
+#elif defined(MCU_CORE_TL721X)
+	plic_interrupt_enable(IRQ_GPIO);
 #elif defined(MCU_CORE_TL321X)
 	if(listLength(gpioIrqHandlerQ)){
 		gpio_conf_list *pList = listHead(gpioIrqHandlerQ);
@@ -278,28 +280,34 @@ void drv_gpio_irq_en(u32 pin)
 
 void drv_gpio_irq_risc0_en(u32 pin)
 {
-#if defined(MCU_CORE_826x) || defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
+#if defined(MCU_CORE_8258)
 	gpio_en_interrupt_risc0(pin, 1);
 #elif defined(MCU_CORE_B91)
 	plic_interrupt_enable(IRQ26_GPIO2RISC0);
+#elif defined(MCU_CORE_TL721X)
+	plic_interrupt_enable(IRQ_GPIO2RISC0);
 #endif
 }
 
 void drv_gpio_irq_risc1_en(u32 pin)
 {
-#if defined(MCU_CORE_826x) || defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
+#if defined(MCU_CORE_8258)
 	gpio_en_interrupt_risc1(pin, 1);
 #elif defined(MCU_CORE_B91)
 	plic_interrupt_enable(IRQ27_GPIO2RISC1);
+#elif defined(MCU_CORE_TL721X)
+	plic_interrupt_enable(IRQ_GPIO2RISC1);
 #endif
 }
 
 void drv_gpio_irq_dis(u32 pin)
 {
-#if defined(MCU_CORE_826x) || defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
+#if defined(MCU_CORE_8258)
 	gpio_en_interrupt(pin, 0);
 #elif defined(MCU_CORE_B91)
 	plic_interrupt_disable(IRQ25_GPIO);
+#elif defined(MCU_CORE_TL721X)
+	plic_interrupt_disable(IRQ_GPIO);
 #elif defined(MCU_CORE_TL321X)
 	if(listLength(gpioIrqHandlerQ)){
 		gpio_conf_list *pList = listHead(gpioIrqHandlerQ);
@@ -317,18 +325,22 @@ void drv_gpio_irq_dis(u32 pin)
 
 void drv_gpio_irq_risc0_dis(u32 pin)
 {
-#if defined(MCU_CORE_826x) || defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
+#if defined(MCU_CORE_8258)
 	gpio_en_interrupt_risc0(pin, 0);
 #elif defined(MCU_CORE_B91)
 	plic_interrupt_disable(IRQ26_GPIO2RISC0);
+#elif defined(MCU_CORE_TL721X)
+	plic_interrupt_disable(IRQ_GPIO2RISC0);
 #endif
 }
 
 void drv_gpio_irq_risc1_dis(u32 pin)
 {
-#if defined(MCU_CORE_826x) || defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
+#if defined(MCU_CORE_8258)
 	gpio_en_interrupt_risc1(pin, 0);
 #elif defined(MCU_CORE_B91)
 	plic_interrupt_disable(IRQ27_GPIO2RISC1);
+#elif defined(MCU_CORE_TL721X)
+	plic_interrupt_disable(IRQ_GPIO2RISC1);
 #endif
 }

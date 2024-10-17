@@ -53,36 +53,22 @@ extern "C" {
 #define ZBHCI_BLE									1
 
 /* Board ID */
-#define BOARD_826x_EVK								0
-#define BOARD_826x_DONGLE							1
-#define BOARD_826x_DONGLE_PA						2
-#define BOARD_8258_EVK								3
-#define BOARD_8258_EVK_V1P2							4//C1T139A30_V1.2
-#define BOARD_8258_DONGLE							5
-#define BOARD_8278_EVK								6
-#define BOARD_8278_DONGLE							7
-#define BOARD_B91_EVK								8
-#define BOARD_B91_DONGLE							9
-#define BOARD_TL321X_EVK							10
-#define BOARD_TL321X_DONGLE							11
+#define BOARD_8258_EVK								1
+#define BOARD_8258_EVK_V1P2							2//C1T139A30_V1.2
+#define BOARD_8258_DONGLE							3
+#define BOARD_B91_EVK								4
+#define BOARD_B91_DONGLE							5
+#define BOARD_TL321X_EVK							6
+#define BOARD_TL321X_DONGLE							7
+#define BOARD_TL721X_EVK							8
+#define BOARD_TL721X_DONGLE							9
 
 /* Board define */
-#if defined(MCU_CORE_826x)
-#if !PA_ENABLE
-	#define BOARD									BOARD_826x_DONGLE
-#else
-	#define BOARD									BOARD_826x_DONGLE_PA
-#endif
-	#define CLOCK_SYS_CLOCK_HZ  					32000000
-#elif defined(MCU_CORE_8258)
+#if defined(MCU_CORE_8258)
 #if (CHIP_TYPE == TLSR_8258_1M)
 	#define FLASH_CAP_SIZE_1M						1
 #endif
 	#define BOARD									BOARD_8258_DONGLE
-	#define CLOCK_SYS_CLOCK_HZ  					48000000
-#elif defined(MCU_CORE_8278)
-	#define FLASH_CAP_SIZE_1M						1
-	#define BOARD									BOARD_8278_DONGLE//BOARD_8278_EVK
 	#define CLOCK_SYS_CLOCK_HZ  					48000000
 #elif defined(MCU_CORE_B91)
 	#define FLASH_CAP_SIZE_1M						1
@@ -92,27 +78,21 @@ extern "C" {
 	#define FLASH_CAP_SIZE_1M						1
 	#define BOARD									BOARD_TL321X_DONGLE//BOARD_TL321X_EVK
 	#define CLOCK_SYS_CLOCK_HZ  					96000000
+#elif defined(MCU_CORE_TL721X)
+	#define FLASH_CAP_SIZE_1M						1
+	#define BOARD									BOARD_TL721X_EVK//BOARD_TL721X_DONGLE
+	#define CLOCK_SYS_CLOCK_HZ  					120000000
 #else
 	#error "MCU is undefined!"
 #endif
 
 /* Board include */
-#if (BOARD == BOARD_826x_EVK)
-	#include "board_826x_evk.h"
-#elif (BOARD == BOARD_826x_DONGLE)
-	#include "board_826x_dongle.h"
-#elif (BOARD == BOARD_826x_DONGLE_PA)
-	#include "board_826x_dongle_pa.h"
-#elif (BOARD == BOARD_8258_DONGLE)
+#if (BOARD == BOARD_8258_DONGLE)
 	#include "board_8258_dongle.h"
 #elif (BOARD == BOARD_8258_EVK)
 	#include "board_8258_evk.h"
 #elif (BOARD == BOARD_8258_EVK_V1P2)
 	#include "board_8258_evk_v1p2.h"
-#elif (BOARD == BOARD_8278_EVK)
-	#include "board_8278_evk.h"
-#elif (BOARD == BOARD_8278_DONGLE)
-	#include "board_8278_dongle.h"
 #elif (BOARD == BOARD_B91_EVK)
 	#include "board_b91_evk.h"
 #elif (BOARD == BOARD_B91_DONGLE)
@@ -121,6 +101,10 @@ extern "C" {
 	#include "board_tl321x_evk.h"
 #elif (BOARD == BOARD_TL321X_DONGLE)
 	#include "board_tl321x_dongle.h"
+#elif (BOARD == BOARD_TL721X_EVK)
+	#include "board_tl721x_evk.h"
+#elif (BOARD == BOARD_TL721X_DONGLE)
+	#include "board_tl721x_dongle.h"
 #endif
 
 
@@ -200,7 +184,7 @@ extern "C" {
 #define APP_SECURITY_ENABLE      					1
 #define APP_DIRECT_ADV_ENABLE						1
 //ble_multi_conn
-#elif defined(MCU_CORE_TL321X)
+#elif defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
 #define ACL_CENTRAL_MAX_NUM							0 // ACL central maximum number
 #define ACL_PERIPHR_MAX_NUM							1 // ACL peripheral maximum number
 

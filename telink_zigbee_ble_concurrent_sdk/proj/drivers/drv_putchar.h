@@ -28,17 +28,12 @@
 #include "../tl_common.h"
 
 
-#if defined(MCU_CORE_826x)
-	#ifndef	BAUDRATE
-		#define BAUDRATE					2000000//2M
-	#endif
-		#define	BIT_INTERVAL	 			(CLOCK_SYS_CLOCK_HZ / BAUDRATE)
-#elif defined(MCU_CORE_8258) || defined(MCU_CORE_8278) || defined(MCU_CORE_B91)
+#if defined(MCU_CORE_8258) || defined(MCU_CORE_B91)
 	#ifndef	BAUDRATE
 		#define BAUDRATE					1000000//1M
 	#endif
 		#define	BIT_INTERVAL	 			((16*1000*1000) / BAUDRATE)
-#elif defined(MCU_CORE_TL321X)
+#elif defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
 	#ifndef	BAUDRATE
 		#define BAUDRATE					1000000//1M
 	#endif
@@ -47,20 +42,20 @@
 
 #if (TLKAPI_DEBUG_ENABLE)
 	#ifdef DEBUG_INFO_TX_PIN
-		#if defined(MCU_CORE_TL321X)
+		#if defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
 			#define TX_PIN_OUTPUT_REG			reg_gpio_out_set_clear(DEBUG_INFO_TX_PIN)
-		#else//826x/8258/8278/b91/b92
+		#else//8258/b91
 			#define TX_PIN_OUTPUT_REG			reg_gpio_out(DEBUG_INFO_TX_PIN)
 		#endif
 
-		#if defined(MCU_CORE_826x) || defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
+		#if defined(MCU_CORE_8258)
 			#define DEBUG_TX_PIN_INIT()		do{	\
 												gpio_set_func(DEBUG_INFO_TX_PIN, AS_GPIO);							\
 												gpio_set_output_en(DEBUG_INFO_TX_PIN, 1);							\
 												gpio_setup_up_down_resistor(DEBUG_INFO_TX_PIN, PM_PIN_PULLUP_1M); 	\
 												gpio_write(DEBUG_INFO_TX_PIN, 1);									\
 											}while(0)
-		#elif defined(MCU_CORE_B91) || defined(MCU_CORE_TL321X)
+		#elif defined(MCU_CORE_B91) || defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
 			#define DEBUG_TX_PIN_INIT()		do{	\
 												gpio_function_en(DEBUG_INFO_TX_PIN);								\
 												gpio_set_output(DEBUG_INFO_TX_PIN, 1);								\

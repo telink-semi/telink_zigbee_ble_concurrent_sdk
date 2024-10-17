@@ -30,7 +30,7 @@
 #include "ble_8258/ble_common.h"
 #elif defined (MCU_CORE_B91)
 #include "ble_b91/ble_common.h"
-#elif defined (MCU_CORE_TL321X)
+#elif defined (MCU_CORE_TL321X) || defined (MCU_CORE_TL721X)
 #include "ble_multi/ble_common.h"
 #endif
 

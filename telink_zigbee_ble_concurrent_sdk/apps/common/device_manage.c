@@ -22,7 +22,7 @@
  *
  *******************************************************************************************************/
 
-#if defined(MCU_CORE_TL321X)
+#if defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
 #include "tl_common.h"
 #include "stack/ble/ble.h"
 

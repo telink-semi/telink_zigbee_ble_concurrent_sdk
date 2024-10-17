@@ -258,7 +258,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="stack/ble/ble_multi|apps/sampleLight/sampleLightMultiBLE.c|apps/sampleLight/sampleLightBLESlave_8258.c|apps/sampleLight/sampleLightBLEMaster_8258.c|apps/common/main.c|apps/bootLoader|apps/sampleContactSensor|apps/sampleSwitch|apps/sampleGW" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="apps/sampleLight/sampleLightMultiBLEAdv.c|stack/ble/ble_multi|apps/sampleLight/sampleLightMultiBLE.c|apps/sampleLight/sampleLightBLESlave_8258.c|apps/sampleLight/sampleLightBLEMaster_8258.c|apps/common/main.c|apps/bootLoader|apps/sampleContactSensor|apps/sampleSwitch|apps/sampleGW" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -400,7 +400,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="stack/ble/ble_multi|apps/sampleSwitch/sampleSwitchMultiBLE.c|apps/sampleSwitch/sampleSwitchBLESlave_8258.c|apps/common/main.c|apps/bootLoader|apps/sampleContactSensor|apps/sampleGW|apps/sampleLight" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="apps/sampleSwitch/sampleSwitchMultiBLEAdv.c|stack/ble/ble_multi|apps/sampleSwitch/sampleSwitchMultiBLE.c|apps/sampleSwitch/sampleSwitchBLESlave_8258.c|apps/common/main.c|apps/bootLoader|apps/sampleContactSensor|apps/sampleGW|apps/sampleLight" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -567,7 +567,7 @@
 								<option defaultValue="-O0" id="nds.cpp.link.option.optimization.level.341240473" name="Optimization Level" superClass="nds.cpp.link.option.optimization.level" valueType="string"/>
 								<option defaultValue="true" id="nds32le-elf-mculib-v5f.cpp.link.option.noshared.base.1761826447" name="No shared libraries (-static)" superClass="nds32le-elf-mculib-v5f.cpp.link.option.noshared.base" valueType="boolean"/>
 							</tool>
-							<tool id="tool.nds32le-elf-mculib-v5f.c.compiler.exe.debug.1319472982" name="Andes C Compiler" superClass="tool.nds32le-elf-mculib-v5f.c.compiler.exe.debug">
+							<tool command="$(CROSS_COMPILE)gcc" id="tool.nds32le-elf-mculib-v5f.c.compiler.exe.debug.1319472982" name="Andes C Compiler" superClass="tool.nds32le-elf-mculib-v5f.c.compiler.exe.debug">
 								<option id="nds32le-elf-mculib-v5f.c.compiler.exe.debug.option.debugging.level.345746351" name="Debug Level" superClass="nds32le-elf-mculib-v5f.c.compiler.exe.debug.option.debugging.level" value="nds.c.debugging.level.none" valueType="enumerated"/>
 								<option id="nds32le-elf-mculib-v5f.c.compiler.exe.debug.option.optimization.level.1558344881" name="Optimization Level" superClass="nds32le-elf-mculib-v5f.c.compiler.exe.debug.option.optimization.level" value="nds.c.optimization.level.more" valueType="enumerated"/>
 								<option id="nds32le-elf-mculib-v5f.c.compiler.exe.debug.option.cmodel.1128607336" name="Code Model" superClass="nds32le-elf-mculib-v5f.c.compiler.exe.debug.option.cmodel" value="nds.c.compiler.option.cmodel.small" valueType="enumerated"/>
@@ -576,7 +576,7 @@
 								<option id="nds.c.compiler.option.preprocessor.undef.symbol.1937895602" name="Undefined symbols (-U)" superClass="nds.c.compiler.option.preprocessor.undef.symbol"/>
 								<option id="nds.c.compiler.option.preprocessor.def.symbols.1781357929" name="Defined symbols (-D)" superClass="nds.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="MCU_CORE_B91=1"/>
-									<listOptionValue builtIn="false" value="BOOT_LOADER_MODE=0"/>
+									<listOptionValue builtIn="false" value="BOOT_LOADER_MODE=1"/>
 									<listOptionValue builtIn="false" value="ROUTER=1"/>
 									<listOptionValue builtIn="false" value="__PROJECT_TL_LIGHT__=1"/>
 								</option>
@@ -601,9 +601,10 @@
 								<option id="nds.c.compiler.option.misc.other.1965628222" name="Other flags" superClass="nds.c.compiler.option.misc.other" value="-mext-dsp -mabi=ilp32f  -c -fmessage-length=0  -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -Wno-nonnull-compare" valueType="string"/>
 								<option id="nds.c.compiler.option.optimization.lto.2029656769" name="Link Time Optimization (-flto)" superClass="nds.c.compiler.option.optimization.lto" value="true" valueType="boolean"/>
 								<option id="nds.c.compiler.option.optimization.flags.562865342" name="Other optimization flags" superClass="nds.c.compiler.option.optimization.flags" value="-fpack-struct -fshort-enums" valueType="string"/>
+								<option id="nds.c.compiler.option.misc.use-cc.toolchain.1352584675" superClass="nds.c.compiler.option.misc.use-cc.toolchain" value="nds.c.compiler.option.misc.use-cc.gcc" valueType="enumerated"/>
 								<inputType id="tool.nds.c.compiler.input.1202630203" superClass="tool.nds.c.compiler.input"/>
 							</tool>
-							<tool id="tool.nds32le-elf-mculib-v5f.c.linker.exe.debug.1179802623" name="Andes C Linker" superClass="tool.nds32le-elf-mculib-v5f.c.linker.exe.debug">
+							<tool command="$(CROSS_COMPILE)gcc" id="tool.nds32le-elf-mculib-v5f.c.linker.exe.debug.1179802623" name="Andes C Linker" superClass="tool.nds32le-elf-mculib-v5f.c.linker.exe.debug">
 								<option defaultValue="-O0" id="nds.c.link.option.optimization.level.1029028487" name="Optimization Level" superClass="nds.c.link.option.optimization.level" value="-O2" valueType="string"/>
 								<option defaultValue="true" id="nds32le-elf-mculib-v5f.c.link.option.noshared.base.1849167730" name="No shared libraries (-static)" superClass="nds32le-elf-mculib-v5f.c.link.option.noshared.base" valueType="boolean"/>
 								<option id="nds.c.link.option.removesections.20816600" name="Remove unused sections (-ffunction-sections or -fdata-sections)" superClass="nds.c.link.option.removesections" value="true" valueType="boolean"/>
@@ -611,7 +612,7 @@
 								<option id="nds.c.link.option.virtualhosting.1109786792" name="Virtual Hosting (-mvh)" superClass="nds.c.link.option.virtualhosting" value="false" valueType="boolean"/>
 								<option defaultValue="" id="nds32le-elf-mculib-v5f.c.link.exe.debug.option.ldscript.590528960" name="Linker Script (-T)" superClass="nds32le-elf-mculib-v5f.c.link.exe.debug.option.ldscript" value="../boot.link" valueType="string"/>
 								<option id="nds.c.link.option.LTO.1100238045" name="Link Time Optimization (-flto)" superClass="nds.c.link.option.LTO" value="true" valueType="boolean"/>
-								<option id="nds.c.link.option.other.duplacitecompiler.862809000" name="DuplaciteComplierOption" superClass="nds.c.link.option.other.duplacitecompiler" value="-mcmodel=small -fpack-struct -fshort-enums -mcpu=d25f -ffunction-sections -fdata-sections -mext-dsp -mabi=ilp32f -fmessage-length=0 -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd " valueType="string"/>
+								<option id="nds.c.link.option.other.duplacitecompiler.862809000" name="DuplaciteComplierOption" superClass="nds.c.link.option.other.duplacitecompiler" value="-mcmodel=small -fpack-struct -fshort-enums -ffunction-sections -fdata-sections -mext-dsp -mabi=ilp32f -fmessage-length=0 -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd " valueType="string"/>
 								<option id="nds.c.link.option.libs.870127276" name="Libraries (-l)" superClass="nds.c.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="ble_b91"/>
 									<listOptionValue builtIn="false" value="zb_router"/>
@@ -672,7 +673,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="stack/ble/ble_multi|apps/sampleLight/sampleLightMultiBLE.c|apps/sampleLight/sampleLightBLESlave_8258.c|apps/sampleLight/sampleLightBLEMaster_8258.c|apps/common/main.c|apps/bootLoader|apps/sampleContactSensor|apps/sampleSwitch|apps/sampleGW" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="apps/sampleLight/sampleLightMultiBLEAdv.c|stack/ble/ble_multi|apps/sampleLight/sampleLightMultiBLE.c|apps/sampleLight/sampleLightBLESlave_8258.c|apps/sampleLight/sampleLightBLEMaster_8258.c|apps/common/main.c|apps/bootLoader|apps/sampleContactSensor|apps/sampleSwitch|apps/sampleGW" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

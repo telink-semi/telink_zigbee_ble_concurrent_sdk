@@ -281,9 +281,6 @@ _always_inline u8 rf_TrxStateGet(void)
  */
 _attribute_ram_code_ void rf_setTrxState(u8 state)
 {
-	if(CURRENT_SLOT_GET() == DUALMODE_SLOT_BLE){
-		return;
-	}
     if(RF_STATE_RX == state || RF_STATE_ED == state){
     	if(TL_ZB_MAC_STATUS_GET() == ZB_MAC_STATE_ACTIVE_SCAN || RF_STATE_ED == state){
     		ZB_RADIO_MODE_AUTO_GAIN();
@@ -479,9 +476,11 @@ _attribute_ram_code_ u8 rf_performCCA(void)
 		return PHY_CCA_BUSY;
 	}
 
-	rf_setTrxState(RF_STATE_OFF);
-	rf_setTrxState(RF_STATE_RX);
-	WaitUs(85);
+	if(rf_TrxStateGet() == RF_STATE_TX || !RF_DMA_BUSY()){
+		rf_setTrxState(RF_STATE_OFF);
+		rf_setTrxState(RF_STATE_RX);
+		WaitUs(85);
+	}
 
 	rssi_cur = ZB_RADIO_RSSI_GET();
 	rssiSum += rssi_cur;
@@ -619,7 +618,7 @@ _attribute_ram_code_ bool isWLANActive(void)
  *
  * @return  none
  */
-#if defined(MCU_CORE_826x) || defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
+#if defined(MCU_CORE_8258)
 _attribute_ram_code_ __attribute__((optimize("-Os")))
 #else
 _attribute_ram_code_
@@ -781,7 +780,7 @@ void rf_rx_irq_handler(void)
  *
  * @return  none
  */
-#if defined(MCU_CORE_826x) || defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
+#if defined(MCU_CORE_8258)
 _attribute_ram_code_ __attribute__((optimize("-Os")))
 #else
 _attribute_ram_code_
@@ -807,7 +806,7 @@ inline bool zb_rfTxDoing(void){
 }
 
 void restore_zb_rf_context(void){
-#if defined(MCU_CORE_TL321X)
+#if defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
 	rf_reset_register_value();
 #else
 	rf_baseband_reset();
@@ -822,5 +821,5 @@ void restore_zb_rf_context(void){
 	ZB_RADIO_RX_BUF_SET(rf_rxBuf);
 
 	rf_setChannel(rf_getChannel());
-	rf_setTrxState(RF_STATE_RX);
+	rf_setTrxState(rfMode);
 }

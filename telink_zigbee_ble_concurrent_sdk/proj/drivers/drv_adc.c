@@ -25,17 +25,18 @@
 
 #include "../tl_common.h"
 
-#if	defined(MCU_CORE_826x)
-	#define ADC_VALUE_GET_WITH_BASE_MODE(v)		(3300 * (v - 128)/(16384 - 256))//Vref(mV) * (v - 128)/(2^14 - 2^8)
-	#define ADC_VALUE_GET_WITH_VBAT_MODE(v)		(3*(1428*(v - 128)/(16384 - 256)))
-#elif defined(MCU_CORE_B91) || defined(MCU_CORE_TL321X)
+#if	defined(MCU_CORE_B91) || defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
 	#define ADC_SAMPLE_NUM						1	//fixed
 	#define ADC_SAMPLE_FREQ						ADC_SAMPLE_FREQ_96K
 	#define ADC_SAMPLE_NDMA_DELAY_TIME			((1000 / ( 6 * (2 << (ADC_SAMPLE_FREQ)))) + 1)//delay 2 sample cycle
+#if defined(MCU_CORE_TL721X)
+	#define ADC_PRESCALE						ADC_PRESCALE_1F8
+#else//b91/b92/tl321x
 	#define ADC_PRESCALE						ADC_PRESCALE_1F4
 #endif
+#endif
 
-#if defined(MCU_CORE_TL321X)
+#if defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
 /**
  * @brief This function serves to get adc sample code by manual and convert to voltage value.
  * @return 		adc_vol_mv_average 	- the average value of adc voltage value.
@@ -79,14 +80,11 @@ static u16 adc_get_voltage(void)
 */
 bool drv_adc_init(void)
 {
-#if	defined(MCU_CORE_826x)
-	ADC_Init();
-	AUDIO2ADC();
-#elif defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
+#if	defined(MCU_CORE_8258)
 	adc_init();
 #elif defined(MCU_CORE_B91)
 
-#elif defined(MCU_CORE_TL321X)
+#elif defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
 	adc_init(NDMA_M_CHN);
 #endif
 	return TRUE;
@@ -99,19 +97,9 @@ bool drv_adc_init(void)
 */
 u16 drv_get_adc_data(void)
 {
-#if defined(MCU_CORE_826x)
-	u32 tmpSum = 0;
-	for(u8 i = 0; i < 8; i++){
-		tmpSum += ADC_SampleValueGet();
-	}
-	tmpSum /= 8;
-	if(tmpSum < 128){
-		tmpSum = 128;
-	}
-	return (u16)ADC_VALUE_GET_WITH_VBAT_MODE(tmpSum);
-#elif defined(MCU_CORE_8258) || defined(MCU_CORE_8278) || defined(MCU_CORE_B91)
+#if defined(MCU_CORE_8258) || defined(MCU_CORE_B91)
 	return (u16)adc_sample_and_get_result();
-#elif defined(MCU_CORE_TL321X)
+#elif defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
 	return (u16)adc_get_voltage();
 #else
 	return 0;
@@ -124,16 +112,7 @@ u16 drv_get_adc_data(void)
 * param[in] pin, the pin number
 * @return
 */
-#if defined(MCU_CORE_826x)
-void drv_adc_mode_pin_set(drv_adc_mode_e mode, ADC_InputPTypeDef pin)
-{
-	if(mode == DRV_ADC_BASE_MODE){
-		ADC_ParamSetting(pin, SINGLEEND, RV_AVDD, RES14, S_3);
-	}else if(mode == DRV_ADC_VBAT_MODE){
-		ADC_BatteryCheckInit(Battery_Chn_VCC);
-	}
-}
-#elif defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
+#if defined(MCU_CORE_8258)
 void drv_adc_mode_pin_set(drv_adc_mode_e mode, GPIO_PinTypeDef pin)
 {
 	if(mode == DRV_ADC_BASE_MODE){
@@ -157,7 +136,7 @@ void drv_adc_mode_pin_set(drv_adc_mode_e mode, adc_input_pin_def_e pin)
 		adc_battery_voltage_sample_init();
 	}
 }
-#elif defined(MCU_CORE_TL321X)
+#elif defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
 void drv_adc_mode_pin_set(drv_adc_mode_e mode, adc_input_pin_e pin)
 {
 	if(mode == DRV_ADC_BASE_MODE){
@@ -182,19 +161,13 @@ void drv_adc_mode_pin_set(drv_adc_mode_e mode, adc_input_pin_e pin)
  */
 void drv_adc_enable(bool enable)
 {
-#if defined(MCU_CORE_826x)
-	if(enable){
-		EN_ADCCLK;
-	}else{
-		DIS_ADCCLK;
-	}
-#elif defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
+#if defined(MCU_CORE_8258)
 	adc_power_on_sar_adc((unsigned char)enable);
-#elif defined(MCU_CORE_B91) || defined(MCU_CORE_TL321X)
+#elif defined(MCU_CORE_B91) || defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
 	if(enable){
 		adc_power_on();
 
-#if defined(MCU_CORE_TL321X)
+#if defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
 		delay_us(30);//Wait >30us after adc_power_on() for ADC to be stable.
 #endif
 	}else{

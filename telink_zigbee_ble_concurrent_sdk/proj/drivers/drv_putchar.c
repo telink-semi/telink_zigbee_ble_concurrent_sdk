@@ -31,7 +31,7 @@ _attribute_ram_code_ void soft_uart_putc(unsigned char byte)
 	u8 j = 0;
 	u32 t1 = 0, t2 = 0;
 
-#if defined(MCU_CORE_TL321X)
+#if defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
 	u16 tmp_bit0 = (DEBUG_INFO_TX_PIN & 0xff)<<8;
 	u16 tmp_bit1 = DEBUG_INFO_TX_PIN & 0xff;
 	u16 bit[10] = {0};

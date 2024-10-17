@@ -107,7 +107,7 @@ enum{
 #define	KB_MAP_NUM		KB_MAP_NORMAL
 #define	KB_MAP_FN		KB_MAP_NORMAL
 
-#define KB_DRIVE_PINS  	{NULL}
+#define KB_DRIVE_PINS  	{0}
 #define KB_SCAN_PINS   	{BUTTON1, BUTTON2}
 
 

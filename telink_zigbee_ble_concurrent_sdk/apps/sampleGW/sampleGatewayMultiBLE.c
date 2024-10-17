@@ -101,11 +101,6 @@ _attribute_data_retention_	unsigned char tlk_flash_capacity;
 #define ACL_PERIPHR_TX_FIFO_NUM			9   //user set value
 
 
-
-
-extern	u8	app_acl_rx_fifo[];
-extern	u8	app_acl_cen_tx_fifo[];
-extern	u8	app_acl_per_tx_fifo[];
 /******************** ACL connection LinkLayer TX & RX data FIFO allocation, End ***************************************************/
 
 
@@ -141,13 +136,13 @@ extern	u8	app_acl_per_tx_fifo[];
  */
 _attribute_ble_data_retention_	u8	app_acl_rx_fifo[ACL_RX_FIFO_SIZE * ACL_RX_FIFO_NUM] = {0};
 
-
+#if ACL_CENTRAL_MAX_NUM
 /**
  * @brief	ACL Central TX buffer, shared by all central connections to hold LinkLayer RF TX data.
  *  		ACL Central TX buffer should be defined only when ACl connection central role is used.
  */
 _attribute_ble_data_retention_	u8	app_acl_cen_tx_fifo[ACL_CENTRAL_TX_FIFO_SIZE * ACL_CENTRAL_TX_FIFO_NUM * ACL_CENTRAL_MAX_NUM] = {0};
-
+#endif
 
 /**
  * @brief	ACL Peripheral TX buffer, shared by all peripheral connections to hold LinkLayer RF TX data.
@@ -157,7 +152,7 @@ _attribute_ble_data_retention_	u8	app_acl_per_tx_fifo[ACL_PERIPHR_TX_FIFO_SIZE *
 
 /******************** ACL connection LinkLayer TX & RX data FIFO allocation, End ***********************************/
 
-
+#if ACL_CENTRAL_MAX_NUM
 /***************** ACL connection L2CAP RX & TX data Buffer allocation, Begin **************************************/
 /**
  * @brief	L2CAP RX Data buffer for ACL Central
@@ -171,7 +166,7 @@ _attribute_ble_data_retention_	u8 app_cen_l2cap_rx_buf[ACL_CENTRAL_MAX_NUM * CEN
  * 			if GATT server on ACL Central not used, this buffer can be saved.
  */
 //_attribute_ble_data_retention_	u8 app_cen_l2cap_tx_buf[ACL_CENTRAL_MAX_NUM * CENTRAL_L2CAP_BUFF_SIZE];
-
+#endif
 
 /**
  * @brief	L2CAP RX Data buffer for ACL Peripheral
@@ -1056,7 +1051,7 @@ void blc_flash_read_mid_get_vendor_set_capacity(void)
 {
 	/* attention: tlk_flash_mid/tlk_flash_vendor/tlk_flash_capacity will be used by application and stack later
 	 * so do not change code here */
-#if defined(MCU_CORE_B95)
+#if defined(MCU_CORE_TL721X)
 	tlk_flash_mid = flash_read_mid_with_device_num(SLAVE0);
 #else
 	tlk_flash_mid = flash_read_mid();
@@ -1102,8 +1097,8 @@ void user_ble_init(void){
 #if ACL_CENTRAL_MAX_NUM
 	blc_ll_initAclCentralRole_module();
 #endif
-	blc_ll_initAclPeriphrRole_module();
 
+	blc_ll_initAclPeriphrRole_module();
 
 	blc_ll_setMaxConnectionNumber(ACL_CENTRAL_MAX_NUM, ACL_PERIPHR_MAX_NUM);
 
@@ -1111,8 +1106,10 @@ void user_ble_init(void){
 
 	/* all ACL connection share same RX FIFO */
 	blc_ll_initAclConnRxFifo(app_acl_rx_fifo, ACL_RX_FIFO_SIZE, ACL_RX_FIFO_NUM);
+#if ACL_CENTRAL_MAX_NUM
 	/* ACL Central TX FIFO */
 	blc_ll_initAclCentralTxFifo(app_acl_cen_tx_fifo, ACL_CENTRAL_TX_FIFO_SIZE, ACL_CENTRAL_TX_FIFO_NUM, ACL_CENTRAL_MAX_NUM);
+#endif
 	/* ACL Peripheral TX FIFO */
 	blc_ll_initAclPeriphrTxFifo(app_acl_per_tx_fifo, ACL_PERIPHR_TX_FIFO_SIZE, ACL_PERIPHR_TX_FIFO_NUM, ACL_PERIPHR_MAX_NUM);
 
@@ -1145,7 +1142,9 @@ void user_ble_init(void){
 	blc_gap_init();
 
 	/* L2CAP data buffer Initialization */
+#if ACL_CENTRAL_MAX_NUM
 	blc_l2cap_initAclCentralBuffer(app_cen_l2cap_rx_buf, CENTRAL_L2CAP_BUFF_SIZE, NULL,	0);
+#endif
 	blc_l2cap_initAclPeripheralBuffer(app_per_l2cap_rx_buf, PERIPHR_L2CAP_BUFF_SIZE, app_per_l2cap_tx_buf, PERIPHR_L2CAP_BUFF_SIZE);
 
 	blc_att_setCentralRxMtuSize(CENTRAL_ATT_RX_MTU); ///must be placed after "blc_gap_init"

@@ -28,9 +28,9 @@ extern void bls_set_enc_dec_busy(int flag);
 void drv_aes_encrypt(u8 *key, u8 *plain, u8 *result)
 {
 	bls_set_enc_dec_busy(1);
-#if defined(MCU_CORE_826x) || defined(MCU_CORE_8258) || defined(MCU_CORE_8278) || defined(MCU_CORE_B91)
+#if defined(MCU_CORE_8258) || defined(MCU_CORE_B91)
 	aes_encrypt(key, plain, result);
-#elif defined(MCU_CORE_TL321X)
+#elif defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
 	//ske_lp_crypto(SKE_ALG_AES_128, SKE_MODE_ECB, SKE_CRYPTO_ENCRYPT, key, 0, NULL, plain, result, 16);
 	ske_lp_aes128_ecb_one_block(SKE_CRYPTO_ENCRYPT, (unsigned int *)key, (unsigned int *)plain, (unsigned int *)result);
 #endif
@@ -41,9 +41,9 @@ void drv_aes_encrypt(u8 *key, u8 *plain, u8 *result)
 void drv_aes_decrypt(u8 *key, u8 *cipher, u8 *result)
 {
 	bls_set_enc_dec_busy(1);
-#if defined(MCU_CORE_826x) || defined(MCU_CORE_8258) || defined(MCU_CORE_8278) || defined(MCU_CORE_B91)
+#if defined(MCU_CORE_8258) || defined(MCU_CORE_B91)
 	aes_decrypt(key, cipher, result);
-#elif defined(MCU_CORE_TL321X)
+#elif defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
 	//ske_lp_crypto(SKE_ALG_AES_128, SKE_MODE_ECB, SKE_CRYPTO_DECRYPT, key, 0, NULL, cipher, result, 16)
 	ske_lp_aes128_ecb_one_block(SKE_CRYPTO_DECRYPT, (unsigned int *)key, (unsigned int *)cipher, (unsigned int *)result);
 #endif

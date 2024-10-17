@@ -230,9 +230,9 @@ void ev_timer_update(u32 updateTime)
 	u32 r = drv_disable_irq();
 
 #if PM_ENABLE
-#if defined(MCU_CORE_826x) || defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
+#if defined(MCU_CORE_8258)
 	prevSleepTick = pm_get_32k_tick();
-#elif defined(MCU_CORE_B91) || defined(MCU_CORE_TL321X)
+#elif defined(MCU_CORE_B91) || defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
 	prevSleepTick = clock_get_32k_tick();
 #endif
 #endif
