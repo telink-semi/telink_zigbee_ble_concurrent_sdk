@@ -197,6 +197,7 @@ enum CDC_LineEncodingParity_t
 	CDC_PARITY_Space = 4, /**< Space parity bit mode on each frame. */
 };
 
+#pragma pack(1)
 /* Type Defines: */
 /** \brief CDC class-specific Functional Header Descriptor (LUFA naming conventions).
  *
@@ -353,6 +354,7 @@ typedef struct
 						  */
 	u8       DataBits; /**< Bits of data per character of the virtual serial port. */
 } CDC_LineEncoding_t;
+#pragma pack()
 
 /* Disable C linkage for C++ Compilers: */
 #if defined(__cplusplus)

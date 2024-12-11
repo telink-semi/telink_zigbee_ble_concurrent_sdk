@@ -25,6 +25,8 @@
 
 #pragma once
 
+#include <stdbool.h>
+
 #if 0
 typedef signed char int8_t;
 typedef unsigned char uint8_t;
@@ -43,7 +45,7 @@ typedef signed char s8;
 
 typedef unsigned short u16;
 typedef signed short s16;
-
+typedef int 		s32;
 typedef unsigned int u32;
 typedef signed int s32;
 
@@ -55,6 +57,14 @@ typedef void (*fn_ptr)(u8*);
 
 typedef u32  u24;
 typedef s32	 s24;
+
+typedef unsigned char 		uint8_t;
+typedef unsigned short 		uint16_t;
+
+typedef unsigned char		 uint08;
+typedef unsigned short		 uint16;
+typedef unsigned int		 uint32;
+typedef unsigned long long	 uint64;
 
 // Generic Status return
 typedef u8 status_t;
@@ -165,9 +175,9 @@ typedef struct {
 
 // There is no way to directly recognise whether a typedef is defined
 // http://stackoverflow.com/questions/3517174/how-to-check-if-a-datatype-is-defined-with-typedef
-#ifdef __GNUC__
-typedef	u16	wchar_t;		
-#endif
+//#ifdef __GNUC__
+//typedef	u16	wchar_t;
+//#endif
 
 #ifndef WIN32
 typedef u32 size_t;
@@ -200,7 +210,4 @@ typedef u32 size_t;
 #define ADDR_MODE_NONE				0        //!< Address not present
 #define ADDR_MODE_SHORT      		2        //!< Short address
 #define ADDR_MODE_EXT       		3        //!< Extended address
-
-
-
 

@@ -35,13 +35,19 @@ extern "C" {
 #endif
 
 #ifndef STRING_VENDOR
-#define STRING_VENDOR       		L"Telink"
+//#define STRING_VENDOR       		L"Telink"
+#define STRING_VENDOR       		{'T', 'e', 'l', 'i', 'n', 'k'}
+#define STRING_VENDOR_LEN			(6 * 2)//UTF-16 length
 #endif
 #ifndef STRING_PRODUCT
-#define STRING_PRODUCT      		L"TelinkUSBDongle"
+//#define STRING_PRODUCT      		L"USBDongle"
+#define STRING_PRODUCT      		{'U', 'S', 'B', 'D', 'o', 'n', 'g', 'l', 'e'}
+#define STRING_PRODUCT_LEN			(9 * 2)//UTF-16 length
 #endif
 #ifndef STRING_SERIAL
-#define STRING_SERIAL       		L"TLSR82xx"
+//#define STRING_SERIAL       		L"TLSR"
+#define STRING_SERIAL       		{'T', 'L', 'S', 'R'}
+#define STRING_SERIAL_LEN			(4 * 2)//UTF-16 length
 #endif
 #ifndef ID_VENDOR
 #define ID_VENDOR					0x248A
@@ -262,6 +268,7 @@ enum {
 	USB_STRING_MS_OS 				   = 0xee,
 };
 
+#pragma pack(1)
 typedef struct {
 	USB_HID_Descriptor_HID_t audio_hid;
 	USB_Descriptor_Endpoint_t audio_in_endpoint;
@@ -338,7 +345,7 @@ typedef struct {
 	USB_Descriptor_Endpoint_t 				sniffer_endpoint;
 #endif
 } USB_Descriptor_Configuration_t;
-
+#pragma pack()
 
 
 u8 *usbdesc_get_language(void);

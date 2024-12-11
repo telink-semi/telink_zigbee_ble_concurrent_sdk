@@ -24,8 +24,8 @@
 
 #if 1
 
-#define  ZIGBEE_AFTER_TIME    (16 * 1000 * 4)	//4ms
-#define  BLE_IDLE_TIME   	  (16 * 1000 * 4)	//5ms
+#define  ZIGBEE_AFTER_TIME    (S_TIMER_CLOCK_1US * 1000 * 4)	//4ms
+#define  BLE_IDLE_TIME   	  (S_TIMER_CLOCK_1US * 1000 * 4)	//5ms
 
 typedef enum{
 	DUALMODE_SLOT_BLE = 0,
@@ -51,6 +51,7 @@ extern app_dualModeInfo_t g_dualModeInfo;
 #define CURRENT_SLOT_SET(s)			 g_dualModeInfo.slot = s
 #define APP_BLE_STATE_SET(state)	 g_dualModeInfo.bleState = state
 #define APP_BLE_STATE_GET()			 g_dualModeInfo.bleState
+#define APP_BLE_STATE_IDLE() 		blc_ll_isBleTaskIdle()
 
 #define ZB_RF_ISR_RECOVERY		do{  \
 									if(CURRENT_SLOT_GET() == DUALMODE_SLOT_ZIGBEE) rf_set_irq_mask(FLD_RF_IRQ_RX|FLD_RF_IRQ_TX);  \
@@ -64,17 +65,12 @@ int is_switch_to_ble(void);
 
 int is_switch_to_zigbee(void);
 
-u8 ble_task_stop(void);
+ble_sts_t ble_task_stop(void);
 
-u8 ble_task_restart(void);
+ble_sts_t ble_task_restart(void);
 
 void zb_ble_switch_proc(void);
 
 void concurrent_mode_main_loop(void);
-
-#if BLE_MASTER_ROLE_ENABLE
-void ble_master_serviceCbRegister(master_service_t cb);
-void ble_master_updateIndCbRegister(master_update_t cb);
-#endif
 
 #endif

@@ -7,6 +7,7 @@
  * @date    2021
  *
  * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *			All rights reserved.
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -19,9 +20,13 @@
  *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
+ *
  *******************************************************************************************************/
 
 #pragma once
+
+#define DUAL_MODE_WITH_SIG					0
+#define DUAL_MODE_WITH_MATTER				1
 
 
 /**********************************************************************
@@ -45,8 +50,11 @@
  *
  * Normal mode is used by default.
  */
-//#define BOOT_LOADER_MODE					0
-
+#if DUAL_MODE_WITH_SIG || DUAL_MODE_WITH_MATTER
+#define BOOT_LOADER_MODE					1
+#else
+#define BOOT_LOADER_MODE					0
+#endif
 
 
 /* Boot loader address. */
@@ -54,23 +62,19 @@
 
 /* APP image address. */
 #if (BOOT_LOADER_MODE)
-	#if DUAL_MODE
-        #define APP_IMAGE_ADDR                  0x80000
-    #else
-	    #define APP_IMAGE_ADDR					0x8000
-    #endif
+	#if DUAL_MODE_WITH_MATTER
+		#define APP_IMAGE_ADDR				0x154000
+	#else
+		#define APP_IMAGE_ADDR				0x8000
+	#endif
 #else
 	#define APP_IMAGE_ADDR					0x0
 #endif
 
 
 /* Chip IDs */
-#define TLSR_8267							0x00
-#define TLSR_8269							0x01
-#define TLSR_8258_512K						0x02
-#define TLSR_8258_1M						0x03
-#define TLSR_8278							0x04
-#define TLSR_9518							0x05
+#define TLSR_B92							0x06
+#define TLSR_B95							0x07
 
 /* Image types */
 #if (BOOT_LOADER_MODE)
@@ -83,4 +87,4 @@
 #define IMAGE_TYPE_LIGHT					(0x01 | (IMAGE_TYPE_BOOT_FLAG << 7))
 #define IMAGE_TYPE_SWITCH					(0x02 | (IMAGE_TYPE_BOOT_FLAG << 7))
 #define IMAGE_TYPE_CONTACT_SENSOR			(0x03 | (IMAGE_TYPE_BOOT_FLAG << 7))
-
+#define IMAGE_TYPE_PLUG						(0x04 | (IMAGE_TYPE_BOOT_FLAG << 7))

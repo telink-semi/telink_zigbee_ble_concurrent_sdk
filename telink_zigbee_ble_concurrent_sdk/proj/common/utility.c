@@ -208,7 +208,7 @@ void swap32(u8 dst[4], const u8 src[4])
     swapX(src, dst, 4);
 }
 
-void swap48(u8 dst[7], const u8 src[7])
+void swap48(u8 dst[6], const u8 src[6])
 {
     swapX(src, dst, 6);
 }
@@ -269,6 +269,15 @@ u8* my_fifo_wptr (my_fifo_t *f)
 	return 0;
 }
 
+u8* my_fifo_wptr_v2 (my_fifo_t *f)
+{
+	if (((f->wptr - f->rptr) & 255) < f->num - 3) //keep 3 fifo left for others evt
+	{
+		return f->p + (f->wptr & (f->num-1)) * f->size;
+	}
+	return 0;
+}
+
 void my_fifo_next (my_fifo_t *f)
 {
 	f->wptr++;
@@ -281,7 +290,7 @@ int my_fifo_push (my_fifo_t *f, u8 *p, int n)
 		return -1;
 	}
 
-	if (n >= f->size)
+	if (n >= (int)f->size)
 	{
 		return -1;
 	}
@@ -305,5 +314,120 @@ u8 * my_fifo_get (my_fifo_t *f)
 		return p;
 	}
 	return 0;
+}
+
+void my_ring_buffer_init (my_ring_buf_t *f,u8 *p, int s)
+{
+	f->size = s;  //size
+	f->mask = s -1;
+	f->wptr = 0;  //head
+	f->rptr = 0;  //tail
+	f->p = p;     //Actual cache
+}
+
+bool my_ring_buffer_is_empty(my_ring_buf_t *f) {
+  return (f->wptr == f->rptr) ? true : false;
+}
+
+u8 my_ring_buffer_is_full(my_ring_buf_t*f) {
+  return ((f->wptr - f->rptr) & f->mask) == f->mask;
+}
+
+void my_ring_buffer_flush(my_ring_buf_t*f) {
+	f->rptr = f->wptr;
+}
+
+/**
+ * @brief   Cache free space
+ * @param  ring_buf
+ * @return number.
+ */
+u16 my_ring_buffer_free_len(my_ring_buf_t *f)
+{
+	u16 size;
+	size = (f->wptr - f->rptr) & f->mask;
+	size = f->size - size;
+  return size;
+}
+
+u16 my_ring_buffer_data_len(my_ring_buf_t *f)
+{
+	 return (f->wptr - f->rptr) & f->mask;
+}
+
+bool my_ring_buffer_push_byte(my_ring_buf_t *f, u8 data)
+{
+  f->p[f->wptr] = data;
+  f->wptr = ((f->wptr + 1) & f->mask);
+  return true;
+}
+
+void my_ring_buffer_push_bytes(my_ring_buf_t *f, u8 *data, u16 size)
+{
+	u16 i;
+	for(i = 0; i < size; i++) {
+	  my_ring_buffer_push_byte(f, data[i]);
+	}
+}
+
+u8 my_ring_buffer_pull_byte(my_ring_buf_t *f)
+{
+	u8 data;
+	data = f->p[f->rptr];
+	f->rptr = ((f->rptr + 1) & f->mask);
+	return data;
+}
+
+void my_ring_buffer_pull_bytes(my_ring_buf_t *f, u8 *data, u16 size)
+{
+	u16 i;
+	for(i = 0; i < size; i++) {
+		data[i] = f->p[f->rptr];
+		f->rptr = ((f->rptr + 1) & f->mask);
+	}
+}
+
+void my_ring_buffer_delete(my_ring_buf_t *f, u16 size)
+{
+	f->rptr = ((f->rptr + size) & f->mask);
+}
+
+u8 my_ring_buffer_get(my_ring_buf_t *f, u16 offset)
+{
+	u8 data;
+	u16 rptr = ((f->rptr + offset) & f->mask);
+	data = f->p[rptr];
+	return data;
+}
+
+
+
+
+const char *hex_to_str(const void *buf, u8 len)
+{
+	static const char hex[] = "0123456789abcdef";
+	static char str[301];
+	const uint8_t *b = buf;
+	u8 i;
+
+	len = min(len, (sizeof(str) - 1) / 3);
+
+	for (i = 0; i < len; i++) {
+		str[i * 3]     = hex[b[i] >> 4];
+		str[i * 3 + 1] = hex[b[i] & 0xf];
+		str[i * 3 + 2] = ' ';
+	}
+
+	str[i * 3] = '\0';
+
+	return str;
+}
+
+const char *addr_to_str(u8* addr)
+{
+#define BDADDR_STR_LEN		18
+	static char addrStr[BDADDR_STR_LEN];
+	snprintf(addrStr, sizeof(addrStr), "%02X:%02X:%02X:%02X:%02X:%02X", addr[5], addr[4], addr[3], addr[2], addr[1], addr[0]);
+	return addrStr;
 }
 #endif

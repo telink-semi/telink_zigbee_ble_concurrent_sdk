@@ -29,6 +29,10 @@
 #include "app_cfg.h"
 #include "platform.h"
 
+
+#include "apps/common/device_manage.h"
+#include "apps/common/tlkapi_debug.h"
+
 #include "common/types.h"
 #include "common/compiler.h"
 #include "common/static_assert.h"
@@ -40,10 +44,15 @@
 #include "common/string.h"
 #include "common/tlPrintf.h"
 #include "common/mempool.h"
+#include "os/ev_queue.h"
+
+#include "drivers/usb/myudb.h"
+//#include "usb_dbg/myudb_usbdesc.h"
 
 #include "os/ev_poll.h"
 #include "os/ev_buffer.h"
 #include "os/ev_queue.h"
+#include "os/ev_rtc.h"
 #include "os/ev_timer.h"
 #include "os/ev.h"
 
@@ -63,3 +72,5 @@
 #include "drivers/drv_putchar.h"
 #include "drivers/drv_usb.h"
 #include "drivers/drv_calibration.h"
+#include "drivers/drv_security.h"
+

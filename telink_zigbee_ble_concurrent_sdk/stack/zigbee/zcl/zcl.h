@@ -42,6 +42,7 @@
  */
 #define MANUFACTURER_CODE_NONE							0x0000
 #define MANUFACTURER_CODE_AMAZON						0x1217
+#define MANUFACTURER_CODE_IKEA							0x117C
 
 
 //Global Cluster Revision (0x0001 - 0xFFFE)
@@ -427,8 +428,7 @@ typedef struct
  *  		if maxInterval is 0xffff, then the configuration info for that attribute need not be maintained;
  *  		if minInterval is 0xffff and maxInterval is 0, than back to default reporting configuration, reportable change field set to 0.
  */
-typedef struct
-{
+typedef struct _attribute_packed_{
 	u16	profileID;
 	u16 clusterID;
 	u16 attrID;
@@ -443,12 +443,12 @@ typedef struct
 	u8	reportableChange[REPORTABLE_CHANGE_MAX_ANALOG_SIZE];
 	u8	prevData[REPORTABLE_CHANGE_MAX_ANALOG_SIZE];
 	u8	used;
-} reportCfgInfo_t;
+} reportCfgInfo_t; //37-bytes
 
 /**
  *  @brief  Definition for ZCL reporting table
  */
-typedef struct {
+typedef struct _attribute_packed_{
 	u8 reportNum;
 	reportCfgInfo_t	reportCfgInfo[ZCL_REPORTING_TABLE_NUM];
 } zcl_reportingTab_t;
@@ -785,6 +785,9 @@ status_t zcl_readReportConfig(u8 srcEp, epInfo_t *pDstEpInfo, u16 clusterId, u16
 status_t zcl_report(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 direction, u8 seqNo, u16 manuCode, u16 clusterId, u16 attrID, u8 dataType, u8 *pData);
 #define zcl_sendReportCmd(a,b,c,d,e,f,g,h) 	(zcl_report((a), (b), (c), (d), ZCL_SEQ_NUM, MANUFACTURER_CODE_NONE, (e), (f), (g), (h)))
 
+status_t zcl_reportAttrs(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 direction, u8 seqNo, u16 manuCode, u16 clusterId, zclReportCmd_t *pReportAttrs);
+#define zcl_sendReportAttrsCmd(a,b,c,d,e,f) (zcl_reportAttrs((a), (b), (c), (d), ZCL_SEQ_NUM, MANUFACTURER_CODE_NONE, (e), (f)))
+
 //for internal
 void zcl_reportingTabInit(void);
 u8 zcl_reportingEntryActiveNumGet(void);
@@ -797,9 +800,9 @@ status_t zcl_configureReporting(u8 endpoint, u16 profileId, u16 clusterId, zclCf
 
 //for application
 bool reportableChangeValueChk(u8 dataType, u8 *curValue, u8 *prevValue, u8 *reportableChange);
-void reportNoMinLimit(void);
-void reportAttrTimerStart(u16 seconds);
+void reportAttrTimerStart(void);
 void reportAttrTimerStop(void);
+void report_handler(void);
 
 #endif /* ZCL_REPORT */
 

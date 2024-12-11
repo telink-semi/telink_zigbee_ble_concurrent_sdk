@@ -86,7 +86,7 @@
    are negative.
    Error can be "generic" or some additional error code.
 */
-enum zb_ret_e{
+enum{
 	/* Most common return types: ok, generic error, BLOCKED, thread exit indication. */
 	RET_OK              				 = 0,
 	RET_ERROR           					,
@@ -146,7 +146,7 @@ enum zb_ret_e{
 	RET_ACK_OK                              ,
 	RET_NO_BOUND_DEVICE                     ,   //0x38
 	RET_BUF_FULL
-}zb_ret_t;
+};
 
 enum{
     START_VAR_ID = 0,
@@ -307,8 +307,8 @@ enum{
 #define	MAC_CAP_ALLOCADDR						BIT(7)
 
 typedef struct{
-	tl_zb_mac_pib_t 	macPib;  //76B
-	nwk_nib_t			nwkNib;  //60B
+	tl_zb_mac_pib_t 	macPib;  		//76B
+	nwk_nib_t			nwkNib;  		//60B
 	touchlink_attr_t	touchlinkAttr;  //8B
 	bdb_attr_t			bdbAttr;		//48B
 }zb_info_t;
@@ -406,6 +406,8 @@ void zb_init(void);
 void os_init(u8 isRetention);
 
 bool tl_stackBusy(void);
+
+void secondClockRun(void);
 
 #if ZB_ROUTER_ROLE
 u32 brcTransRecordTblSizeGet(void);

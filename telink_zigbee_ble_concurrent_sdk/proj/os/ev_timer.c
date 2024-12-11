@@ -310,6 +310,7 @@ bool ev_timer_process(bool det)
 
 		/* more than 1 ms. */
 		if(updateTime){
+			ev_rtc_update(updateTime);
 			ev_timer_update(updateTime);
 			evtReady = ev_timer_executeCB(det);
 		}

@@ -188,9 +188,6 @@ _CODE_ZCL_ status_t zcl_scene_addSceneEntry(u8 endpoint, zcl_sceneEntry_t *pScen
 	pSceneEntry->endpoint = endpoint;
 	memcpy((u8 *)&pSceneEntry->scene, (u8 *)pScene, sizeof(zcl_sceneEntry_t));
 
-	/* scenes save */
-	zcl_scenesSave(endpoint);
-
 	return ZCL_STA_SUCCESS;
 }
 
@@ -619,6 +616,10 @@ _CODE_ZCL_ static status_t zcl_addScenePrc(zclIncoming_t *pInMsg)
 	/* check if group id is valid */
 	if((addScene.scene.groupId == 0) || aps_group_search(addScene.scene.groupId, endpoint)){
 		status = zcl_scene_addSceneEntry(endpoint, &addScene.scene);
+		if(status == ZCL_STA_SUCCESS){
+			/* scenes save */
+			zcl_scenesSave(endpoint);
+		}
 	}else{
 		status = ZCL_STA_INVALID_FIELD;
 	}
@@ -991,6 +992,10 @@ _CODE_ZCL_ static status_t zcl_scene_clientCmdHandler(zclIncoming_t *pInMsg)
 			break;
 		default:
 			status = ZCL_STA_UNSUP_CLUSTER_COMMAND;
+
+			if(pInMsg->clusterAppCb){
+				status = pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, pInMsg->pData);
+			}
 			break;
 	}
 

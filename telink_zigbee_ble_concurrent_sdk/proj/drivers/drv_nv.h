@@ -66,7 +66,7 @@
  * 		0x00000  ------------			 0x00000  ------------
  *
  * #else
- *    #if !DUAL_MODE
+ *    #if !DUAL_MODE_WITH_SIG && !DUAL_MODE_WITH_MATTER
  *	 				512k							  1M
  * 		0x80000  ------------			0x100000  ------------
  *	 			|			 |					 |  MAC_Addr  |
@@ -97,7 +97,7 @@
  *	 			| BootLoader |					 | BootLoader |
  *	 	0x00000  ------------			 0x00000  ------------
  *
- *	 #else
+ *	 #else if DUAL_MODE_WITH_SIG
  *	 				 1M
  * 		0x100000  ------------
  *	 	   	    |  MAC_Addr  |
@@ -130,7 +130,39 @@
  *	 	0x08000 |------------|
  *	 			| BootLoader |
  *	 	0x00000  ------------
- *
+ *	 #else if DUAL_MODE_WITH_MATTER
+ *	 				 4M
+ * 	   0x400000  ------------
+ *	 	   	    |  MAC_Addr  |
+ * 	   0x3FF000 |------------|
+ *	 	        | F_CFG_Info |
+ * 	   0x3FE000 |------------|
+ *	 			|            |
+ * 	   0x3A7000 |------------|
+ *	 			| SHARE_PARA |
+ * 	   0x3A6000 |------------|
+ *	 			|		     |
+ * 	   0x3A5000 |------------|
+ *	 			| U_Cfg_Info |
+ * 	   0x3A3000 |------------|
+ *	 			|  NV_ZIGBEE |
+ * 	   0x38D000 |------------|
+ *	 			|   NV_BLE   |
+ * 	   0x38B000 |------------|
+ *	 			|            |
+ * 	   0x35E000 |------------|------
+ *	 			|            |
+ *	 			|            | slot1
+ *	 			|            |
+ * 	   0x1B9000 |------------|------
+ *	 			| ZIGBEE_FW  |
+ * 	   0x154000 |------------|
+ *	 			|			 | slot0
+ *	 			| MATTER_FW  |
+ *	 			|		     |
+ *	 	0x14000 |------------|------
+ *	 			|MATTER_BOOT |
+ *	 	0x00000  ------------
  *	 #endif
  *
  * #endif
@@ -140,7 +172,7 @@
 /* Flash Base Address define */
 #if defined(MCU_CORE_826x) || defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
 	#define FLASH_TLNK_FLAG_OFFSET		8
-#elif defined(MCU_CORE_B91)
+#elif defined(MCU_CORE_B91) || defined(MCU_CORE_B92) || defined(MCU_CORE_B95)
 	#define FLASH_TLNK_FLAG_OFFSET		32
 #endif
 
@@ -215,7 +247,11 @@ extern u32 g_u32CfgFlashAddr;
  */
 /* 16 bytes for pre-install code. */
 #if(FLASH_CAP_SIZE_1M || FLASH_CAP_SIZE_2M || FLASH_CAP_SIZE_4M)
-#define CFG_PRE_INSTALL_CODE			(0xFD000)
+#if DUAL_MODE_WITH_MATTER
+	#define CFG_PRE_INSTALL_CODE		(0x3A4000)
+#else
+	#define CFG_PRE_INSTALL_CODE		(0xFD000)
+#endif
 #else
 #define CFG_PRE_INSTALL_CODE			(0x78000)
 #endif
@@ -226,7 +262,11 @@ extern u32 g_u32CfgFlashAddr;
  * it will erase NV first.
  */
 #if(FLASH_CAP_SIZE_1M || FLASH_CAP_SIZE_2M || FLASH_CAP_SIZE_4M)
-#define CFG_FACTORY_RST_CNT			  	(0xFC000)
+#if DUAL_MODE_WITH_MATTER
+	#define CFG_FACTORY_RST_CNT			(0x3A3000)
+#else
+	#define CFG_FACTORY_RST_CNT			(0xFC000)
+#endif
 #else
 #define CFG_FACTORY_RST_CNT			  	(0x79000)
 #endif
@@ -243,30 +283,33 @@ extern u32 g_u32CfgFlashAddr;
     #define	NV_BASE_ADDRESS2			(0x7A000)
     #define CFG_NV_START_FOR_BLE		(0x74000)
 #endif
-#if DUAL_MODE
+#if DUAL_MODE_WITH_SIG || DUAL_MODE_WITH_MATTER
     #error "should use bootloade mode!!!"
 #endif
 #else
 #if(FLASH_CAP_SIZE_1M || FLASH_CAP_SIZE_2M || FLASH_CAP_SIZE_4M)
-    #if DUAL_MODE
-        #define NV_ADDR_FOR_SDK_TYPE		(0x24000)
-        #define NV_BASE_ADDRESS				(0x26000)
-        #define CFG_NV_START_FOR_BLE		(0x3C000)
-    #else
-		#define CFG_NV_START_FOR_BLE		(0xE4000)
-		#define NV_BASE_ADDRESS				(0xE6000)
-    #endif
+    #if DUAL_MODE_WITH_SIG
+        #define NV_ADDR_FOR_SDK_TYPE	(0x24000)
+        #define NV_BASE_ADDRESS			(0x26000)
+        #define CFG_NV_START_FOR_BLE	(0x3C000)
+	#elif DUAL_MODE_WITH_MATTER
+		#define CFG_NV_START_FOR_BLE	(0x38B000)
+		#define NV_BASE_ADDRESS			(0x38D000)
+	#else
+		#define CFG_NV_START_FOR_BLE	(0xE4000)
+		#define NV_BASE_ADDRESS			(0xE6000)
+	#endif
 #else
     #define CFG_NV_START_FOR_BLE		(0x68000)
 	#define	NV_BASE_ADDRESS				(0x6A000)
 	#define	NV_BASE_ADDRESS2			(0x7A000)
-    #if DUAL_MODE
-        #error "should use 1M flash!!!"
+    #if DUAL_MODE_WITH_SIG || DUAL_MODE_WITH_MATTER
+        #error "should larger capacity flash!!!"
     #endif
 #endif
 #endif
 
-#if DUAL_MODE
+#if DUAL_MODE_WITH_SIG
 typedef enum{
 	TYPE_TLK_MESH  						= 0x000000A3,// don't change, must same with telink mesh SDK
 	TYPE_SIG_MESH  						= 0x0000003A,// don't change, must same with telink mesh SDK
@@ -277,13 +320,17 @@ typedef enum{
 }telink_sdk_type_t;
 
 #define CFG_TELINK_SDK_TYPE				(NV_ADDR_FOR_SDK_TYPE)
-#endif	/* DUAL_MODE */
+#endif	/* DUAL_MODE_WITH_SIG */
 
 
 /*
  * Flash address of APP firmware.
  */
 #define FLASH_ADDR_OF_APP_FW			APP_IMAGE_ADDR
+
+#ifndef FLASH_SMP_PAIRING_MAX_SIZE
+#define FLASH_SMP_PAIRING_MAX_SIZE         						(4096)
+#endif
 
 
 /************************************************************************
@@ -292,6 +339,7 @@ typedef enum{
 #if !defined(BOOT_LOADER_MODE) || (BOOT_LOADER_MODE == 0)
 //unchangeable address
 #define FLASH_ADDR_OF_OTA_IMAGE		    (0x40000)
+
 #if(FLASH_CAP_SIZE_1M || FLASH_CAP_SIZE_2M || FLASH_CAP_SIZE_4M)
 	//max size = (0x80000 - 0) / 2 = 256k
 	#define FLASH_OTA_IMAGE_MAX_SIZE	    (FLASH_ADDR_OF_OTA_IMAGE - FLASH_ADDR_OF_APP_FW)
@@ -301,17 +349,20 @@ typedef enum{
 #endif
 
 #else
-    #if DUAL_MODE
+    #if DUAL_MODE_WITH_SIG
         #define FLASH_OTA_IMAGE_MAX_SIZE	(0x40000)
         #define FLASH_ADDR_OF_OTA_IMAGE		(0x40000)
-    #else
+	#elif DUAL_MODE_WITH_MATTER
+		#define FLASH_OTA_IMAGE_MAX_SIZE	(0x1B9000 - 0x154000)
+		#define FLASH_ADDR_OF_OTA_IMAGE		(0x2F9000)
+	#else
 		//1M   Flash: max size = (0xE4000 - 0x8000) / 2 = 440k
 		//512k Flash: max size = (0x68000 - 0x8000) / 2 = 192k
 		#define FLASH_OTA_IMAGE_MAX_SIZE	((CFG_NV_START_FOR_BLE - FLASH_ADDR_OF_APP_FW) / 2)
 		//1M   Flash: ota addr = 0x8000 + 440k = 0x76000
 		//512k Flash: ota addr = 0x8000 + 192k = 0x38000
 		#define FLASH_ADDR_OF_OTA_IMAGE		(FLASH_ADDR_OF_APP_FW + FLASH_OTA_IMAGE_MAX_SIZE)
-    #endif
+	#endif
 #endif
 
 /******************************************** END ***********************************************************/
@@ -336,7 +387,7 @@ typedef struct{
 	u16 size;
 	u8  itemId;
 	u8  usedState;
-#if defined(MCU_CORE_B91)
+#if defined(MCU_CORE_B91) || defined(MCU_CORE_B92)
 	u8  resv[8];   //PUYA flash only supports re-write 64 times
 #endif
 }nv_info_idx_t;
@@ -349,7 +400,7 @@ typedef struct{
 	u8  used;
 }itemHdr_t;
 
-typedef struct{
+typedef struct _attribute_packed_{
 	u16 opIndex;
 	u8 	opSect;
 }itemIfno_t;
@@ -416,6 +467,13 @@ typedef enum{
 	NV_ITEM_APP_SIMPLE_DESC,
 	NV_ITEM_APP_POWER_CNT,
 	NV_ITEM_APP_GP_TRANS_TABLE,
+
+	NV_ITEM_ZCL_ON_OFF_2			= 0x31,
+	NV_ITEM_ZCL_LEVEL_2				= 0x32,
+	NV_ITEM_ZCL_COLOR_CTRL_2		= 0x33,
+
+	NV_ITEM_APP_COMM_TIMEOUT		= 0x40,
+	NV_ITEM_APP_PRIVATE_SCENE_STORED= 0x41,
 
 	NV_ITEM_APS_BINDING_TABLE_V2    = 0x80,  /* mustn't modify it */
 

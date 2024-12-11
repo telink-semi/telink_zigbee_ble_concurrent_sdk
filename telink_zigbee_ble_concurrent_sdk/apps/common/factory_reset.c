@@ -7,6 +7,7 @@
  * @date    2021
  *
  * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *			All rights reserved.
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -19,13 +20,14 @@
  *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
+ *
  *******************************************************************************************************/
 
 #include "tl_common.h"
 #include "factory_reset.h"
 #include "zb_api.h"
 
-#define FACTORY_RESET_POWER_CNT_THRESHOLD		10	//times
+#define FACTORY_RESET_POWER_CNT_THRESHOLD		5	//times
 #define FACTORY_RESET_TIMEOUT					2	//second
 
 ev_timer_event_t *factoryRst_timerEvt = NULL;
@@ -65,14 +67,14 @@ static s32 factoryRst_timerCb(void *arg){
 	return -1;
 }
 
-void factroyRst_handler(void){
+void factoryRst_handler(void){
 	if(factoryRst_exist){
 		factoryRst_exist = FALSE;
 		zb_factoryReset();
 	}
 }
 
-void factroyRst_init(void){
+void factoryRst_init(void){
 	factoryRst_powerCntRestore();
 	factoryRst_powerCnt++;
 	factoryRst_powerCntSave();

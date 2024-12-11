@@ -65,12 +65,6 @@ enum{
 
 extern kb_data_t kb_event;
 
-
-
-static inline unsigned int gpio_read_cache(u32 pin, u8 *p){
-	return p[pin>>8] & (pin & 0xff);
-}
-
 static inline int kb_is_key_valid(kb_data_t *p){
 	return (p->cnt || p->ctrl_key);
 }

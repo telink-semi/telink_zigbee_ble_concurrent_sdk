@@ -24,7 +24,7 @@
  *******************************************************************************************************/
 
 #include "../drivers/drv_putchar.h"
-#if defined(MCU_CORE_B91)
+#if defined(MCU_CORE_B91) || defined(MCU_CORE_B92) || defined(MCU_CORE_B95)
 	#include <stdarg.h>
 #else
 	typedef char *va_list;
@@ -42,13 +42,16 @@
 
 
 
-#if defined(MCU_CORE_B91)
+#if defined(MCU_CORE_B91) || defined(MCU_CORE_B92) || defined(MCU_CORE_B95)
 __attribute__((used)) int _write(int fd, const unsigned char *buf, int size){
 	(void)fd;
-    int i;
+    int i = 0;
+#if (UART_PRINTF_MODE || USB_PRINTF_MODE)
+
     for(i = 0; i < size; i++){
     	drv_putchar(buf[i]);
     }
+#endif
     return i;
 }
 #else

@@ -546,6 +546,7 @@ enum HID_ReportItemTypes_t
 	HID_REPORT_CUSTOM 		= 3,
 };
 
+#pragma pack(1)
 /** \brief HID class-specific HID Descriptor (LUFA naming conventions).
  *
  *  Type define for the HID class-specific HID descriptor, to describe the HID device's specifications. Refer to the HID
@@ -617,6 +618,7 @@ typedef struct
 	u8 Reserved; /**< Reserved for OEM use, always set to 0. */
 	u8 KeyCode[6]; /**< Key codes of the currently pressed keys. */
 }USB_KeyboardReport_Data_t;
+#pragma pack()
 
 /** Type define for the data type used to store HID report descriptor elements. */
 typedef u8 USB_Descriptor_HIDReport_Datatype_t;

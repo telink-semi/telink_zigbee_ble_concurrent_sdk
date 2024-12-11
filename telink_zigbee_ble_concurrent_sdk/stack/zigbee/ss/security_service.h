@@ -143,21 +143,21 @@ typedef enum{
 	SS_GLB_LK_CERTIFICATION  = 3,
 }ss_glbLKId_e;
 
-typedef struct{
-	addrExt_t			device_address;
+typedef struct _attribute_packed_{
+	addrExt_t device_address;
 
-	u8					linkKey[CCM_KEY_SIZE];		/* The actual value of the link key. */
+	u8 linkKey[CCM_KEY_SIZE];		/* The actual value of the link key. */
 
-	ss_keyAttributes_e 	keyAttr;
-	ss_linkKeytype_e 	apsLinkKeyType;
-	u8					used;
-	u8					rsv;//used as mapping index to stack item
+	u8 keyAttr;//ss_keyAttributes_e
+	u8 apsLinkKeyType;//ss_linkKeytype_e
+	u8 used;
+	u8 rsv;//used as mapping index to stack item
 
-	u32					outgoingFrameCounter;
-	u32					incomingFrameCounter;
+	u32	outgoingFrameCounter;
+	u32	incomingFrameCounter;
 }ss_dev_pair_set_t;
 
-typedef struct{
+typedef struct _attribute_packed_{
 	u32						ssTimeoutPeriod;
 	u32						outgoingFrameCounter;
 	u32						prevOutgoingFrameCounter;
@@ -171,7 +171,7 @@ typedef struct{
 	u8						activeSecureMaterialIndex:2;
 	u8						reserved:1;
 	u8						activeKeySeqNum;
-	ss_preconfiguredKey_e	preConfiguredKeyType;//pre-configured type, should be set during init state which used for ZDO auth
+	u8						preConfiguredKeyType;//ss_preconfiguredKey_e, should be set during init state which used for ZDO auth
 	ss_tcPolicy_t			tcPolicy;									//10
 	u8						*touchLinkKey;
 	u8						*distributeLinkKey;
@@ -185,8 +185,6 @@ typedef struct{
 	                               }while(0)
 
 #define SSIB_GLK_FLAG_GET()   ((ss_ib.reserved << 1) | ss_ib.resv1)
-
-
 
 
 //Parameters for APSME-TRANSPORT-KEY.request primitive
@@ -238,12 +236,12 @@ typedef struct{
 	/*The extended 64-bit address of the
 	device originating the update-device
 	command.*/
-	addrExt_t 						srcAddr;
+	addrExt_t srcAddr;
 	/*The extended 64-bit address of the device
 	whose status is being updated.*/
-	addrExt_t 						devAddr;
-	u16								devShortAddr;
-	ss_apsmeUpdateDevStatus_e		status;
+	addrExt_t devAddr;
+	u16	devShortAddr;
+	u8 status;//ss_apsmeUpdateDevStatus_e
 }ss_apsmeUpdateDeviceInd_t;
 
 //Parameters for APSME-REMOVE-DEVICE.request primitive
@@ -283,7 +281,7 @@ typedef struct{
 	/* ZB_ADDR_16BIT_DEV_OR_BROADCAST or ZB_ADDR_64BIT_DEV. */
 	u8				dstAddrMode;//zb_addr_mode_t
 	/* the type of key being requested. */
-	ss_keyReqType_e	keyType;
+	u8				keyType;//ss_keyReqType_e
 }ss_apsmeRequestKeyReq_t;
 
 //Parameters for APSME-REQUEST-KEY.indication primitive
@@ -298,7 +296,7 @@ typedef struct{
 	/* ZB_ADDR_16BIT_DEV_OR_BROADCAST or ZB_ADDR_64BIT_DEV. */
 	u8				dstAddrMode;//zb_addr_mode_t
 	/* the type of key being requested. */
-	ss_keyReqType_e	keyType;
+	u8				keyType;//ss_keyReqType_e
 }ss_apsmeRequestKeyInd_t;
 
 //Parameters for APSME-SWITCH-KEY.request primitive

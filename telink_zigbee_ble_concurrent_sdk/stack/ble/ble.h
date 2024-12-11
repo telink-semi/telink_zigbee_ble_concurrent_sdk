@@ -1,13 +1,12 @@
 /********************************************************************************************************
- * @file     ble.h 
+ * @file    ble.h
  *
- * @brief    This is the header file for ble
+ * @brief   This is the header file for BLE SDK
  *
- * @author  Zigbee Group
- * @date    2021
+ * @author  BLE GROUP
+ * @date    06,2022
  *
- * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- *          All rights reserved.
+ * @par     Copyright (c) 2022, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -22,20 +21,34 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
+#ifndef BLE_H_
+#define BLE_H_
 
-#ifndef BLE_H__
-#define BLE_H__
 
-#if defined (MCU_CORE_8258)
-#include "ble_8258/ble.h"
-#define BLE_BLT_STATE_GET()    blt_state
 
-#elif defined (MCU_CORE_B91)
-#include "ble_b91/ble.h"
-#define BLE_BLT_STATE_GET()    bltParam.blt_state
+#include "ble_common.h"
+#include "ble_format.h"
 
-#endif
+#include "controller/ble_controller.h"
+#include "host/ble_host.h"
 
-void ble_rf_pa_init(bool ioset_need, u32 TXEN_pin, u32 RXEN_pin);
+#include "hci/hci.h"
+#include "hci/hci_const.h"
+#include "hci/hci_cmd.h"
+#include "hci/hci_event.h"
 
-#endif /* BLE_H_H_ */
+#include "service/ota/ota.h"
+#include "service/ota/ota_server.h"
+#include "service/device_information.h"
+#include "service/hids.h"
+#include "service/uuid.h"
+#include "stack/ble/debug/debug.h"
+
+
+#define BLE_BLT_STATE_GET()    (!blc_ll_isBleTaskIdle())
+#define			BLS_LINK_STATE_IDLE					0
+#define			BLS_LINK_STATE_CONN					1
+#define			BLS_LINK_STATE_ADV					2
+
+
+#endif /* BLE_H_ */

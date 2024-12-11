@@ -40,59 +40,33 @@ extern "C" {
 #define	UART_PRINTF_MODE				0
 #define USB_PRINTF_MODE         		0
 
+/*
+ * Enable UART to upgrade image.
+ */
+#define UART_ENABLE						0//1
+
 /* Board ID */
-#define BOARD_826x_EVK					0
-#define BOARD_826x_DONGLE				1
-#define BOARD_826x_DONGLE_PA			2
-#define BOARD_8258_EVK					3
-#define BOARD_8258_EVK_V1P2				4//C1T139A30_V1.2
-#define BOARD_8258_DONGLE				5
-#define BOARD_8278_EVK					6
-#define BOARD_8278_DONGLE				7
-#define BOARD_B91_EVK					8
-#define BOARD_B91_DONGLE				9
+#define BOARD_B92_EVK					9
+#define BOARD_B92_DONGLE				10
 
 /* Board define */
-#if defined(MCU_CORE_826x)
-	#define BOARD						BOARD_826x_DONGLE
-	#define CLOCK_SYS_CLOCK_HZ  		32000000
-#elif defined(MCU_CORE_8258)
-#if (CHIP_TYPE == TLSR_8258_1M)
-	#define FLASH_CAP_SIZE_1M			1
-#endif
-	#define BOARD						BOARD_8258_DONGLE
-	#define CLOCK_SYS_CLOCK_HZ  		48000000
-#elif defined(MCU_CORE_8278)
-	#define FLASH_CAP_SIZE_1M		  	1
-	#define BOARD						BOARD_8278_DONGLE//BOARD_8278_EVK
-	#define CLOCK_SYS_CLOCK_HZ  		48000000
-#elif defined(MCU_CORE_B91)
-	#define FLASH_CAP_SIZE_1M		  	1
-	#define BOARD						BOARD_B91_DONGLE//BOARD_B91_EVK
+#if defined(MCU_CORE_B92)
+	#if DUAL_MODE_WITH_MATTER
+		#define FLASH_CAP_SIZE_4M		1
+	#else
+		#define FLASH_CAP_SIZE_2M		1
+	#endif
+	#define BOARD						BOARD_B92_EVK//BOARD_B92_DONGLE//BOARD_B92_EVK
 	#define CLOCK_SYS_CLOCK_HZ  		48000000
 #else
 	#error "MCU is undefined!"
 #endif
 
 /* Board include */
-#if (BOARD == BOARD_826x_EVK)
-	#include "board_826x_evk.h"
-#elif (BOARD == BOARD_826x_DONGLE)
-	#include "board_826x_dongle.h"
-#elif (BOARD == BOARD_8258_DONGLE)
-	#include "board_8258_dongle.h"
-#elif (BOARD == BOARD_8258_EVK)
-	#include "board_8258_evk.h"
-#elif (BOARD == BOARD_8258_EVK_V1P2)
-	#include "board_8258_evk_v1p2.h"
-#elif (BOARD == BOARD_8278_EVK)
-	#include "board_8278_evk.h"
-#elif (BOARD == BOARD_8278_DONGLE)
-	#include "board_8278_dongle.h"
-#elif (BOARD == BOARD_B91_EVK)
-	#include "board_b91_evk.h"
-#elif (BOARD == BOARD_B91_DONGLE)
-	#include "board_b91_dongle.h"
+#if (BOARD == BOARD_B92_EVK)
+	#include "board_b92_evk.h"
+#elif (BOARD == BOARD_B92_DONGLE)
+	#include "board_b92_dongle.h"
 #endif
 
 
@@ -110,25 +84,16 @@ extern "C" {
 
 #define VOLTAGE_SAFETY_THRESHOLD                    2200
 
-#if defined(MCU_CORE_826x)
-	#define VOLTAGE_DETECT_ADC_PIN					0
-#elif defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
-	#define VOLTAGE_DETECT_ADC_PIN					GPIO_PC5
-#elif defined(MCU_CORE_B91)
-	#define VOLTAGE_DETECT_ADC_PIN					ADC_GPIO_PB0
-#endif
 
 /* flash write protect */
-#define	FLASH_W_PROTECT                             0
+#define	FLASH_PROTECT_ENABLE                        0
 
 /**********************************************************************
  * EV configuration
  */
 typedef enum{
-	EV_POLL_ED_DETECT,
-	EV_POLL_FACTORY_RST,
-	EV_POLL_HCI,
-    EV_POLL_IDLE,
+	EV_POLL_UART_PROC,
+	EV_POLL_KEY_PRESS,
 	EV_POLL_MAX,
 }ev_poll_e;
 

@@ -37,5 +37,13 @@
 #include "chip_b91/driver_b91.h"
 #include "chip_b91/gpio_default.h"
 #include "chip_b91/ext_driver/driver_ext.h"
+#elif defined (MCU_CORE_B92)
+#include "chip_b92/driver.h"
+#include "chip_b92/gpio_default.h"
+#include "chip_b92/ext_driver/driver_ext.h"
+#elif defined (MCU_CORE_B95)
+#include "chip_b95/driver.h"
+#include "chip_b95/gpio_default.h"
+#include "chip_b95/ext_driver/driver_ext.h"
 #endif
 

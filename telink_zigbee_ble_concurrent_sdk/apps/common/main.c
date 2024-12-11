@@ -7,6 +7,7 @@
  * @date    2021
  *
  * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *			All rights reserved.
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -24,31 +25,24 @@
 
 #include "zb_common.h"
 
-extern void user_init(bool isRetention);
-
 
 /*
  * main:
  * */
-int main(void){
-	u32 tick = 0;
-	u8 isRetention = drv_platform_init();
 
-#if VOLTAGE_DETECT_ENABLE
-	if(!isRetention){
-		voltage_detect();
-	}
-#endif
+int main(void){
+	startup_state_e state = drv_platform_init();
+	u8 isRetention = (state == SYSTEM_DEEP_RETENTION) ? 1 : 0;
+
 
 	os_init(isRetention);
-
 #if 0
 	extern void moduleTest_start(void);
 	moduleTest_start();
-#endif
+#else
 
+	extern void user_init(bool isRetention);
 	user_init(isRetention);
-
 	drv_enable_irq();
 
 #if (MODULE_WATCHDOG_ENABLE)
@@ -57,17 +51,20 @@ int main(void){
 #endif
 
 #if VOLTAGE_DETECT_ENABLE
-    tick = clock_time();
+    u32 tick = clock_time();
 #endif
 
 	while(1){
 #if VOLTAGE_DETECT_ENABLE
 		if(clock_time_exceed(tick, 200 * 1000)){
-			voltage_detect();
+			voltage_detect(0);
 			tick = clock_time();
 		}
 #endif
 
+#if defined(MCU_CORE_B92)
+		drv_vbusWatchdogClose();
+#endif
     	ev_main();
 
 #if (MODULE_WATCHDOG_ENABLE)
@@ -80,6 +77,8 @@ int main(void){
 		drv_wd_clear();
 #endif
 	}
+
+#endif
 
 	return 0;
 }

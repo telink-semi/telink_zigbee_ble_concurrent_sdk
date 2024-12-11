@@ -172,9 +172,14 @@ ev_queue_sts_t ev_queue_rawDelete(ev_queue_t* q, queue_item_t* element);
   */
 queue_item_t* ev_queue_rawPop(ev_queue_t* q);
 
+ev_queue_sts_t		ev_queue_insert(ev_queue_t *pQueue, void *item, void *prev);
+
+ev_queue_sts_t		queue_remove(ev_queue_t *pQueue, void *item, void *prev);
+
 /**  @} end of group EV_QUEUE_FUNCTIONS */
 
 /**  @} end of group EV_QUEUE */
 
 /**  @} end of group TELINK_COMMON_MODULE */
+
 

@@ -226,6 +226,12 @@ _CODE_ZCL_ static status_t zcl_addGroupPrc(zclIncoming_t *pInMsg)
 		status = ZCL_STA_CMD_HAS_RESP;
 	}
 
+	if(status == ZCL_STA_SUCCESS || status == ZCL_STA_CMD_HAS_RESP){
+		if(pInMsg->clusterAppCb){
+			pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, &addGroup);
+		}
+	}
+
 	return status;
 }
 
