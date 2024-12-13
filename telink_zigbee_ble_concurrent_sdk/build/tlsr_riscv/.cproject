@@ -202,6 +202,7 @@
 									<listOptionValue builtIn="false" value="ble_b91"/>
 									<listOptionValue builtIn="false" value="zb_router"/>
 									<listOptionValue builtIn="false" value="drivers_b91"/>
+									<listOptionValue builtIn="false" value="m"/>
 								</option>
 								<option id="nds.c.link.option.paths.32872337" name="Library search path (-L)" superClass="nds.c.link.option.paths" valueType="libPaths">
 									<listOptionValue builtIn="false" value="../../../stack/ble/lib"/>
@@ -601,7 +602,7 @@
 								<option id="nds.c.compiler.option.misc.other.1965628222" name="Other flags" superClass="nds.c.compiler.option.misc.other" value="-mext-dsp -mabi=ilp32f  -c -fmessage-length=0  -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -Wno-nonnull-compare" valueType="string"/>
 								<option id="nds.c.compiler.option.optimization.lto.2029656769" name="Link Time Optimization (-flto)" superClass="nds.c.compiler.option.optimization.lto" value="true" valueType="boolean"/>
 								<option id="nds.c.compiler.option.optimization.flags.562865342" name="Other optimization flags" superClass="nds.c.compiler.option.optimization.flags" value="-fpack-struct -fshort-enums" valueType="string"/>
-								<option id="nds.c.compiler.option.misc.use-cc.toolchain.1352584675" superClass="nds.c.compiler.option.misc.use-cc.toolchain" value="nds.c.compiler.option.misc.use-cc.gcc" valueType="enumerated"/>
+								<option id="nds.c.compiler.option.misc.use-cc.toolchain.1352584675" name="Compiler to use" superClass="nds.c.compiler.option.misc.use-cc.toolchain" value="nds.c.compiler.option.misc.use-cc.gcc" valueType="enumerated"/>
 								<inputType id="tool.nds.c.compiler.input.1202630203" superClass="tool.nds.c.compiler.input"/>
 							</tool>
 							<tool command="$(CROSS_COMPILE)gcc" id="tool.nds32le-elf-mculib-v5f.c.linker.exe.debug.1179802623" name="Andes C Linker" superClass="tool.nds32le-elf-mculib-v5f.c.linker.exe.debug">
@@ -617,6 +618,7 @@
 									<listOptionValue builtIn="false" value="ble_b91"/>
 									<listOptionValue builtIn="false" value="zb_router"/>
 									<listOptionValue builtIn="false" value="drivers_b91"/>
+									<listOptionValue builtIn="false" value="m"/>
 								</option>
 								<option id="nds.c.link.option.paths.1164542994" name="Library search path (-L)" superClass="nds.c.link.option.paths" valueType="libPaths">
 									<listOptionValue builtIn="false" value="../../../stack/ble/lib"/>

@@ -82,7 +82,7 @@ extern "C" {
 	#define CLOCK_SYS_CLOCK_HZ  					96000000
 #elif defined(MCU_CORE_TL721X)
 	#define FLASH_CAP_SIZE_1M						1
-	#define BOARD									BOARD_TL721X_EVK//BOARD_TL721X_DONGLE
+	#define BOARD									BOARD_TL721X_DONGLE//BOARD_TL721X_EVK
 	#define CLOCK_SYS_CLOCK_HZ  					120000000
 #else
 	#error "MCU is undefined!"
@@ -91,8 +91,6 @@ extern "C" {
 /* Board include */
 #if (BOARD == BOARD_8258_DONGLE)
 	#include "board_8258_dongle.h"
-#elif (BOARD == BOARD_8258_EVK)
-	#include "board_8258_evk.h"
 #elif (BOARD == BOARD_8258_EVK_V1P2)
 	#include "board_8258_evk_v1p2.h"
 #elif (BOARD == BOARD_B91_EVK)
@@ -121,8 +119,6 @@ extern "C" {
  * such as VCC.
  */
 #define VOLTAGE_DETECT_ENABLE						0
-#define VOLTAGE_DETECT_ADC_PIN						VOLTAGE_DETECT_PIN
-
 #define VOLTAGE_SAFETY_THRESHOLD                    2200
 
 /* Flash protect module */

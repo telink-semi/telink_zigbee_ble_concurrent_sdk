@@ -83,7 +83,7 @@ int zb_ble_hci_cmd_handler(u16 clusterId, u8 len, u8 *payload){
 
 		zb_mgmtNwkUpdateReq(dstAddr, &req, &sn, NULL);
 	}else if(clusterId == ZCL_CLUSTER_GEN_ON_OFF){
-		sampleLight_onoff(cmdId);
+		sampleLight_onOffUpdate(cmdId);
 	}else if(clusterId == ZCL_CLUSTER_GEN_LEVEL_CONTROL){
 		if(cmdId == ZCL_CMD_LEVEL_MOVE_TO_LEVEL){
 			sampleLight_moveToLevelProcess(cmdId, (moveToLvl_t *)pCmd);

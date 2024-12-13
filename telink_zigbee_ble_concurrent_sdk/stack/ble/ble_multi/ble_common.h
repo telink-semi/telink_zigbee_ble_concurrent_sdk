@@ -106,6 +106,7 @@ typedef enum {
     HCI_ERR_PACKET_TOO_LONG                                        = 0x45,
     HCI_ERR_TOO_LATE                                               = 0x46,
     HCI_ERR_TOO_EARLY                                              = 0x47,
+    HCI_ERR_INSUFFICIENT_CHANNELS                                  = 0x48,
     //DBG used only for CIS
     HCI_ERR_CONN_TERM_CIS_MIC_FAILURE                              = 0xD3,
 

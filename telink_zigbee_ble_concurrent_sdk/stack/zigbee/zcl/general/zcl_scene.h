@@ -55,13 +55,16 @@
 /**
  *  @brief  Max size for ZCL scene name
  */
+#ifndef ZCL_MAX_SCENE_NAME_LEN
 #define ZCL_MAX_SCENE_NAME_LEN                          16
+#endif
 
 /**
  *  @brief  Max size for ZCL scene extension field
  */
+#ifndef ZCL_MAX_SCENE_EXT_FIELD_SIZE
 #define ZCL_MAX_SCENE_EXT_FIELD_SIZE                    20
-
+#endif
 
 
 

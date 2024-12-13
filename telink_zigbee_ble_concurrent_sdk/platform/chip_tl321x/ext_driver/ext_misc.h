@@ -24,8 +24,6 @@
 #ifndef DRIVERS_TL321X_EXT_MISC_H_
 #define DRIVERS_TL321X_EXT_MISC_H_
 
-//#include "drivers/TL321X/reg_include/core_reg.h" //#include "nds_intrinsic.h"
-
 #include "types.h"
 #include "../compatibility_pack/cmpt.h"
 #include "../lib/include/analog.h"
@@ -156,7 +154,7 @@ void rf_set_channel_power_enable(unsigned char enable);
 
 
 /******************************* trng_start ******************************************************************/
-#define rand                        trng_rand
+
 #define random_generator_init       trng_init
 
 

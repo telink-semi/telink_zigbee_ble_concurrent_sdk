@@ -88,6 +88,15 @@ void        blc_ll_recoverDeepRetention(void);
  */
 void        blc_pm_setSleepMask (sleep_mask_t mask);
 
+
+/**
+ * @brief   Set the WFI (Wait For Interrupt) mask.
+ * @param   mask    The WFI mask to be set.
+ * @return  0x00: command succeeded; others is not supported.
+ */
+unsigned char blc_pm_setWfiMask (wfi_mask_t mask);
+
+
 /**
  * @brief   for user to enable or disable deepSleep retention function
  * @param   en -  deepSleep retention enable, 1: enable; 0: disable

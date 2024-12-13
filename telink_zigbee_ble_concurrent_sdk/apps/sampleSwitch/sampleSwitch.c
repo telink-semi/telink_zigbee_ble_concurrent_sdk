@@ -198,23 +198,6 @@ static void sampleSwitchSysException(void)
 #endif
 }
 
-void report_handler(void)
-{
-	if(zb_isDeviceJoinedNwk()){
-		if(zcl_reportingEntryActiveNumGet()){
-			u16 second = 1;//TODO: fix me
-
-			reportNoMinLimit();
-
-			//start report timer
-			reportAttrTimerStart(second);
-		}else{
-			//stop report timer
-			reportAttrTimerStop();
-		}
-	}
-}
-
 void app_task(void)
 {
 	if(BDB_STATE_GET() == BDB_STATE_IDLE){

@@ -30,13 +30,13 @@
 #endif
 
 #if defined(MCU_CORE_8258)
-int Tl_printf(const char *format, ...);
+int tl_printf(const char *format, ...);
 #endif
 
 
 #if (TLKAPI_DEBUG_ENABLE)
 #if defined(MCU_CORE_8258)
-	#define printf										Tl_printf
+	#define printf										tl_printf
 #endif
 
 	#define TRACE										printf

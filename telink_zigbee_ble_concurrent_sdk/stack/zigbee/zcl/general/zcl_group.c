@@ -87,7 +87,8 @@ _CODE_ZCL_ status_t zcl_group_view(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDef
 
 _CODE_ZCL_ status_t zcl_group_getMembership(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, u8 groupCnt, u16 *groupList)
 {
-	u8 buf[2*APS_GROUP_TABLE_NUM+1];
+	u8 buf[2 * APS_GROUP_TABLE_NUM + 1];
+	
 	if(groupCnt > APS_GROUP_TABLE_NUM){
 		return ZCL_STA_INVALID_VALUE;
 	}

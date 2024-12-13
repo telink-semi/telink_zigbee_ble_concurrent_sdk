@@ -78,14 +78,15 @@ extern "C" {
 #define LED_POWER					LED_R
 #define LED_PERMIT					LED_G
 
-#define VOLTAGE_DETECT_PIN			ADC_GPIO_PB6
+// ADC
+#define VOLTAGE_DETECT_ADC_PIN		ADC_GPIO_PB6
 
 // UART
 #if ZBHCI_UART
-	#define UART_TX_PIN         	UART0_TX_PA3
-	#define UART_RX_PIN         	UART0_RX_PA4
+#define UART_TX_PIN         		UART0_TX_PA3
+#define UART_RX_PIN         		UART0_RX_PA4
 
-	#define UART_PIN_CFG()			uart_set_pin(UART_TX_PIN, UART_RX_PIN);// uart tx/rx pin set
+#define UART_PIN_CFG()				drv_uart_pin_set(UART_TX_PIN, UART_RX_PIN);// uart tx/rx pin set
 #endif
 
 // DEBUG

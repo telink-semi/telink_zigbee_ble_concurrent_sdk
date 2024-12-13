@@ -251,33 +251,16 @@ void sampleLightAttrsChk(void)
 	}
 }
 
-void report_handler(void)
-{
-	if(zb_isDeviceJoinedNwk()){
-		if(zcl_reportingEntryActiveNumGet()){
-			u16 second = 1;//TODO: fix me
-
-			reportNoMinLimit();
-
-			//start report timer
-			reportAttrTimerStart(second);
-		}else{
-			//stop report timer
-			reportAttrTimerStop();
-		}
-	}
-}
-
 void app_task(void)
 {
 	app_key_handler();
 	localPermitJoinState();
 	if(BDB_STATE_GET() == BDB_STATE_IDLE){
-		//factroyRst_handler();
+		//factoryRst_handler();
 
 		report_handler();
 
-#if 0/* NOTE: If set to '1', the latest status of lighting will be stored. */
+#if 1/* NOTE: If set to '1', the latest status of lighting will be stored. */
 		sampleLightAttrsChk();
 #endif
 	}
@@ -285,10 +268,6 @@ void app_task(void)
 
 static void sampleLightSysException(void)
 {
-	zcl_onOffAttr_save();
-	zcl_levelAttr_save();
-	zcl_colorCtrlAttr_save();
-
 #if 1
 	SYSTEM_RESET();
 #else
@@ -325,7 +304,8 @@ void user_zb_init(bool isRetention)
 
 	/* Initialize LEDs*/
 	led_init();
-	hwLight_init();
+	
+	light_init();
 
 	//factroyRst_init();
 
@@ -359,9 +339,36 @@ void user_zb_init(bool isRetention)
 	}
 
     /* Set default reporting configuration */
-    u8 reportableChange = 0x00;
-    bdb_defaultReportingCfg(SAMPLE_LIGHT_ENDPOINT, HA_PROFILE_ID, ZCL_CLUSTER_GEN_ON_OFF, ZCL_ATTRID_ONOFF,
-    						0x0000, 0x003c, (u8 *)&reportableChange);
+	u8 reportableChange[2] = {0x00, 0x00};
+    bdb_defaultReportingCfg(SAMPLE_LIGHT_ENDPOINT, HA_PROFILE_ID,
+    						ZCL_CLUSTER_GEN_ON_OFF, ZCL_ATTRID_ONOFF,
+    						1, 120, (u8 *)&reportableChange);//min = 1s, max = 120s
+#if ZCL_LEVEL_CTRL_SUPPORT
+    bdb_defaultReportingCfg(SAMPLE_LIGHT_ENDPOINT, HA_PROFILE_ID,
+    						ZCL_CLUSTER_GEN_LEVEL_CONTROL, ZCL_ATTRID_LEVEL_CURRENT_LEVEL,
+    						1, 120, (u8 *)&reportableChange);
+#endif
+#if COLOR_RGB_SUPPORT
+    bdb_defaultReportingCfg(SAMPLE_LIGHT_ENDPOINT, HA_PROFILE_ID,
+    						ZCL_CLUSTER_LIGHTING_COLOR_CONTROL, ZCL_ATTRID_CURRENT_HUE,
+							1, 120, (u8 *)&reportableChange);
+    bdb_defaultReportingCfg(SAMPLE_LIGHT_ENDPOINT, HA_PROFILE_ID,
+    						ZCL_CLUSTER_LIGHTING_COLOR_CONTROL, ZCL_ATTRID_CURRENT_SATURATION,
+							1, 120, (u8 *)&reportableChange);
+#ifndef COLOR_X_Y_DISABLE
+    bdb_defaultReportingCfg(SAMPLE_LIGHT_ENDPOINT, HA_PROFILE_ID,
+    						ZCL_CLUSTER_LIGHTING_COLOR_CONTROL, ZCL_ATTRID_CURRENT_X,
+							1, 120, (u8 *)&reportableChange);
+    bdb_defaultReportingCfg(SAMPLE_LIGHT_ENDPOINT, HA_PROFILE_ID,
+    						ZCL_CLUSTER_LIGHTING_COLOR_CONTROL, ZCL_ATTRID_CURRENT_Y,
+							1, 120, (u8 *)&reportableChange);
+#endif
+#endif
+#if COLOR_CCT_SUPPORT
+    bdb_defaultReportingCfg(SAMPLE_LIGHT_ENDPOINT, HA_PROFILE_ID,
+    						ZCL_CLUSTER_LIGHTING_COLOR_CONTROL, ZCL_ATTRID_COLOR_TEMPERATURE_MIREDS,
+							1, 120, (u8 *)&reportableChange);
+#endif
 
     /* Initialize BDB */
 	bdb_init((af_simple_descriptor_t *)&sampleLight_simpleDesc, &g_bdbCommissionSetting, &g_zbDemoBdbCb, 1);

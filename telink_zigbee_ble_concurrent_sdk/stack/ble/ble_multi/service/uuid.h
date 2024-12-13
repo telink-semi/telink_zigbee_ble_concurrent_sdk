@@ -1226,8 +1226,8 @@ extern const unsigned char characteristicBgsFeaturesUuid[ATT_16_UUID_LEN];
 extern const unsigned char characteristicBgrFeaturesUuid[ATT_16_UUID_LEN];
 //TODO: Ranging profile has not been confirmed yet. by junhui.hu
 extern const unsigned char characteristicRasFeatureUuid[ATT_16_UUID_LEN];
-extern const unsigned char characteristicLiveRangingDataUuid[ATT_16_UUID_LEN];
-extern const unsigned char characteristicStoredRangingDataUuid[ATT_16_UUID_LEN];
+extern const unsigned char characteristicRealTimeProcedureDataUuid[ATT_16_UUID_LEN];
+extern const unsigned char characteristicOnDemandProcedureDataUuid[ATT_16_UUID_LEN];
 extern const unsigned char characteristicControlPointUuid[ATT_16_UUID_LEN];
 extern const unsigned char characteristicRangingDataReadyUuid[ATT_16_UUID_LEN];
 extern const unsigned char characteristicRangingDataOverwrittenUuid[ATT_16_UUID_LEN];

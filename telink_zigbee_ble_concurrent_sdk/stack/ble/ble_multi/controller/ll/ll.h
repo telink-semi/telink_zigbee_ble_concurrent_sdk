@@ -171,6 +171,13 @@ bool        blc_ll_isBleTaskIdle(void);
 void        blc_ll_setCustomizedAdvertisingScanningChannel (u8 chn0, u8 chn1, u8 chn2);
 
 
+/**
+ * @brief   Check if the RF is currently busy.
+ * This function checks if the RF module is currently in a busy state.
+ * @return  true if the RF is busy, false otherwise.
+ */
+bool blc_ll_isRfBusy(void);
+
 u32 get_ble_end_event_tick(void);
 u32 get_ble_next_event_tick(void);
 u32 get_ble_event_state(void);

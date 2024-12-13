@@ -80,7 +80,8 @@ extern "C" {
 
 #define	PM_WAKEUP_LEVEL		  		PM_WAKEUP_LEVEL_LOW
 
-#define VOLTAGE_DETECT_PIN			ADC_GPIO_PB7//todo
+// ADC
+#define VOLTAGE_DETECT_ADC_PIN		ADC_GPIO_PB7//todo
 
 // UART
 #if ZBHCI_UART

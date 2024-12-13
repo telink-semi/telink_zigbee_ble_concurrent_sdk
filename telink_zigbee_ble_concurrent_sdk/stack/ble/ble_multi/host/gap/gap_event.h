@@ -211,7 +211,7 @@ Situation 2:   SMP Fast Connect                                                 
 /**
  *  @brief  Event Parameters for "GAP_EVT_SMP_PAIRING_BEGIN"
  */
-typedef struct {
+typedef struct __attribute__((packed)) {
     u16 connHandle;
     u8  secure_conn;
     u8  tk_method;
@@ -220,7 +220,7 @@ typedef struct {
 /**
  *  @brief  Event Parameters for "GAP_EVT_SMP_PAIRING_SUCCESS"
  */
-typedef struct {
+typedef struct __attribute__((packed)) {
     u16 connHandle;
     u8  bonding;
     u8  bonding_result;
@@ -229,7 +229,7 @@ typedef struct {
 /**
  *  @brief  Event Parameters for "GAP_EVT_SMP_PAIRING_FAIL"
  */
-typedef struct {
+typedef struct __attribute__((packed)) {
     u16 connHandle;
     u8  reason;
 } gap_smp_pairingFailEvt_t;
@@ -237,7 +237,7 @@ typedef struct {
 /**
  *  @brief  Event Parameters for "GAP_EVT_SMP_CONN_ENCRYPTION_DONE"
  */
-typedef struct {
+typedef struct __attribute__((packed)) {
     u16 connHandle;
     u8  re_connect;   //1: re_connect, encrypt with previous distributed LTK;   0: pairing , encrypt with STK
 } gap_smp_connEncDoneEvt_t;
@@ -245,7 +245,7 @@ typedef struct {
 /**
  *  @brief  Event Parameters for "GAP_EVT_SMP_SECURITY_PROCESS_DONE"
  */
-typedef struct {
+typedef struct __attribute__((packed)) {
     u16 connHandle;
     u8  re_connect;   //1: re_connect, encrypt with previous distributed LTK;   0: pairing , encrypt with STK
 } gap_smp_securityProcessDoneEvt_t;
@@ -262,7 +262,7 @@ typedef struct __attribute__((packed)) {
 /**
  *  @brief  Event Parameters for "GAP_EVT_SMP_TK_REQUEST_PASSKEY"
  */
-typedef struct {
+typedef struct __attribute__((packed)) {
     u16 connHandle;
 } gap_smp_TkReqPassKeyEvt_t;
 
@@ -286,14 +286,14 @@ typedef struct __attribute__((packed))  {
 /**
  *  @brief  Event Parameters for "GAP_EVT_SMP_TK_REQUEST_OOB"
  */
-typedef struct {
+typedef struct __attribute__((packed)) {
     u16 connHandle;
 } gap_smp_TkRequestOOBEvt_t;
 
 /**
  *  @brief  Event Parameters for "GAP_EVT_ATT_EXCHANGE_MTU"
  */
-typedef struct {
+typedef struct __attribute__((packed)) {
     u16 connHandle;
     u16 peer_MTU;
     u16 effective_MTU;
@@ -327,7 +327,7 @@ typedef struct __attribute__((packed)) {
 /**
  *  @brief  Event Parameters for "GAP_EVT_MASK_L2CAP_COC_CONNECT"
  */
-typedef struct {
+typedef struct __attribute__((packed)) {
     u16 connHandle;
     u16 spsm;
     u16 mtu;
@@ -338,7 +338,7 @@ typedef struct {
 /**
  *  @brief  Event Parameters for "GAP_EVT_MASK_L2CAP_COC_DISCONNECT"
  */
-typedef struct {
+typedef struct __attribute__((packed)) {
     u16 connHandle;
     u16 srcCid;
     u16 dstCid;
@@ -347,7 +347,7 @@ typedef struct {
 /**
  *  @brief  Event Parameters for "GAP_EVT_MASK_L2CAP_COC_RECONFIGURE"
  */
-typedef struct{
+typedef struct __attribute__((packed)) {
     u16 connHandle;
     u16 srcCid;
     u16 mtu;
@@ -366,7 +366,7 @@ typedef struct __attribute__((packed)) {
 /**
  *  @brief  Event Parameters for "GAP_EVT_MASK_L2CAP_COC_SEND_DATA_FINISH"
  */
-typedef struct{
+typedef struct __attribute__((packed)) {
     u16 connHandle;
     u16 srcCid;
 } gap_l2cap_cocSendDataFinishEvt_t;
