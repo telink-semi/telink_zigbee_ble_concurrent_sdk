@@ -1,7 +1,7 @@
 /********************************************************************************************************
- * @file    board_8258_evk.h
+ * @file    board_8258_evk_v1p2.h
  *
- * @brief   This is the header file for board_8258_evk
+ * @brief   This is the header file for board_8258_evk_v1p2
  *
  * @author  Zigbee Group
  * @date    2021
