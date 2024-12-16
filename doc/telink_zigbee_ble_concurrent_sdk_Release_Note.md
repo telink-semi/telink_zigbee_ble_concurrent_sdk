@@ -26,8 +26,9 @@
 * Fix the DeviceEnabled attribute handling of ZCL Basic Cluster.
 * Update libraries to fix the issue of searching for end devices when the broadcast method is 0xFFFF.
 * Update libraries to fix the length issue of APS encrypted data.
-	The affected SDK versions are from v2.3.2.0 to v2.4.0.0.
-	In addition, users also can fix this issue by using the tl_apsDataIndRegister() function as follows. This patch is only available for SDK versions from v2.3.2.0 to v2.4.0.0.
+	-The affected SDK versions are from v2.3.2.0 to v2.4.0.0.
+	-In addition, users also can fix this issue by using the tl_apsDataIndRegister() function as follows. This patch is only available for SDK versions from v2.3.2.0 to v2.4.0.0.
+	~~~
 	void app_apsDataIndLengthFix(void *arg){
 		aps_data_ind_t *ind = (aps_data_ind_t *)arg;
 		if(ind->security_status & SECURITY_IN_APSLAYER){
@@ -36,6 +37,7 @@
 	}
 
 	tl_apsDataIndRegister(app_apsDataIndLengthFix);
+	~~~
 ### Performance
 * None
 ### BREAKING CHANGES
@@ -76,8 +78,9 @@
 * 修复ZCL Basic cluster里关于DeviceEnabled属性的处理
 * 更新库修复在广播地址为0xFFFF时转发给终端设备时搜索终端设备地址的问题
 * 更新库修复APS层加密数据长度问题
-	受影响的SDK版本为v2.3.2.0 to v2.4.0.0.
-	如果用户用到APS层加解密，可以使用tl_apsDataIndRegister()来修复此问题，参考如下。 该补丁仅限于版本为v2.3.2.0 to v2.4.0.0的SDK。
+	-受影响的SDK版本为v2.3.2.0 to v2.4.0.0.
+	-如果用户用到APS层加解密，可以使用tl_apsDataIndRegister()来修复此问题，参考如下。 该补丁仅限于版本为v2.3.2.0 to v2.4.0.0的SDK。
+	~~~
 	void app_apsDataIndLengthFix(void *arg){
 		aps_data_ind_t *ind = (aps_data_ind_t *)arg;
 		if(ind->security_status & SECURITY_IN_APSLAYER){
@@ -86,6 +89,7 @@
 	}
 
 	tl_apsDataIndRegister(app_apsDataIndLengthFix);
+	~~~
 ### Performance
 * None
 ### BREAKING CHANGES
