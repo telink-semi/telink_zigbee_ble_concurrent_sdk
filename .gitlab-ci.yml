@@ -1,0 +1,193 @@
+stages:
+  - scc
+  - genLicense
+  - checkLicense
+  - build_tc32
+  - build_riscv
+  - build_iotStudio
+  - cov
+  - fossid
+  - plainPW_check
+  - oss
+  - misspellChecking
+
+scc:
+  stage: scc
+  script:
+    - echo "Enter scc stage"
+    - scc | tee scc.txt
+    - bash /usr/bin/scc_calc.sh
+    - echo  "The End SCC result:"
+    - cat scc.txt
+  artifacts:
+    paths:
+    - scc.txt
+
+genLicense:
+  variables:
+    CODE_COMPILE_ARCH: 'EAGLE_ANDES'
+    COV_PF_CATALOG: 'ZIGBEE'
+  stage: genLicense
+  before_script:
+  script:
+    - date
+    - generat_license_list
+    - date
+  artifacts:
+    paths:
+    - "license_list_gen.txt"
+    - "no_license_list_gen.txt"
+    - "mismatch_license_file_gen.txt"
+  when: manual
+
+checkLicense:
+  variables:
+    CODE_COMPILE_ARCH: 'EAGLE_ANDES'
+    COV_PF_CATALOG: 'ZIGBEE'
+  stage: checkLicense
+  allow_failure: yes
+  before_script:
+  script:
+    - date
+    - check_license
+    #- generat_license_list # For no license files
+    - date
+
+  artifacts:
+    when: always
+    paths:
+    - "mismatch_license.txt"
+    - "no_license*.txt"
+    - "unknow_type_file.txt"
+
+build_tc32:
+  variables:
+    PROJECT_PATH: './telink_zigbee_ble_concurrent_sdk/build/tlsr_tc32'
+    PROJECT_NAME: 'telink_zigbee_ble_concurrent_sdk_8258'
+  stage: build_tc32
+  tags:
+    - LINUX
+    - TC32
+  before_script:
+  script:
+    - which tc32-elf-gcc
+    - chmod +x telink_zigbee_ble_concurrent_sdk/tools/*.sh
+    - date
+    - ls telink_zigbee_ble_concurrent_sdk/build/tlsr_tc32
+    - $TC32_ECLIPSE_BUILD  -data ${CI_PIPELINE_ID}_WS1  -import $PROJECT_PATH -cleanBuild $PROJECT_NAME/concurrent_sampleLight_8258
+    - date
+
+  artifacts:
+    paths:
+    - "$PROJECT_PATH/concurrent_sampleLight_8258/*.bin"
+    - "$PROJECT_PATH/concurrent_sampleLight_8258/*.lst"
+    - "$PROJECT_PATH/concurrent_sampleLight_8258/*.elf"
+
+build_riscv:
+  variables:    
+    PROJECT_PATH: './telink_zigbee_ble_concurrent_sdk/build/tlsr_riscv'
+    PROJECT_NAME: 'telink_zigbee_ble_concurrent_sdk_b91'
+  stage: build_riscv
+  before_script:
+  script:
+    - ls
+    - pwd
+    - chmod +x telink_zigbee_ble_concurrent_sdk/tools/*.sh
+    - date
+    - echo "--------------- Will build Demo -----------------"
+    - echo $PROJECT_PATH
+    - $ANDESRISCV_ECLIPSE_BUILD  -data ${CI_PIPELINE_ID}_WS  -import $PROJECT_PATH -cleanBuild $PROJECT_NAME/concurrent_sampleLight_b91
+    - date
+
+  artifacts:
+    paths:
+    - "$PROJECT_PATH/concurrent_sampleLight_b91/output/*.bin"
+    - "$PROJECT_PATH/concurrent_sampleLight_b91/output/objdump.txt"
+
+build_iotStudio:
+  variables:    
+    PROJECT_PATH: './telink_zigbee_ble_concurrent_sdk/build/iot_riscv_tl321x'
+    PROJECT_NAME: 'telink_zigbee_ble_concurrent_sdk_tl321x'
+  stage: build_iotStudio
+  before_script:
+  script:
+    - ls
+    - pwd
+    - chmod +x telink_zigbee_ble_concurrent_sdk/tools/*.sh
+    - date
+    - echo "--------------- Will build Demo -----------------"
+    - echo $PROJECT_PATH
+    - $TELINK_IDE_BUILD  -data ${CI_PIPELINE_ID}_WS  -import $PROJECT_PATH -cleanBuild $PROJECT_NAME/concurrent_sampleLight_tl321x
+    - date
+
+  artifacts:
+    paths:
+    - "$PROJECT_PATH/concurrent_sampleLight_tl321x/*.bin"
+    - "$PROJECT_PATH/concurrent_sampleLight_tl321x/*.lst"
+    - "$PROJECT_PATH/concurrent_sampleLight_tl321x/*.elf"
+
+# The cov job definition
+cov:
+  variables:    
+    CODE_COMPILE_ARCH: 'TC32'    
+    COV_PF_CATALOG: 'ZIGBEE'  
+  stage: cov 
+  tags:    
+    - COV    
+    - LINUX    
+    - TC32
+  before_script:  
+  script:    
+    - chmod +x telink_zigbee_ble_concurrent_sdk/tools/*.sh    
+    - $COV_B COV_$CI_PROJECT_NAME $COV_B_TEMPLATE/$CODE_COMPILE_ARCH $TC32_ECLIPSE_BUILD  -data ${CI_PIPELINE_ID}_WS  -import telink_zigbee_ble_concurrent_sdk/build/tlsr_tc32  -cleanBuild telink_zigbee_ble_concurrent_src_8258/concurrent_sampleLight_8258    
+    - $COV_A COV_$CI_PROJECT_NAME    
+    - cov_add_commit_steam_project_2_platform.sh
+  when: manual
+        
+fossid:
+  tags:
+    - FOSSID
+  stage: fossid
+  script:
+    - fossid_check.sh
+  artifacts:
+    paths:
+    - fossid*.txt
+  when: manual
+
+plainPW_check:
+  stage: plainPW_check 
+  script:
+    - echo "Enter Plain Password checking stage"
+    - check_plain_weak_password | tee result.txt
+    - ls -l result.txt
+    - echo "Error List:"
+    - cat result.txt
+  artifacts:
+    paths:
+    - result.txt
+  when: manual
+
+oss:
+  tags:
+    - OSS
+  stage: oss
+  script:
+    - oss_checking .
+  artifacts:
+    paths:
+    - scan_result
+  when: manual
+
+misspellChecking:
+  stage: misspellChecking
+  tags:
+    - LINUX
+  script:
+    - echo "--------------- Begin ------------------------"
+    - misspell-check
+    - echo "---------------- End -----------------------"
+  artifacts:
+    paths:
+    - misspell_result.txt
+    
