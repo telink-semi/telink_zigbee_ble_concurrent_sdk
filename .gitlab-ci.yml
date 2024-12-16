@@ -190,4 +190,5 @@ misspellChecking:
   artifacts:
     paths:
     - misspell_result.txt
+  when: manual
     
