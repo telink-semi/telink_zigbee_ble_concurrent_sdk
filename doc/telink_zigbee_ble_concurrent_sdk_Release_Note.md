@@ -1,3 +1,96 @@
+## V2.4.0.1
+
+### Version
+* Chips
+  - TC32: TLSR8258
+  - RISCV: TLSR921x(B91), TL321x, TL721x
+* Driver Version
+  - tl_platform_sdk V3.2.0(TL321x, TL721x)
+* BLE Version
+  - tl_ble_sdk V4.0.4.2(TL321x, TL721x)
+* Zigbee Version
+  - telink_zigbee_sdk V3.7.1.2
+* Toolchain Version
+  - TLSR8258: TC32 ELF GCC4.3
+  - TLSR921x(B91): TL32 ELF MCULIB V5F GCC7.4
+  - TL321x: TL32 ELF MCULIB V5 GCC12.2
+  - TL721x: TL32 ELF MCULIB V5F GCC12.2
+* IDE Version
+  - Telink IDE: [Telink IDE](https://wiki.telink-semi.cn/tools_and_sdk/Tools/IDE/Telink_IDE.zip)
+  - Telink V323 RDS: [telink_v323_rds](https://wiki.telink-semi.cn/tools_and_sdk/Tools/IDE/telink_v323_rds_official_windows.zip)
+  - Telink IoT Studio: [TelinkIoTStudio_V2024.8](http://wiki.telink-semi.cn/tools_and_sdk/Tools/IoTStudio/TelinkIoTStudio_V2024.8.zip)
+### Features
+* Update sampleLight demo for level and color cluster.
+### Bug Fixes
+* Decorate structures that require single byte alignment with "_attributie_packed_" in BLE multiply connection stack.
+* Fix the DeviceEnabled attribute handling of ZCL Basic Cluster.
+* Update libraries to fix the issue of searching for end devices when the broadcast method is 0xFFFF.
+* Update libraries to fix the length issue of APS encrypted data.
+	The affected SDK versions are from v2.3.2.0 to v2.4.0.0.
+	In addition, users also can fix this issue by using the tl_apsDataIndRegister() function as follows. This patch is only available for SDK versions from v2.3.2.0 to v2.4.0.0.
+	void app_apsDataIndLengthFix(void *arg){
+		aps_data_ind_t *ind = (aps_data_ind_t *)arg;
+		if(ind->security_status & SECURITY_IN_APSLAYER){
+			ind->asduLength += 4;
+		}
+	}
+
+	tl_apsDataIndRegister(app_apsDataIndLengthFix);
+### Performance
+* None
+### BREAKING CHANGES
+* None
+### CodeSize
+* Units: KBytes(RAM/FLASH Size)
+
+|   chip   | concurrent_sampleGW | concurrent_sampleLight | concurrent_sampleSwitch | concurrent_sampleLightAdv | concurrent_sampleSwitchAdv |
+| :------- | :-----------------: | :--------------------: | :---------------------: | :-----------------------: | :------------------------: |
+| TLSR8258 | 44 / 211            | 41 / 215               | 32 / 171                |  \				     	| \	                         |
+| TLSR921x | 48 / 192            | 46 / 198               | 38 / 159                |  \						| \                          |
+| TL321x   | 76 / 229            | 74 / 236               | 69 / 199                | 46 / 188	                | 47 / 151                   |
+| TL721x   | 77 / 230            | 74 / 236               | 70 / 200                | 47 / 189                  | 48 / 152                   |
+
+###版本
+* 芯片
+  - TC32: TLSR8258
+  - RISCV: TLSR921x(B91), TL321x, TL721x
+* 驱动版本
+  - tl_platform_sdk V3.2.0(TL321x, TL721x)
+* BLE版本
+  - tl_ble_sdk V4.0.4.2(TL321x, TL721x)
+* Zigbee版本
+  - telink_zigbee_sdk V3.7.1.2
+* 工具链版本
+  - TLSR8258: TC32 ELF GCC4.3
+  - TLSR921x(B91): TL32 ELF MCULIB V5F GCC7.4
+  - TL321x: TL32 ELF MCULIB V5 GCC12.2
+  - TL721x: TL32 ELF MCULIB V5F GCC12.2
+* IDE版本
+  - Telink IDE: [Telink IDE](https://wiki.telink-semi.cn/tools_and_sdk/Tools/IDE/Telink_IDE.zip)
+  - Telink V323 RDS: [telink_v323_rds](https://wiki.telink-semi.cn/tools_and_sdk/Tools/IDE/telink_v323_rds_official_windows.zip)
+  - Telink IoT Studio: [TelinkIoTStudio_V2024.8](http://wiki.telink-semi.cn/tools_and_sdk/Tools/IoTStudio/TelinkIoTStudio_V2024.8.zip)
+### Features
+* 更新sampleLight示例代码，主要针对灯的level和color
+### Bug Fixes
+* 修复BLE多连接协议栈中，对需要单字节对齐的结构体加_attributie_packed_修饰
+* 修复ZCL Basic cluster里关于DeviceEnabled属性的处理
+* 更新库修复在广播地址为0xFFFF时转发给终端设备时搜索终端设备地址的问题
+* 更新库修复APS层加密数据长度问题
+	受影响的SDK版本为v2.3.2.0 to v2.4.0.0.
+	如果用户用到APS层加解密，可以使用tl_apsDataIndRegister()来修复此问题，参考如下。 该补丁仅限于版本为v2.3.2.0 to v2.4.0.0的SDK。
+	void app_apsDataIndLengthFix(void *arg){
+		aps_data_ind_t *ind = (aps_data_ind_t *)arg;
+		if(ind->security_status & SECURITY_IN_APSLAYER){
+			ind->asduLength += 4;
+		}
+	}
+
+	tl_apsDataIndRegister(app_apsDataIndLengthFix);
+### Performance
+* None
+### BREAKING CHANGES
+* None
+
 ## V2.4.0.0
 
 ### Version
