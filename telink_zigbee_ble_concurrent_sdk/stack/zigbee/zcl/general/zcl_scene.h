@@ -49,7 +49,7 @@
  *  @brief  Size of ZCL scene table
  */
 #ifndef ZCL_SCENE_TABLE_NUM
-#define ZCL_SCENE_TABLE_NUM								8
+#define ZCL_SCENE_TABLE_NUM                             8
 #endif
 
 /**
@@ -84,15 +84,15 @@
 #define ZCL_CMD_SCENE_ENHANCED_VIEW_SCENE                 0x41
 #define ZCL_CMD_SCENE_COPY_SCENE                          0x42
 
-#define ZCL_CMD_SCENE_ADD_SCENE_RSP						  0x00
-#define	ZCL_CMD_SCENE_VIEW_SCENE_RSP					  0x01
-#define ZCL_CMD_SCENE_REMOVE_SCENE_RSP					  0x02
-#define ZCL_CMD_SCENE_REMOVE_ALL_SCENE_RSP				  0x03
-#define ZCL_CMD_SCENE_STORE_SCENE_RSP					  0x04
-#define ZCL_CMD_SCENE_GET_SCENE_MEMSHIP_RSP				  0x06
-#define ZCL_CMD_SCENE_ENHANCED_ADD_SCENE_RSP			  0x40
-#define ZCL_CMD_SCENE_ENHANCED_VIEW_SCENE_RSP			  0x41
-#define ZCL_CMD_SCENE_COPY_SCENE_RSP					  0x42
+#define ZCL_CMD_SCENE_ADD_SCENE_RSP                       0x00
+#define ZCL_CMD_SCENE_VIEW_SCENE_RSP                      0x01
+#define ZCL_CMD_SCENE_REMOVE_SCENE_RSP                    0x02
+#define ZCL_CMD_SCENE_REMOVE_ALL_SCENE_RSP                0x03
+#define ZCL_CMD_SCENE_STORE_SCENE_RSP                     0x04
+#define ZCL_CMD_SCENE_GET_SCENE_MEMSHIP_RSP               0x06
+#define ZCL_CMD_SCENE_ENHANCED_ADD_SCENE_RSP              0x40
+#define ZCL_CMD_SCENE_ENHANCED_VIEW_SCENE_RSP             0x41
+#define ZCL_CMD_SCENE_COPY_SCENE_RSP                      0x42
 
 /** @} end of group zcl_SCENE_cmdId */
 
@@ -123,7 +123,7 @@ typedef struct _attribute_packed_{
     u8 sceneId;                                 //!< The identifier, unique within this group, which is used to identify this scene.
     u8 sceneName[ZCL_MAX_SCENE_NAME_LEN];       //!< The name of the scene
     u16 transTime;                              //!< Seconds it will take for the device to change from its current state to the requested scene.
-    u16 transTime100ms;							//!< todo - check if this causes any problems
+    u16 transTime100ms;                         //!< todo - check if this causes any problems
     u8 extFieldLen;                             //!< The length of extension field
     u8 extField[ZCL_MAX_SCENE_EXT_FIELD_SIZE];  //!< The extension field
 } zcl_sceneEntry_t; //44-bytes
@@ -132,7 +132,7 @@ typedef struct _attribute_packed_{
  *  @brief  Structure definition for add scene command in scene cluster
  */
 typedef struct _attribute_packed_{
-	zcl_sceneEntry_t scene;
+    zcl_sceneEntry_t scene;
 } addScene_t;
 
 /**
@@ -171,7 +171,7 @@ typedef struct {
  */
 typedef struct {
     u16 groupId;                        //!< group id
-    u16 transTime;						//!< transition time, tenth of a second
+    u16 transTime;                      //!< transition time, tenth of a second
     u8 sceneId;                         //!< scene id
 } recallScene_t;
 
@@ -208,7 +208,7 @@ typedef struct {
  */
 typedef struct {
     u8 status;                          //!< status
-    zcl_sceneEntry_t scene;				//!< scene
+    zcl_sceneEntry_t scene;             //!< scene
 } viewSceneRsp_t;
 
 /**
@@ -245,7 +245,7 @@ typedef struct {
     u8 capacity;                        //!< capacity
     u16 groupId;                        //!< group id
     u8 sceneCnt;                        //!< scene count
-    u8 *sceneList;                    	//!< scene list
+    u8 *sceneList;                      //!< scene list
 } getSceneMemRsp_t;
 
 /**
@@ -262,13 +262,13 @@ typedef struct {
  *  @brief  Definition format for scene command payload
  */
 typedef union{
-	addSceneRsp_t 		addSceneRsp;
-	viewSceneRsp_t 		viewSceneRsp;
-	removeSceneRsp_t 	removeSceneRsp;
-	removeAllSceneRsp_t removeAllSceneRsp;
-	storeSceneRsp_t 	storeSceneRsp;
-	getSceneMemRsp_t 	getSceneMembershipRsp;
-	copySceneRsp_t 		copySceneRsp;
+    addSceneRsp_t       addSceneRsp;
+    viewSceneRsp_t      viewSceneRsp;
+    removeSceneRsp_t    removeSceneRsp;
+    removeAllSceneRsp_t removeAllSceneRsp;
+    storeSceneRsp_t     storeSceneRsp;
+    getSceneMemRsp_t    getSceneMembershipRsp;
+    copySceneRsp_t      copySceneRsp;
 }zcl_scene_cmdPayload_t;
 
 
@@ -292,15 +292,15 @@ typedef void (*zcl_copySceneRspCb_t)(apsdeDataInd_t *pApsdeInd, copySceneRsp_t *
  *  @brief  Structure definition for commands callback functions in Scene cluster
  */
 typedef struct {
-	zcl_storeSceneCb_t     			storeSceneCbFunc;
-	zcl_recallSceneCb_t     		recallSceneCbFunc;
-	zcl_addSceneRspCb_t     		addSceneRspCbFunc;
-	zcl_viewSceneRspCb_t     		viewSceneRspCbFunc;
-	zcl_removeSceneRspCb_t     		removeSceneRspCbFunc;
-	zcl_removeAllSceneRspCb_t     	removeAllSceneRspCbFunc;
-	zcl_storeSceneRspCb_t     		storeSceneRspCbFunc;
-	zcl_getSceneMembershipRspCb_t   getSceneMembershipRspCbFunc;
-	zcl_copySceneRspCb_t     		copySceneRspCbFunc;
+    zcl_storeSceneCb_t              storeSceneCbFunc;
+    zcl_recallSceneCb_t             recallSceneCbFunc;
+    zcl_addSceneRspCb_t             addSceneRspCbFunc;
+    zcl_viewSceneRspCb_t            viewSceneRspCbFunc;
+    zcl_removeSceneRspCb_t          removeSceneRspCbFunc;
+    zcl_removeAllSceneRspCb_t       removeAllSceneRspCbFunc;
+    zcl_storeSceneRspCb_t           storeSceneRspCbFunc;
+    zcl_getSceneMembershipRspCb_t   getSceneMembershipRspCbFunc;
+    zcl_copySceneRspCb_t            copySceneRspCbFunc;
 } zcl_scene_AppCallbacks_t;
 
 /** @} end of group ZCL_SCENE_Callbacks */
@@ -326,7 +326,7 @@ typedef struct {
  */
 extern zcl_sceneAttr_t zcl_attr_scene;
 
-#define zcl_sceneAttrGet()					&zcl_attr_scene
+#define zcl_sceneAttrGet()                  &zcl_attr_scene
 
 /**
  *  @brief  External variable for scene Attribute table
@@ -342,9 +342,9 @@ extern const u8 zcl_scene_attrNum;
  *  @brief  Structure definition for scene table
  */
 typedef struct _attribute_packed_{
-	u8 used;
-	u8 endpoint;
-	zcl_sceneEntry_t scene;
+    u8 used;
+    u8 endpoint;
+    zcl_sceneEntry_t scene;
 } zcl_sceneTable_t;
 
 extern zcl_sceneTable_t g_zcl_sceneTab[];
@@ -376,8 +376,8 @@ status_t zcl_scene_register(u8 endpoint, u16 manuCode, u8 attrNum, const zclAttr
  * @return      status_t
  */
 status_t zcl_scene_addScene(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, u8 cmdId, addScene_t *pAddScene);
-#define zcl_scene_addSceneCmd(a,b,c,d)				(zcl_scene_addScene((a), (b), (c), ZCL_SEQ_NUM, ZCL_CMD_SCENE_ADD_SCENE, (d)))
-#define zcl_scene_enhancedAddSceneCmd(a,b,c,d)		(zcl_scene_addScene((a), (b), (c), ZCL_SEQ_NUM, ZCL_CMD_SCENE_ENHANCED_ADD_SCENE, (d)))
+#define zcl_scene_addSceneCmd(a,b,c,d)              (zcl_scene_addScene((a), (b), (c), ZCL_SEQ_NUM, ZCL_CMD_SCENE_ADD_SCENE, (d)))
+#define zcl_scene_enhancedAddSceneCmd(a,b,c,d)      (zcl_scene_addScene((a), (b), (c), ZCL_SEQ_NUM, ZCL_CMD_SCENE_ENHANCED_ADD_SCENE, (d)))
 
 /**
  * @brief       API to send view scene command in SCENE cluster
@@ -392,8 +392,8 @@ status_t zcl_scene_addScene(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp
  * @return      status_t
  */
 status_t zcl_scene_viewScene(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, u8 cmdId, viewScene_t *pViewScene);
-#define zcl_scene_viewSceneCmd(a,b,c,d)				(zcl_scene_viewScene((a), (b), (c), ZCL_SEQ_NUM, ZCL_CMD_SCENE_VIEW_SCENE, (d)))
-#define zcl_scene_enhancedViewSceneCmd(a,b,c,d)		(zcl_scene_viewScene((a), (b), (c), ZCL_SEQ_NUM, ZCL_CMD_SCENE_ENHANCED_VIEW_SCENE, (d)))
+#define zcl_scene_viewSceneCmd(a,b,c,d)             (zcl_scene_viewScene((a), (b), (c), ZCL_SEQ_NUM, ZCL_CMD_SCENE_VIEW_SCENE, (d)))
+#define zcl_scene_enhancedViewSceneCmd(a,b,c,d)     (zcl_scene_viewScene((a), (b), (c), ZCL_SEQ_NUM, ZCL_CMD_SCENE_ENHANCED_VIEW_SCENE, (d)))
 
 /**
  * @brief       API to send remove scene command in SCENE cluster
@@ -407,7 +407,7 @@ status_t zcl_scene_viewScene(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRs
  * @return      status_t
  */
 status_t zcl_scene_removeScene(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, removeScene_t *pRemoveScene);
-#define zcl_scene_removeSceneCmd(a,b,c,d)		(zcl_scene_removeScene((a), (b), (c), ZCL_SEQ_NUM, (d)))
+#define zcl_scene_removeSceneCmd(a,b,c,d)       (zcl_scene_removeScene((a), (b), (c), ZCL_SEQ_NUM, (d)))
 
 /**
  * @brief       API to send remove all scene command in SCENE cluster
@@ -421,7 +421,7 @@ status_t zcl_scene_removeScene(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefault
  * @return      status_t
  */
 status_t zcl_scene_removeAllScene(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, removeAllScene_t *pRemoveAllScene);
-#define zcl_scene_removeAllSceneCmd(a,b,c,d)		(zcl_scene_removeAllScene((a), (b), (c), ZCL_SEQ_NUM, (d)))
+#define zcl_scene_removeAllSceneCmd(a,b,c,d)        (zcl_scene_removeAllScene((a), (b), (c), ZCL_SEQ_NUM, (d)))
 
 /**
  * @brief       API to send store scene command in SCENE cluster
@@ -435,7 +435,7 @@ status_t zcl_scene_removeAllScene(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefa
  * @return      status_t
  */
 status_t zcl_scene_storeScene(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, storeScene_t *pStoreScene);
-#define zcl_scene_storeSceneCmd(a,b,c,d)		(zcl_scene_storeScene((a), (b), (c), ZCL_SEQ_NUM, (d)))
+#define zcl_scene_storeSceneCmd(a,b,c,d)        (zcl_scene_storeScene((a), (b), (c), ZCL_SEQ_NUM, (d)))
 
 /**
  * @brief       API to send recall scene command in SCENE cluster
@@ -449,7 +449,7 @@ status_t zcl_scene_storeScene(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultR
  * @return      status_t
  */
 status_t zcl_scene_recallScene(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, recallScene_t *pRecallScene);
-#define zcl_scene_recallSceneCmd(a,b,c,d)		(zcl_scene_recallScene((a), (b), (c), ZCL_SEQ_NUM, (d)))
+#define zcl_scene_recallSceneCmd(a,b,c,d)       (zcl_scene_recallScene((a), (b), (c), ZCL_SEQ_NUM, (d)))
 
 /**
  * @brief       API to send get scene membership command in SCENE cluster
@@ -463,7 +463,7 @@ status_t zcl_scene_recallScene(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefault
  * @return      status_t
  */
 status_t zcl_scene_getSceneMemship(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, getSceneMemship_t *pGetMembership);
-#define zcl_scene_getSceneMemshipCmd(a,b,c,d)		(zcl_scene_getSceneMemship((a), (b), (c), ZCL_SEQ_NUM, (d)))
+#define zcl_scene_getSceneMemshipCmd(a,b,c,d)       (zcl_scene_getSceneMemship((a), (b), (c), ZCL_SEQ_NUM, (d)))
 
 /**
  * @brief       API to send copy scene command in SCENE cluster
@@ -477,7 +477,7 @@ status_t zcl_scene_getSceneMemship(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDef
  * @return      status_t
  */
 status_t zcl_scene_copyScene(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, copyScene_t *pCopyScene);
-#define zcl_scene_copySceneCmd(a,b,c,d)		(zcl_scene_copyScene((a), (b), (c), ZCL_SEQ_NUM, (d)))
+#define zcl_scene_copySceneCmd(a,b,c,d)     (zcl_scene_copyScene((a), (b), (c), ZCL_SEQ_NUM, (d)))
 
 
 
@@ -491,4 +491,4 @@ extern void zcl_scene_removeAllSceneEntry(u8 endpoint, u16 groupId, bool updateN
 
 /** @} end of group TELINK_ZIGBEE_STACK */
 
-#endif	/* ZCL_SCENE_H */
+#endif  /* ZCL_SCENE_H */

@@ -7,7 +7,7 @@
  * @date    2021
  *
  * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- *			All rights reserved.
+ *          All rights reserved.
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -22,24 +22,23 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-
 #ifndef _APP_UI_H_
 #define _APP_UI_H_
 
 /**********************************************************************
  * CONSTANT
  */
-#define LED_ON						1
-#define LED_OFF						0
+#define LED_ON          1
+#define LED_OFF         0
 
 
 /**********************************************************************
  * TYPEDEFS
  */
-enum{
-	APP_STATE_NORMAL,
-	APP_FACTORY_NEW_SET_CHECK,
-	APP_FACTORY_NEW_DOING
+enum {
+    APP_STATE_NORMAL,
+    APP_FACTORY_NEW_SET_CHECK,
+    APP_FACTORY_NEW_DOING
 };
 
 
@@ -59,4 +58,4 @@ void led_off(u32 pin);
 void app_key_handler(void);
 void set_detect_voltage(u16 v);
 
-#endif	/* _APP_UI_H_ */
+#endif  /* _APP_UI_H_ */

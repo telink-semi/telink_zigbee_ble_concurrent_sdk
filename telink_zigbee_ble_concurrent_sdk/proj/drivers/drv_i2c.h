@@ -22,15 +22,14 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-
 #pragma once
 
 
 #if defined(MCU_CORE_8258)
-	#define I2C_CLOCK_SOURCE			CLOCK_SYS_CLOCK_HZ
+    #define I2C_CLOCK_SOURCE            CLOCK_SYS_CLOCK_HZ
 #elif defined(MCU_CORE_B91) || defined(MCU_CORE_TL721X) || defined(MCU_CORE_TL321X)
-	/* PCLK provides clock source for I2C module. */
-	#define I2C_CLOCK_SOURCE			(sys_clk.pclk * 1000 * 1000)
+    /* PCLK provides clock source for I2C module. */
+    #define I2C_CLOCK_SOURCE            (sys_clk.pclk * 1000 * 1000)
 #endif
 
 

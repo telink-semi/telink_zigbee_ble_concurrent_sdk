@@ -40,8 +40,8 @@
  *  @{
  */
 //Global Attribute
-#define ZCL_ATTRID_GLOBAL_CLUSTER_REVISION				 0xFFFD
-#define ZCL_ATTRID_GLOBAL_ATTR_REPORTING_STATUS			 0xFFFE
+#define ZCL_ATTRID_GLOBAL_CLUSTER_REVISION               0xFFFD
+#define ZCL_ATTRID_GLOBAL_ATTR_REPORTING_STATUS          0xFFFE
 
 /** @addtogroup zcl_cluster_id ZCL Cluster Identifier //2.2.2.1
  * @{
@@ -68,13 +68,13 @@
 #define ZCL_CLUSTER_GEN_MULTISTATE_OUTPUT_BASIC           0x0013
 #define ZCL_CLUSTER_GEN_MULTISTATE_VALUE_BASIC            0x0014
 #define ZCL_CLUSTER_GEN_COMMISSIONING                     0x0015
-#define ZCL_CLUSTER_GEN_PARTITION						  0x0016
+#define ZCL_CLUSTER_GEN_PARTITION                         0x0016
 #define ZCL_CLUSTER_OTA                                   0x0019
-#define ZCL_CLUSTER_GEN_POWER_PROFILE					  0x001A
-#define ZCL_CLUSTER_GEN_APPLIANCE_CONTROL				  0x001B
-#define ZCL_CLUSTER_GEN_POLL_CONTROL					  0x0020
-#define ZCL_CLUSTER_GEN_GREEN_POWER		                  0x0021
-#define ZCL_CLUSTER_GEN_KEEP_ALIVE		                  0x0025
+#define ZCL_CLUSTER_GEN_POWER_PROFILE                     0x001A
+#define ZCL_CLUSTER_GEN_APPLIANCE_CONTROL                 0x001B
+#define ZCL_CLUSTER_GEN_POLL_CONTROL                      0x0020
+#define ZCL_CLUSTER_GEN_GREEN_POWER                       0x0021
+#define ZCL_CLUSTER_GEN_KEEP_ALIVE                        0x0025
 #define ZCL_CLUSTER_GEN_DIAGNOSTICS                       0x0B05
 
 // Closures Clusters
@@ -101,9 +101,9 @@
 #define ZCL_CLUSTER_MS_FLOW_MEASUREMENT                   0x0404
 #define ZCL_CLUSTER_MS_RELATIVE_HUMIDITY                  0x0405
 #define ZCL_CLUSTER_MS_OCCUPANCY_SENSING                  0x0406
-#define ZCL_CLUSTER_MS_LEAF_WETNESS						  0x0407
-#define ZCL_CLUSTER_MS_SOIL_MOISTURE					  0x0408
-#define ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT			  0x0B04
+#define ZCL_CLUSTER_MS_LEAF_WETNESS                       0x0407
+#define ZCL_CLUSTER_MS_SOIL_MOISTURE                      0x0408
+#define ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT             0x0B04
 
 // Security and Safety (SS) Clusters
 #define ZCL_CLUSTER_SS_IAS_ZONE                           0x0500
@@ -136,7 +136,7 @@
 // Smart Energy Clusters
 #define ZCL_CLUSTER_SE_PRICE                              0x0700
 #define ZCL_CLUSTER_SE_Demand_RSP_AND_LOAD_CONTROL        0x0701
-#define ZCL_CLUSTER_SE_METERING                    		  0x0702
+#define ZCL_CLUSTER_SE_METERING                           0x0702
 #define ZCL_CLUSTER_SE_MESSAGING                          0x0703
 #define ZCL_CLUSTER_SE_SE_TUNNELING                       0x0704
 #define ZCL_CLUSTER_SE_PREPAYMENT                         0x0705
@@ -146,15 +146,15 @@
 #define ZCL_CLUSTER_TOUCHLINK_COMMISSIONING               0x1000
 
 // Work with all hub cluster
-#define ZCL_CLUSTER_WWAH								  0xFC57
+#define ZCL_CLUSTER_WWAH                                  0xFC57
 
 
 // test cluster
-#define ZCL_CLUSTER_TELINK_SDK_TEST						  0xFF00
-#define ZCL_CLUSTER_TELINK_SDK_TEST_REQ					  0xFF01
-#define ZCL_CLUSTER_TELINK_SDK_TEST_RSP					  0xFF02
-#define ZCL_CLUSTER_TELINK_SDK_TEST_CLEAR_REQ			  0xFF03
-#define ZCL_CLUSTER_TELINK_SDK_TEST_CLEAR_RSP			  0xFF04
+#define ZCL_CLUSTER_TELINK_SDK_TEST                       0xFF00
+#define ZCL_CLUSTER_TELINK_SDK_TEST_REQ                   0xFF01
+#define ZCL_CLUSTER_TELINK_SDK_TEST_RSP                   0xFF02
+#define ZCL_CLUSTER_TELINK_SDK_TEST_CLEAR_REQ             0xFF03
+#define ZCL_CLUSTER_TELINK_SDK_TEST_CLEAR_RSP             0xFF04
 
 /** @} end of group zcl_cluster_id */
 
@@ -229,7 +229,7 @@
 #define ACCESS_CONTROL_READ                             0x01
 #define ACCESS_CONTROL_WRITE                            0x02
 #define ACCESS_CONTROL_REPORTABLE                       0x04
-#define ACCESS_CONTROL_SCENE							0x08
+#define ACCESS_CONTROL_SCENE                            0x08
 #define ACCESS_CONTROL_AUTH_READ                        0x10
 #define ACCESS_CONTROL_AUTH_WRITE                       0x20
 #define ACCESS_CONTROL_COMMAND                          0x40
@@ -237,13 +237,13 @@
 #define ACCESS_CONTROL_CLIENT_ATTR                      0x80
 
 /* for discovery attributes extended. read/write/reportable bits mask */
-#define ACCESS_CONTROL_EXT_MASK							0x07
+#define ACCESS_CONTROL_EXT_MASK                         0x07
 
 /** @} end of group zcl_attribute_accessCtrl */
 
 /* used for configure reporting command */
-#define ZCL_SEND_ATTR_REPORTS							0x00
-#define ZCL_EXPECT_ATTR_REPORTS							0x01
+#define ZCL_SEND_ATTR_REPORTS                           0x00
+#define ZCL_EXPECT_ATTR_REPORTS                         0x01
 
 /** @addtogroup zcl_error_codes ZCL Error Codes
  * @{
@@ -298,4 +298,4 @@
 
 /** @} end of group TELINK_ZIGBEE_STACK */
 
-#endif	/* ZCL_CONST_H */
+#endif  /* ZCL_CONST_H */

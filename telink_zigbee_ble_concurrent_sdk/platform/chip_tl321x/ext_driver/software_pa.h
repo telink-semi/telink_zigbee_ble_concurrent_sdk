@@ -28,7 +28,7 @@
 
 
 /**
- * @brief	software PA enable
+ * @brief   software PA enable
  */
 //#ifndef PA_ENABLE
 //#define PA_ENABLE                           1

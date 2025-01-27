@@ -22,15 +22,13 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-
 #pragma once
 
 
-
-typedef enum{
-	DRV_ADC_BASE_MODE,
-	DRV_ADC_VBAT_MODE,
-}drv_adc_mode_e;
+typedef enum {
+    DRV_ADC_BASE_MODE,
+    DRV_ADC_VBAT_MODE,
+} drv_adc_mode_e;
 
 /****
 * brief: ADC initiate function
@@ -58,7 +56,7 @@ void drv_adc_mode_pin_set(drv_adc_mode_e mode, GPIO_PinTypeDef pin);
 #elif defined(MCU_CORE_B91)
 void drv_adc_mode_pin_set(drv_adc_mode_e mode, adc_input_pin_def_e pin);
 #elif defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
-void drv_adc_mode_pin_set(drv_adc_mode_e mode, adc_input_pin_e pin);
+void drv_adc_mode_pin_set(drv_adc_mode_e mode, adc_input_pch_e pin);
 #endif
 
 /****
@@ -67,5 +65,4 @@ void drv_adc_mode_pin_set(drv_adc_mode_e mode, adc_input_pin_e pin);
 * @return
 */
 void drv_adc_enable(bool enable);
-
 

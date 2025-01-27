@@ -34,6 +34,7 @@
 
 #include "hci/hci.h"
 #include "hci/hci_const.h"
+#include "hci/hci_vendor.h"
 #include "hci/hci_cmd.h"
 #include "hci/hci_event.h"
 
@@ -50,8 +51,6 @@
 /*********************************************************/
 
 /*********************************************************/
-
-
 
 
 #endif /* BLE_H_ */

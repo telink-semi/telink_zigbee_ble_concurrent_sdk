@@ -22,7 +22,6 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-
 #pragma once
 
 
@@ -49,17 +48,15 @@
  */
 //#define BOOT_LOADER_MODE					0
 
-
-
 /* Boot loader address. */
-#define BOOT_LOADER_IMAGE_ADDR				0x0
+#define BOOT_LOADER_IMAGE_ADDR			 	0x0
 
 /* APP image address. */
 #if (BOOT_LOADER_MODE)
 	#if DUAL_MODE
-        #define APP_IMAGE_ADDR                  0x80000
+        #define APP_IMAGE_ADDR              0x80000
     #else
-	    #define APP_IMAGE_ADDR					0x8000
+	    #define APP_IMAGE_ADDR	            0x8000
     #endif
 #else
 	#define APP_IMAGE_ADDR					0x0

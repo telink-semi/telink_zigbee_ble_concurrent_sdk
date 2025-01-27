@@ -33,6 +33,7 @@
 #include "../timer.h"
 #include "../flash.h"
 #include "../mdec.h"
+#include "../trng.h"
 #include "../sys.h"
 #include "../plic.h"
 #include "../stimer.h"

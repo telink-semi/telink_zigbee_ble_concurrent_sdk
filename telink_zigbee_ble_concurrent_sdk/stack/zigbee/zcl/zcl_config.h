@@ -232,4 +232,4 @@
 #endif
 
 
-#endif	/* ZCL_CONFIG_H */
+#endif  /* ZCL_CONFIG_H */

@@ -50,70 +50,70 @@
 
 zcl_lightColorCtrlAttr_t zcl_attr_lightColorCtrl = {
 #ifdef ZCL_ATTRID_CURRENT_HUE_ENABLE
-		.zcl_attr_currentHue						=	0,
+        .zcl_attr_currentHue                        =   0,
 #endif
 #ifdef ZCL_ATTRID_CURRENT_SATURATION_ENABLE
-		.zcl_attr_currentSaturation					=	0,
+        .zcl_attr_currentSaturation                 =   0,
 #endif
 #ifdef ZCL_ATTRID_REMAINING_TIME_ENABLE
-		.zcl_attr_remainingTime						=	0,
+        .zcl_attr_remainingTime                     =   0,
 #endif
 #ifdef ZCL_ATTRID_CURRENT_X_ENABLE
-		.zcl_attr_currX								=	0x616B,//0.381
+        .zcl_attr_currX                             =   0x616B,//0.381
 #endif
 #ifdef ZCL_ATTRID_CURRENT_Y_ENABLE
-		.zcl_attr_currY								=	0x607D,//0.377
+        .zcl_attr_currY                             =   0x607D,//0.377
 #endif
 #ifdef ZCL_ATTRID_DRIFT_COMPENSATION_ENABLE
-		.zcl_attr_driftComensation					=	0,
+        .zcl_attr_driftComensation                  =   0,
 #endif
 #ifdef ZCL_ATTRID_COMPENSATION_TEXT_ENABLE
-		.zcl_attr_compensationText					=	NULL,
+        .zcl_attr_compensationText                  =   NULL,
 #endif
 #ifdef ZCL_ATTRID_COLOR_TEMPERATURE_MIREDS_ENABLE
-		.zcl_attr_colorTemperatureMireds			=	0x00FA,//4000K
+        .zcl_attr_colorTemperatureMireds            =   0x00FA,//4000K
 #endif
 #ifdef ZCL_ATTRID_COLOR_MODE_ENABLE
-		.zcl_attr_colorMode							=	ZCL_COLOR_MODE_CURRENT_X_Y,
+        .zcl_attr_colorMode                         =   ZCL_COLOR_MODE_CURRENT_X_Y,
 #endif
 #ifdef ZCL_ATTRID_COLOR_OPTIONS_ENABLE
-		.zcl_attr_options							=	0,
+        .zcl_attr_options                           =   0,
 #endif
 #ifdef ZCL_ATTRID_ENHANCED_CURRENT_HUE_ENABLE
-		.zcl_attr_enhancedCurrentHue				=	0,
+        .zcl_attr_enhancedCurrentHue                =   0,
 #endif
 #ifdef ZCL_ATTRID_ENHANCED_COLOR_MODE_ENABLE
-		.zcl_attr_enhancedColorMode					=	ZCL_COLOR_MODE_CURRENT_X_Y,
+        .zcl_attr_enhancedColorMode                 =   ZCL_COLOR_MODE_CURRENT_X_Y,
 #endif
 #ifdef ZCL_ATTRID_COLOR_LOOP_ACTIVE_ENABLE
-		.zcl_attr_colorLoopActive					=	0,
+        .zcl_attr_colorLoopActive                   =   0,
 #endif
 #ifdef ZCL_ATTRID_COLOR_LOOP_DIRECTION_ENABLE
-		.zcl_attr_colorLoopDirection				=	0,
+        .zcl_attr_colorLoopDirection                =   0,
 #endif
 #ifdef ZCL_ATTRID_COLOR_LOOP_TIME_ENABLE
-		.zcl_attr_colorLoopTime						=	0x0019,
+        .zcl_attr_colorLoopTime                     =   0x0019,
 #endif
 #ifdef ZCL_ATTRID_COLOR_LOOP_START_ENHANCED_HUE_ENABLE
-		.zcl_attr_colorLoopStartEnhancedHue			=	0x2300,
+        .zcl_attr_colorLoopStartEnhancedHue         =   0x2300,
 #endif
 #ifdef ZCL_ATTRID_COLOR_LOOP_STORED_ENHANCED_HUE_ENABLE
-		.zcl_attr_colorLoopStoredEnhancedHue		=	0,
+        .zcl_attr_colorLoopStoredEnhancedHue        =   0,
 #endif
 #ifdef ZCL_ATTRID_COLOR_CAPABILITIES_ENABLE
-		.zcl_attr_colorCapabilities					=	0,
+        .zcl_attr_colorCapabilities                 =   0,
 #endif
 #ifdef ZCL_ATTRID_COLOR_TEMP_PHYSICAL_MIN_MIREDS_ENABLE
-		.zcl_attr_colorTempPhysicalMinMireds		=	0,
+        .zcl_attr_colorTempPhysicalMinMireds        =   0,
 #endif
 #ifdef ZCL_ATTRID_COLOR_TEMP_PHYSICAL_MAX_MIREDS_ENABLE
-		.zcl_attr_colorTempPhysicalMaxMireds		=	0xFEFF,
+        .zcl_attr_colorTempPhysicalMaxMireds        =   0xFEFF,
 #endif
 #ifdef ZCL_ATTRID_COUPLE_COLOR_TEMP_TO_LEVEL_MIN_MIREDS_ENABLE
-		.zcl_attr_coupleColorTempToLevelMinMireds	=	0x0001,
+        .zcl_attr_coupleColorTempToLevelMinMireds   =   0x0001,
 #endif
 #ifdef ZCL_ATTRID_START_UP_COLOR_TEMPERATURE_MIREDS_ENABLE
-		.zcl_attr_startUpColorTemperatureMireds		=	ZCL_START_UP_COLOR_TEMPERATURE_MIREDS_TO_PREVIOUS,
+        .zcl_attr_startUpColorTemperatureMireds     =   ZCL_START_UP_COLOR_TEMPERATURE_MIREDS_TO_PREVIOUS,
 #endif
 };
 
@@ -287,12 +287,12 @@ const u8 zcl_lightColorCtrl_attrNum = ( sizeof(lightColorCtrl_attrTbl) / sizeof(
 
 nv_sts_t zcl_colorCtrl_saveAttr(void)
 {
-	return zcl_attr_colorCtrlParams_save();
+    return zcl_attr_colorCtrlParams_save();
 }
 
 nv_sts_t zcl_colorCtrl_loadAttr(void)
 {
-	return zcl_attr_colorCtrlParams_restore();
+    return zcl_attr_colorCtrlParams_restore();
 }
 
 #endif  /* ZCL_LIGHT_COLOR_CONTROL */

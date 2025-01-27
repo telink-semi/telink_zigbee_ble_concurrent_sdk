@@ -63,17 +63,17 @@ u8  zcl_attr_lightSensorType = 0;
 /* Attribute record list */
 const zclAttrInfo_t illuminanceMeasure_attrTbl[] =
 {
-	{ ZCL_ATTRID_MEASURED_VALUE,      ZCL_DATA_TYPE_UINT16,     ACCESS_CONTROL_READ,  (u8*)&zcl_attr_measuredVal },
-	{ ZCL_ATTRID_MIN_MEASURED_VALUE,  ZCL_DATA_TYPE_UINT16,     ACCESS_CONTROL_READ,  (u8*)&zcl_attr_minMeasuredVal },
-	{ ZCL_ATTRID_MAX_MEASURED_VALUE,  ZCL_DATA_TYPE_UINT16,     ACCESS_CONTROL_READ,  (u8*)&zcl_attr_maxMeasuredVal },
+    { ZCL_ATTRID_MEASURED_VALUE,      ZCL_DATA_TYPE_UINT16,     ACCESS_CONTROL_READ,  (u8*)&zcl_attr_measuredVal },
+    { ZCL_ATTRID_MIN_MEASURED_VALUE,  ZCL_DATA_TYPE_UINT16,     ACCESS_CONTROL_READ,  (u8*)&zcl_attr_minMeasuredVal },
+    { ZCL_ATTRID_MAX_MEASURED_VALUE,  ZCL_DATA_TYPE_UINT16,     ACCESS_CONTROL_READ,  (u8*)&zcl_attr_maxMeasuredVal },
 #ifdef ZCL_ATTR_TOLERANCE_ENABLE
-	{ ZCL_ATTRID_TOLERANCE,           ZCL_DATA_TYPE_UINT16,     ACCESS_CONTROL_READ,  (u8*)&zcl_attr_tolerance },
+    { ZCL_ATTRID_TOLERANCE,           ZCL_DATA_TYPE_UINT16,     ACCESS_CONTROL_READ,  (u8*)&zcl_attr_tolerance },
 #endif
 
 #ifdef ZCL_ATTR_LIGHT_SENSOR_TYPE_ENABLE
-	{ ZCL_ATTRID_LIGHT_SENSOR_TYPE,   ZCL_DATA_TYPE_ENUM8,      ACCESS_CONTROL_READ,  (u8*)&zcl_attr_lightSensorType },
+    { ZCL_ATTRID_LIGHT_SENSOR_TYPE,   ZCL_DATA_TYPE_ENUM8,      ACCESS_CONTROL_READ,  (u8*)&zcl_attr_lightSensorType },
 #endif
-	{ ZCL_ATTRID_GLOBAL_CLUSTER_REVISION, ZCL_DATA_TYPE_UINT16,  ACCESS_CONTROL_READ,  (u8*)&zcl_attr_global_clusterRevision},
+    { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION, ZCL_DATA_TYPE_UINT16,  ACCESS_CONTROL_READ,  (u8*)&zcl_attr_global_clusterRevision},
 };
 
 const u8 zcl_illuminanceMeasure_attrNum = ( sizeof(illuminanceMeasure_attrTbl) / sizeof(zclAttrInfo_t) );

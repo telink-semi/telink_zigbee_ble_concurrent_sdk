@@ -37,122 +37,123 @@ volatile u8 T_taskRunCnt = 0;
 volatile u8 T_taskBleTrig = 0;
 
 
-static void app_bleStopRestart(void){
-	T_taskRunCnt++;
-	/* for debugging ble start/stop */
-	if(T_taskBleTrig){
-		if(T_taskBleTrig == 0x01){
-			ble_task_stop();
-		}else if(T_taskBleTrig == 0x02){
-			ble_task_restart();
-		}
-		T_taskBleTrig = 0;
-	}
+static void app_bleStopRestart(void)
+{
+    T_taskRunCnt++;
+    /* for debugging ble start/stop */
+    if (T_taskBleTrig) {
+        if (T_taskBleTrig == 0x01) {
+            ble_task_stop();
+        } else if (T_taskBleTrig == 0x02) {
+            ble_task_restart();
+        }
+        T_taskBleTrig = 0;
+    }
 }
 
+int main(void)
+{
+    startup_state_e state = drv_platform_init();
+    u8 isRetention = (state == SYSTEM_DEEP_RETENTION) ? 1 : 0;
 
-int main(void){
-	startup_state_e state = drv_platform_init();
-	u8 isRetention = (state == SYSTEM_DEEP_RETENTION) ? 1 : 0;
-
-	os_init(isRetention);
+    os_init(isRetention);
 
 #if 0
-	extern void moduleTest_start(void);
-	CURRENT_SLOT_SET(DUALMODE_SLOT_ZIGBEE);
-	moduleTest_start();
+    extern void moduleTest_start(void);
+    CURRENT_SLOT_SET(DUALMODE_SLOT_ZIGBEE);
+    moduleTest_start();
 #endif
 
 #if PM_ENABLE
     g_switchAppCtx.keyPressDebounce = 3;
-	app_pm_init();
+    app_pm_init();
 #endif
 
 #if VOLTAGE_DETECT_ENABLE
-	/*
-	 * !!!in order to avoid error data written in flash,
-	 * recommend setting VOLTAGE_DETECT_ENABLE as 1 to get the stable/safe voltage
-	 */
-	bool powerOn = (state == SYSTEM_BOOT) ? 1 : 0;
-	u16 voltage = 0;
+    /*
+     * !!!in order to avoid error data written in flash,
+     * recommend setting VOLTAGE_DETECT_ENABLE as 1 to get the stable/safe voltage
+     */
+    bool powerOn = (state == SYSTEM_BOOT) ? 1 : 0;
+    u16 voltage = 0;
 
-	bool pending = 1;
-	while(pending){
-		voltage = voltage_detect(powerOn, APP_VOLTAGE_THRESHOLD_CUTOFF);
-		if(voltage <= APP_VOLTAGE_THRESHOLD_CUTOFF){
+    bool pending = 1;
+    while (pending) {
+        voltage = voltage_detect(powerOn, APP_VOLTAGE_THRESHOLD_CUTOFF);
+        if (voltage <= APP_VOLTAGE_THRESHOLD_CUTOFF) {
 #if PM_ENABLE
-			/* !!!entering cut off mode is recommended */
-			app_enterCutOffMode();
+            /* !!!entering cut off mode is recommended */
+            app_enterCutOffMode();
 #endif
-		}else{
-			pending = 0;
-		}
-	}
+        } else {
+            pending = 0;
+        }
+    }
 #endif
 
 #if PA_ENABLE
-	rf_paInit(PA_TX, PA_RX);
+    rf_paInit(PA_TX, PA_RX);
 #endif
 
-	user_zb_init(isRetention);
+    user_zb_init(isRetention);
 
-	ble_radio_init();
-	user_ble_init(isRetention);
+    ble_radio_init();
+    user_ble_init(isRetention);
 
-	if(CURRENT_SLOT_GET() == DUALMODE_SLOT_ZIGBEE){
-	#if !BLE_ACTIVE_BY_UI
-		ble_task_restart();
-		ble_advertiseTickUpdate();
-	#else
-		switch_to_zb_context();
-	#endif
-	}
+    if(CURRENT_SLOT_GET() == DUALMODE_SLOT_ZIGBEE){
+    #if !BLE_ACTIVE_BY_UI
+        ble_task_restart();
+        ble_advertiseTickUpdate();
+    #else
+        switch_to_zb_context();
+    #endif
+    }
 
-	drv_enable_irq();
+    drv_enable_irq();
 
 #if (MODULE_WATCHDOG_ENABLE)
-	drv_wd_setInterval(600);
+    drv_wd_setInterval(600);
     drv_wd_start();
 #endif
 
-	while(1){
+    while (1) {
 #if (MODULE_WATCHDOG_ENABLE)
-		drv_wd_clear();
+        drv_wd_clear();
 #endif
 
 #if (VOLTAGE_DETECT_ENABLE)
-		voltage = voltage_detect(0, APP_VOLTAGE_THRESHOLD_CUTOFF);
-		if(voltage <= APP_VOLTAGE_THRESHOLD_CUTOFF){
+        voltage = voltage_detect(0, APP_VOLTAGE_THRESHOLD_CUTOFF);
+        if (voltage <= APP_VOLTAGE_THRESHOLD_CUTOFF) {
 #if PM_ENABLE
-			/* !!!entering cut off mode is recommended */
-			app_enterCutOffMode();
+            /* !!!entering cut off mode is recommended */
+            app_enterCutOffMode();
 #endif
-			continue;
-		}
-
-#if PM_ENABLE
-		set_detect_voltage(voltage);
-		if(voltage <= APP_VOLTAGE_THRESHOLD_LOW_VOL){
-			/* TODO: enter low voltage warning mode */
-		}
-#endif
-#endif
-
-		concurrent_mode_main_loop();
-		app_key_handler();
-
-		/* sample code to restart/stop ble task */
-		app_bleStopRestart();
+            continue;
+        }
 
 #if PM_ENABLE
-		if(g_switchAppCtx.keyPressDebounce > 0){
-			g_switchAppCtx.keyPressDebounce--;
-		}else{
-			app_pm_task();
-		}
+        set_detect_voltage(voltage);
+        if (voltage <= APP_VOLTAGE_THRESHOLD_LOW_VOL) {
+            /* TODO: enter low voltage warning mode */
+        }
 #endif
-	}
+#endif
 
-	return 0;
+        concurrent_mode_main_loop();
+        app_key_handler();
+
+        /* sample code to restart/stop ble task */
+        app_bleStopRestart();
+
+#if PM_ENABLE
+        if (g_switchAppCtx.keyPressDebounce > 0) {
+            g_switchAppCtx.keyPressDebounce--;
+        } else {
+            app_pm_task();
+        }
+#endif
+    }
+
+    return 0;
 }
 

@@ -24,8 +24,6 @@
 #pragma once
 
 
-
-
 #include "lib/include/plic.h"
 #include "lib/include/pm/pm.h"
 #include "lib/include/rf/rf_common.h"
@@ -53,12 +51,14 @@
 #include "uart.h"
 #include "lib/include/stimer.h"
 
+#include "lpc.h"
 #include "lib/include/clock.h"
 #include "lib/include/mspi.h"
 #include "adc.h"
 #include "qdec.h"
 #include "plic_sw.h"
 #include "plmt.h"
+#include "lib/include/otp/otp.h"
 #include "flash/flash_type.h"
 #include "flash/flash_common.h"
 #include "ir_learn.h"

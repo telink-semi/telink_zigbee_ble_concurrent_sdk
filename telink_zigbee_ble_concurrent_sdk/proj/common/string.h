@@ -39,25 +39,25 @@ void *memcpy(void *des_ptr, const void *src_ptr, unsigned int);
 #else
 void *mymemset(void *d, int c, unsigned int n,unsigned int);
 void *mymemcpy(void *des_ptr, const void *src_ptr, unsigned int, unsigned int);
-#define	memcpy(x,y,z)			mymemcpy(x,y,z,__LINE__)
-#define	memset(x,y,z)			mymemset(x,y,z,__LINE__)
+#define memcpy(x,y,z)           mymemcpy(x,y,z,__LINE__)
+#define memset(x,y,z)           mymemset(x,y,z,__LINE__)
 #endif
 
 // do not return void*,  otherwise, we must use a variable to store the dest porinter, that is not performance 
 void memcpy4(void *dest, const void *src, unsigned int);
 void *memchr(const void *_s, int _c, unsigned int _n);
-int	memcmp(const void *_s1, const void *_s2, unsigned int _n);
+int memcmp(const void *_s1, const void *_s2, unsigned int _n);
 
 char *strcat(char *_s1, const char *_s2);
 char *strchr(const char *_s, int _c);
-int	strcmp(const char *_s1, const char *_s2);
-int	strcoll(const char *_s1, const char *_s2);
+int strcmp(const char *_s1, const char *_s2);
+int strcoll(const char *_s1, const char *_s2);
 char *strcpy(char *_s1, const char *_s2);
 unsigned int strcspn(const char *_s1, const char *_s2);
 char *strerror(int _errcode);
 unsigned int strlen(const char *_s);
 char *strncat(char *_s1, const char *_s2, unsigned int _n);
-int	strncmp(const char *_s1, const char *_s2, unsigned int _n);
+int strncmp(const char *_s1, const char *_s2, unsigned int _n);
 char *strncpy(char *_s1, const char *_s2, unsigned int _n);
 char *strpbrk(const char *_s1, const char *_s2);
 char *strrchr(const char *_s, int _c);

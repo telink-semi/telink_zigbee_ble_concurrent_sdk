@@ -22,15 +22,14 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-
 #pragma once
 
 #define LIST_CONCAT2(a, b) a##b
 #define LIST_CONCAT(a, b) LIST_CONCAT2(a, b)
 
-#define LIST(name) 		\
-		static void *LIST_CONCAT(name, _list) = NULL; \
-		static list_t name = (list_t)&LIST_CONCAT(name, _list);
+#define LIST(name)      \
+        static void *LIST_CONCAT(name, _list) = NULL; \
+        static list_t name = (list_t)&LIST_CONCAT(name, _list);
 
 
 typedef void ** list_t;

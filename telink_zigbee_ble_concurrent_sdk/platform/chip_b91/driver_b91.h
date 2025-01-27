@@ -40,6 +40,7 @@
 #include "nds_intrinsic.h"
 #include "mdec.h"
 
+#include "trng.h"
 #include "sys.h"
 #include "pke.h"
 #include "plic.h"

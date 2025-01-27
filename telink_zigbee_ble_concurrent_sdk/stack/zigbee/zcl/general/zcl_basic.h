@@ -72,18 +72,18 @@
 /** @} end of group zcl_basic_attrId */
 
 /* Power Source Attribute values */
-#define POWER_SOURCE_UNKNOWN                              	0x00
-#define POWER_SOURCE_MAINS_1_PHASE                        	0x01
-#define POWER_SOURCE_MAINS_3_PHASE                        	0x02
-#define POWER_SOURCE_BATTERY                              	0x03
-#define POWER_SOURCE_DC                                   	0x04
-#define POWER_SOURCE_EMERG_MAINS_CONST_PWR                	0x05
-#define POWER_SOURCE_EMERG_MAINS_XFER_SW                  	0x06
+#define POWER_SOURCE_UNKNOWN                                0x00
+#define POWER_SOURCE_MAINS_1_PHASE                          0x01
+#define POWER_SOURCE_MAINS_3_PHASE                          0x02
+#define POWER_SOURCE_BATTERY                                0x03
+#define POWER_SOURCE_DC                                     0x04
+#define POWER_SOURCE_EMERG_MAINS_CONST_PWR                  0x05
+#define POWER_SOURCE_EMERG_MAINS_XFER_SW                    0x06
 
 /**
  *  @brief Max length of char string
  */
-#define ZCL_BASIC_MAX_LENGTH 								24
+#define ZCL_BASIC_MAX_LENGTH                                24
 
 /** @} end of group ZCL_BASIC_Constant */
 
@@ -101,7 +101,7 @@ typedef void (*zcl_rstFacDefaultCb_t)(apsdeDataInd_t *pApsdeInd);
  *  @brief  Structure definition for commands callback functions in BASIC cluster
  */
 typedef struct {
-	zcl_rstFacDefaultCb_t    rstFacDefaultCbFunc;
+    zcl_rstFacDefaultCb_t    rstFacDefaultCbFunc;
 } zcl_basic_AppCallbacks_t;
 
 /** @} end of group ZCL_BASIC_Callbacks */
@@ -168,7 +168,7 @@ status_t zcl_basic_register(u8 endpoint, u16 manuCode, u8 attrNum, const zclAttr
  * @return      None
  */
 status_t zcl_basic_reset(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo);
-#define zcl_basic_resetFactoryDftCmd(a,b,c)	(zcl_basic_reset((a), (b), (c), ZCL_SEQ_NUM))
+#define zcl_basic_resetFactoryDftCmd(a,b,c) (zcl_basic_reset((a), (b), (c), ZCL_SEQ_NUM))
 
 /** @} end of group ZCL_BASIC_Fountions */
 
@@ -178,4 +178,4 @@ status_t zcl_basic_reset(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u
 
 /** @} end of group TELINK_ZIGBEE_STACK */
 
-#endif	/* ZCL_BASIC_H */
+#endif  /* ZCL_BASIC_H */

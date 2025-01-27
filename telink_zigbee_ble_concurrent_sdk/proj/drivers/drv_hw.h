@@ -22,20 +22,19 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-
 #pragma once
 
 #if defined(MCU_CORE_8258)
-	#define SYSTEM_RESET()			mcu_reset()
+    #define SYSTEM_RESET()              mcu_reset()
 #elif defined(MCU_CORE_B91) || defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
-	#define SYSTEM_RESET()			sys_reboot()
+    #define SYSTEM_RESET()              sys_reboot()
 #endif
 
-typedef enum{
-	SYSTEM_BOOT,			//power on or boot
-	SYSTEM_DEEP_RETENTION,	//deep with retention back
-	SYSTEM_DEEP,			//deep back
-}startup_state_e;
+typedef enum {
+    SYSTEM_BOOT,                //power on or boot
+    SYSTEM_DEEP_RETENTION,      //deep with retention back
+    SYSTEM_DEEP,                //deep back
+} startup_state_e;
 
 extern u32 sysTimerPerUs;
 

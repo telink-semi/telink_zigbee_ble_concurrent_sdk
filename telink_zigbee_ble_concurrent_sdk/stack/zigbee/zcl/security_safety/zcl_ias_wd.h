@@ -47,12 +47,12 @@
  */
 
 typedef union {
-	u8 byte;
-	struct{
-		u8 warningMode:4;
-		u8 strobe:2;
-		u8 sirenLevel:2;
-	}bits;
+    u8 byte;
+    struct{
+        u8 warningMode:4;
+        u8 strobe:2;
+        u8 sirenLevel:2;
+    }bits;
 } warning_t;
 
 /**
@@ -61,21 +61,21 @@ typedef union {
 typedef struct {
     u16 warningDuration;
     warning_t warning;
-    u8	strobeDutyCycle;
-    u8	strobeLevel;
+    u8  strobeDutyCycle;
+    u8  strobeLevel;
 } startWarning_t;
 
 /**
  *  @brief  Structure definition for squawk command
  */
 typedef union {
-	u8	byte;
-	struct{
-		u8 squawk:4;
-		u8 strobe:1;
-		u8 reserved:1;
-		u8 squawkLevel:2;
-	}bits;
+    u8  byte;
+    struct{
+        u8 squawk:4;
+        u8 strobe:1;
+        u8 reserved:1;
+        u8 squawkLevel:2;
+    }bits;
 } squawk_t;
 
 #if 0
@@ -87,8 +87,8 @@ typedef void (*zcl_SquawkCb_t)(apsdeDataInd_t *pApsdeInd, squawk_t *pSquawk);
  *  @brief  Structure definition for commands callback functions in ias wd cluster
  */
 typedef struct {
-	zcl_startWarningCb_t    startWarningCbFunc;
-    zcl_SquawkCb_t 			squawkCbFunc;
+    zcl_startWarningCb_t    startWarningCbFunc;
+    zcl_SquawkCb_t          squawkCbFunc;
 } zcl_iasWd_AppCallbacks_t;
 
 
@@ -105,9 +105,9 @@ status_t zcl_iasWd_register(u8 endpoint, u16 manuCode, u8 attrNum, const zclAttr
 
 
 status_t zcl_iasWd_startWarning(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, startWarning_t *pStartWarning);
-#define zcl_iasWd_startWarningCmd(a,b,c,d)	(zcl_iasWd_startWarning((a), (b), (c), ZCL_SEQ_NUM, (d)))
+#define zcl_iasWd_startWarningCmd(a,b,c,d)  (zcl_iasWd_startWarning((a), (b), (c), ZCL_SEQ_NUM, (d)))
 
 status_t zcl_iasWd_squawk(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, squawk_t *pSquawk);
-#define zcl_iasWd_squawkCmd(a,b,c,d)	(zcl_iasWd_squawk((a), (b), (c), ZCL_SEQ_NUM, (d)))
+#define zcl_iasWd_squawkCmd(a,b,c,d)    (zcl_iasWd_squawk((a), (b), (c), ZCL_SEQ_NUM, (d)))
 
-#endif	/* ZCL_IAS_WD_H */
+#endif  /* ZCL_IAS_WD_H */

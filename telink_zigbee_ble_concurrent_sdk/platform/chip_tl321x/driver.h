@@ -24,18 +24,18 @@
 #pragma once
 
 
-
-
 #include "lib/include/plic.h"
 #include "lib/include/pm/pm.h"
 #include "lib/include/rf/rf_common.h"
 #include "lib/include/sys.h"
 #include "lib/include/trng/trng_algorithm.h"
 #include "lib/include/pke/pke_algorithm.h"
+#include "lib/include/hash/hash_algorithm.h"
 #include "lib/include/ske/ske_algorithm.h"
 
 #include "lib/include/emi.h"
 #include "lib/include/efuse.h"
+#include "audio.h"
 #include "lib/include/analog.h"
 #include "dma.h"
 #include "gpio.h"
@@ -51,6 +51,7 @@
 #include "uart.h"
 #include "lib/include/stimer.h"
 
+#include "lpc.h"
 #include "lib/include/clock.h"
 #include "lib/include/mspi.h"
 #include "adc.h"

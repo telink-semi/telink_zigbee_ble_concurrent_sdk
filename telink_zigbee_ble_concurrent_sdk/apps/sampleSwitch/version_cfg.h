@@ -7,7 +7,7 @@
  * @date    2021
  *
  * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- *			All rights reserved.
+ *          All rights reserved.
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -28,35 +28,35 @@
 #include "../common/comm_cfg.h"
 
 #if defined(MCU_CORE_8258)
-		#define CHIP_TYPE					TLSR_8258_1M//TLSR_8258_1M
-		#define MCU_CORE_TYPE   			MCU_CORE_8258
+        #define CHIP_TYPE                   TLSR_8258_1M//TLSR_8258_1M
+        #define MCU_CORE_TYPE               MCU_CORE_8258
 #elif defined(MCU_CORE_B91)
-		#define CHIP_TYPE					TLSR_B91
-		#define MCU_CORE_TYPE   			MCU_CORE_B91
+        #define CHIP_TYPE                   TLSR_B91
+        #define MCU_CORE_TYPE               MCU_CORE_B91
 #elif defined(MCU_CORE_TL321X)
-		#define CHIP_TYPE					TLSR_TL321X
-		#define MCU_CORE_TYPE  				MCU_CORE_TL321X
+        #define CHIP_TYPE                   TLSR_TL321X
+        #define MCU_CORE_TYPE               MCU_CORE_TL321X
 #elif defined(MCU_CORE_TL721X)
-		#define CHIP_TYPE					TLSR_TL721X
-		#define MCU_CORE_TYPE  				MCU_CORE_TL721X
+        #define CHIP_TYPE                   TLSR_TL721X
+        #define MCU_CORE_TYPE               MCU_CORE_TL721X
 #endif
 
-#define APP_RELEASE							0x10//app release 1.0
-#define APP_BUILD							0x01//app build 01
-#define STACK_RELEASE						0x30//stack release 3.0
-#define STACK_BUILD							0x01//stack build 01
+#define APP_RELEASE                     0x10//app release 1.0
+#define APP_BUILD                       0x01//app build 01
+#define STACK_RELEASE                   0x30//stack release 3.0
+#define STACK_BUILD                     0x01//stack build 01
 
 /*********************************************************************************************
  * During OTA upgrade, the upgraded device will check the rules of the following three fields.
  * Refer to ZCL OTA specification for details.
  */
-#define MANUFACTURER_CODE_TELINK           	0x1141//Telink ID
-#define	IMAGE_TYPE							((CHIP_TYPE << 8) | IMAGE_TYPE_SWITCH)
-#define	FILE_VERSION					  	((APP_RELEASE << 24) | (APP_BUILD << 16) | (STACK_RELEASE << 8) | STACK_BUILD)
+#define MANUFACTURER_CODE_TELINK        0x1141//Telink ID
+#define	IMAGE_TYPE                      ((CHIP_TYPE << 8) | IMAGE_TYPE_SWITCH)
+#define	FILE_VERSION                    ((APP_RELEASE << 24) | (APP_BUILD << 16) | (STACK_RELEASE << 8) | STACK_BUILD)
 
 /* Pre-compiled link configuration. */
-#define IS_BOOT_LOADER_IMAGE				0
-#define RESV_FOR_APP_RAM_CODE_SIZE			0
-#define IMAGE_OFFSET						APP_IMAGE_ADDR
+#define IS_BOOT_LOADER_IMAGE            0
+#define RESV_FOR_APP_RAM_CODE_SIZE      0
+#define IMAGE_OFFSET                    APP_IMAGE_ADDR
 
-#define	DEEPRETENTION_SECTION_USED          1
+#define DEEPRETENTION_SECTION_USED      1

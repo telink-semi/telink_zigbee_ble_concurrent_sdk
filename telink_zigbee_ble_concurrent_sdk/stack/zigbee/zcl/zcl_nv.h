@@ -32,7 +32,7 @@
  *
  * @param
  *
- * @return	nv_sts_t
+ * @return  nv_sts_t
  *
  */
 nv_sts_t zcl_reportingTab_save(void);
@@ -42,7 +42,7 @@ nv_sts_t zcl_reportingTab_save(void);
  *
  * @param
  *
- * @return	nv_sts_t
+ * @return  nv_sts_t
  *
  */
 nv_sts_t zcl_reportingTab_restore(void);
@@ -131,4 +131,4 @@ nv_sts_t zcl_useTCForClusterInfo_restore(void);
 
 
  
-#endif	/* ZCL_NV_H */
+#endif  /* ZCL_NV_H */

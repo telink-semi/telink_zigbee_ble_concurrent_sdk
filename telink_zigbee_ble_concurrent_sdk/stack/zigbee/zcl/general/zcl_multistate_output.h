@@ -33,31 +33,31 @@
  */
 
 /**
- *  @brief	multistate output cluster Attribute IDs
+ *  @brief  multistate output cluster Attribute IDs
  */
-#define ZCL_MULTISTATE_OUTPUT_ATTRID_STATE_TEXT     			0x000E
-#define ZCL_MULTISTATE_OUTPUT_ATTRID_DESCRIPTION    			0x001C
-#define ZCL_MULTISTATE_OUTPUT_ATTRID_NUM_OF_STATES   			0x004A
-#define ZCL_MULTISTATE_OUTPUT_ATTRID_OUT_OF_SERVICE   			0x0051
-#define ZCL_MULTISTATE_OUTPUT_ATTRID_PRESENT_VALUE       		0x0055
-#define ZCL_MULTISTATE_OUTPUT_ATTRID_PRIORITY_ARRAY   			0x0057
-#define ZCL_MULTISTATE_OUTPUT_ATTRID_RELIABLILITY         		0x0067
-#define ZCL_MULTISTATE_OUTPUT_ATTRID_RELINQUISH_DEFAULT     	0x0068
-#define ZCL_MULTISTATE_OUTPUT_ATTRID_STATUS_FLAGS           	0x006F
-#define ZCL_MULTISTATE_OUTPUT_ATTRID_APP_TYPE       			0x0100
+#define ZCL_MULTISTATE_OUTPUT_ATTRID_STATE_TEXT                 0x000E
+#define ZCL_MULTISTATE_OUTPUT_ATTRID_DESCRIPTION                0x001C
+#define ZCL_MULTISTATE_OUTPUT_ATTRID_NUM_OF_STATES              0x004A
+#define ZCL_MULTISTATE_OUTPUT_ATTRID_OUT_OF_SERVICE             0x0051
+#define ZCL_MULTISTATE_OUTPUT_ATTRID_PRESENT_VALUE              0x0055
+#define ZCL_MULTISTATE_OUTPUT_ATTRID_PRIORITY_ARRAY             0x0057
+#define ZCL_MULTISTATE_OUTPUT_ATTRID_RELIABLILITY               0x0067
+#define ZCL_MULTISTATE_OUTPUT_ATTRID_RELINQUISH_DEFAULT         0x0068
+#define ZCL_MULTISTATE_OUTPUT_ATTRID_STATUS_FLAGS               0x006F
+#define ZCL_MULTISTATE_OUTPUT_ATTRID_APP_TYPE                   0x0100
 
 /**
  *  @brief Max length of char string
  */
-#define ZCL_MULTISTATE_OUTPUT_MAX_LENGTH 						24
+#define ZCL_MULTISTATE_OUTPUT_MAX_LENGTH                        24
 
 
 /**
  *  @brief  Definition format for priority array
  */
 typedef struct {
-	bool boolPara;
-	u16 u16Para;
+    bool boolPara;
+    u16 u16Para;
 } zcl_mulOutput_priorityArray_t;
 
 
@@ -100,4 +100,4 @@ extern const u8 zcl_multistate_output_attrNum;
 
 status_t zcl_multistate_output_Attribute_register(u8 endpoint, u16 manuCode, u8 attrNum, const zclAttrInfo_t attrTbl[], cluster_forAppCb_t cb);
 
-#endif	/* ZCL_MULTISTATE_OUTPUT_H */
+#endif  /* ZCL_MULTISTATE_OUTPUT_H */

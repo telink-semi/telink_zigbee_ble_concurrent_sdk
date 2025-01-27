@@ -48,4 +48,4 @@ status_t zcl_time_register(u8 endpoint, u16 manuCode, u8 attrNum, const zclAttrI
 
 
 
-#endif	/* ZCL_TIME_H */
+#endif  /* ZCL_TIME_H */

@@ -66,7 +66,7 @@
 #define ZCL_ATTRID_IDENTIFY_TIME                          0x0000
 /** @} end of group zcl_identify_attrId */
 
-#define DEFAULT_IDENTIFY_DURATION						  5
+#define DEFAULT_IDENTIFY_DURATION                         5
 /** @} end of group ZCL_IDENTIFY_Constant */
 
 
@@ -84,22 +84,22 @@ typedef enum {
  *  @brief  Definition format for trigger effect command
  */
 typedef struct {
-	u8 effectId;           //!< effect identifier
-	u8 effectVariant;      //!< effect Variant
+    u8 effectId;           //!< effect identifier
+    u8 effectVariant;      //!< effect Variant
 } zcl_triggerEffect_t;
 
 /**
  *  @brief  Definition format for identify command
  */
 typedef struct {
-	u16 identifyTime;
+    u16 identifyTime;
 } zcl_identifyCmd_t;
 
 /**
  *  @brief  Definition format for identify response command
  */
 typedef struct {
-	u16 timeout;
+    u16 timeout;
 } zcl_identifyRspCmd_t;
 
 
@@ -107,9 +107,9 @@ typedef struct {
  *  @brief  Definition format for identify command payload
  */
 typedef union{
-	zcl_identifyCmd_t				identify;
-	zcl_identifyRspCmd_t			identifyRsp;
-	zcl_triggerEffect_t				triggerEffect;
+    zcl_identifyCmd_t               identify;
+    zcl_identifyRspCmd_t            identifyRsp;
+    zcl_triggerEffect_t             triggerEffect;
 }zcl_identify_cmdPayload_t;
 
 
@@ -139,9 +139,9 @@ typedef void (*zcl_identifyQueryRspCb_t)(apsdeDataInd_t *pApsdeInd, u16 timeout)
  *  @brief  Structure definition for commands callback functions in Level cluster
  */
 typedef struct {
-	zcl_identifyCb_t    		identifyCbFunc;
-	zcl_triggerEffectCb_t	    triggerEffectCbFunc;
-	zcl_identifyQueryRspCb_t	identifyQueryRspCbFunc;
+    zcl_identifyCb_t            identifyCbFunc;
+    zcl_triggerEffectCb_t       triggerEffectCbFunc;
+    zcl_identifyQueryRspCb_t    identifyQueryRspCbFunc;
 } zcl_identify_AppCallbacks_t;
 
 /** @} end of group ZCL_IDENTIFY_Callbacks */
@@ -192,7 +192,7 @@ status_t zcl_identify_register(u8 endpoint, u16 manuCode, u8 attrNum, const zclA
  * @return      None
  */
 status_t zcl_identify_identify(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, u16 identifyTime, u32 manuCode);
-#define zcl_identify_identifyCmd(a,b,c,d,e)	(zcl_identify_identify((a), (b), (c), ZCL_SEQ_NUM,(d), (e)))
+#define zcl_identify_identifyCmd(a,b,c,d,e) (zcl_identify_identify((a), (b), (c), ZCL_SEQ_NUM,(d), (e)))
 
 /**
  * @brief       API to send Identify Query command in IDENTIFY cluster
@@ -205,7 +205,7 @@ status_t zcl_identify_identify(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefault
  * @return      None
  */
 status_t zcl_identify_identifyQuery(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo);
-#define zcl_identify_identifyQueryCmd(a,b,c)	(zcl_identify_identifyQuery((a), (b), (c), ZCL_SEQ_NUM))
+#define zcl_identify_identifyQueryCmd(a,b,c)    (zcl_identify_identifyQuery((a), (b), (c), ZCL_SEQ_NUM))
 
 /**
  * @brief       API to send trigger command in IDENTIFY cluster
@@ -220,7 +220,7 @@ status_t zcl_identify_identifyQuery(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDe
  * @return      None
  */
 status_t zcl_identify_triggerEffect(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, u8 effectId, u8 effectVariant);
-#define zcl_identify_sendTriggerCmd(a,b,c,d,e)	zcl_identify_triggerEffect((a), (b), (c), ZCL_SEQ_NUM, (d), (e))
+#define zcl_identify_sendTriggerCmd(a,b,c,d,e)  zcl_identify_triggerEffect((a), (b), (c), ZCL_SEQ_NUM, (d), (e))
 
 
 extern void zcl_identify_commissioningIdentify(zclIncoming_t *pInMsg, u16 identifyTime);
@@ -233,4 +233,4 @@ extern void zcl_identify_commissioningIdentify(zclIncoming_t *pInMsg, u16 identi
 
 /** @} end of group TELINK_ZIGBEE_STACK */
 
-#endif	/* ZCL_IDENTIFY_H */
+#endif  /* ZCL_IDENTIFY_H */

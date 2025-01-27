@@ -22,7 +22,6 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-
 #include "../tl_common.h"
 
 #if defined(MCU_CORE_B91)
@@ -39,22 +38,22 @@ pspi_csn_pin_def_e drv_cs_pin;
 void drv_spi_master_init(u32 spiClock, drv_spi_mode_e mode)
 {
 #if	defined(MCU_CORE_8258) || defined(MCU_CORE_B91)
-	u8 divClock = ((2 * spiClock) >= SPI_CLOCK_SOURCE) ? 0 : (u8)(SPI_CLOCK_SOURCE / (2 * spiClock) - 1);
+    u8 divClock = ((2 * spiClock) >= SPI_CLOCK_SOURCE) ? 0 : (u8)(SPI_CLOCK_SOURCE / (2 * spiClock) - 1);
 #elif defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
-	u8 divClock = SPI_CLOCK_SOURCE / spiClock;
+    u8 divClock = SPI_CLOCK_SOURCE / spiClock;
 #endif
 
 #if	defined(MCU_CORE_8258)
-	spi_master_init(divClock, mode);
+    spi_master_init(divClock, mode);
 #elif defined(MCU_CORE_B91)
-	/* B91 supports normal SPI mode and SPI Plus mode,
-	 * here we use the commonly used normal mode.
-	 */
-	spi_master_init(PSPI_MODULE, divClock, mode);
-	spi_master_config(PSPI_MODULE, SPI_NORMAL);
+    /* B91 supports normal SPI mode and SPI Plus mode,
+     * here we use the commonly used normal mode.
+     */
+    spi_master_init(PSPI_MODULE, divClock, mode);
+    spi_master_config(PSPI_MODULE, SPI_NORMAL);
 #elif defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
-	spi_master_init(GSPI_MODULE, divClock, mode);
-	spi_master_config(GSPI_MODULE, SPI_NORMAL);
+    spi_master_init(GSPI_MODULE, divClock, mode);
+    spi_master_config(GSPI_MODULE, SPI_NORMAL);
 #endif
 }
 
@@ -66,11 +65,11 @@ void drv_spi_master_init(u32 spiClock, drv_spi_mode_e mode)
 void drv_spi_slave_init(drv_spi_mode_e mode)
 {
 #if	defined(MCU_CORE_8258)
-	spi_slave_init(0, mode);
+    spi_slave_init(0, mode);
 #elif defined(MCU_CORE_B91)
-	spi_slave_init(PSPI_MODULE, mode);
+    spi_slave_init(PSPI_MODULE, mode);
 #elif defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
-	spi_slave_init(GSPI_MODULE, mode);
+    spi_slave_init(GSPI_MODULE, mode);
 #endif
 }
 
@@ -82,33 +81,33 @@ void drv_spi_slave_init(drv_spi_mode_e mode)
 #if	defined(MCU_CORE_8258)
 void drv_spi_master_pin_select(SPI_GPIO_GroupTypeDef pinGroup)
 {
-	spi_master_gpio_set(pinGroup);
+    spi_master_gpio_set(pinGroup);
 }
 #elif defined(MCU_CORE_B91)
 void drv_spi_master_pin_select(pspi_clk_pin_def_e sclk_pin, pspi_csn_pin_def_e cs_pin, pspi_mosi_io0_pin_def_e mosi_pin, pspi_miso_io1_pin_def_e miso_pin)
 {
-	pspi_pin_config_t pspi_pin_config;
+    pspi_pin_config_t pspi_pin_config;
 
-	pspi_pin_config.pspi_clk_pin = sclk_pin;
-	pspi_pin_config.pspi_csn_pin = cs_pin;
-	pspi_pin_config.pspi_mosi_io0_pin = mosi_pin;
-	pspi_pin_config.pspi_miso_io1_pin = miso_pin;
+    pspi_pin_config.pspi_clk_pin = sclk_pin;
+    pspi_pin_config.pspi_csn_pin = cs_pin;
+    pspi_pin_config.pspi_mosi_io0_pin = mosi_pin;
+    pspi_pin_config.pspi_miso_io1_pin = miso_pin;
 
-	drv_cs_pin = cs_pin;
+    drv_cs_pin = cs_pin;
 
-	pspi_set_pin(&pspi_pin_config);
+    pspi_set_pin(&pspi_pin_config);
 }
 #elif defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
 void drv_spi_master_pin_select(gpio_pin_e sclk_pin, gpio_pin_e cs_pin, gpio_pin_e mosi_pin, gpio_pin_e miso_pin)
 {
-	gspi_pin_config_t gspi_pin_config;
-	gspi_pin_config.spi_clk_pin = sclk_pin;
-	gspi_pin_config.spi_csn_pin = cs_pin;
-	gspi_pin_config.spi_mosi_io0_pin = mosi_pin;
-	gspi_pin_config.spi_miso_io1_pin = miso_pin;
-	gspi_pin_config.spi_io2_pin = 0;
-	gspi_pin_config.spi_io3_pin = 0;
-	gspi_set_pin(&gspi_pin_config);
+    gspi_pin_config_t gspi_pin_config;
+    gspi_pin_config.spi_clk_pin = sclk_pin;
+    gspi_pin_config.spi_csn_pin = cs_pin;
+    gspi_pin_config.spi_mosi_io0_pin = mosi_pin;
+    gspi_pin_config.spi_miso_io1_pin = miso_pin;
+    gspi_pin_config.spi_io2_pin = 0;
+    gspi_pin_config.spi_io3_pin = 0;
+    gspi_set_pin(&gspi_pin_config);
 }
 #endif
 
@@ -120,26 +119,26 @@ void drv_spi_master_pin_select(gpio_pin_e sclk_pin, gpio_pin_e cs_pin, gpio_pin_
 #if	defined(MCU_CORE_8258)
 void drv_spi_slave_pin_select(SPI_GPIO_GroupTypeDef pinGroup)
 {
-	spi_slave_gpio_set(pinGroup);
+    spi_slave_gpio_set(pinGroup);
 }
 #elif defined(MCU_CORE_B91)
 void drv_spi_slave_pin_select(pspi_clk_pin_def_e sclk_pin, pspi_csn_pin_def_e cs_pin, pspi_mosi_io0_pin_def_e mosi_pin, pspi_miso_io1_pin_def_e miso_pin)
 {
-	pspi_pin_config_t pspi_pin_config;
+    pspi_pin_config_t pspi_pin_config;
 
-	pspi_pin_config.pspi_clk_pin = sclk_pin;
-	pspi_pin_config.pspi_csn_pin = cs_pin;
-	pspi_pin_config.pspi_mosi_io0_pin = mosi_pin;
-	pspi_pin_config.pspi_miso_io1_pin = miso_pin;
+    pspi_pin_config.pspi_clk_pin = sclk_pin;
+    pspi_pin_config.pspi_csn_pin = cs_pin;
+    pspi_pin_config.pspi_mosi_io0_pin = mosi_pin;
+    pspi_pin_config.pspi_miso_io1_pin = miso_pin;
 
-	drv_cs_pin = cs_pin;
+    drv_cs_pin = cs_pin;
 
-	pspi_set_pin(&pspi_pin_config);
+    pspi_set_pin(&pspi_pin_config);
 }
 #elif defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
 void drv_spi_slave_pin_select(gpio_pin_e sclk_pin, gpio_pin_e cs_pin, gpio_pin_e mosi_pin, gpio_pin_e miso_pin)
 {
-	drv_spi_master_pin_select(sclk_pin, cs_pin, mosi_pin, miso_pin);
+    drv_spi_master_pin_select(sclk_pin, cs_pin, mosi_pin, miso_pin);
 }
 
 #endif
@@ -158,42 +157,41 @@ void drv_spi_slave_pin_select(gpio_pin_e sclk_pin, gpio_pin_e cs_pin, gpio_pin_e
 void drv_spi_write(u8 *cmd, int cmdLen, u8 *data, int dataLen, u32 csPin)
 {
 #if	defined(MCU_CORE_8258)
-	spi_write(cmd, cmdLen, data, dataLen, csPin);
+    spi_write(cmd, cmdLen, data, dataLen, csPin);
 #elif defined(MCU_CORE_B91)
-	u8 *pBuf = (u8 *)ev_buf_allocate(cmdLen + dataLen);
-	if(pBuf){
-		if(drv_cs_pin != csPin){
-			pspi_cs_pin_dis(drv_cs_pin);
-			pspi_cs_pin_en(csPin);
-			drv_cs_pin = csPin;
-		}
+    u8 *pBuf = (u8 *)ev_buf_allocate(cmdLen + dataLen);
+    if (pBuf) {
+        if (drv_cs_pin != csPin) {
+            pspi_cs_pin_dis(drv_cs_pin);
+            pspi_cs_pin_en(csPin);
+            drv_cs_pin = csPin;
+        }
 
-		u8 *pData = pBuf;
+        u8 *pData = pBuf;
 
-		memcpy(pData, cmd, cmdLen);
-		pData += cmdLen;
-		memcpy(pData, data, dataLen);
-		pData += dataLen;
+        memcpy(pData, cmd, cmdLen);
+        pData += cmdLen;
+        memcpy(pData, data, dataLen);
+        pData += dataLen;
 
-		spi_master_write(PSPI_MODULE, pBuf, cmdLen + dataLen);
-		ev_buf_free(pBuf);
-	}
+        spi_master_write(PSPI_MODULE, pBuf, cmdLen + dataLen);
+        ev_buf_free(pBuf);
+    }
 #elif defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
-	u8 *pBuf = (u8 *)ev_buf_allocate(cmdLen + dataLen);
-	if(pBuf){
-		u8 *pData = pBuf;
+    u8 *pBuf = (u8 *)ev_buf_allocate(cmdLen + dataLen);
+    if (pBuf) {
+        u8 *pData = pBuf;
 
-		memcpy(pData, cmd, cmdLen);
-		pData += cmdLen;
-		memcpy(pData, data, dataLen);
-		pData += dataLen;
+        memcpy(pData, cmd, cmdLen);
+        pData += cmdLen;
+        memcpy(pData, data, dataLen);
+        pData += dataLen;
 
-		spi_master_write(GSPI_MODULE, pBuf, cmdLen + dataLen);
-		ev_buf_free(pBuf);
-	}
+        spi_master_write(GSPI_MODULE, pBuf, cmdLen + dataLen);
+        ev_buf_free(pBuf);
+    }
 #endif
 }
-
 
 /**
  * @brief      This function serves to read a bulk of data from the SPI slave
@@ -209,16 +207,15 @@ void drv_spi_write(u8 *cmd, int cmdLen, u8 *data, int dataLen, u32 csPin)
 void drv_spi_read(u8 *cmd, int cmdLen, u8 *data, int dataLen, u32 csPin)
 {
 #if	defined(MCU_CORE_8258)
-	spi_read(cmd, cmdLen, data, dataLen, csPin);
+    spi_read(cmd, cmdLen, data, dataLen, csPin);
 #elif defined(MCU_CORE_B91)
-	if(drv_cs_pin != csPin){
-		pspi_cs_pin_dis(drv_cs_pin);
-		pspi_cs_pin_en(csPin);
-		drv_cs_pin = csPin;
-	}
-	spi_master_write_read(PSPI_MODULE, cmd, cmdLen, data, dataLen);
+    if (drv_cs_pin != csPin) {
+        pspi_cs_pin_dis(drv_cs_pin);
+        pspi_cs_pin_en(csPin);
+        drv_cs_pin = csPin;
+    }
+    spi_master_write_read(PSPI_MODULE, cmd, cmdLen, data, dataLen);
 #elif defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
-	spi_master_write_read(GSPI_MODULE, cmd, cmdLen, data, dataLen);
+    spi_master_write_read(GSPI_MODULE, cmd, cmdLen, data, dataLen);
 #endif
 }
-

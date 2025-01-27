@@ -33,21 +33,21 @@
  */
 
 /**
- *  @brief	multistate input cluster Attribute IDs
+ *  @brief  multistate input cluster Attribute IDs
  */
-#define ZCL_MULTISTATE_INPUT_ATTRID_STATE_TEXT     				0x000E
-#define ZCL_MULTISTATE_INPUT_ATTRID_DESCRIPTION    			    0x001C
-#define ZCL_MULTISTATE_INPUT_ATTRID_NUM_OF_STATES   			0x004A
-#define ZCL_MULTISTATE_INPUT_ATTRID_OUT_OF_SERVICE   			0x0051
-#define ZCL_MULTISTATE_INPUT_ATTRID_PRESENT_VALUE       		0x0055
-#define ZCL_MULTISTATE_INPUT_ATTRID_RELIABLILITY         		0x0067
-#define ZCL_MULTISTATE_INPUT_ATTRID_STATUS_FLAGS           		0x006F
-#define ZCL_MULTISTATE_INPUT_ATTRID_APP_TYPE       				0x0100
+#define ZCL_MULTISTATE_INPUT_ATTRID_STATE_TEXT                  0x000E
+#define ZCL_MULTISTATE_INPUT_ATTRID_DESCRIPTION                 0x001C
+#define ZCL_MULTISTATE_INPUT_ATTRID_NUM_OF_STATES               0x004A
+#define ZCL_MULTISTATE_INPUT_ATTRID_OUT_OF_SERVICE              0x0051
+#define ZCL_MULTISTATE_INPUT_ATTRID_PRESENT_VALUE               0x0055
+#define ZCL_MULTISTATE_INPUT_ATTRID_RELIABLILITY                0x0067
+#define ZCL_MULTISTATE_INPUT_ATTRID_STATUS_FLAGS                0x006F
+#define ZCL_MULTISTATE_INPUT_ATTRID_APP_TYPE                    0x0100
 
 /**
  *  @brief Max length of char string
  */
-#define ZCL_MULTISTATE_INPUT_MAX_LENGTH 						24
+#define ZCL_MULTISTATE_INPUT_MAX_LENGTH                         24
 
 #if 0
 #ifdef ZCL_MULTISTATE_INPUT_ATTR_STATE_TEXT_ENABLE
@@ -82,4 +82,4 @@ extern const u8 zcl_multistate_input_attrNum;
 
 status_t zcl_multistate_input_register(u8 endpoint, u16 manuCode, u8 attrNum, const zclAttrInfo_t attrTbl[], cluster_forAppCb_t cb);
 
-#endif	/* ZCL_MULTISTATE_INPUT_H */
+#endif  /* ZCL_MULTISTATE_INPUT_H */

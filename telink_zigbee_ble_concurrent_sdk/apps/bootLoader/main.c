@@ -7,6 +7,7 @@
  * @date    2021
  *
  * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *			All rights reserved.
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -19,22 +20,21 @@
  *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
+ *
  *******************************************************************************************************/
-
 #include "tl_common.h"
 #include "bootloader.h"
 
+int main(void)
+{
+    startup_state_e state = drv_platform_init();
 
-int main(void){
-	startup_state_e state = drv_platform_init();
+    bootloader_init((state == SYSTEM_BOOT));
 
-	bootloader_init((state == SYSTEM_BOOT));
+    while(1) {
+        gpio_toggle(LED_POWER);
+        WaitMs(100);
+    }
 
-	while(1){
-		gpio_toggle(LED_POWER);
-		WaitMs(100);
-	}
-
-	return 0;
+    return 0;
 }
-

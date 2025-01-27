@@ -29,6 +29,8 @@
 #include "ext_misc.h"
 #include "software_pa.h"
 #include "mcu_boot.h"
+#include "ext_hci_uart.h"
+#include "ext_flash.h"
 
 /*********************************************************/
 

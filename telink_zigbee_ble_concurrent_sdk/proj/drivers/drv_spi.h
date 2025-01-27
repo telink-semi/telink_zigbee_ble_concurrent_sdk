@@ -22,17 +22,16 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-
 #pragma once
 
 
 #if defined(MCU_CORE_8258)
-	#define SPI_CLOCK_SOURCE			CLOCK_SYS_CLOCK_HZ
+    #define SPI_CLOCK_SOURCE    CLOCK_SYS_CLOCK_HZ
 #elif defined(MCU_CORE_B91)
-	/* PCLK provides clock source for PSPI module. */
-	#define SPI_CLOCK_SOURCE			(sys_clk.pclk * 1000 * 1000)
+    /* PCLK provides clock source for PSPI module. */
+    #define SPI_CLOCK_SOURCE    (sys_clk.pclk * 1000 * 1000)
 #elif defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
-	#define SPI_CLOCK_SOURCE			(sys_clk.pll_clk * 1000 * 1000)
+    #define SPI_CLOCK_SOURCE    (sys_clk.pll_clk * 1000 * 1000)
 #endif
 
 /**
@@ -43,7 +42,7 @@ typedef enum {
     SPI_MODE_2,
     SPI_MODE_1,
     SPI_MODE_3,
-}drv_spi_mode_e;
+} drv_spi_mode_e;
 
 
 

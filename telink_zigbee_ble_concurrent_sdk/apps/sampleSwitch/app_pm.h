@@ -31,13 +31,9 @@
 extern drv_pm_pinCfg_t g_switchPmCfg[];
 
 void app_pm_init(void);
-
 void app_pm_task(void);
-
 void app_pm_wakeupPinCfg(void);
-
 u8 app_zigbeeIdle(void);
-
 void app_zigbeePollRateRecovery(void);
 
 /*
@@ -46,4 +42,4 @@ void app_zigbeePollRateRecovery(void);
  * */
 void app_enterCutOffMode(void);
 
-#endif	/* _APP_PM_H_ */
+#endif  /* _APP_PM_H_ */

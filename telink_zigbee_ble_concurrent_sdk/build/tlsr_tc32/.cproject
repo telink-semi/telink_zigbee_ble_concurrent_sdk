@@ -13,7 +13,7 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactName="${ConfigName}" buildArtefactType="com.telink.tc32eclipse.buildArtefactType.app" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=com.telink.tc32eclipse.buildArtefactType.app,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" description="Coordinator-8258" id="com.telink.tc32eclipse.configuration.app.debug.789487754.868726797" name="concurrent_sampleGW_8258" parent="com.telink.tc32eclipse.configuration.app.debug" postbuildStep="&quot;../../../tools/tl_check_fw.sh&quot; ${ConfigName} tc32" prebuildStep="&quot;../../../tools/tl_link_load.sh&quot; &quot;../../../platform/boot/8258/boot_8258.link&quot; &quot;${workspace_loc:/${ProjName}}/boot.link&quot;">
+				<configuration artifactName="${ConfigName}" buildArtefactType="com.telink.tc32eclipse.buildArtefactType.app" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=com.telink.tc32eclipse.buildArtefactType.app,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" description="Coordinator-8258" id="com.telink.tc32eclipse.configuration.app.debug.789487754.868726797" name="concurrent_sampleGW_8258" optionalBuildProperties="" parent="com.telink.tc32eclipse.configuration.app.debug" postbuildStep="&quot;../../../tools/tl_check_fw.sh&quot; ${ConfigName} tc32" prebuildStep="&quot;../../../tools/tl_link_load.sh&quot; &quot;../../../platform/boot/8258/boot_8258.link&quot; &quot;${workspace_loc:/${ProjName}}/boot.link&quot;">
 					<folderInfo id="com.telink.tc32eclipse.configuration.app.debug.789487754.868726797." name="/" resourcePath="">
 						<toolChain id="com.telink.tc32eclipse.toolchain.TC32Win.app.debug.1223590302" name="TC32-GCC Toolchain" superClass="com.telink.tc32eclipse.toolchain.TC32Win.app.debug">
 							<option id="com.telink.tc32eclipse.toolchain.options.toolchain.objcopy.flash.app.debug.644138609" name="Generate binary file for Flash memory" superClass="com.telink.tc32eclipse.toolchain.options.toolchain.objcopy.flash.app.debug"/>
@@ -94,7 +94,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="apps/sampleGW/sampleGatewayMultiBLE.c|stack/ble/ble_multi|apps/sampleGW/sampleGwBLESlave_b91.c|apps/sampleGW/sampleGwBLE_b91.c|apps/common/main.c|apps/sampleGW/sampleGatewayBLE_slave.c|stack/ble/ble_8258/hci/usb.c|stack/ble/ble_8258/hci/usb_desc.c|stack/ble/ble_8258/hci/usb_ctrl.c|stack/ble/ble_8258/hci/usb_bulk.c|stack/ble/ble_b91|apps/bootLoader|apps/sampleContactSensor|apps/sampleSwitch|apps/zbSniffer|apps/sampleLight|platform/chip_8278|platform/chip_826x" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="apps/common/hci_transport|apps/sampleGW/sampleGatewayMultiBLEController.c|apps/sampleGW/sampleGatewayMultiBLE.c|stack/ble/ble_multi|apps/sampleGW/sampleGwBLESlave_b91.c|apps/sampleGW/sampleGwBLE_b91.c|apps/common/main.c|apps/sampleGW/sampleGatewayBLE_slave.c|stack/ble/ble_8258/hci/usb.c|stack/ble/ble_8258/hci/usb_desc.c|stack/ble/ble_8258/hci/usb_ctrl.c|stack/ble/ble_8258/hci/usb_bulk.c|stack/ble/ble_b91|apps/bootLoader|apps/sampleContactSensor|apps/sampleSwitch|apps/zbSniffer|apps/sampleLight|platform/chip_8278|platform/chip_826x" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -192,7 +192,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="apps/sampleLight/sampleLightMultiBLEAdv.c|apps/sampleLight/sampleLightMultiBLE.c|stack/ble/ble_multi|apps/sampleLight/sampleLightBLESlave_b91.c|apps/sampleLight/sampleLightBLE_slave_b91.c|apps/common/main.c|stack/ble/ble_8258/hci/usb.c|stack/ble/ble_8258/hci/usb_desc.c|stack/ble/ble_8258/hci/usb_ctrl.c|stack/ble/ble_8258/hci/usb_bulk.c|stack/ble/ble_b91|apps/bootLoader|apps/sampleContactSensor|apps/sampleSwitch|apps/zbSniffer|apps/sampleGW|platform/chip_8278|platform/chip_826x" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="apps/common/hci_transport|apps/sampleLight/sampleLightMultiBLEAdv.c|apps/sampleLight/sampleLightMultiBLE.c|stack/ble/ble_multi|apps/sampleLight/sampleLightBLESlave_b91.c|apps/sampleLight/sampleLightBLE_slave_b91.c|apps/common/main.c|stack/ble/ble_8258/hci/usb.c|stack/ble/ble_8258/hci/usb_desc.c|stack/ble/ble_8258/hci/usb_ctrl.c|stack/ble/ble_8258/hci/usb_bulk.c|stack/ble/ble_b91|apps/bootLoader|apps/sampleContactSensor|apps/sampleSwitch|apps/zbSniffer|apps/sampleGW|platform/chip_8278|platform/chip_826x" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -288,7 +288,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="apps/sampleSwitch/sampleSwitchMultiBLEAdv.c|apps/sampleSwitch/sampleSwitchMultiBLE.c|stack/ble/ble_multi|apps/sampleSwitch/sampleSwitchBLESlave_b91.c|apps/sampleSwitch/sampleSwitchBLE_slave_b91.c|apps/common/main.c|stack/ble/ble_8258/hci/usb.c|stack/ble/ble_8258/hci/usb_desc.c|stack/ble/ble_8258/hci/usb_ctrl.c|stack/ble/ble_8258/hci/usb_bulk.c|stack/ble/ble_b91|apps/bootLoader|apps/sampleContactSensor|apps/zbSniffer|apps/sampleGW|apps/sampleLight|platform/chip_8278|platform/chip_826x" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="apps/common/hci_transport|apps/sampleSwitch/sampleSwitchMultiBLEAdv.c|apps/sampleSwitch/sampleSwitchMultiBLE.c|stack/ble/ble_multi|apps/sampleSwitch/sampleSwitchBLESlave_b91.c|apps/sampleSwitch/sampleSwitchBLE_slave_b91.c|apps/common/main.c|stack/ble/ble_8258/hci/usb.c|stack/ble/ble_8258/hci/usb_desc.c|stack/ble/ble_8258/hci/usb_ctrl.c|stack/ble/ble_8258/hci/usb_bulk.c|stack/ble/ble_b91|apps/bootLoader|apps/sampleContactSensor|apps/zbSniffer|apps/sampleGW|apps/sampleLight|platform/chip_8278|platform/chip_826x" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -377,7 +377,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="apps/common/module_test.c|apps/common/factory_reset.c|stack|zbhci|apps/common/zigbee_ble_switch.c|apps/sampleGW|apps/sampleGW/sampleGwBLESlave_b91.c|apps/sampleGW/sampleGwBLE_b91.c|apps/common/main.c|apps/sampleGW/sampleGatewayBLE_slave.c|stack/ble/ble_8258/hci/usb.c|stack/ble/ble_8258/hci/usb_desc.c|stack/ble/ble_8258/hci/usb_ctrl.c|stack/ble/ble_8258/hci/usb_bulk.c|stack/ble/ble_b91|apps/sampleContactSensor|apps/sampleSwitch|apps/zbSniffer|apps/sampleLight|platform/chip_8278|platform/chip_826x" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="apps/common/hci_transport|apps/common/module_test.c|apps/common/factory_reset.c|stack|zbhci|apps/common/zigbee_ble_switch.c|apps/sampleGW|apps/sampleGW/sampleGwBLESlave_b91.c|apps/sampleGW/sampleGwBLE_b91.c|apps/common/main.c|apps/sampleGW/sampleGatewayBLE_slave.c|stack/ble/ble_8258/hci/usb.c|stack/ble/ble_8258/hci/usb_desc.c|stack/ble/ble_8258/hci/usb_ctrl.c|stack/ble/ble_8258/hci/usb_bulk.c|stack/ble/ble_b91|apps/sampleContactSensor|apps/sampleSwitch|apps/zbSniffer|apps/sampleLight|platform/chip_8278|platform/chip_826x" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -475,7 +475,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="apps/sampleLight/sampleLightMultiBLEAdv.c|apps/sampleLight/sampleLightMultiBLE.c|stack/ble/ble_multi|apps/sampleLight/sampleLightBLESlave_b91.c|apps/sampleLight/sampleLightBLE_slave_b91.c|apps/common/main.c|stack/ble/ble_8258/hci/usb.c|stack/ble/ble_8258/hci/usb_desc.c|stack/ble/ble_8258/hci/usb_ctrl.c|stack/ble/ble_8258/hci/usb_bulk.c|stack/ble/ble_b91|apps/bootLoader|apps/sampleContactSensor|apps/sampleSwitch|apps/zbSniffer|apps/sampleGW|platform/chip_8278|platform/chip_826x" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="apps/common/hci_transport|apps/sampleLight/sampleLightMultiBLEAdv.c|apps/sampleLight/sampleLightMultiBLE.c|stack/ble/ble_multi|apps/sampleLight/sampleLightBLESlave_b91.c|apps/sampleLight/sampleLightBLE_slave_b91.c|apps/common/main.c|stack/ble/ble_8258/hci/usb.c|stack/ble/ble_8258/hci/usb_desc.c|stack/ble/ble_8258/hci/usb_ctrl.c|stack/ble/ble_8258/hci/usb_bulk.c|stack/ble/ble_b91|apps/bootLoader|apps/sampleContactSensor|apps/sampleSwitch|apps/zbSniffer|apps/sampleGW|platform/chip_8278|platform/chip_826x" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

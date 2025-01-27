@@ -1,10 +1,10 @@
 /********************************************************************************************************
- * @file	plic_isr.c
+ * @file    plic_isr.c
  *
- * @brief	This is the source file for tl321x
+ * @brief   This is the source file for tl321x
  *
- * @author	Driver Group
- * @date	2024
+ * @author  Driver Group
+ * @date    2024
  *
  * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *          All rights reserved.
@@ -53,8 +53,10 @@ extern void gpio0_irq_handler(void);
 extern void gpio1_irq_handler(void);
 extern void gpio2_irq_handler(void);
 
+#if(!BLE_SUPPORT_CONTROLLER_ONLY)
 PLIC_ISR_REGISTER(uart0_irq_handler, IRQ_UART0)
 PLIC_ISR_REGISTER(dma_irq_handler, IRQ_DMA)
+#endif
 PLIC_ISR_REGISTER(rf_irq_handler, IRQ_ZB_RT)
 PLIC_ISR_REGISTER(timer1_irq_handler, IRQ_TIMER1)
 PLIC_ISR_REGISTER(timer0_irq_handler, IRQ_TIMER0)
@@ -136,17 +138,14 @@ __attribute__((weak)) void trap_entry(void)
     long mstatus = 0;
     long mxstatus = 0;
 
-    if(g_plic_preempt_en)
-    {
+    if (g_plic_preempt_en) {
         mepc = read_csr(NDS_MEPC);
         mstatus = read_csr(NDS_MSTATUS);
         mxstatus = read_csr(NDS_MXSTATUS);
     }
 
-    if((mcause & 0x80000000UL) && ((mcause & 0x7FFFFFFFUL) == 7)) /* machine timer interrupt */
-    {
-        if(g_plic_preempt_en)
-        {
+    if((mcause & 0x80000000UL) && ((mcause & 0x7FFFFFFFUL) == 7)) {/* machine timer interrupt */
+        if(g_plic_preempt_en) {
             /* before enable global interrupt,disable the timer interrupt to prevent re-entry */
             core_mie_disable(FLD_MIE_MTIE);
             set_csr(NDS_MSTATUS, FLD_MSTATUS_MIE);
@@ -154,38 +153,30 @@ __attribute__((weak)) void trap_entry(void)
 
         mtime_irq_handler();
 
-        if(g_plic_preempt_en)
-        {
+        if(g_plic_preempt_en) {
             clear_csr(NDS_MSTATUS, FLD_MSTATUS_MIE);
             /* re-enable the timer interrupt. */
             core_mie_enable(FLD_MIE_MTIE);
         }
-    }
-    else if((mcause & 0x80000000UL) && ((mcause & 0x7FFFFFFFUL) == 3)) /* machine software interrupt */
-    {
+    } else if((mcause & 0x80000000UL) && ((mcause & 0x7FFFFFFFUL) == 3)) {/* machine software interrupt */
         plic_sw_interrupt_claim();
         /* if support interrupt nest,enable global interrupt */
-        if(g_plic_preempt_en)
-        {
+        if(g_plic_preempt_en) {
             set_csr(NDS_MSTATUS, FLD_MSTATUS_MIE);
         }
 
         mswi_irq_handler();
 
-        if(g_plic_preempt_en)
-        {
+        if(g_plic_preempt_en) {
             clear_csr(NDS_MSTATUS, FLD_MSTATUS_MIE);
         }
 
         plic_sw_interrupt_complete();
-    }
-    else /* unhandled Trap */
-    {
+    } else {/* unhandled Trap */
         except_handler();
     }
 
-    if(g_plic_preempt_en)
-    {
+    if(g_plic_preempt_en) {
         write_csr(NDS_MSTATUS, mstatus);
         write_csr(NDS_MEPC, mepc);
         write_csr(NDS_MXSTATUS, mxstatus);

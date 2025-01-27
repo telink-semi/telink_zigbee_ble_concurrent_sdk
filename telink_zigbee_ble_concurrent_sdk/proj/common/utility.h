@@ -28,31 +28,31 @@
 #include "types.h"
 
 
-#define abs(a)   				(((a) > 0) ? ((a)) : (-(a)))
-#define absSub(a, b)  			((a) > (b) ? ((a)-(b)) : ((b)-(a)))
+#define abs(a)                  (((a) > 0) ? ((a)) : (-(a)))
+#define absSub(a, b)            ((a) > (b) ? ((a)-(b)) : ((b)-(a)))
 
-#define cat2(i,j)       		i##j
-#define cat3(i,j,k)     		i##j##k
+#define cat2(i,j)               i##j
+#define cat3(i,j,k)             i##j##k
 
 #ifndef min
-#define min(a,b)				((a) < (b) ? (a) : (b))
+#define min(a,b)                ((a) < (b) ? (a) : (b))
 #endif
 
 #ifndef max
-#define max(a,b)	((a) > (b) ? (a): (b))
+#define max(a,b)    ((a) > (b) ? (a): (b))
 #endif
 
 #ifndef min2
-#define min2(a,b)				((a) < (b) ? (a) : (b))
+#define min2(a,b)               ((a) < (b) ? (a) : (b))
 #endif
 #ifndef min3
-#define min3(a,b,c)				min2(min2(a, b), c)
+#define min3(a,b,c)             min2(min2(a, b), c)
 #endif
 #ifndef max2
-#define max2(a,b)				((a) > (b) ? (a): (b))
+#define max2(a,b)               ((a) > (b) ? (a): (b))
 #endif
 #ifndef max3
-#define max3(a,b,c)				max2(max2(a, b), c)
+#define max3(a,b,c)             max2(max2(a, b), c)
 #endif
 
 #define LENGTHOF(s, m)          (sizeof(((s*)0)->m))
@@ -62,94 +62,94 @@
 #define ROUND_TO_POW2(x, r)     (((x) + (r) - 1) & ~((r) - 1))
 
 //  direct memory access 
-#define U8_GET(addr)			(*(volatile unsigned char  *)(addr))
-#define U16_GET(addr)			(*(volatile unsigned short *)(addr))
-#define U32_GET(addr)			(*(volatile unsigned int  *)(addr))
+#define U8_GET(addr)            (*(volatile unsigned char  *)(addr))
+#define U16_GET(addr)           (*(volatile unsigned short *)(addr))
+#define U32_GET(addr)           (*(volatile unsigned int  *)(addr))
 
-#define U8_SET(addr, v)			(*(volatile unsigned char  *)(addr) = (unsigned char)(v))
-#define U16_SET(addr, v)		(*(volatile unsigned short *)(addr) = (unsigned short)(v))
-#define U32_SET(addr, v)		(*(volatile unsigned int  *)(addr) = (v))
+#define U8_SET(addr, v)         (*(volatile unsigned char  *)(addr) = (unsigned char)(v))
+#define U16_SET(addr, v)        (*(volatile unsigned short *)(addr) = (unsigned short)(v))
+#define U32_SET(addr, v)        (*(volatile unsigned int  *)(addr) = (v))
 
-#define U8_INC(addr)			U8_GET(addr) += 1
-#define U16_INC(addr)			U16_GET(addr) += 1
-#define U32_INC(addr)			U32_GET(addr) += 1
+#define U8_INC(addr)            U8_GET(addr) += 1
+#define U16_INC(addr)           U16_GET(addr) += 1
+#define U32_INC(addr)           U32_GET(addr) += 1
 
-#define U8_DEC(addr)			U8_GET(addr) -= 1
-#define U16_DEC(addr)			U16_GET(addr) -= 1
-#define U32_DEC(addr)			U32_GET(addr) -= 1
+#define U8_DEC(addr)            U8_GET(addr) -= 1
+#define U16_DEC(addr)           U16_GET(addr) -= 1
+#define U32_DEC(addr)           U32_GET(addr) -= 1
 
-#define U8_CPY(addr1,addr2)		U8_SET(addr1, U8_GET(addr2))
-#define U16_CPY(addr1,addr2)	U16_SET(addr1, U16_GET(addr2))
-#define U32_CPY(addr1,addr2)	U32_SET(addr1, U32_GET(addr2))
+#define U8_CPY(addr1,addr2)     U8_SET(addr1, U8_GET(addr2))
+#define U16_CPY(addr1,addr2)    U16_SET(addr1, U16_GET(addr2))
+#define U32_CPY(addr1,addr2)    U32_SET(addr1, U32_GET(addr2))
 
-#define MAKE_U16(h,l) 			((unsigned short)(((h) << 8) | (l)))
-#define MAKE_U24(a,b,c)			((unsigned int)(((a) << 16) | ((b) << 8) | (c)))
-#define MAKE_U32(a,b,c,d)		((unsigned int)(((a) << 24) | ((b) << 16) | ((c) << 8) | (d)))
+#define MAKE_U16(h,l)           ((unsigned short)(((h) << 8) | (l)))
+#define MAKE_U24(a,b,c)         ((unsigned int)(((a) << 16) | ((b) << 8) | (c)))
+#define MAKE_U32(a,b,c,d)       ((unsigned int)(((a) << 24) | ((b) << 16) | ((c) << 8) | (d)))
 
-#define BOUND(x, l, m)			((x) < (l) ? (l) : ((x) > (m) ? (m) : (x)))
-#define SET_BOUND(x, l, m)		((x) = BOUND(x, l, m))
-#define BOUND_INC(x, m)			do{++(x); (x) = (x) < (m) ? (x) : 0;} while(0)
-#define BOUND_INC_POW2(x, m)	do{								\
-									STATIC_ASSERT_POW2(m);		\
-									(x) = ((x)+1) & (m-1);		\
-								}while(0)
+#define BOUND(x, l, m)          ((x) < (l) ? (l) : ((x) > (m) ? (m) : (x)))
+#define SET_BOUND(x, l, m)      ((x) = BOUND(x, l, m))
+#define BOUND_INC(x, m)         do{++(x); (x) = (x) < (m) ? (x) : 0;} while(0)
+#define BOUND_INC_POW2(x, m)    do{                             \
+                                    STATIC_ASSERT_POW2(m);      \
+                                    (x) = ((x)+1) & (m-1);      \
+                                }while(0)
 
-#define IS_POWER_OF_2(x)		(!(x & (x-1)))
-#define IS_LITTLE_ENDIAN 		(*(unsigned short*)"\0\xff" > 0x100)
-#define IS_4BYTE_ALIGN(x) 		(!(x & 3))
+#define IS_POWER_OF_2(x)        (!(x & (x-1)))
+#define IS_LITTLE_ENDIAN        (*(unsigned short*)"\0\xff" > 0x100)
+#define IS_4BYTE_ALIGN(x)       (!(x & 3))
 
-#define IMPLIES(x, y) 			(!(x) || (y))
+#define IMPLIES(x, y)           (!(x) || (y))
 
 // x > y ? 1 : (x ==y : 0 ? -1)
-#define COMPARE(x, y) 			(((x) > (y)) - ((x) < (y)))
-#define SIGN(x) 				COMPARE(x, 0)
+#define COMPARE(x, y)           (((x) > (y)) - ((x) < (y)))
+#define SIGN(x)                 COMPARE(x, 0)
 
 // better than xor swap:  http://stackoverflow.com/questions/3912699/why-swap-with-xor-works-fine-in-c-but-in-java-doesn't-some-puzzle
-#define SWAP(x, y, T) 			do { T tmp = (x); (x) = (y); (y) = tmp; } while(0)
-#define SORT2(a, b, T) 			do { if ((a) > (b)) SWAP((a), (b), T); } while (0)
+#define SWAP(x, y, T)           do { T tmp = (x); (x) = (y); (y) = tmp; } while(0)
+#define SORT2(a, b, T)          do { if ((a) > (b)) SWAP((a), (b), T); } while (0)
 
-#define foreach(i, n) 			for(int i = 0; i < (n); ++i)
-#define foreach_range(i, s, e) 	for(int i = (s); i < (e); ++i)
-#define foreach_arr(i, arr) 	for(int i = 0; i < ARRAY_SIZE(arr); ++i)
+#define foreach(i, n)           for(int i = 0; i < (n); ++i)
+#define foreach_range(i, s, e)  for(int i = (s); i < (e); ++i)
+#define foreach_arr(i, arr)     for(int i = 0; i < ARRAY_SIZE(arr); ++i)
 //  round robbin foreach
-#define foreach_hint(i, n, h) 	for(int i = 0, ++h, h=h<n?h:0; i < n; ++h, h=h<n?h:0)
+#define foreach_hint(i, n, h)   for(int i = 0, ++h, h=h<n?h:0; i < n; ++h, h=h<n?h:0)
 
-#define ARRAY_SIZE(a) 			(sizeof(a) / sizeof(*a))
+#define ARRAY_SIZE(a)           (sizeof(a) / sizeof(*a))
 
-#define everyN(i, n) 			++(i); (i)=((i) < N ? (i) : 0); if(0 == (i))
-
-
-#define HI_UINT16(a) 			(((a) >> 8) & 0xFF)
-#define LO_UINT16(a) 			((a) & 0xFF)
-
-#define U16_HI(a)   			(((a) >> 8) & 0xFF)
-#define U16_LO(a)    			((a) & 0xFF)
-
-#define U24_BYTE0(a) 			((a) & 0xFF)
-#define U24_BYTE1(a) 			(((a) >> 8) & 0xFF)
-#define U24_BYTE2(a) 			(((a) >> 16) & 0xFF)
-
-#define U32_BYTE0(a) 			((a) & 0xFF)
-#define U32_BYTE1(a) 			(((a) >> 8) & 0xFF)
-#define U32_BYTE2(a) 			(((a) >> 16) & 0xFF)
-#define U32_BYTE3(a) 			(((a) >> 24) & 0xFF)
-
-#define BUILD_U16(lo, hi)			( (unsigned short)((((hi) & 0x00FF) << 8) + ((lo) & 0x00FF)) )
-#define BUILD_U24(b0, b1, b2)		( (unsigned int)((((b2) & 0x000000FF) << 16) + (((b1) & 0x000000FF) << 8) + ((b0) & 0x000000FF)) )
-#define BUILD_U32(b0, b1, b2, b3)	( (unsigned int)((((b3) & 0x000000FF) << 24) + (((b2) & 0x000000FF) << 16) + (((b1) & 0x000000FF) << 8) + ((b0) & 0x000000FF)) )
-
-#define BUILD_S16(lo, hi)			( (signed short)((((hi) & 0x00FF) << 8) + ((lo) & 0x00FF)) )
-#define BUILD_S24(b0, b1, b2)		( (signed int)((((b2) & 0x000000FF) << 16) + (((b1) & 0x000000FF) << 8) + ((b0) & 0x000000FF)) )
-#define BUILD_S32(b0, b1, b2, b3)	( (signed int)((((b3) & 0x000000FF) << 24) + (((b2) & 0x000000FF) << 16) + (((b1) & 0x000000FF) << 8) + ((b0) & 0x000000FF)) )
+#define everyN(i, n)            ++(i); (i)=((i) < N ? (i) : 0); if(0 == (i))
 
 
-#define HASH_MAGIC_VAL 			5381u
-#define INT_MASK      			0x7fffffff
+#define HI_UINT16(a)            (((a) >> 8) & 0xFF)
+#define LO_UINT16(a)            ((a) & 0xFF)
+
+#define U16_HI(a)               (((a) >> 8) & 0xFF)
+#define U16_LO(a)               ((a) & 0xFF)
+
+#define U24_BYTE0(a)            ((a) & 0xFF)
+#define U24_BYTE1(a)            (((a) >> 8) & 0xFF)
+#define U24_BYTE2(a)            (((a) >> 16) & 0xFF)
+
+#define U32_BYTE0(a)            ((a) & 0xFF)
+#define U32_BYTE1(a)            (((a) >> 8) & 0xFF)
+#define U32_BYTE2(a)            (((a) >> 16) & 0xFF)
+#define U32_BYTE3(a)            (((a) >> 24) & 0xFF)
+
+#define BUILD_U16(lo, hi)           ( (unsigned short)((((hi) & 0x00FF) << 8) + ((lo) & 0x00FF)) )
+#define BUILD_U24(b0, b1, b2)       ( (unsigned int)((((b2) & 0x000000FF) << 16) + (((b1) & 0x000000FF) << 8) + ((b0) & 0x000000FF)) )
+#define BUILD_U32(b0, b1, b2, b3)   ( (unsigned int)((((b3) & 0x000000FF) << 24) + (((b2) & 0x000000FF) << 16) + (((b1) & 0x000000FF) << 8) + ((b0) & 0x000000FF)) )
+
+#define BUILD_S16(lo, hi)           ( (signed short)((((hi) & 0x00FF) << 8) + ((lo) & 0x00FF)) )
+#define BUILD_S24(b0, b1, b2)       ( (signed int)((((b2) & 0x000000FF) << 16) + (((b1) & 0x000000FF) << 8) + ((b0) & 0x000000FF)) )
+#define BUILD_S32(b0, b1, b2, b3)   ( (signed int)((((b3) & 0x000000FF) << 24) + (((b2) & 0x000000FF) << 16) + (((b1) & 0x000000FF) << 8) + ((b0) & 0x000000FF)) )
+
+
+#define HASH_MAGIC_VAL          5381u
+#define INT_MASK                0x7fffffff
 
 /* TODO: check is this hash optimal for ints */
-#define HASH_FUNC_STEP(hash_var, v) 		((((hash_var) << 5) + (hash_var)) + (v))
-#define FOUR_INT_HASH_FUNC(v1, v2, v3, v4) 	(HASH_FUNC_STEP(HASH_FUNC_STEP( HASH_FUNC_STEP( HASH_FUNC_STEP(HASH_MAGIC_VAL, (v1)), (v2)), (v3)), (v4)) & INT_MASK)
-#define TWO_INT_HASH_FUNC(v1, v2)      		(HASH_FUNC_STEP(HASH_FUNC_STEP(HASH_MAGIC_VAL, (v1)), (v2)) & INT_MASK)
+#define HASH_FUNC_STEP(hash_var, v)         ((((hash_var) << 5) + (hash_var)) + (v))
+#define FOUR_INT_HASH_FUNC(v1, v2, v3, v4)  (HASH_FUNC_STEP(HASH_FUNC_STEP( HASH_FUNC_STEP( HASH_FUNC_STEP(HASH_MAGIC_VAL, (v1)), (v2)), (v3)), (v4)) & INT_MASK)
+#define TWO_INT_HASH_FUNC(v1, v2)           (HASH_FUNC_STEP(HASH_FUNC_STEP(HASH_MAGIC_VAL, (v1)), (v2)) & INT_MASK)
 
 
 void addrCpy(addr_t *pDstAddr, addr_t* pSrcAddr);
@@ -157,33 +157,33 @@ void generateRandomData(unsigned char *pData, unsigned char len);
 
 #if 1
 
-#define U16_TO_BYTES(n)			((u8) (n)), ((u8)((n) >> 8))
-#define U24_TO_BYTES(n)			((u8) (n)),	((u8)((n) >> 8)), ((u8)((n) >> 16))
-#define U32_TO_BYTES(n)			((u8) (n)),	((u8)((n) >> 8)), ((u8)((n) >> 16)), ((u8)((n) >> 24))
+#define U16_TO_BYTES(n)         ((u8) (n)), ((u8)((n) >> 8))
+#define U24_TO_BYTES(n)         ((u8) (n)), ((u8)((n) >> 8)), ((u8)((n) >> 16))
+#define U32_TO_BYTES(n)         ((u8) (n)), ((u8)((n) >> 8)), ((u8)((n) >> 16)), ((u8)((n) >> 24))
 
-#define BYTE_TO_UINT16(n, p)	{n = ((u16)(p)[0] + ((u16)(p)[1]<<8));}
-#define BYTE_TO_UINT24(n, p)	{n = ((u32)(p)[0] + ((u32)(p)[1]<<8) + \
-									((u32)(p)[2]<<16));}
-#define BYTE_TO_UINT32(n, p)	{n = ((u32)(p)[0] + ((u32)(p)[1]<<8) + \
-									((u32)(p)[2]<<16) + ((u32)(p)[3]<<24));}
+#define BYTE_TO_UINT16(n, p)    {n = ((u16)(p)[0] + ((u16)(p)[1]<<8));}
+#define BYTE_TO_UINT24(n, p)    {n = ((u32)(p)[0] + ((u32)(p)[1]<<8) + \
+                                    ((u32)(p)[2]<<16));}
+#define BYTE_TO_UINT32(n, p)    {n = ((u32)(p)[0] + ((u32)(p)[1]<<8) + \
+                                    ((u32)(p)[2]<<16) + ((u32)(p)[3]<<24));}
 
-#define STREAM_TO_U8(n, p)		{n = *(p); p++;}
-#define STREAM_TO_U16(n, p)		{BYTE_TO_UINT16(n,p); p+=2;}
-#define STREAM_TO_U24(n, p)		{BYTE_TO_UINT24(n,p); p+=3;}
-#define STREAM_TO_U32(n, p)		{BYTE_TO_UINT32(n,p); p+=4;}
-#define STREAM_TO_STR(n, p, l)	{memcpy(n, p, l); p+=l;}
+#define STREAM_TO_U8(n, p)      {n = *(p); p++;}
+#define STREAM_TO_U16(n, p)     {BYTE_TO_UINT16(n,p); p+=2;}
+#define STREAM_TO_U24(n, p)     {BYTE_TO_UINT24(n,p); p+=3;}
+#define STREAM_TO_U32(n, p)     {BYTE_TO_UINT32(n,p); p+=4;}
+#define STREAM_TO_STR(n, p, l)  {memcpy(n, p, l); p+=l;}
 
-#define U8_TO_STREAM(p, n)		{*(p)++ = (u8)(n);}
-#define U16_TO_STREAM(p, n)		{*(p)++ = (u8)(n); *(p)++ = (u8)((n)>>8);}
-#define U24_TO_STREAM(p, n)		{*(p)++ = (u8)(n); *(p)++ = (u8)((n)>>8); \
-								*(p)++ = (u8)((n)>>16);}
-#define U32_TO_STREAM(p, n)		{*(p)++ = (u8)(n); *(p)++ = (u8)((n)>>8); \
-								*(p)++ = (u8)((n)>>16); *(p)++ = (u8)((n)>>24);}
-#define U40_TO_STREAM(p, n)		{*(p)++ = (u8)(n); *(p)++ = (u8)((n)>>8); \
-								*(p)++ = (u8)((n)>>16); *(p)++ = (u8)((n)>>24); \
-								*(p)++ = (u8)((n)>>32);}
+#define U8_TO_STREAM(p, n)      {*(p)++ = (u8)(n);}
+#define U16_TO_STREAM(p, n)     {*(p)++ = (u8)(n); *(p)++ = (u8)((n)>>8);}
+#define U24_TO_STREAM(p, n)     {*(p)++ = (u8)(n); *(p)++ = (u8)((n)>>8); \
+                                *(p)++ = (u8)((n)>>16);}
+#define U32_TO_STREAM(p, n)     {*(p)++ = (u8)(n); *(p)++ = (u8)((n)>>8); \
+                                *(p)++ = (u8)((n)>>16); *(p)++ = (u8)((n)>>24);}
+#define U40_TO_STREAM(p, n)     {*(p)++ = (u8)(n); *(p)++ = (u8)((n)>>8); \
+                                *(p)++ = (u8)((n)>>16); *(p)++ = (u8)((n)>>24); \
+                                *(p)++ = (u8)((n)>>32);}
 
-#define STR_TO_STREAM(p, n, l)	{memcpy(p, n, l); p+=l;}
+#define STR_TO_STREAM(p, n, l)  {memcpy(p, n, l); p+=l;}
 
 
 static inline void u16_to_bstream_le(u16 val, u8 dst[2])
@@ -264,13 +264,13 @@ static inline u64 mul64_32x32(u32 u, u32 v)
 }
 
 
-typedef	struct {
-	u32		size;
-	u16		num;
-	u8		wptr;
-	u8		rptr;
-	u8*		p;
-}	my_fifo_t;
+typedef struct {
+    u32     size;
+    u16     num;
+    u8      wptr;
+    u8      rptr;
+    u8*     p;
+}   my_fifo_t;
 
 void my_fifo_init (my_fifo_t *f, int s, u8 n, u8 *p);
 u8* my_fifo_wptr (my_fifo_t *f);
@@ -279,13 +279,13 @@ int my_fifo_push (my_fifo_t *f, u8 *p, int n);
 void my_fifo_pop (my_fifo_t *f);
 u8 * my_fifo_get (my_fifo_t *f);
 
-#define		MYFIFO_INIT(name,size,n)		u8 name##_b[size * n]={0};my_fifo_t name = {size,n,0,0, name##_b}
+#define     MYFIFO_INIT(name,size,n)        u8 name##_b[size * n]={0};my_fifo_t name = {size,n,0,0, name##_b}
 
-#define		MYFIFO_INIT_IRAM(name,size,n)		u8 name##_b[size * n]__attribute__((aligned(4)))/*={0}*/;my_fifo_t name = {size,n,0,0, name##_b}
+#define     MYFIFO_INIT_IRAM(name,size,n)       u8 name##_b[size * n]__attribute__((aligned(4)))/*={0}*/;my_fifo_t name = {size,n,0,0, name##_b}
 
 
-#define		DATA_LENGTH_ALIGN4(n)				(((n) + 3) / 4 * 4)
-#define		DATA_LENGTH_ALIGN16(n)				(((n) + 15) / 16 * 16)
+#define     DATA_LENGTH_ALIGN4(n)               (((n) + 3) / 4 * 4)
+#define     DATA_LENGTH_ALIGN16(n)              (((n) + 15) / 16 * 16)
 
 #define log_write_data(id, type, dat)
 #define log_task_begin(id)
@@ -294,31 +294,31 @@ u8 * my_fifo_get (my_fifo_t *f);
 #define log_event(id)
 #endif
 #define log_data(id, dat)
-#define	LOG_TICK(id,e)			do{e;}while (0)
+#define LOG_TICK(id,e)          do{e;}while (0)
 
 #define LOG(x, s,...)
 
 extern unsigned int xcrc32(const unsigned char *buf, int len, unsigned int init);
 
 
-#define DBG_ZIGBEE_STATUS_EN		1
+#define DBG_ZIGBEE_STATUS_EN        1
 #if DBG_ZIGBEE_STATUS_EN
 extern volatile u8 T_rfStatusDbg[];
 extern u32 T_rfStatusCnt;
-#define DBG_ZIGBEE_STATUS(v)	T_rfStatusDbg[(T_rfStatusCnt++) & 0xff] = v;
+#define DBG_ZIGBEE_STATUS(v)    T_rfStatusDbg[(T_rfStatusCnt++) & 0xff] = v;
 #else
 #define DBG_ZIGBEE_STATUS(v)
 #endif
 
 ///////////////////////////////////////ring buf ///////////////////////////////////
 
-typedef	struct {
-	u16		size;
-	u16     mask;
-	u16		wptr;
-	u16		rptr;
-	u8*		p;
-}	my_ring_buf_t;
+typedef struct {
+    u16     size;
+    u16     mask;
+    u16     wptr;
+    u16     rptr;
+    u8*     p;
+}   my_ring_buf_t;
 /**
  * @brief      ring buf init
  * @param[in]  f buf size

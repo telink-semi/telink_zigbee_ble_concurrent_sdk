@@ -85,4 +85,4 @@ status_t zcl_occupancySensing_register(u8 endpoint, u16 manuCode, u8 attrNum, co
 
 /** @} end of group TELINK_ZIGBEE_STACK */
 
-#endif	/* ZCL_OCCUPANCY_SENSING_H */
+#endif  /* ZCL_OCCUPANCY_SENSING_H */

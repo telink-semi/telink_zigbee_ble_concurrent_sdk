@@ -92,12 +92,12 @@ typedef addrExt_t extAddr_t;
 typedef union {
 	u16  shortAddr;
 	addrExt_t extAddr;
-}tl_zb_addr_t;
+} tl_zb_addr_t;
 
 typedef union {
 	u32	srcId;
 	addrExt_t gpdIeeeAddr;
-}gpdId_t;
+} gpdId_t;
 
 /**
  *  @brief Type definition for combined short/extended device address

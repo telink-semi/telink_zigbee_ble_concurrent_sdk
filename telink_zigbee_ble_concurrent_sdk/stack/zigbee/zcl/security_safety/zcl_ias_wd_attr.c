@@ -53,8 +53,8 @@ u16 zcl_attr_MaxDuration = 240;
 /* Attribute record list */
 const zclAttrInfo_t iasWD_attrTbl[] =
 {
-	{ ZCL_ATTRID_WD_MAX_DURATION,	   ZCL_DATA_TYPE_UINT16,     ACCESS_CONTROL_READ| ACCESS_CONTROL_WRITE,  (u8*)&zcl_attr_MaxDuration},
-	{ ZCL_ATTRID_GLOBAL_CLUSTER_REVISION, ZCL_DATA_TYPE_UINT16,  ACCESS_CONTROL_READ,  (u8*)&zcl_attr_global_clusterRevision},
+    { ZCL_ATTRID_WD_MAX_DURATION,      ZCL_DATA_TYPE_UINT16,     ACCESS_CONTROL_READ| ACCESS_CONTROL_WRITE,  (u8*)&zcl_attr_MaxDuration},
+    { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION, ZCL_DATA_TYPE_UINT16,  ACCESS_CONTROL_READ,  (u8*)&zcl_attr_global_clusterRevision},
 };
 
 const u8 zcl_iasWD_attrNum = ( sizeof(iasWD_attrTbl) / sizeof(zclAttrInfo_t) );

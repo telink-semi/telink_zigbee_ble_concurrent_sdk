@@ -115,7 +115,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="stack/ble/ble_multi|apps/sampleGW/sampleGatewayMultiBLE.c|apps/sampleGW/sampleGwBLESlave_8258.c|apps/common/main.c|apps/bootLoader|apps/sampleContactSensor|apps/sampleSwitch|apps/sampleLight" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="apps/sampleGW/sampleGatewayMultiBLEController.c|apps/common/hci_transport|stack/ble/ble_multi|apps/sampleGW/sampleGatewayMultiBLE.c|apps/sampleGW/sampleGwBLESlave_8258.c|apps/common/main.c|apps/bootLoader|apps/sampleContactSensor|apps/sampleSwitch|apps/sampleLight" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -259,7 +259,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="apps/sampleLight/sampleLightMultiBLEAdv.c|stack/ble/ble_multi|apps/sampleLight/sampleLightMultiBLE.c|apps/sampleLight/sampleLightBLESlave_8258.c|apps/sampleLight/sampleLightBLEMaster_8258.c|apps/common/main.c|apps/bootLoader|apps/sampleContactSensor|apps/sampleSwitch|apps/sampleGW" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="apps/common/hci_transport|apps/sampleLight/sampleLightMultiBLEAdv.c|stack/ble/ble_multi|apps/sampleLight/sampleLightMultiBLE.c|apps/sampleLight/sampleLightBLESlave_8258.c|apps/sampleLight/sampleLightBLEMaster_8258.c|apps/common/main.c|apps/bootLoader|apps/sampleContactSensor|apps/sampleSwitch|apps/sampleGW" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -401,7 +401,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="apps/sampleSwitch/sampleSwitchMultiBLEAdv.c|stack/ble/ble_multi|apps/sampleSwitch/sampleSwitchMultiBLE.c|apps/sampleSwitch/sampleSwitchBLESlave_8258.c|apps/common/main.c|apps/bootLoader|apps/sampleContactSensor|apps/sampleGW|apps/sampleLight" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="apps/common/hci_transport|apps/sampleSwitch/sampleSwitchMultiBLEAdv.c|stack/ble/ble_multi|apps/sampleSwitch/sampleSwitchMultiBLE.c|apps/sampleSwitch/sampleSwitchBLESlave_8258.c|apps/common/main.c|apps/bootLoader|apps/sampleContactSensor|apps/sampleGW|apps/sampleLight" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -530,7 +530,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="apps/common/main.c|apps/common/zigbee_ble_switch.c|stack|platform/services/irq_handler.c|zigbee|zbhci|apps/sampleLight|apps/common/module_test.c|apps/common/factory_reset.c|apps/sampleContactSensor|apps/sampleSwitch|apps/sampleGW" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="apps/common/hci_transport|apps/common/main.c|apps/common/zigbee_ble_switch.c|stack|platform/services/irq_handler.c|zigbee|zbhci|apps/sampleLight|apps/common/module_test.c|apps/common/factory_reset.c|apps/sampleContactSensor|apps/sampleSwitch|apps/sampleGW" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -675,7 +675,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="apps/sampleLight/sampleLightMultiBLEAdv.c|stack/ble/ble_multi|apps/sampleLight/sampleLightMultiBLE.c|apps/sampleLight/sampleLightBLESlave_8258.c|apps/sampleLight/sampleLightBLEMaster_8258.c|apps/common/main.c|apps/bootLoader|apps/sampleContactSensor|apps/sampleSwitch|apps/sampleGW" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="apps/common/hci_transport|apps/sampleLight/sampleLightMultiBLEAdv.c|stack/ble/ble_multi|apps/sampleLight/sampleLightMultiBLE.c|apps/sampleLight/sampleLightBLESlave_8258.c|apps/sampleLight/sampleLightBLEMaster_8258.c|apps/common/main.c|apps/bootLoader|apps/sampleContactSensor|apps/sampleSwitch|apps/sampleGW" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

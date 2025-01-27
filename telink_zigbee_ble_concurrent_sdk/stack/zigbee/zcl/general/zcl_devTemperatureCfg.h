@@ -53,7 +53,7 @@
 #define ZCL_ATTRID_DEV_TEMP_OVER_TEMP_TOTAL               0x0003
 #define ZCL_ATTRID_DEV_TEMP_ALARM_MASK                    0x0010
 #define ZCL_ATTRID_DEV_TEMP_LOW_THRES                     0x0011
-#define ZCL_ATTRID_DEV_TEMP_HIGH_THRES					  0x0012
+#define ZCL_ATTRID_DEV_TEMP_HIGH_THRES                    0x0012
 #define ZCL_ATTRID_DEV_TEMP_LOW_TRIP                      0x0013
 #define ZCL_ATTRID_DEV_TEMP_HIGH_TRIP                     0x0014
 
@@ -116,4 +116,4 @@ status_t zcl_devTemperatureCfg_register(u8 endpoint, u16 manuCode, u8 attrNum, c
 
 /** @} end of group TELINK_ZIGBEE_STACK */
 
-#endif	/* ZCL_DEV_TEMP_CFG_H */
+#endif  /* ZCL_DEV_TEMP_CFG_H */

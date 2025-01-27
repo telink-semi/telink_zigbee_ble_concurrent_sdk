@@ -38,14 +38,11 @@
  *
  * @return      None
  */
-volatile u8 T_bleCmdDbg[64] = {0};
-int zb_ble_hci_cmd_handler(u16 cmdId, u8 len, u8 * payload){
-	T_bleCmdDbg[0] = len;
-	memcpy((u8*)&T_bleCmdDbg[1], (u8*)&cmdId, 2);
-	memcpy((u8*)&T_bleCmdDbg[3], payload, len);
-#if(ZBHCI_BLE)
-	zbhciCmdHandler(cmdId, (u16)len, payload);
+int zb_ble_hci_cmd_handler(u16 cmdId, u8 len, u8 * payload)
+{
+#if(ZBHCI_BLE) || (ZBHCI_BLE_CONTROLLER)
+    zbhciCmdHandler(cmdId, (u16)len, payload);
 #endif
-	return 0;
+    return 0;
 }
 
