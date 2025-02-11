@@ -1,0 +1,35 @@
+From 5e3aa16f66b3cead45472ec17ec78cbdd88b63c4 Mon Sep 17 00:00:00 2001
+From: "huanli.wang" <huanli.wang@telink-semi.com>
+Date: Tue, 11 Feb 2025 18:46:28 +0800
+Subject: [PATCH] breaking changes(calibration): Modify the judgment logic of
+ frequency_offset-value
+
+---
+ .../proj/drivers/drv_calibration.c                            | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/telink_zigbee_ble_concurrent_sdk/proj/drivers/drv_calibration.c b/telink_zigbee_ble_concurrent_sdk/proj/drivers/drv_calibration.c
+index d5f6aa9..dc957e3 100644
+--- a/telink_zigbee_ble_concurrent_sdk/proj/drivers/drv_calibration.c
++++ b/telink_zigbee_ble_concurrent_sdk/proj/drivers/drv_calibration.c
+@@ -120,7 +120,7 @@ static void drv_calib_freq_offset(void)
+ 
+ 	flash_read(CFG_FREQUENCY_OFFSET, 1, &freq_offset_value);
+ 
+-	if((freq_offset_value != 0xff) && (freq_offset_value <= 63)){
++	if(freq_offset_value != 0xff){
+ 		rf_update_internal_cap(freq_offset_value);
+ 	}
+ }
+@@ -144,7 +144,7 @@ static void drv_calib_freq_offset(void)
+ 
+ 	flash_read(CFG_FREQUENCY_OFFSET, 1, &freq_offset_value);
+ 
+-	if((freq_offset_value != 0xff) && (freq_offset_value <= 63)){
++	if(freq_offset_value != 0xff){
+ 		rf_update_internal_cap(freq_offset_value);
+ 	}
+ }
+-- 
+2.42.0.windows.1
+
