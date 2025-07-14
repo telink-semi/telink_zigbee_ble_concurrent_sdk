@@ -52,11 +52,5 @@ _CODE_ZCL_ status_t zcl_illuminanceMeasure_register(u8 endpoint, u16 manuCode, u
 {
     return zcl_registerCluster(endpoint, ZCL_CLUSTER_MS_ILLUMINANCE_MEASUREMENT, manuCode, attrNum, attrTbl, NULL, cb);
 }
+
 #endif  /* ZCL_ILLUMINANCE_MEASUREMENT */
-
-
-
-
-
-
-

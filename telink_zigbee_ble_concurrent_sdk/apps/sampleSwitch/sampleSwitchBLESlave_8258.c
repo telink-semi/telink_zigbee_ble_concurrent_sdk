@@ -45,6 +45,9 @@
 #define TX_FIFO_SIZE                       40
 #define TX_FIFO_NUM                        16
 
+static u16 g_appBleInterval = CONN_INTERVAL_50MS;
+static u16 g_appBleLatency = 19;
+
 typedef enum {
     ATT_H_START = 0,
 
@@ -339,11 +342,6 @@ void ble_exception_data_abandom(u8 e,u8 *p, int n)
     T_bleDataAbandom++;
 }
 
-_attribute_ram_code_ void   user_set_rf_power (u8 e, u8 *p, int n)
-{
-    rf_set_power_level_index (g_ble_txPowerSet);
-}
-
 _attribute_ram_code_ void   app_exitSuspendCb (u8 e, u8 *p, int n)
 {
     rf_set_power_level_index (g_ble_txPowerSet);
@@ -351,15 +349,13 @@ _attribute_ram_code_ void   app_exitSuspendCb (u8 e, u8 *p, int n)
     secondClockRun();
 }
 
-
 void task_connect (u8 e, u8 *p, int n)
 {
     /* interval:    n*1.25 ms
      * lantency:    (n+1)*8*1.25 ms
      * timeout:     n*10 ms
      * */
-    bls_l2cap_requestConnParamUpdate (8, 8, 99, 400);
-    //bls_l2cap_requestConnParamUpdate (160, 160, 0, 3200);  // 200 mS
+    bls_l2cap_requestConnParamUpdate(g_appBleInterval, g_appBleInterval, g_appBleLatency, 400);
 
     latest_user_event_tick = clock_time();
 
@@ -513,7 +509,6 @@ void user_ble_normal_init(void)
 
     ////// Host Initialization  //////////
     blc_gap_peripheral_init();    //gap initialization
-    extern void my_att_init ();
     my_att_init (); //gatt initialization
     blc_l2cap_register_handler (blc_l2cap_packet_receive);      //l2cap initialization
 
@@ -577,7 +572,7 @@ void user_ble_normal_init(void)
 
 
     //set rf power index, user must set it after every suspend wakeup, cause relative setting will be reset in suspend
-    user_set_rf_power(0, 0, 0);
+    rf_set_power_level_index (g_ble_txPowerSet);
     bls_app_registerEventCallback (BLT_EV_FLAG_SUSPEND_EXIT, &app_exitSuspendCb);
 
     //ble event call back

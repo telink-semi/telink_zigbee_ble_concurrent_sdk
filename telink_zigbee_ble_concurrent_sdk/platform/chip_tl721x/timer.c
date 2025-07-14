@@ -234,3 +234,78 @@ void timer_set_rx_dma_add_list_element(timer_type_e type, dma_chn_e chn, dma_cha
     config_addr->dma_chain_data_len = dma_cal_size(data_len, DMA_WORD_WIDTH);
     config_addr->dma_chain_llp_ptr  = (unsigned int)(llpoint);
 }
+
+/*
+ * @brief     This function set timer input capture mode.
+ * @param[in] capt_mode  - timer input capture mode.
+ * @return    none.
+ */
+void timer_set_input_capture_mode(timer_type_e type, timer_capt_mode_e capt_mode, gpio_pin_e pin)
+{
+    gpio_function_en(pin);
+    gpio_output_dis(pin); //disable output
+    gpio_input_en(pin);   //enable input
+    switch(type)
+        {
+            case TIMER0:
+                reg_tmr_sta1 = FLD_TMR0_CAPT_IRQ;//clear irq status
+                reg_tmr_ctrl0 &= (~FLD_TMR0_MODE);
+                reg_tmr_ctrl1 &= (~FLD_TMR0_CAPT_MODE);
+                reg_tmr_ctrl1 |= capt_mode;
+
+                gpio_gpio2risc0_irq_en(pin);
+                BM_SET(reg_gpio_irq_ctrl, FLD_GPIO_IRQ_LVL_GPIO2RISC0);
+                reg_gpio_irq_clr = FLD_GPIO_IRQ_GPIO2RISC0_CLR;//must clear cause to unexpected interrupt.
+                gpio_set_irq_mask(GPIO_IRQ_MASK_GPIO2RISC0);//the mask of gpio2risc0 needs to be turned on for the signal to go from gpio to timer0
+
+                break;
+            case TIMER1:
+                reg_tmr_sta1 = FLD_TMR1_CAPT_IRQ;//clear irq status
+                reg_tmr_ctrl0 &= (~FLD_TMR1_MODE);
+                reg_tmr_ctrl1 &= (~FLD_TMR1_CAPT_MODE);
+                reg_tmr_ctrl1 |= capt_mode<<4;
+
+                gpio_gpio2risc1_irq_en(pin);
+                BM_SET(reg_gpio_irq_ctrl, FLD_GPIO_IRQ_LVL_GPIO2RISC1);
+                reg_gpio_irq_clr =FLD_GPIO_IRQ_GPIO2RISC1_CLR;//must clear cause to unexpected interrupt.
+                gpio_set_irq_mask(GPIO_IRQ_MASK_GPIO2RISC1);//the mask of gpio2risc1 needs to be turned on for the signal to go from gpio to timer1
+
+                break;
+            default:
+                break;
+        }
+    timer_input_capture_en(type);
+}
+
+/*
+ * @brief     This function is used to reset the tick value to 0 when it is equal to the preset capture tick value or when a capture is triggered.
+ * @param[in] type - TIMER0 or TIMER1.
+ * @param[in] reset - 1: reset the tick  0: do not reset the tick
+ * @return    none.
+ */
+void timer_reset_tick(timer_type_e type, unsigned char reset)
+{
+  unsigned char mask = 0;
+
+  switch(type) {
+    case TIMER0:
+      mask = FLD_TMR0_NOWRAP;
+      break;
+    case TIMER1:
+      mask = FLD_TMR1_NOWRAP;
+      break;
+    default:
+      break;
+  }
+
+  if(mask != 0)
+  {
+      if(reset != 0) {
+        BM_CLR(reg_tmr_ctrl0, mask);
+      } else {
+        BM_SET(reg_tmr_ctrl0, mask);
+      }
+  }
+
+}
+

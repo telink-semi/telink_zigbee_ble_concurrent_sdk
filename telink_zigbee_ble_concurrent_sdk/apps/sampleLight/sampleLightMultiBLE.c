@@ -30,11 +30,11 @@
 
 #include "stack/ble/ble_multi/controller/ll/adv/leg_adv.h"
 
-_attribute_ble_data_retention_      int central_smp_pending = 0;        // SMP: security & encryption;
+_attribute_ble_data_retention_  int central_smp_pending = 0;        // SMP: security & encryption;
 _attribute_data_retention_  unsigned int  tlk_flash_mid = 0;
 _attribute_data_retention_  unsigned int  tlk_flash_vendor = 0;
 _attribute_data_retention_  unsigned char tlk_flash_capacity;
-
+_attribute_data_retention_ u32 flash_sector_mac_address = FLASH_ADDR_OF_MAC_ADDR_2M;
 
 
 /********************* ACL connection LinkLayer TX & RX data FIFO allocation, Begin ************************************************/
@@ -46,7 +46,6 @@ _attribute_data_retention_  unsigned char tlk_flash_capacity;
  * 2. for CIS peripheral, receive ll_cis_req(36Byte), must be equal to or greater than 36
  */
 #define ACL_CONN_MAX_RX_OCTETS          27  //user set value
-
 
 /**
  * @brief   connMaxTxOctets
@@ -63,7 +62,6 @@ _attribute_data_retention_  unsigned char tlk_flash_capacity;
 #define ACL_PERIPHR_MAX_TX_OCTETS       27  //user set value
 
 
-
 /**
  * @brief   ACL RX buffer size & number
  *          ACL RX buffer is shared by all connections to hold LinkLayer RF RX data.
@@ -76,7 +74,6 @@ _attribute_data_retention_  unsigned char tlk_flash_capacity;
  */
 #define ACL_RX_FIFO_SIZE                CAL_LL_ACL_RX_FIFO_SIZE(ACL_CONN_MAX_RX_OCTETS)  //user can not change !!!
 #define ACL_RX_FIFO_NUM                 8   //user set value
-
 
 /**
  * @brief   ACL TX buffer size & number
@@ -103,9 +100,6 @@ _attribute_data_retention_  unsigned char tlk_flash_capacity;
 /******************** ACL connection LinkLayer TX & RX data FIFO allocation, End ***************************************************/
 
 
-
-
-
 /***************** ACL connection L2CAP RX & TX data Buffer allocation, Begin **************************************/
 /**
  * @brief   RX MTU size & L2CAP buffer size
@@ -122,7 +116,6 @@ _attribute_data_retention_  unsigned char tlk_flash_capacity;
  */
 #define CENTRAL_ATT_RX_MTU              23  //user set value
 #define PERIPHR_ATT_RX_MTU              23  //user set value
-
 
 #define CENTRAL_L2CAP_BUFF_SIZE         CAL_L2CAP_BUFF_SIZE(CENTRAL_ATT_RX_MTU) //user can not change !!!
 #define PERIPHR_L2CAP_BUFF_SIZE         CAL_L2CAP_BUFF_SIZE(PERIPHR_ATT_RX_MTU) //user can not change !!!
@@ -172,7 +165,6 @@ _attribute_ble_data_retention_  u8 app_cen_l2cap_rx_buf[ACL_CENTRAL_MAX_NUM * CE
  */
 _attribute_ble_data_retention_  u8 app_per_l2cap_rx_buf[ACL_PERIPHR_MAX_NUM * PERIPHR_L2CAP_BUFF_SIZE];
 
-
 /**
  * @brief   L2CAP TX Data buffer for ACL Peripheral
  *          GATT server on ACL Peripheral use this buffer.
@@ -187,8 +179,7 @@ static u16 g_bleSlaveConnHandle = 0;
 /***************** ACL connection L2CAP RX & TX data Buffer allocation, End ****************************************/
 
 
-typedef enum
-{
+typedef enum {
     ATT_H_START = 0,
 
 
@@ -250,10 +241,11 @@ typedef enum
 
     ATT_END_H,
 
-}ATT_HANDLE;
+} ATT_HANDLE;
 
 
-typedef struct{
+typedef struct __attribute__((packed))
+{
     u8  type;
     u8  rf_len;
     u16 l2capLen;
@@ -261,11 +253,10 @@ typedef struct{
     u8  opcode;
     u16 handle;
     u8 value;
-}ble_rf_packet_att_write_t;
+} ble_rf_packet_att_write_t;
 
 ////////////////////////////////////////// peripheral-role ATT service concerned ///////////////////////////////////////////////
-typedef struct
-{
+typedef struct {
   /** Minimum value for the connection event (interval. 0x0006 - 0x0C80 * 1.25 ms) */
   u16 intervalMin;
   /** Maximum value for the connection event (interval. 0x0006 - 0x0C80 * 1.25 ms) */
@@ -317,44 +308,35 @@ static const u8 my_devName[] = {'m','u','l','t','i','-','-','l','i','g','h','t'}
 static const u8 my_PnPtrs [] = {0x02, 0x8a, 0x24, 0x66, 0x82, 0x01, 0x00};
 
 //////////////////////// Battery /////////////////////////////////////////////////
-static const u16 my_batServiceUUID        = SERVICE_UUID_BATTERY;
-static const u16 my_batCharUUID           = CHARACTERISTIC_UUID_BATTERY_LEVEL;
+static const u16 my_batServiceUUID = SERVICE_UUID_BATTERY;
+static const u16 my_batCharUUID = CHARACTERISTIC_UUID_BATTERY_LEVEL;
 _attribute_ble_data_retention_  static u8 batteryValueInCCC[2] = {0,0};
 _attribute_ble_data_retention_  static u8 my_batVal[1]  = {99};
 
 
 //////////////////////// OTA //////////////////////////////////
-static const  u8 my_OtaServiceUUID[16]              = WRAPPING_BRACES(TELINK_OTA_UUID_SERVICE);
-static const  u8 my_OtaUUID[16]                     = WRAPPING_BRACES(TELINK_SPP_DATA_OTA);
-_attribute_ble_data_retention_  static        u8 my_OtaData                         = 0x00;
-_attribute_ble_data_retention_  static        u8 my_OtaDataCCC[2] = {0,0};
-static const u8  my_OtaName[] = {'O', 'T', 'A'};
-
-
-// Include attribute (Battery service)
-//static const u16 include[3] = {BATT_PS_H, BATT_LEVEL_INPUT_CCB_H, SERVICE_UUID_BATTERY};
-
-
+static const u8 my_OtaServiceUUID[16] = WRAPPING_BRACES(TELINK_OTA_UUID_SERVICE);
+static const u8 my_OtaUUID[16] = WRAPPING_BRACES(TELINK_SPP_DATA_OTA);
+_attribute_ble_data_retention_  static u8 my_OtaData                         = 0x00;
+_attribute_ble_data_retention_  static u8 my_OtaDataCCC[2] = {0,0};
+static const u8 my_OtaName[] = {'O', 'T', 'A'};
 
 ////////////////////// SPP ////////////////////////////////////
-static const u8 TelinkSppServiceUUID[16]                = WRAPPING_BRACES(TELINK_SPP_UUID_SERVICE);
-static const u8 TelinkSppDataServer2ClientUUID[16]      = WRAPPING_BRACES(TELINK_SPP_DATA_SERVER2CLIENT);
-static const u8 TelinkSppDataClient2ServerUUID[16]      = WRAPPING_BRACES(TELINK_SPP_DATA_CLIENT2SERVER);
-
+static const u8 TelinkSppServiceUUID[16] = WRAPPING_BRACES(TELINK_SPP_UUID_SERVICE);
+static const u8 TelinkSppDataServer2ClientUUID[16] = WRAPPING_BRACES(TELINK_SPP_DATA_SERVER2CLIENT);
+static const u8 TelinkSppDataClient2ServerUUID[16] = WRAPPING_BRACES(TELINK_SPP_DATA_CLIENT2SERVER);
 
 // Spp data from Server to Client characteristic variables
-_attribute_ble_data_retention_  static u8 SppDataServer2ClientDataCCC[2]                = {0};
+_attribute_ble_data_retention_  static u8 SppDataServer2ClientDataCCC[2] = {0};
 //this array will not used for sending data(directly calling HandleValueNotify API), so cut array length from 20 to 1, saving some SRAM
-_attribute_ble_data_retention_  static u8 SppDataServer2ClientData[1]                   = {0};  //SppDataServer2ClientData[20]
+_attribute_ble_data_retention_  static u8 SppDataServer2ClientData[1] = {0};  //SppDataServer2ClientData[20]
 // Spp data from Client to Server characteristic variables
 //this array will not used for receiving data(data processed by Attribute Write CallBack function), so cut array length from 20 to 1, saving some SRAM
-_attribute_ble_data_retention_  static u8 SppDataClient2ServerData[1]                   = {0};  //SppDataClient2ServerData[20]
-
+_attribute_ble_data_retention_  static u8 SppDataClient2ServerData[1] = {0};  //SppDataClient2ServerData[20]
 
 //SPP data descriptor
-static const u8 TelinkSPPS2CDescriptor[]                = "Telink SPP: Module->Phone";
-static const u8 TelinkSPPC2SDescriptor[]                = "Telink SPP: Phone->Module";
-
+static const u8 TelinkSPPS2CDescriptor[] = "Telink SPP: Module->Phone";
+static const u8 TelinkSPPC2SDescriptor[] = "Telink SPP: Phone->Module";
 
 //// GAP attribute values
 static const u8 my_devNameCharVal[5] = {
@@ -373,14 +355,12 @@ static const u8 my_periConnParamCharVal[5] = {
     U16_LO(GATT_UUID_PERI_CONN_PARAM), U16_HI(GATT_UUID_PERI_CONN_PARAM)
 };
 
-
 //// GATT attribute values
 static const u8 my_serviceChangeCharVal[5] = {
     CHAR_PROP_INDICATE,
     U16_LO(GenericAttribute_ServiceChanged_DP_H), U16_HI(GenericAttribute_ServiceChanged_DP_H),
     U16_LO(GATT_UUID_SERVICE_CHANGE), U16_HI(GATT_UUID_SERVICE_CHANGE)
 };
-
 
 //// device Information  attribute values
 static const u8 my_PnCharVal[5] = {
@@ -416,7 +396,6 @@ static const u8 my_OtaCharVal[19] = {
     TELINK_SPP_DATA_OTA,
 };
 
-
 int spp_onReceiveData(u16 connHandle, ble_rf_packet_att_write_t *p)
 {
     (void)connHandle; //unused, remove warning
@@ -425,8 +404,8 @@ int spp_onReceiveData(u16 connHandle, ble_rf_packet_att_write_t *p)
     return 0;
 }
 
-
-int app_bleOtaWrite(u16 connHandle, void *p){
+int app_bleOtaWrite(u16 connHandle, void *p)
+{
     rf_packet_att_data_t *req = (rf_packet_att_data_t*)p;
     u8 len = req->rf_len - 9;
     u16 cmd_type =  req->dat[0] ;
@@ -438,7 +417,8 @@ int app_bleOtaWrite(u16 connHandle, void *p){
     return 0;
 }
 
-int app_bleOtaRead(u16 connHandle, void *p){
+int app_bleOtaRead(u16 connHandle, void *p)
+{
     my_OtaData++;  //for testing, user can fill the valid data here
     return 0;
 }
@@ -464,14 +444,11 @@ void app_enter_ota_mode(void)
  */
 void app_ota_result(int result)
 {
+    if (result == OTA_SUCCESS) {  //led for debug: OTA success
 
-    if(result == OTA_SUCCESS){  //led for debug: OTA success
-
-    }
-    else{  //OTA fail
+    } else {  //OTA fail
 
     }
-
 #if FLASH_PROTECT_ENABLE
     flash_lock();
 #endif
@@ -482,7 +459,6 @@ void app_ota_result(int result)
 static const attribute_t my_Attributes[] = {
 
     {ATT_END_H - 1, 0 , 0, 0, NULL, NULL, NULL, NULL},  // total num of attribute
-
 
     // 0001 - 0007  gap
     {7,ATT_PERMISSIONS_READ,2,2,(u8*)(size_t)(&my_primaryServiceUUID),  (u8*)(size_t)(&my_gapServiceUUID), 0, 0},
@@ -535,7 +511,6 @@ static const attribute_t my_Attributes[] = {
 #endif
     {0,ATT_PERMISSIONS_RDWR,2,sizeof(my_OtaDataCCC),(u8*)(size_t)(&clientCharacterCfgUUID),     (u8*)(my_OtaDataCCC), 0, 0},    //value
     {0,ATT_PERMISSIONS_READ, 2,sizeof (my_OtaName),(u8*)(size_t)(&userdesc_UUID), (u8*)(size_t)(my_OtaName), 0, 0},
-
 };
 
 /**
@@ -544,12 +519,10 @@ static const attribute_t my_Attributes[] = {
  * @param   none.
  * @return  none.
  */
-void    my_gatt_init (void)
+void my_gatt_init (void)
 {
     bls_att_setAttributeTable ((u8 *)(size_t)my_Attributes);
 }
-
-
 
 /**
  * @brief   BLE Advertising data
@@ -587,7 +560,7 @@ int app_le_adv_report_event_handle(u8 *p)
 
     #if 0  //debug, print ADV report number every 5 seconds
         AA_dbg_adv_rpt ++;
-        if(clock_time_exceed(tick_adv_rpt, 5000000)){
+        if (clock_time_exceed(tick_adv_rpt, 5000000)) {
             tlkapi_send_string_data(APP_CONTR_EVT_LOG_EN, "[APP][EVT] Adv report", pa->mac, 6);
             tick_adv_rpt = clock_time();
         }
@@ -595,7 +568,7 @@ int app_le_adv_report_event_handle(u8 *p)
 
     /*********************** Central Create connection demo: Key press or ADV pair packet triggers pair  ********************/
     #if (ACL_CENTRAL_SMP_ENABLE)
-        if(central_smp_pending){     //if previous connection SMP not finish, can not create a new connection
+        if (central_smp_pending) {     //if previous connection SMP not finish, can not create a new connection
             return 1;
         }
     #endif
@@ -610,7 +583,7 @@ int app_le_adv_report_event_handle(u8 *p)
         central_auto_connect = blc_smp_searchBondingPeripheralDevice_by_PeerMacAddress(pa->adr_type, pa->mac);
     #endif
 
-    if(central_auto_connect || user_manual_pairing){
+    if (central_auto_connect || user_manual_pairing) {
 
         /* send create connection command to Controller, trigger it switch to initiating state. After this command, Controller
          * will scan all the ADV packets it received but not report to host, to find the specified device(mac_adr_type & mac_adr),
@@ -622,23 +595,23 @@ int app_le_adv_report_event_handle(u8 *p)
                                  0, 0xFFFF);
 
 
-        if(status == BLE_SUCCESS){ //create connection success
+        if (status == BLE_SUCCESS) { //create connection success
             tlkapi_send_string_data(APP_LOG_EN, "[APP][CMD] create connection success", pa->mac, 6);
         }
     }
     /*********************** Central Create connection demo code end  *******************************************************/
-
-
     return 0;
 }
 
-static s32 app_bleIntervalChange(void *arg){
+static s32 app_bleIntervalChange(void *arg)
+{
     bls_l2cap_requestConnParamUpdate (g_bleSlaveConnHandle, g_appBleInterval, g_appBleInterval, g_appBleLatency, 400);  // 1 S
 
     return -1;
 }
 
-void app_bleConnIntervalSet(u8 interval, u16 latency){
+void app_bleConnIntervalSet(u8 interval, u16 latency)
+{
     g_appBleInterval = interval;
     g_appBleLatency  = latency;
 
@@ -654,17 +627,16 @@ int app_le_connection_complete_event_handle(u8 *p)
 {
     hci_le_connectionCompleteEvt_t *pConnEvt = (hci_le_connectionCompleteEvt_t *)p;
 
-    if(pConnEvt->status == BLE_SUCCESS){
+    if (pConnEvt->status == BLE_SUCCESS) {
 
         dev_char_info_insert_by_conn_event(pConnEvt);
 
-        if(pConnEvt->role == ACL_ROLE_CENTRAL) // central role, process SMP and SDP if necessary
-        {
+        if (pConnEvt->role == ACL_ROLE_CENTRAL) { // central role, process SMP and SDP if necessary
             #if (ACL_CENTRAL_SMP_ENABLE)
                 central_smp_pending = pConnEvt->connHandle; // this connection need SMP
             #endif
 
-        }else{
+        } else {
             g_bleSlaveConnHandle = pConnEvt->connHandle;
             bls_l2cap_requestConnParamUpdate(pConnEvt->connHandle, g_appBleInterval, g_appBleInterval, g_appBleLatency, CONN_TIMEOUT_4S);        // 1 second
         }
@@ -673,14 +645,12 @@ int app_le_connection_complete_event_handle(u8 *p)
     return 0;
 }
 
-
-
 /**
  * @brief      BLE Disconnection event handler
  * @param[in]  p         Pointer point to event parameter buffer.
  * @return
  */
-int     app_disconnect_event_handle(u8 *p)
+int app_disconnect_event_handle(u8 *p)
 {
     hci_disconnectionCompleteEvt_t  *pDisConn = (hci_disconnectionCompleteEvt_t *)p;
 
@@ -688,37 +658,27 @@ int     app_disconnect_event_handle(u8 *p)
 
     g_bleSlaveConnHandle = 0;
     //terminate reason
-    if(pDisConn->reason == HCI_ERR_CONN_TIMEOUT){   //connection timeout
+    if (pDisConn->reason == HCI_ERR_CONN_TIMEOUT) {   //connection timeout
 
-    }
-    else if(pDisConn->reason == HCI_ERR_REMOTE_USER_TERM_CONN){     //peer device send terminate command on link layer
+    } else if (pDisConn->reason == HCI_ERR_REMOTE_USER_TERM_CONN) {     //peer device send terminate command on link layer
 
-    }
-    else if(pDisConn->reason == HCI_ERR_CONN_TERM_BY_LOCAL_HOST){
+    } else if (pDisConn->reason == HCI_ERR_CONN_TERM_BY_LOCAL_HOST) {
 
-    }
-    else{
+    } else {
 
     }
 
 
     /* if previous connection SMP & SDP not finished, clear flag */
     #if (ACL_CENTRAL_SMP_ENABLE)
-        if(central_smp_pending == pDisConn->connHandle){
+        if (central_smp_pending == pDisConn->connHandle) {
             central_smp_pending = 0;
         }
     #endif
 
-//  if(central_disconnect_connhandle == pDisConn->connHandle){  //un_pair disconnection flow finish, clear flag
-//      central_disconnect_connhandle = 0;
-//  }
-
     dev_char_info_delete_by_connhandle(pDisConn->connHandle);
-
-
     return 0;
 }
-
 
 /**
  * @brief      BLE Connection update complete event handler
@@ -730,7 +690,7 @@ int app_le_connection_update_complete_event_handle(u8 *p)
     hci_le_connectionUpdateCompleteEvt_t *pUpt = (hci_le_connectionUpdateCompleteEvt_t *)p;
     tlkapi_send_string_data(APP_CONTR_EVT_LOG_EN, "[APP][EVT] Connection Update Event", &pUpt->connHandle, 8);
 
-    if(pUpt->status == BLE_SUCCESS){
+    if (pUpt->status == BLE_SUCCESS) {
 
     }
 
@@ -751,42 +711,31 @@ int app_controller_event_callback (u32 h, u8 *p, int n)
 {
     (void)n; //unused, remove warning
 
-    if (h &HCI_FLAG_EVENT_BT_STD)       //Controller HCI event
-    {
+    if (h & HCI_FLAG_EVENT_BT_STD) {       //Controller HCI event
         u8 evtCode = h & 0xff;
 
         //------------ disconnect -------------------------------------
-        if(evtCode == HCI_EVT_DISCONNECTION_COMPLETE)  //connection terminate
-        {
+        if(evtCode == HCI_EVT_DISCONNECTION_COMPLETE) {  //connection terminate
             app_disconnect_event_handle(p);
-        }
-        else if(evtCode == HCI_EVT_LE_META)  //LE Event
-        {
+        } else if (evtCode == HCI_EVT_LE_META) { //LE Event
             u8 subEvt_code = p[0];
 
             //------hci le event: le connection complete event---------------------------------
-            if (subEvt_code == HCI_SUB_EVT_LE_CONNECTION_COMPLETE)  // connection complete
-            {
+            if (subEvt_code == HCI_SUB_EVT_LE_CONNECTION_COMPLETE) { // connection complete
+
                 app_le_connection_complete_event_handle(p);
-            }
-            //--------hci le event: le adv report event ----------------------------------------
-            else if (subEvt_code == HCI_SUB_EVT_LE_ADVERTISING_REPORT)  // ADV packet
-            {
+            } else if (subEvt_code == HCI_SUB_EVT_LE_ADVERTISING_REPORT) { // ADV packet
                 //after controller is set to scan state, it will report all the adv packet it received by this event
 
                 app_le_adv_report_event_handle(p);
-            }
+            } else if (subEvt_code == HCI_SUB_EVT_LE_CONNECTION_UPDATE_COMPLETE)  { // connection update
             //------hci le event: le connection update complete event-------------------------------
-            else if (subEvt_code == HCI_SUB_EVT_LE_CONNECTION_UPDATE_COMPLETE)  // connection update
-            {
                 app_le_connection_update_complete_event_handle(p);
             }
         }
     }
 
-
     return 0;
-
 }
 
 
@@ -803,8 +752,7 @@ int app_host_event_callback (u32 h, u8 *para, int n)
 
     u8 event = h & 0xFF;
 
-    switch(event)
-    {
+    switch(event) {
         case GAP_EVT_SMP_PAIRING_BEGIN:
         {
 
@@ -822,8 +770,8 @@ int app_host_event_callback (u32 h, u8 *para, int n)
             #if (ACL_CENTRAL_SMP_ENABLE)
                 gap_smp_pairingFailEvt_t *pEvt = (gap_smp_pairingFailEvt_t *)para;
 
-                if( dev_char_get_conn_role_by_connhandle(pEvt->connHandle) == ACL_ROLE_CENTRAL){
-                    if(central_smp_pending == pEvt->connHandle){
+                if (dev_char_get_conn_role_by_connhandle(pEvt->connHandle) == ACL_ROLE_CENTRAL) {
+                    if (central_smp_pending == pEvt->connHandle) {
                         central_smp_pending = 0;
                         tlkapi_send_string_data(APP_SMP_LOG_EN, "[APP][SMP] paring fail", &pEvt->connHandle, sizeof(gap_smp_pairingFailEvt_t));
                     }
@@ -844,11 +792,11 @@ int app_host_event_callback (u32 h, u8 *para, int n)
             gap_smp_connEncDoneEvt_t* pEvt = (gap_smp_connEncDoneEvt_t*)para;
             tlkapi_send_string_data(APP_SMP_LOG_EN, "[APP][SMP] Security process done event", &pEvt->connHandle, sizeof(gap_smp_connEncDoneEvt_t));
 
-            if( dev_char_get_conn_role_by_connhandle(pEvt->connHandle) == ACL_ROLE_CENTRAL){
+            if (dev_char_get_conn_role_by_connhandle(pEvt->connHandle) == ACL_ROLE_CENTRAL) {
 
                 #if (ACL_CENTRAL_SMP_ENABLE)
-                    if( dev_char_get_conn_role_by_connhandle(pEvt->connHandle) == ACL_ROLE_CENTRAL){
-                        if(central_smp_pending == pEvt->connHandle){
+                    if (dev_char_get_conn_role_by_connhandle(pEvt->connHandle) == ACL_ROLE_CENTRAL) {
+                        if (central_smp_pending == pEvt->connHandle) {
                             central_smp_pending = 0;
                         }
                     }
@@ -903,8 +851,6 @@ int app_host_event_callback (u32 h, u8 *para, int n)
     return 0;
 }
 
-
-
 #define         HID_HANDLE_CONSUME_REPORT           25
 #define         HID_HANDLE_KEYBOARD_REPORT          29
 #define         AUDIO_HANDLE_MIC                    52
@@ -918,29 +864,23 @@ int app_host_event_callback (u32 h, u8 *para, int n)
  */
 int app_gatt_data_handler (u16 connHandle, u8 *pkt)
 {
-    if( dev_char_get_conn_role_by_connhandle(connHandle) == ACL_ROLE_CENTRAL )   //GATT data for Central
-    {
+    if (dev_char_get_conn_role_by_connhandle(connHandle) == ACL_ROLE_CENTRAL ) {  //GATT data for Central
         rf_packet_att_t *pAtt = (rf_packet_att_t*)pkt;
 
         //so any ATT data before service discovery will be dropped
         dev_char_info_t* dev_info = dev_char_info_search_by_connhandle (connHandle);
-        if(dev_info)
-        {
+        if (dev_info) {
             //-------   user process ------------------------------------------------
 //          u16 attHandle = pAtt->handle;
+            if (pAtt->opcode == ATT_OP_HANDLE_VALUE_NOTI) {
 
-            if(pAtt->opcode == ATT_OP_HANDLE_VALUE_NOTI)
-            {
-
-            }
-            else if (pAtt->opcode == ATT_OP_HANDLE_VALUE_IND)
-            {
+            } else if (pAtt->opcode == ATT_OP_HANDLE_VALUE_IND) {
 
             }
         }
 
-        if(!(pAtt->opcode & 0x01)){
-            switch(pAtt->opcode){
+        if (!(pAtt->opcode & 0x01)) {
+            switch (pAtt->opcode) {
                 case ATT_OP_FIND_INFO_REQ:
                 case ATT_OP_FIND_BY_TYPE_VALUE_REQ:
                 case ATT_OP_READ_BY_TYPE_REQ:
@@ -964,26 +904,12 @@ int app_gatt_data_handler (u16 connHandle, u8 *pkt)
                     break;
             }
         }
-    }
-    else{   //GATT data for Peripheral
-
+    } else {   //GATT data for Peripheral
 
     }
-
-
     return 0;
 }
 
-/*
- *B91:  VVWWXX 775FD8 YYZZ
- *B92:  VVWWXX B4CF3C YYZZ
-
- * public_mac:
- *              B91 : VVWWXX 775FD8
- *              B92 : VVWWXX B4CF3C
- *
- * random_static_mac: VVWWXXYYZZ C0
- */
 /**
  * @brief       This function is used to initialize the MAC address
  * @param[in]   flash_addr - flash address for MAC address
@@ -991,63 +917,62 @@ int app_gatt_data_handler (u16 connHandle, u8 *pkt)
  * @param[in]   mac_random_static - random static MAC address
  * @return      none
  */
-_attribute_no_inline_
-void blc_initMacAddress(int flash_addr, u8 *mac_public, u8 *mac_random_static)
+_attribute_no_inline_ void blc_initMacAddress(int flash_addr, u8 *mac_public, u8 *mac_random_static)
 {
+	flash_sector_mac_address = flash_addr;
+
     int rand_mac_byte3_4_read_OK = 0;
-    u8 mac_read[8];
+    u8  mac_read[8];
     flash_read_page(flash_addr, 8, mac_read);
 
     u8 value_rand[5];
     generateRandomNum(5, value_rand);
 
     u8 ff_six_byte[6] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
-    if ( memcmp(mac_read, ff_six_byte, 6) ) { //read MAC address on flash success
-        memcpy(mac_public, mac_read, 6);  //copy public address from flash
+    if (memcmp(mac_read, ff_six_byte, 6)) { //read MAC address on flash success
+        memcpy(mac_public, mac_read, 6);    //copy public address from flash
 
-        if(mac_read[6] != 0xFF && mac_read[7] != 0xFF){
-            mac_random_static[3] = mac_read[6];
-            mac_random_static[4] = mac_read[7];
+        if (mac_read[6] != 0xFF && mac_read[7] != 0xFF) {
+            mac_random_static[3]     = mac_read[6];
+            mac_random_static[4]     = mac_read[7];
             rand_mac_byte3_4_read_OK = 1;
         }
+    } else {                                       //no MAC address on flash
+
+#if (BUILT_IN_MAC_ON_DEVICE)
+        if (get_device_mac_address(mac_read, 8)) { //read device MAC address
+            memcpy(mac_public, mac_read, 6);       //copy public address from device
+
+            mac_random_static[3]     = mac_read[6];
+            mac_random_static[4]     = mac_read[7];
+            rand_mac_byte3_4_read_OK = 1;
+        } else
+#endif
+        {
+            mac_public[0] = value_rand[0];
+            mac_public[1] = value_rand[1];
+            mac_public[2] = value_rand[2];
+
+            /* company id */
+            mac_public[3] = U32_BYTE0(PDA_COMPANY_ID);
+            mac_public[4] = U32_BYTE1(PDA_COMPANY_ID);
+            mac_public[5] = U32_BYTE2(PDA_COMPANY_ID);
+
+            flash_write_page(flash_addr, 6, mac_public); //store public address on flash for future use
+        }
     }
-    else{  //no MAC address on flash
 
-        #if (BUILT_IN_MAC_ON_EFUSE)
-            if(efuse_get_mac_address(mac_read, 8)) //read MAC address on Efuse success
-            {
-                memcpy(mac_public, mac_read, 6);  //copy public address from Efuse
-
-                mac_random_static[3] = mac_read[6];
-                mac_random_static[4] = mac_read[7];
-                rand_mac_byte3_4_read_OK = 1;
-            }
-            else
-        #endif
-            {
-                mac_public[0] = value_rand[0];
-                mac_public[1] = value_rand[1];
-                mac_public[2] = value_rand[2];
-
-                /* company id */
-                mac_public[3] = U32_BYTE0(PDA_COMPANY_ID);
-                mac_public[4] = U32_BYTE1(PDA_COMPANY_ID);
-                mac_public[5] = U32_BYTE2(PDA_COMPANY_ID);
-
-                flash_write_page (flash_addr, 6, mac_public); //store public address on flash for future use
-            }
-    }
 
     mac_random_static[0] = mac_public[0];
     mac_random_static[1] = mac_public[1];
     mac_random_static[2] = mac_public[2];
-    mac_random_static[5] = 0xC0;            //for random static
+    mac_random_static[5] = 0xC0; //for random static
 
-    if(!rand_mac_byte3_4_read_OK){
+    if (!rand_mac_byte3_4_read_OK) {
         mac_random_static[3] = value_rand[3];
         mac_random_static[4] = value_rand[4];
 
-        flash_write_page (flash_addr + 6, 2, (u8 *)(mac_random_static + 3) ); //store random address on flash for future use
+        flash_write_page(flash_addr + 6, 2, (u8 *)(mac_random_static + 3)); //store random address on flash for future use
     }
 }
 
@@ -1073,7 +998,6 @@ void blc_flash_read_mid_get_vendor_set_capacity(void)
 void user_ble_init(void)
 {
 //////////////////////////// BLE stack Initialization  Begin //////////////////////////////////
-
 #if (TLKAPI_DEBUG_ENABLE)
     tlkapi_debug_init();
     blc_debug_enableStackLog(STK_LOG_NONE);
@@ -1089,6 +1013,8 @@ void user_ble_init(void)
     blc_ll_initBasicMCU();
 
     blc_ll_initStandby_module(mac_public);
+
+    blc_ll_setRandomAddr(mac_random_static);
 
     blc_ll_initLegacyAdvertising_module();
 
@@ -1119,11 +1045,7 @@ void user_ble_init(void)
     blc_ll_initAclPeriphrTxFifo(app_acl_per_tx_fifo, ACL_PERIPHR_TX_FIFO_SIZE, ACL_PERIPHR_TX_FIFO_NUM, ACL_PERIPHR_MAX_NUM);
 
     blc_ll_setAclCentralBaseConnectionInterval(CONN_INTERVAL_31P25MS);
-
-
     //////////// LinkLayer Initialization  End /////////////////////////
-
-
 
     //////////// HCI Initialization  Begin /////////////////////////
     blc_hci_registerControllerDataHandler (blc_l2cap_pktHandler);
@@ -1139,7 +1061,6 @@ void user_ble_init(void)
                                     |   HCI_LE_EVT_MASK_CONNECTION_UPDATE_COMPLETE);
 
     //////////// HCI Initialization  End /////////////////////////
-
 
     //////////// Host Initialization  Begin /////////////////////////
     /* Host Initialization */
@@ -1178,7 +1099,6 @@ void user_ble_init(void)
 
     blc_smp_smpParamInit();
 
-
     //host(GAP/SMP/GATT/ATT) event process: register host event callback and set event mask
     blc_gap_registerHostEventHandler( app_host_event_callback );
     blc_gap_setEventMask( GAP_EVT_MASK_SMP_PAIRING_BEGIN            |  \
@@ -1204,11 +1124,7 @@ void user_ble_init(void)
         #endif
     }
 
-
-
 //////////////////////////// BLE stack Initialization  End //////////////////////////////////
-
-
 
 //////////////////////////// User Configuration for BLE application ////////////////////////////
     blc_ll_setAdvData(tbl_advData, sizeof(tbl_advData));
@@ -1245,7 +1161,8 @@ void user_ble_init(void)
     tlkapi_send_string_data(APP_LOG_EN, "[APP][INI] acl connection demo init", 0, 0);
 }
 
-int blt_sdk_main_loop(void){
+int blt_sdk_main_loop(void)
+{
     ////////////////////////////////////// BLE entry /////////////////////////////////
     blc_sdk_main_loop();
 

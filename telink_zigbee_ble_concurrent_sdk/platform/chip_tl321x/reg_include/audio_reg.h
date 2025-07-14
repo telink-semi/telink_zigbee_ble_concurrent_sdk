@@ -21,6 +21,8 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
+#include "chip_config.h"
+#if(COMPATIBLE_WITH_TL321X_AND_TL323X == 0)
 #ifndef AUDIO_REG_H
 #define AUDIO_REG_H
 #include "soc.h"
@@ -949,4 +951,5 @@ enum
  */
 #define reg_step_h_1(i) REG_ADDR8((ASCL1_BASE + 0x07) + (i * 0x08))
 
+#endif
 #endif

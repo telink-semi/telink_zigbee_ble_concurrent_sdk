@@ -53,19 +53,10 @@
 #define		CUST_FIRMWARE_SIGNKEY_ADDR		0x77180
 #endif
 
-
-
-
 //master
 #ifndef		CFG_ADR_PEER
 #define		CFG_ADR_PEER					0x78000
 #endif
-
-
-
-
-
-
 
 
 /*
@@ -79,8 +70,6 @@ static inline void blc_app_setExternalCrystalCapEnable(u8  en)
 
 }
 
-
-
 static inline void blc_app_loadCustomizedParameters(void)
 {
 	 if(!blt_miscParam.ext_cap_en)
@@ -92,12 +81,6 @@ static inline void blc_app_loadCustomizedParameters(void)
 		 }
 	 }
 }
-
-
-
-
-
-
 
 ///////////////////  Feature ////////////////////////////
 

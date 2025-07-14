@@ -22,17 +22,15 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-
 #ifndef ZCL_WINDOW_COVERING_H
 #define ZCL_WINDOW_COVERING_H
-
 
 
 /*********************************************************************
  * CONSTANTS
  */
 /**
- *  @brief  Window covering Attribute IDs
+ *  @brief	Window covering Attribute IDs
  */
 #define ZCL_ATTRID_WINDOW_COVERING_TYPE                 0x0000
 #define ZCL_ATTRID_PHYSICAL_CLOSED_LIMIT_LIFT           0x0001
@@ -57,7 +55,7 @@
 
 
 /**
- *  @brief  Window covering cluster Command IDs
+ *  @brief	Window covering cluster Command IDs
  */
 #define ZCL_CMD_UP_OPEN                                 0x00
 #define ZCL_CMD_DOWN_CLOSE                              0x01
@@ -68,46 +66,43 @@
 #define ZCL_CMD_GO_TO_TILT_PERCENTAGE                   0x08
 
 
-
 /**
  *  @brief  Defined for Go To Lift Value command
  */
-typedef struct{
+typedef struct {
     u16 liftValue;
-}zcl_goToLiftValue_t;
+} zcl_goToLiftValue_t;
 
 /**
  *  @brief  Defined for Go To Lift Percentage command
  */
-typedef struct{
+typedef struct {
     u8 perLiftValue;
-}zcl_goToLiftPer_t;
+} zcl_goToLiftPer_t;
 
 /**
  *  @brief  Defined for Go To Tilt Value command
  */
-typedef struct{
+typedef struct {
     u16 tiltValue;
-}zcl_goToTilttValue_t;
+} zcl_goToTilttValue_t;
 
 /**
  *  @brief  Defined for Go To Tilt Percentage command
  */
-typedef struct{
+typedef struct {
     u8 perTiltValue;
-}zcl_goToTiltPer_t;
-
-
+} zcl_goToTiltPer_t;
 
 /**
  *  @brief  Definition format for window covering command payload
  */
-typedef union{
+typedef union {
     zcl_goToLiftValue_t goToLiftValue;
-    zcl_goToLiftPer_t   goToLiftPer;
+    zcl_goToLiftPer_t goToLiftPer;
     zcl_goToTilttValue_t goToTiltValue;
-    zcl_goToTiltPer_t   goToTiltPer;
-}zcl_winCovering_cmdPayload_t;
+    zcl_goToTiltPer_t goToTiltPer;
+} zcl_winCovering_cmdPayload_t;
 
 
 #if 0
@@ -119,8 +114,8 @@ typedef status_t (*zcl_windowCovering_genCmdCb_t)(apsdeDataInd_t *pInd, u8 cmdId
  *  @brief  Structure definition for commands callBack functions in door lock cluster
  */
 typedef struct {
-    zcl_windowCovering_genCmdCb_t    genCmdCbFunc;
-}zcl_WindowCovering_AppCallbacks_t;
+    zcl_windowCovering_genCmdCb_t genCmdCbFunc;
+} zcl_WindowCovering_AppCallbacks_t;
 
 
 extern u8 zcl_attr_WindowCoveringType;
@@ -135,12 +130,12 @@ extern const u8 zcl_windowCovering_attrNum;
 status_t zcl_windowCovering_register(u8 endpoint, u16 manuCode, u8 attrNum, const zclAttrInfo_t attrTbl[], cluster_forAppCb_t cb);
 
 status_t zcl_windowCovering_upOpen(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo);
-#define zcl_windowCovering_upOpenCmdSend(a,b,c) (zcl_windowCovering_upOpen((a), (b), (c), ZCL_SEQ_NUM))
+#define zcl_windowCovering_upOpenCmdSend(a,b,c)         (zcl_windowCovering_upOpen((a), (b), (c), ZCL_SEQ_NUM))
 
 status_t zcl_windowCovering_downClose(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo);
-#define zcl_windowCovering_downCloseCmdSend(a,b,c)  (zcl_windowCovering_downClose((a), (b), (c), ZCL_SEQ_NUM))
+#define zcl_windowCovering_downCloseCmdSend(a,b,c)      (zcl_windowCovering_downClose((a), (b), (c), ZCL_SEQ_NUM))
 
 status_t zcl_windowCovering_stop(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo);
-#define zcl_windowCovering_stopCmdSend(a,b,c)   (zcl_windowCovering_stop((a), (b), (c), ZCL_SEQ_NUM))
+#define zcl_windowCovering_stopCmdSend(a,b,c)           (zcl_windowCovering_stop((a), (b), (c), ZCL_SEQ_NUM))
 
-#endif  /* ZCL_WINDOW_COVERING_H */
+#endif	/* ZCL_WINDOW_COVERING_H */

@@ -64,6 +64,15 @@ ble_sts_t blc_ll_setExtScanParam(own_addr_type_t ownAddrType, scan_fp_type_t sca
 
 
 /**
+ * @brief
+ * @param num_test[in]   the number of individual tests in the decision instructions.
+ * @param pDec_test[in]  the pointer to the test parameter buffer.
+ * @return
+ */
+ble_sts_t blc_ll_setDecisionInstructCmd(u8 num_test, dec_ins_t* pDec_test);
+
+
+/**
  * @brief      This function is used to enable or disable scanning.
  * @param[in]  extScan_en - 0x00: Scanning disabled; 0x01: Scanning enabled
  * @param[in]  filter_duplicate - Filter_Duplicates

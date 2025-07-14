@@ -22,11 +22,8 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-
 #ifndef ZCL_POWER_CFG_H
 #define ZCL_POWER_CFG_H
-
-
 
 
 #define ZCL_ATTRID_MAINS_VOLTAGE                        0x0000
@@ -54,10 +51,6 @@
 #define ZCL_ATTRID_BATTERY_ALARM_STATE                  0x003E
 
 
-
-
-
 status_t zcl_powerCfg_register(u8 endpoint, u16 manuCode, u8 attrNum, const zclAttrInfo_t attrTbl[], cluster_forAppCb_t cb);
 
-
-#endif  /* ZCL_POWER_CFG_H */
+#endif	/* ZCL_POWER_CFG_H */

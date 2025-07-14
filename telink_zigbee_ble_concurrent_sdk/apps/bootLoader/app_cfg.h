@@ -50,6 +50,9 @@ extern "C" {
 #define BOARD_TL321X_DONGLE                         7
 #define BOARD_TL721X_EVK                            8
 #define BOARD_TL721X_DONGLE                         9
+//Module
+#define BOARD_ML7218D_MERCURY                       10//ML7218D-MERCURY-M0-PE11-V1.3
+#define BOARD_ML7218A_GAIA                          11//ML7218A_GAIA-M0-PE11-V1.3
 
 /* Board define */
 #if defined(MCU_CORE_8258)
@@ -65,7 +68,7 @@ extern "C" {
 #elif defined(MCU_CORE_TL321X)
     #define FLASH_CAP_SIZE_1M                       1
     #define BOARD                                   BOARD_TL321X_DONGLE//BOARD_TL321X_EVK
-    #define CLOCK_SYS_CLOCK_HZ                      96000000
+    #define CLOCK_SYS_CLOCK_HZ                      48000000
 #elif defined(MCU_CORE_TL721X)
     #define FLASH_CAP_SIZE_1M                       1
     #define BOARD                                   BOARD_TL721X_DONGLE//BOARD_TL721X_EVK
@@ -91,6 +94,10 @@ extern "C" {
     #include "board_tl721x_evk.h"
 #elif (BOARD == BOARD_TL721X_DONGLE)
     #include "board_tl721x_dongle.h"
+#elif (BOARD == BOARD_ML7218D_MERCURY)
+    #include "board_ml7218d_mercury.h"
+#elif (BOARD == BOARD_ML7218A_GAIA)
+    #include "board_ml7218a_gaia.h"
 #endif
 
 

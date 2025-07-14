@@ -3,7 +3,7 @@
  *
  * @brief    This is the header file for b91 BLE SDK
  *
- * @author	 BLE GROUP
+ * @author   BLE GROUP
  * @date         12,2021
  *
  * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
@@ -20,12 +20,10 @@
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
  *******************************************************************************************************/
-
 #ifndef LL_WHITELIST_H_
 #define LL_WHITELIST_H_
 
 #include "stack/ble/ble_b91/ble_common.h"
-
 
 /**
  * @brief      reset whitelist
@@ -33,7 +31,6 @@
  * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
 ble_sts_t ll_whiteList_reset(void);
-
 
 /**
  * @brief      add a device form whitelist
@@ -43,7 +40,6 @@ ble_sts_t ll_whiteList_reset(void);
  */
 ble_sts_t ll_whiteList_add(u8 type, u8 *addr);
 
-
 /**
  * @brief      delete a device from whitelist
  * @param[in]  type - device mac address type
@@ -52,17 +48,11 @@ ble_sts_t ll_whiteList_add(u8 type, u8 *addr);
  */
 ble_sts_t ll_whiteList_delete(u8 type, u8 *addr);
 
-
-
-
 /**
  * @brief      get whitelist size
  * @param[out] pointer to size
  * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
 ble_sts_t ll_whiteList_getSize(u8 *returnPublicAddrListSize) ;
-
-
-
 
 #endif /* LL_WHITELIST_H_ */

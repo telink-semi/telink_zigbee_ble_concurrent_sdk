@@ -26,11 +26,11 @@
 #include "compiler.h"
 #include "lib/include/stimer.h"
 #define ADC_CHN_CNT                        3
-#define ADC_GPIO_VREF_DEFAULT_VALUE        1202
-#define ADC_GPIO_VREF_OFFSET_DEFAULT_VALUE 7
+#define ADC_GPIO_VREF_DEFAULT_VALUE        1230
+#define ADC_GPIO_VREF_OFFSET_DEFAULT_VALUE 0
 
-#define ADC_VBAT_VREF_DEFAULT_VALUE        1207
-#define ADC_VBAT_VREF_OFFSET_DEFAULT_VALUE -7
+#define ADC_VBAT_VREF_DEFAULT_VALUE        1230
+#define ADC_VBAT_VREF_OFFSET_DEFAULT_VALUE 0
 
 _attribute_data_retention_sec_ unsigned short g_adc_vref[ADC_CHN_CNT] = {ADC_GPIO_VREF_DEFAULT_VALUE, ADC_VBAT_VREF_DEFAULT_VALUE, ADC_GPIO_VREF_DEFAULT_VALUE}; //default ADC ref voltage (unit:mV)
 _attribute_data_retention_sec_ signed char    g_adc_vref_offset[ADC_CHN_CNT];                                                                                    //ADC calibration value voltage offset (unit:mV).
@@ -83,16 +83,15 @@ static inline void adc_reset(void)
 static inline void adc_clk_en(void)
 {
     reg_clk_en3 |= FLD_CLK3_SARADC_EN;
-    analog_write_reg8(areg_adc_clk_setting, analog_read_reg8(areg_adc_clk_setting) | FLD_CLK_24M_TO_SAR_EN);
 }
 
 /**
  * @brief      This function disable ADC analog clock.
  * @return     none
  */
-static inline void adc_ana_clk_dis(void)
+static inline void adc_clk_dis(void)
 {
-    analog_write_reg8(areg_adc_clk_setting, analog_read_reg8(areg_adc_clk_setting) & (~FLD_CLK_24M_TO_SAR_EN));
+    reg_clk_en3 = reg_clk_en3 & (~FLD_CLK3_SARADC_EN);
 }
 
 /**
@@ -139,12 +138,14 @@ static void adc_set_tsample_cycle(adc_sample_chn_e chn, adc_sample_cycle_e sampl
     case ADC_M_CHANNEL:
         reg_adc_tsamp = ((reg_adc_tsamp & (~FLD_M_TSAMP)) | sample_cycle);
         break;
+#if(COMPATIBLE_WITH_TL321X_AND_TL323X == 0)
     case ADC_L_CHANNEL:
         reg_adc_tsamp = ((reg_adc_tsamp & (~FLD_L_TSAMP)) | (sample_cycle << 4));
         break;
     case ADC_R_CHANNEL:
         reg_adc_r_tsamp = ((reg_adc_r_tsamp & (~FLD_R_TSAMP)) | sample_cycle);
         break;
+#endif
     default:
         break;
     }
@@ -167,7 +168,7 @@ static inline void adc_set_state_length(adc_sample_chn_e chn, unsigned short r_m
  * @brief   This function is used to enable the transmission of data from the adc's M channel, L channel, and R channel to the sar adc rxfifo.
  * @return  none
  * @note    -# In DMA mode, must enable this function.
- *          -# In NDMA mode, if this function is not enabled, the adc code can only be read from the registers, but it will lead to the problem of repeatedly getting the same adc code when calling adc_get_code() several times,
+ *          -# In NDMA mode, if this function is not enabled, the adc code can only be read from the registers, but it will lead to the problem of repeatedly getting the same adc code when calling adc_get_raw_code() several times,
  *             if this function is enabled, the adc code can be read from the rx fifo, and this problem can be avoided, so it is also must enable it.
  */
 static inline void adc_all_chn_data_to_fifo_en(void)
@@ -238,7 +239,7 @@ static inline void adc_set_scan_chn_dis(void)
 /**
  * @brief    This function is used to power on sar_adc.
  * @return   none.
- * @note     -# User need to wait >30us after adc_power_on() for ADC to be stable.
+ * @note     -# User need to wait >100us after adc_power_on() for ADC to be stable.
  *           -# If you calling adc_power_off(), because all analog circuits of ADC are turned off after adc_power_off(),
  *            it is necessary to wait >30us after re-adc_power_on() for ADC to be stable.
  */
@@ -319,11 +320,14 @@ static void adc_set_ref_voltage(adc_sample_chn_e chn, adc_ref_vol_e v_ref)
         //Vref buffer bias current trimming:        150%
         //Comparator preamp bias current trimming:  100%
         analog_write_reg8(areg_ain_scale, (analog_read_reg8(areg_ain_scale) & (0xC0)) | 0x3d);
-    } else if (v_ref == ADC_VREF_0P9V) {
+    }
+#if(COMPATIBLE_WITH_TL321X_AND_TL323X == 0)
+    else if (v_ref == ADC_VREF_0P9V) {
         //Vref buffer bias current trimming:        100%
         //Comparator preamp bias current trimming:  100%
         analog_write_reg8(areg_ain_scale, (analog_read_reg8(areg_ain_scale) & (0xC0)) | 0x15);
     }
+#endif
 }
 
 /**
@@ -460,7 +464,7 @@ void adc_gpio_sample_init(adc_sample_chn_e chn, adc_gpio_cfg_t cfg)
     g_adc_vref[chn]        = g_adc_gpio_calib_vref;        //set gpio sample calib vref
     g_adc_vref_offset[chn] = g_adc_gpio_calib_vref_offset; //set adc_vref_offset as adc_gpio_calib_vref_offset
 }
-
+#if(COMPATIBLE_WITH_TL321X_AND_TL323X == 0)
 /**
  * @brief This function is used to initialize the ADC for vbat sampling.
  * @param[in]  chn -structure for configuring ADC channel.
@@ -489,7 +493,7 @@ void adc_vbat_sample_init(adc_sample_chn_e chn)
     g_adc_vref[chn]        = g_adc_vbat_calib_vref;        //set vbat sample calib vref
     g_adc_vref_offset[chn] = g_adc_vbat_calib_vref_offset; //set g_adc_vref_offset as g_adc_vbat_calib_vref_offset
 }
-
+#endif
 /**
  * @brief  This function is used to initialize the ADC for gpio sampling to indirectly sample the vbat voltage.
  * @param[in]  chn -the channel to be configured.
@@ -576,23 +580,28 @@ unsigned short adc_calculate_temperature(unsigned short adc_code)
 /**
  * @brief This function serves to calculate voltage from adc sample code.
  * @param[in]   chn - enum variable of ADC sample channel.
- * @param[in]   adc_code    - the adc sample code.
- * @return      adc_vol_mv  - the average value of adc voltage value.
+ * @param[in]   adc_code    - the adc sample code(should be positive value.)
+ * @return      adc_vol_mv  - the average value of adc voltage value(adc voltage value >= 0).
  */
 /*!< BLE USED */
 _attribute_ram_code_
 /*!< BLE USED END */
 unsigned short adc_calculate_voltage(adc_sample_chn_e chn, unsigned short adc_code)
 {
-    //When the code value is 0, the returned voltage value should be 0.
-    if (adc_code == 0) {
-        return 0;
-    } else {
-        //////////////// adc sample data convert to voltage(mv) ////////////////
-        //                          (Vref, adc_pre_scale)   (BIT<10~0> valid data)
-        //           =  (adc_code * Vref * adc_pre_scale / 0x800) + offset
-        //           =  (adc_code * Vref * adc_pre_scale >>11) + offset
-        return (((adc_code * g_adc_vbat_divider[chn] * g_adc_pre_scale[chn] * g_adc_vref[chn]) >> 11) + g_adc_vref_offset[chn]);
+    /**
+     *  adc sample code convert to voltage(mv):
+     *  (adc code BIT<10~0> is valid data)
+     *  adc_voltage  =  (adc_code * Vref * adc_pre_scale / 0x800) + offset
+     *               =  (adc_code * Vref * adc_pre_scale >>11) + offset
+     */
+    unsigned short adc_voltage = (((adc_code * g_adc_vbat_divider[chn] * g_adc_pre_scale[chn] * g_adc_vref[chn]) >> 11) + g_adc_vref_offset[chn]);
+
+    if(adc_voltage & BIT(15))
+    {
+        return 0;//When the adc_voltage < 0, the returned voltage value should be 0.
+    }else
+    {
+        return adc_voltage;
     }
 }
 
@@ -708,11 +717,13 @@ static inline unsigned char adc_get_m_chn_valid_status(void)
 /**
  * @brief This function serves to directly get an adc sample code from fifo.
  * @return  adc_code    - the adc sample code.
+ *                      - Bit[11:15] of the adc code read from reg_adc_rxfifo_dat are sign bits,if the adc code is positive, bits [11:15] are all 1's,
+ *                        if the adc code is negative, bits [11:15] are all 0's and valid data bits are Bit[0:10],the valid range is 0~0x7FF.
  */
 /*!< BLE USED */
 _attribute_ram_code_
 /*!< BLE USED END */
-unsigned short adc_get_code(void)
+unsigned short adc_get_raw_code(void)
 {
     unsigned short adc_code = 0;
     /**
@@ -738,6 +749,7 @@ _attribute_ram_code_
 /*!< BLE USED END */
 void adc_start_sample_nodma(void)
 {
+    adc_clr_rx_fifo_cnt(); //If the fifo is not cleared, there may be residual values in the fifo that affect the sampling results.
     adc_all_chn_data_to_fifo_en();
     adc_set_scan_chn_cnt(1);
 }
@@ -750,4 +762,14 @@ void adc_stop_sample_nodma(void)
 {
     adc_all_chn_data_to_fifo_dis();
     adc_clr_rx_fifo_cnt();
+}
+
+/**
+ * @brief     This function serves to get adc DMA sample status.
+ * @return      0: the sample is in progress.
+ *              !0: the sample is finished.
+ */
+unsigned char adc_get_sample_status_dma(void)
+{
+    return (dma_get_tc_irq_status(1 << adc_dma_chn));
 }

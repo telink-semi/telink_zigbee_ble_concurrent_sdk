@@ -7,7 +7,6 @@
  * @date    2024
  *
  * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- *          All rights reserved.
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -22,6 +21,8 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
+#include "chip_config.h"
+#if(COMPATIBLE_WITH_TL321X_AND_TL323X == 0)
 #include "ir_learn.h"
 
 static dma_config_t g_irlearn_dma_rx_config = {
@@ -210,3 +211,5 @@ void ir_learn_set_dma_chain_llp(dma_chn_e chn, unsigned char *dst_addr, unsigned
     dma_set_size(chn, data_len, DMA_WORD_WIDTH);
     reg_dma_llp(chn) = (unsigned int)head_of_list;
 }
+
+#endif

@@ -337,12 +337,6 @@ void ble_exception_data_abandom(u8 e,u8 *p, int n)
     T_bleDataAbandom++;
 }
 
-_attribute_ram_code_ void   user_set_rf_power (u8 e, u8 *p, int n)
-{
-    rf_set_power_level_index (g_ble_txPowerSet);
-}
-
-
 void task_connect (u8 e, u8 *p, int n)
 {
     /* interval:    n*1.25 ms
@@ -350,7 +344,6 @@ void task_connect (u8 e, u8 *p, int n)
      * timeout:     n*10 ms
      * */
     bls_l2cap_requestConnParamUpdate (g_appBleInterval, g_appBleInterval, g_appBleLatency, 400);  // 1 S
-    //bls_l2cap_requestConnParamUpdate (160, 160, 0, 400);  // 200 mS
 
     latest_user_event_tick = clock_time();
 
@@ -538,9 +531,7 @@ void user_ble_init(void)
 
     bls_ll_setAdvEnable(1);  //adv enable
 
-    //set rf power index, user must set it after every suspend wakeup, cause relative setting will be reset in suspend
-    user_set_rf_power(0, 0, 0);
-    bls_app_registerEventCallback (BLT_EV_FLAG_SUSPEND_EXIT, &user_set_rf_power);
+    rf_set_power_level_index (g_ble_txPowerSet);
 
     //ble event call back
     bls_app_registerEventCallback (BLT_EV_FLAG_CONNECT, &task_connect);
@@ -552,22 +543,7 @@ void user_ble_init(void)
     bls_app_registerEventCallback (BLT_EV_FLAG_CONN_PARA_UPDATE, &task_conn_update_done);
 
     ///////////////////// Power Management initialization///////////////////
-#if(BLE_APP_PM_ENABLE)
-    blc_ll_initPowerManagement_module();
-
-    #if (PM_DEEPSLEEP_RETENTION_ENABLE)
-        bls_pm_setSuspendMask (SUSPEND_ADV | DEEPSLEEP_RETENTION_ADV | SUSPEND_CONN | DEEPSLEEP_RETENTION_CONN);
-        blc_pm_setDeepsleepRetentionThreshold(95, 95);
-        blc_pm_setDeepsleepRetentionEarlyWakeupTiming(250);
-        blc_pm_setDeepsleepRetentionType(DEEPSLEEP_MODE_RET_SRAM_LOW32K);
-    #else
-        bls_pm_setSuspendMask (SUSPEND_ADV | SUSPEND_CONN);
-    #endif
-
-    bls_app_registerEventCallback (BLT_EV_FLAG_SUSPEND_ENTER, &ble_remote_set_sleep_wakeup);
-#else
     bls_pm_setSuspendMask (SUSPEND_DISABLE);
-#endif
 
     advertise_begin_tick = clock_time();
 }

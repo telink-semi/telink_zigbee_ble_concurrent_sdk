@@ -482,7 +482,10 @@ void gpio_set_probe_clk_function(gpio_func_pin_e pin, probe_clk_sel_e sel_clk)
  * @return     none.
  * @note       This function called by .S file to shutdown all the GPIO input which can decrease the current early.
  *             If this C function is called in the S file, it needs to be called after setting sp.
- */
+ *             In order to be compatible with flash_boot_ramcode.link, added a new code segment named flash_code.
+ *             If this function compiled to the text segment, then it cannot be found.
+ *             If this function compiled to the vectors segment, then it will at the starting address of vectors segment which can not be accepted.
+*/
 _attribute_flash_code_sec_noinline_ void gpio_shutdown_flashcode_for_asm(void)
 {
     //disable input
@@ -498,17 +501,21 @@ _attribute_flash_code_sec_noinline_ void gpio_shutdown_flashcode_for_asm(void)
     reg_ana_len     = 1;
     reg_ana_addr    = 0xbd;
     reg_ana_data(0) = 0x00;
-    while (!(reg_ana_buf_cnt & FLD_ANA_TX_BUFCNT));
+    while (!(reg_ana_buf_cnt & FLD_ANA_TX_BUFCNT))
+        ;
     reg_ana_ctrl = (FLD_ANA_CYC | FLD_ANA_RW);
-    while (reg_ana_ctrl & FLD_ANA_BUSY);
+    while (reg_ana_ctrl & FLD_ANA_BUSY)
+        ;
     reg_ana_ctrl = 0x00;
 
     reg_ana_len     = 1;
     reg_ana_addr    = 0xc2;
     reg_ana_data(0) = 0x00;
-    while (!(reg_ana_buf_cnt & FLD_ANA_TX_BUFCNT));
+    while (!(reg_ana_buf_cnt & FLD_ANA_TX_BUFCNT))
+        ;
     reg_ana_ctrl = (FLD_ANA_CYC | FLD_ANA_RW);
-    while (reg_ana_ctrl & FLD_ANA_BUSY);
+    while (reg_ana_ctrl & FLD_ANA_BUSY)
+        ;
     reg_ana_ctrl = 0x00;
 
     reg_rst1 &= ~(FLD_RST1_ALGM);
@@ -536,17 +543,21 @@ _attribute_ram_code_sec_ void gpio_shutdown_ramcode_for_asm(void)
     reg_ana_len     = 1;
     reg_ana_addr    = 0xbd;
     reg_ana_data(0) = 0x00;
-    while (!(reg_ana_buf_cnt & FLD_ANA_TX_BUFCNT));
+    while (!(reg_ana_buf_cnt & FLD_ANA_TX_BUFCNT))
+        ;
     reg_ana_ctrl = (FLD_ANA_CYC | FLD_ANA_RW);
-    while (reg_ana_ctrl & FLD_ANA_BUSY);
+    while (reg_ana_ctrl & FLD_ANA_BUSY)
+        ;
     reg_ana_ctrl = 0x00;
 
     reg_ana_len     = 1;
     reg_ana_addr    = 0xc2;
     reg_ana_data(0) = 0x00;
-    while (!(reg_ana_buf_cnt & FLD_ANA_TX_BUFCNT));
+    while (!(reg_ana_buf_cnt & FLD_ANA_TX_BUFCNT))
+        ;
     reg_ana_ctrl = (FLD_ANA_CYC | FLD_ANA_RW);
-    while (reg_ana_ctrl & FLD_ANA_BUSY);
+    while (reg_ana_ctrl & FLD_ANA_BUSY)
+        ;
     reg_ana_ctrl = 0x00;
 
     reg_rst1 &= ~(FLD_RST1_ALGM);

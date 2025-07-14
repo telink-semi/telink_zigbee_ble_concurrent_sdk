@@ -88,9 +88,10 @@ extern "C" {
 #endif
 
 #if BLE_SUPPORT_CONTROLLER_ONLY
-#define HCI_TR_RX_PIN        GPIO_FC_PA0
-#define HCI_TR_TX_PIN        GPIO_FC_PA1
-#define HCI_TR_BAUDRATE      (1000000)
+#define HCI_TR_TX_PIN        GPIO_FC_PA0
+#define HCI_TR_RX_PIN        GPIO_FC_PA1
+
+#define HCI_TR_BAUDRATE      (115200)
 #endif
 
 // DEBUG

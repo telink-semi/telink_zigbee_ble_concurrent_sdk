@@ -27,11 +27,11 @@
 #include "lib/include/stimer.h"
 #define ADC_CHN_CNT                        3
 
-#define ADC_GPIO_VREF_DEFAULT_VALUE        1220
-#define ADC_GPIO_VREF_OFFSET_DEFAULT_VALUE 8
+#define ADC_GPIO_VREF_DEFAULT_VALUE        1260
+#define ADC_GPIO_VREF_OFFSET_DEFAULT_VALUE 0
 
-#define ADC_VBAT_VREF_DEFAULT_VALUE        1220
-#define ADC_VBAT_VREF_OFFSET_DEFAULT_VALUE 15
+#define ADC_VBAT_VREF_DEFAULT_VALUE        1260
+#define ADC_VBAT_VREF_OFFSET_DEFAULT_VALUE 0
 /**
  * Note: When the reference voltage is configured to 1.2V, the calculated ADC voltage value is closest to the actual voltage value using ADC_GPIO_VREF_DEFAULT_VALUE/ADC_VBAT_VREF_DEFAULT_VALUE as the coefficient default.
  * ADC_GPIO_VREF_DEFAULT_VALUE/ADC_VBAT_VREF_DEFAULT_VALUE is the value obtained by ATE through big data statistics, which is more in line with most chips than 1200.
@@ -43,14 +43,15 @@ _attribute_data_retention_sec_ signed char    g_adc_gpio_calib_vref_offset = ADC
 _attribute_data_retention_sec_ unsigned short g_adc_vbat_calib_vref        = ADC_VBAT_VREF_DEFAULT_VALUE;                                                        //ADC vbat calibration value voltage (unit:mV)(used for vbat voltage sample).
 _attribute_data_retention_sec_ signed char    g_adc_vbat_calib_vref_offset = ADC_VBAT_VREF_OFFSET_DEFAULT_VALUE;                                                 //ADC vbat calibration value voltage offset (unit:mV)(used for vbat voltage sample).
 
+unsigned char g_adc_channel_set_state[ADC_CHN_CNT];
 volatile unsigned char g_adc_pre_scale[ADC_CHN_CNT];
 volatile unsigned char g_adc_vbat_divider[ADC_CHN_CNT];
 unsigned char          g_adc_rx_fifo_index = 0;
 unsigned char          g_channel_cnt       = 0;
-
+unsigned char          g_adc_vbat_div = 0;
 dma_chn_e    adc_dma_chn;
 dma_config_t adc_rx_dma_config =
-    {
+{
         .dst_req_sel    = 0,
         .src_req_sel    = DMA_REQ_SAR_ADC_RX,
         .dst_addr_ctrl  = DMA_ADDR_INCREMENT,
@@ -87,16 +88,15 @@ static inline void adc_reset(void)
 static inline void adc_clk_en(void)
 {
     reg_clk_en3 |= FLD_CLK3_SARADC_EN;
-    analog_write_reg8(areg_adc_clk_setting, analog_read_reg8(areg_adc_clk_setting) | FLD_CLK_24M_TO_SAR_EN);
 }
 
 /**
- * @brief      This function disable ADC analog clock.
+ * @brief     This function disable adc source clock: xtal 24M
  * @return     none
  */
-static inline void adc_ana_clk_dis(void)
+static inline void adc_clk_dis(void)
 {
-    analog_write_reg8(areg_adc_clk_setting, analog_read_reg8(areg_adc_clk_setting) & (~FLD_CLK_24M_TO_SAR_EN));
+    reg_clk_en3 = reg_clk_en3 & (~FLD_CLK3_SARADC_EN);
 }
 
 /**
@@ -164,14 +164,14 @@ static void adc_set_tsample_cycle(adc_sample_chn_e chn, adc_sample_cycle_e sampl
 static inline void adc_set_state_length(adc_sample_chn_e chn, unsigned short r_max_mc, unsigned char r_max_s)
 {
     reg_adc_capture_state(chn)     = r_max_mc;
-    reg_adc_channel_set_state(chn) = ((reg_adc_channel_set_state(chn) & (~FLD_R_MAX_S)) | r_max_s);
+    g_adc_channel_set_state[chn] = ((g_adc_channel_set_state[chn] & (~FLD_R_MAX_S)) | r_max_s);
 }
 
 /**
  * @brief   This function is used to enable the transmission of data from the adc's M channel, L channel, and R channel to the sar adc rxfifo.
  * @return  none
  * @note    -# In DMA mode, must enable this function.
- *          -# In NDMA mode, if this function is not enabled, the adc code can only be read from the registers, but it will lead to the problem of repeatedly getting the same adc code when calling adc_get_code() several times,
+ *          -# In NDMA mode, if this function is not enabled, the adc code can only be read from the registers, but it will lead to the problem of repeatedly getting the same adc code when calling adc_get_raw_code() several times,
  *             if this function is enabled, the adc code can be read from the rx fifo, and this problem can be avoided, so it is also must enable it.
  */
 static inline void adc_all_chn_data_to_fifo_en(void)
@@ -203,10 +203,10 @@ static inline void adc_set_scan_chn_cnt(unsigned char chn_cnt)
  * @return      none
  * @note        Enabling this function on chip A2 will affect adc performance. This function cannot be used
  */
- static inline void adc_data_weighted_average_en(void)
- {
-     analog_write_reg8(areg_adc_data_sample_control, (analog_read_reg8(areg_adc_data_sample_control) | FLD_DWA_EN_O));
- }
+static inline void adc_data_weighted_average_en(void)
+{
+ analog_write_reg8(areg_adc_data_sample_control, (analog_read_reg8(areg_adc_data_sample_control) | FLD_DWA_EN_O));
+}
 #endif
 /**
  * @brief      This function disable adc digital clock.
@@ -243,9 +243,10 @@ static inline void adc_set_scan_chn_dis(void)
 /**
  * @brief    This function is used to power on sar_adc.
  * @return   none.
- * @note     -# User need to wait >30us after adc_power_on() for ADC to be stable.
- *           -# If you calling adc_power_off(), because all analog circuits of ADC are turned off after adc_power_off(),
- *            it is necessary to wait >100us after re-adc_power_on() for ADC to be stable.
+ * @note     -# When gpio samples, the user needs to wait >200us after adc_power_on () for the ADC to stabilize.
+ *           -# When vbat samples, the user needs to wait >300us after adc_power_on () for the ADC to stabilize.
+ *           -# If you call adc_power_off(), the analog circuits of the ADC are powered down. After calling adc_power_on() again,
+ *           it is necessary to wait for a period of time to allow the ADC to stabilize.
  */
 /*!< BLE USED */
 _attribute_ram_code_
@@ -255,20 +256,57 @@ void adc_power_on(void)
     /**
      * adc_set_scan_chn_dis() must be called to stop the state machine at the beginning of the M channel and not start sampling.
      */
+    for(unsigned char chn = 0; chn < (g_channel_cnt & 0x0f); chn++) {
+        reg_adc_channel_set_state(chn) = g_adc_channel_set_state[chn];
+    }
+    reg_adc_vbat_div = g_adc_vbat_div;
+
     adc_set_scan_chn_dis();
     analog_write_reg8(areg_adc_pga_ctrl, (analog_read_reg8(areg_adc_pga_ctrl) & (~FLD_SAR_ADC_POWER_DOWN)));
+    /*
+     * Perform a reset operation when the adc is powered up, which will restart the digital state machine and clear the previous state. 
+     * Confirm with digital circuit colleagues that performing an ADC reset at power-up helps to improve the operational stability of the ADC.
+     * (updated by bolong.zhang, confirmed by shiyi.wu at 202503013)
+     */
+    adc_reset();                   //reset whole digital adc module
     adc_dig_clk_en();
 }
-
+#if ADC_ANTI_AGING_MODE
 /**
  * @brief      This function is used to power off sar_adc.
  * @return     none
+ * @note       Use this function with the caveat that it will first turn off the interrupt and then restore it after performing the relevant operation.
  */
 void adc_power_off(void)
 {
-    analog_write_reg8(areg_adc_pga_ctrl, (analog_read_reg8(areg_adc_pga_ctrl) | FLD_SAR_ADC_POWER_DOWN));
+    /*
+     * The base voltage decreases over time after a power off, and the logic here solves this problem.
+     * (updated by bolong.zhang, confirmed by shiyi.wu at 20250219)
+     */
+    adc_dig_clk_dis();  //Turn off the digital clock of the ADC.
+    reg_adc_vbat_div = (reg_adc_vbat_div & (~BIT_RNG(0, 1))) | ((ADC_VBAT_DIV_1F4));  //The default is ADC_VBAT_DIV_1F4
+    reg_adc_channel_set_state(ADC_M_CHANNEL) = (reg_adc_channel_set_state(ADC_M_CHANNEL) & (~FLD_SEL_VREF)) | (ADC_VREF_ANTI_AGING << 6);
+    unsigned int r = core_interrupt_disable();  //Turning off interrupts is to avoid interrupts interfering with the timing of the digital state machine and to ensure that the digital state machine operates as expected.
+    adc_set_scan_chn_cnt(1);  //Open the M-channel to enable the configuration of the M-channel.
+    adc_reset();  //reset whole digital adc module.
+    adc_dig_clk_en();  //Turn on the digital clock of the ADC.
+    delay_us(1);  //Wait for the digital state machine to transmit the register values to the analog module.
+    adc_dig_clk_dis();  //Turn off the digital clock of the ADC.
+    analog_write_reg8(areg_adc_pga_ctrl, (analog_read_reg8(areg_adc_pga_ctrl) | FLD_SAR_ADC_POWER_DOWN));  //adc power down
+    core_restore_interrupt(r);
 }
-
+#else
+/**
+ * @brief      This function is used to power off sar_adc.
+ * @return     none
+ * @note       Use this function with the caveat that it will first turn off the interrupt and then restore it after performing the relevant operation.
+ */
+void adc_power_off(void)
+{
+    adc_set_scan_chn_dis();//Turn off the M channel before configuring the verf, vbat, and div related registers of the M channel.
+    analog_write_reg8(areg_adc_pga_ctrl, (analog_read_reg8(areg_adc_pga_ctrl) | FLD_SAR_ADC_POWER_DOWN)); //adc power down
+}
+#endif
 /**
  * @brief This function is used to set IO port for ADC supply or ADC IO port voltage sampling.
  * @param[in]  mode - ADC gpio pin sample mode
@@ -318,19 +356,13 @@ void adc_set_diff_pin(adc_sample_chn_e chn, adc_input_pin_def_e p_pin, adc_input
  */
 static void adc_set_ref_voltage(adc_sample_chn_e chn, adc_ref_vol_e v_ref)
 {
-    reg_adc_channel_set_state(chn) = (reg_adc_channel_set_state(chn) & (~FLD_SEL_VREF)) | (v_ref << 6);
-    if (v_ref == ADC_VREF_GPIO_1P2V || v_ref == ADC_VREF_VBAT_1P2V) {
-        //Vref buffer bias current trimming:        150%
-        //Comparator preamp bias current trimming:  100%
-        analog_write_reg8(areg_ain_scale, (analog_read_reg8(areg_ain_scale) & (0xC0)) | 0x3d);
-    }
-    //Only for internal testing,not recommended.
-    //    else if(v_ref == ADC_VREF_0P9V)      //
-    //    {
-    //        //Vref buffer bias current trimming:        100%
-    //        //Comparator preamp bias current trimming:  100%
-    //        analog_write_reg8(areg_ain_scale  , (analog_read_reg8( areg_ain_scale  )&(0xC0)) | 0x15 );
-    //    }
+    g_adc_channel_set_state[chn] = (g_adc_channel_set_state[chn] & (~FLD_SEL_VREF)) | (v_ref << 6);
+
+    //Vref buffer bias current trimming:        150%
+    //Comparator preamp bias current trimming:  100%
+    analog_write_reg8(areg_ain_scale, (analog_read_reg8(areg_ain_scale) & (0xC0)) | 0x3d);
+
+
 }
 
 /**
@@ -356,7 +388,7 @@ static void adc_set_sample_rate(adc_sample_chn_e chn, adc_sample_freq_e sample_f
  */
 static inline void adc_set_scale_factor(adc_sample_chn_e chn, adc_pre_scale_e pre_scale)
 {
-    reg_adc_channel_set_state(chn) = ((reg_adc_channel_set_state(chn) & (~FLD_SEL_AI_SCALE)) | (pre_scale << 4));
+    g_adc_channel_set_state[chn] = ((g_adc_channel_set_state[chn] & (~FLD_SEL_AI_SCALE)) | (pre_scale << 4));
     g_adc_pre_scale[chn]           = 1 << pre_scale;
 }
 
@@ -371,7 +403,7 @@ void adc_set_vbat_divider(adc_sample_chn_e chn, adc_vbat_div_e vbat_div)
 {
     unsigned char offset = (chn == 0) ? 0 : (1 << chn);
 
-    reg_adc_vabt_div        = (reg_adc_vabt_div & (~BIT_RNG(offset, offset + 1))) | ((vbat_div) << offset);
+    g_adc_vbat_div        = (g_adc_vbat_div & (~BIT_RNG(offset, offset + 1))) | ((vbat_div) << offset);
     g_adc_vbat_divider[chn] = vbat_div ? (5 - vbat_div) : 1;
 }
 
@@ -399,8 +431,20 @@ _attribute_ram_code_
 /*!< BLE USED END */
 void adc_init(adc_chn_cnt_e channel_cnt)
 {
+    /*
+     * Since these two registers are used to prevent aging, it is necessary to reconfigure their values after an ADC reboot.
+     * Therefore, a global variable is set to record the values of these two registers so that the configuration can be restored correctly after a reboot.
+     * (updated by bolong.zhang)
+     */
+    for(unsigned char chn = 0; chn < (unsigned char)(channel_cnt &0x0f ); chn++) {
+        g_adc_channel_set_state[chn] = reg_adc_channel_set_state(chn);
+    }
+   
+    g_adc_vbat_div = reg_adc_vbat_div;
     adc_power_off();               //power off sar adc
-    adc_reset();                   //reset whole digital adc module
+#if (ADC_ANTI_AGING_MODE == 0)
+    adc_reset();                    //reset whole digital adc module
+#endif
     adc_clk_en();                  //enable signal of 24M clock to sar adc
     adc_set_clk();                 //set adc digital clk to 24MHz and adc analog clk to 4MHz
     adc_set_resolution(ADC_RES12); //default adc_resolution set as 12bit ,BIT(11) is sign bit
@@ -432,6 +476,7 @@ void adc_init(adc_chn_cnt_e channel_cnt)
 void adc_chn_config(adc_sample_chn_e chn, adc_chn_cfg_t adc_cfg)
 {
     adc_set_diff_input(chn, adc_cfg.input_p, adc_cfg.input_n);
+
     adc_set_vbat_divider(chn, adc_cfg.divider);
     adc_set_ref_voltage(chn, adc_cfg.v_ref);
     adc_set_scale_factor(chn, adc_cfg.pre_scale);
@@ -453,6 +498,14 @@ void adc_gpio_sample_init(adc_sample_chn_e chn, adc_gpio_cfg_t cfg)
     adc_pin_config(ADC_GPIO_MODE, cfg.pin);
     adc_chn_cfg_t chn_cfg =
         {
+            /*
+             * In a multi-channel sampling environment, there are scenarios where VBAT sampling and GPIO sampling are constantly switching channels, 
+             * and VBAT sampling requires the divider to be turned on. if the GPIO is configured with ADC_VBAT_DIV_OFF, 
+             * it will cause VBAT sampling to be abnormal. 
+             * The reason is that it takes about 100us for the divider to stabilize from off to on,
+             * and the GPIO switching time to VBAT is shorter than the 100us stabilization time in multi-channel sampling, resulting in VBAT sampling abnormality.
+             * (updated by bolong.zhang, confirmed by haitao.gu at 20250219)
+             */
             .divider     = ADC_VBAT_DIV_OFF,
             .v_ref       = cfg.v_ref,
             .pre_scale   = cfg.pre_scale,
@@ -479,9 +532,14 @@ void adc_vbat_sample_init(adc_sample_chn_e chn)
 {
     adc_chn_cfg_t chn_cfg =
         {
-            .divider     = ADC_VBAT_DIV_1F4,
-            .v_ref       = ADC_VREF_VBAT_1P2V,
-            .pre_scale   = ADC_PRESCALE_1,
+            /* 
+             * Because vbat sampling did not perform well at divider =1 pre_scale =1/4, 
+             * Haitao recommended that the TL721X use a divider =1/2 pre_scale =1/2
+             * (updated by bolong.zhang, confirmed by haitao.gu at 20250219)
+             */
+            .divider     = ADC_VBAT_DIV_1F2,
+            .v_ref       = ADC_VREF_1P2V,
+            .pre_scale   = ADC_PRESCALE_1F2,
             .sample_freq = ADC_SAMPLE_FREQ_96K,
             .input_p     = ADC_VBAT,
             .input_n     = GND,
@@ -509,7 +567,7 @@ void adc_gpio_sample_vbat_init(adc_sample_chn_e chn, adc_gpio_cfg_t cfg)
     adc_pin_config(ADC_VBAT_MODE, cfg.pin);
     adc_chn_cfg_t chn_cfg =
         {
-            .divider     = ADC_VBAT_DIV_OFF,
+            .divider     = ADC_VBAT_DIV_1F2,
             .v_ref       = cfg.v_ref,
             .pre_scale   = cfg.pre_scale,
             .sample_freq = cfg.sample_freq,
@@ -553,15 +611,15 @@ static inline void adc_temp_sensor_power_off(void)
 void adc_temp_init(adc_sample_chn_e chn)
 {
     adc_chn_cfg_t chn_cfg =
-        {
+    {
             .divider     = ADC_VBAT_DIV_OFF,
-            .v_ref       = ADC_VREF_VBAT_1P2V,
-            .pre_scale   = ADC_PRESCALE_1F4,
+            .v_ref       = ADC_VREF_1P2V,
+            .pre_scale   = ADC_PRESCALE_1,
             .sample_freq = ADC_SAMPLE_FREQ_96K,
             .input_p     = ADC_TEMPSENSORP_EE,
             .input_n     = ADC_TEMPSENSORN_EE,
 
-        };
+    };
     adc_chn_config(chn, chn_cfg);
     adc_temp_sensor_power_on();
 }
@@ -577,29 +635,33 @@ unsigned short adc_calculate_temperature(unsigned short adc_code)
 {
     //////////////// adc sample data convert to temperature(Celsius) ////////////////
     //adc_temp_value = 564 - ((adc_code * 819)>>11)
-    return 564 - ((adc_code * 4 * 819) >> 11);
+    return 564 - ((adc_code * 819) >> 11);
 }
 #endif
 /**
  * @brief This function serves to calculate voltage from adc sample code.
  * @param[in]   chn - enum variable of ADC sample channel.
- * @param[in]   adc_code    - the adc sample code.
- * @return      adc_vol_mv  - the average value of adc voltage value.
+ * @param[in]   adc_code    - the adc sample code(should be positive value.)
+ * @return      adc_vol_mv  - the average value of adc voltage value(adc voltage value >= 0).
  */
 /*!< BLE USED */
 _attribute_ram_code_
 /*!< BLE USED END */
 unsigned short adc_calculate_voltage(adc_sample_chn_e chn, unsigned short adc_code)
 {
-    //When the code value is 0, the returned voltage value should be 0.
-    if (adc_code == 0) {
-        return 0;
-    } else {
-        //////////////// adc sample data convert to voltage(mv) ////////////////
-        //                          (Vref, adc_pre_scale)   (BIT<10~0> valid data)
-        //           =  (adc_code * Vref * adc_pre_scale / 0x800) + offset
-        //           =  (adc_code * Vref * adc_pre_scale >>11) + offset
-        return (((adc_code * g_adc_vbat_divider[chn] * g_adc_pre_scale[chn] * g_adc_vref[chn]) >> 11) + g_adc_vref_offset[chn]);
+    /**
+     *  adc sample code convert to voltage(mv):
+     *  (adc code BIT<10~0> is valid data)
+     *  adc_voltage  =  (adc_code * Vref * adc_pre_scale / 0x800) + offset
+     *               =  (adc_code * Vref * adc_pre_scale >>11) + offset
+     */
+    unsigned short adc_voltage = (((adc_code * g_adc_vbat_divider[chn] * g_adc_pre_scale[chn] * g_adc_vref[chn]) >> 11) + g_adc_vref_offset[chn]);
+    if(adc_voltage & BIT(15))
+    {
+        return 0;//When the adc_voltage < 0, the returned voltage value should be 0.
+    }else
+    {
+        return adc_voltage;
     }
 }
 
@@ -647,7 +709,7 @@ void adc_set_dma_config(dma_chn_e chn)
      * The TL721X's RX FIFO is stored in HALF WORD units.
      */
     adc_set_rx_fifo_trig_cnt(1); //Default value is 1, users should not change.
-    adc_clr_rx_fifo_cnt();       //If not removed, there may be a risk of residual values in the fifo, affecting sampling.
+    adc_clr_rx_fifo_cnt();       //If ADC rx fifo is not cleared, there may be residual values in the fifo that affect the sampling results.
     adc_all_chn_data_to_fifo_en();
 }
 
@@ -716,11 +778,13 @@ static inline unsigned char adc_get_m_chn_valid_status(void)
 /**
  * @brief This function serves to directly get an adc sample code from fifo.
  * @return  adc_code    - the adc sample code.
+ *                      - Bit[11:15] of the adc code read from reg_adc_rxfifo_dat are sign bits,if the adc code is positive, bits [11:15] are all 1's,
+ *                        if the adc code is negative, bits [11:15] are all 0's and valid data bits are Bit[0:10],the valid range is 0~0x7FF.
  */
 /*!< BLE USED */
 _attribute_ram_code_
 /*!< BLE USED END */
-unsigned short adc_get_code(void)
+unsigned short adc_get_raw_code(void)
 {
     unsigned short adc_code = 0;
     /**
@@ -760,3 +824,139 @@ void adc_stop_sample_nodma(void)
     adc_all_chn_data_to_fifo_dis();
     adc_clr_rx_fifo_cnt();
 }
+
+/** 
+ * @brief   This function is designed to prevent the aging of the ADC reference voltage during deep sleep.
+ * @return  none
+ * @note    The reference voltage value of ADC Vref decreases with time, which can be avoided by calling this interface.
+ */
+_attribute_flash_code_sec_noinline_ void adc_anti_aging_mode_flashcode_for_asm(void)
+{
+
+    //The following logic is equivalent to adc_reset()
+    reg_rst3 &= (~FLD_RST3_SARADC);
+    reg_rst3 |= FLD_RST3_SARADC;
+    //The following logic is equivalent to adc_clk_en()
+    reg_clk_en3 |= FLD_CLK3_SARADC_EN;
+
+    if (read_reg8(0x14083d) == CHIP_VERSION_A1) 
+    {
+        //Since this interface is called within the .s file and requires the configuration of analog registers, it is necessary to enable the analog clock first.
+        reg_rst1 |= FLD_RST1_ALGM;
+        reg_clk_en1 |= FLD_CLK1_ALGM_EN,
+        /*
+        * Turn on xtal_24M clock to analog (includes stimer), this should setup before power up PLL and call pm_wait_xtal_ready.
+        * Because the stimer is necessary for the pm_wait_xtal_ready.
+        * ADC operation depends on the 24M_xtl in sc_clk. In sc_clk, the 24M_xtl source requires two switches to be enabled in sequence.
+        * The first level enables the 24M_xtl source, and the second level is controlled by bit 0x8c[1] in reg_ana.
+        * (add by bolong, confirmed by ya.yan,qiangkai20240513)
+        */
+        //The following logic is equivalent to     analog_write_reg8(areg_0x8c, 0x82)
+
+        reg_ana_len     = 1;
+        reg_ana_addr    = 0x8c;
+        reg_ana_data(0) = 0x82;
+        while (!(reg_ana_buf_cnt & FLD_ANA_TX_BUFCNT))
+            ;
+        reg_ana_ctrl = (FLD_ANA_CYC | FLD_ANA_RW);
+        while (reg_ana_ctrl & FLD_ANA_BUSY)
+            ;
+        reg_ana_ctrl = 0x00;
+    }
+
+    //The following logic is equivalent to adc_set_scan_chn_cnt(1)
+    reg_adc_config0 = ((reg_adc_config0 & (~FLD_SCANT_MAX)) | ((1 * 2) << 4)); //scan_cnt = chn_cnt*2
+
+    //The following logic is equivalent to a adc_set_clk(FLD_SAR_ADC_CLK_DIV)
+    reg_adc_config1 = ((reg_adc_config1 & FLD_SAR_ADC_CLK_DIV) | 1); //div=1, adc digital clk = 24MHz/div.(crystal = 24MHz)
+
+    //The following logic is equivalent to a reg_adc_capture_state(ADC_M_CHANNEL)
+    reg_adc_config2 |= BIT(ADC_M_CHANNEL);
+
+    //Anti-aging configuration
+    reg_adc_vbat_div = (reg_adc_vbat_div & (~BIT_RNG(0, 1))) | ((ADC_VBAT_DIV_1F4));  
+    reg_adc_channel_set_state(ADC_M_CHANNEL) = (reg_adc_channel_set_state(ADC_M_CHANNEL) & (~FLD_SEL_VREF)) | (ADC_VREF_ANTI_AGING << 6);
+
+    reg_adc_capture_state(ADC_M_CHANNEL)     = 1;
+    reg_adc_rng_capture_state = 0x01;
+    
+    //The following logic is equivalent to a adc_dig_clk_en();
+    reg_adc_config2 |= FLD_CLK_EN;
+
+    //The following logic is equivalent to a delay_us(1)
+    unsigned long long start = rdmcycle();
+    while (rdmcycle() - start < (unsigned long long)(1 * 24)) {
+    }
+
+    //Restore default
+    reg_adc_config2 = 0x10; 
+
+}
+
+/**
+ * @brief   This function is designed to prevent the aging of the ADC reference voltage during deep retention sleep.
+ * @return  none
+ * @note    The reference voltage value of ADC Vref decreases with time, which can be avoided by calling this interface.
+ */
+_attribute_ram_code_sec_noinline_ void adc_anti_aging_mode_ramcode_for_asm(void)
+{
+    //The following logic is equivalent to adc_reset()
+    reg_rst3 &= (~FLD_RST3_SARADC);
+    reg_rst3 |= FLD_RST3_SARADC;
+    //The following logic is equivalent to adc_clk_en()
+    reg_clk_en3 |= FLD_CLK3_SARADC_EN;
+
+    if (read_reg8(0x14083d) == CHIP_VERSION_A1) 
+    {
+        //Since this interface is called within the .s file and requires the configuration of analog registers, it is necessary to enable the analog clock first.
+        reg_rst1 |= FLD_RST1_ALGM;
+        reg_clk_en1 |= FLD_CLK1_ALGM_EN,
+        /*
+        * Turn on xtal_24M clock to analog (includes stimer), this should setup before power up PLL and call pm_wait_xtal_ready.
+        * Because the stimer is necessary for the pm_wait_xtal_ready.
+        * ADC operation depends on the 24M_xtl in sc_clk. In sc_clk, the 24M_xtl source requires two switches to be enabled in sequence.
+        * The first level enables the 24M_xtl source, and the second level is controlled by bit 0x8c[1] in reg_ana.
+        * (add by bolong, confirmed by ya.yan,qiangkai20240513)
+        */
+        //The following logic is equivalent to     analog_write_reg8(areg_0x8c, 0x82)
+
+        reg_ana_len     = 1;
+        reg_ana_addr    = 0x8c;
+        reg_ana_data(0) = 0x82;
+        while (!(reg_ana_buf_cnt & FLD_ANA_TX_BUFCNT))
+            ;
+        reg_ana_ctrl = (FLD_ANA_CYC | FLD_ANA_RW);
+        while (reg_ana_ctrl & FLD_ANA_BUSY)
+            ;
+        reg_ana_ctrl = 0x00;
+    }
+
+    //The following logic is equivalent to adc_set_scan_chn_cnt(1)
+    reg_adc_config0 = ((reg_adc_config0 & (~FLD_SCANT_MAX)) | ((1 * 2) << 4)); //scan_cnt = chn_cnt*2
+
+    //The following logic is equivalent to a adc_set_clk(FLD_SAR_ADC_CLK_DIV)
+    reg_adc_config1 = ((reg_adc_config1 & FLD_SAR_ADC_CLK_DIV) | 1); //div=1, adc digital clk = 24MHz/div.(crystal = 24MHz)
+
+    //The following logic is equivalent to a reg_adc_capture_state(ADC_M_CHANNEL)
+    reg_adc_config2 |= BIT(ADC_M_CHANNEL);
+
+    //Anti-aging configuration
+    reg_adc_vbat_div = (reg_adc_vbat_div & (~BIT_RNG(0, 1))) | ((ADC_VBAT_DIV_1F4));  
+    reg_adc_channel_set_state(ADC_M_CHANNEL) = (reg_adc_channel_set_state(ADC_M_CHANNEL) & (~FLD_SEL_VREF)) | (ADC_VREF_ANTI_AGING << 6);
+
+    reg_adc_capture_state(ADC_M_CHANNEL)     = 1;
+    reg_adc_rng_capture_state = 0x01;
+    
+    //The following logic is equivalent to a adc_dig_clk_en();
+    reg_adc_config2 |= FLD_CLK_EN;
+
+    //The following logic is equivalent to a delay_us(1)
+    unsigned long long start = rdmcycle();
+    while (rdmcycle() - start < (unsigned long long)(1 * 24)) {
+    }
+
+    //Restore default
+    reg_adc_config2 = 0x10; 
+
+}
+

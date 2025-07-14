@@ -137,6 +137,10 @@ void gpio_setup_up_down_resistor(gpio_pin_e gpio, gpio_pull_type up_down);
  */
 void rf_drv_ble_init(void);
 
+void rf_drv_hpmc_compensate(void);
+
+void rf_drv_dcoc_cali_sw(void);
+
 #define RF_POWER_P3dBm   RF_POWER_INDEX_P3p03dBm
 #define RF_POWER_P0dBm   RF_POWER_INDEX_P0p08dBm
 #define RF_POWER_P9dBm   RF_POWER_INDEX_P9p10dBm

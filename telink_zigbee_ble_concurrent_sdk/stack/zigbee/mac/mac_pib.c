@@ -40,7 +40,7 @@ const mac_pibTbl_t g_zbMacPibTbl[] = {
     {OFFSETOF(tl_zb_mac_pib_t, ackWaitDuration),        sizeof(u8), 54, 54},            /* MAC_ACK_WAIT_DURATION */
     {OFFSETOF(tl_zb_mac_pib_t, associationPermit),      sizeof(bool), FALSE, TRUE},     /* MAC_ASSOCIATION_PERMIT */
     {OFFSETOF(tl_zb_mac_pib_t, autoReq),                sizeof(bool), FALSE, TRUE},     /* MAC_AUTO_REQUEST */
-    {OFFSETOF(tl_zb_mac_pib_t, battLifeExt), 		sizeof(bool), FALSE, TRUE},     /* MAC_BATT_LIFE_EXT */
+    {OFFSETOF(tl_zb_mac_pib_t, battLifeExt),            sizeof(bool), FALSE, TRUE},     /* MAC_BATT_LIFE_EXT */
     {OFFSETOF(tl_zb_mac_pib_t, battLifeExtPeriods),     sizeof(u8), 6, 6},              /* MAC_BATT_LIFE_EXT_PERIODS */
     {OFFSETOF(tl_zb_mac_pib_t, beaconPayload),          sizeof(zb_mac_beacon_payload_t), 0, 0}, /* MAC_BEACON_PAYLOAD */
     {OFFSETOF(tl_zb_mac_pib_t, beaconPayloadLen),       sizeof(u8), 0, 52},             /* MAC_BEACON_PAYLOAD_LENGTH */
@@ -145,7 +145,7 @@ _CODE_MAC_ void generateIEEEAddr(void)
     flash_read(CFG_MAC_ADDRESS, 8, addr);
 
     if (ZB_IEEE_ADDR_IS_INVALID(addr)) {
-        if (!drv_get_primary_ieee_addr((u8*)addr)) {
+        if (!drv_get_primary_ieee_addr(addr)) {
             unsigned int t0 = clock_time();
             u32 jitter = 0;
             do {
@@ -169,12 +169,12 @@ _CODE_MAC_ void generateIEEEAddr(void)
     } else {
         /* MAC address format in TLSR serial chips:
          * xx xx xx 38 C1 A4 xx xx
-         * xx xx xx D1 19 C4 xx xx   vulture
-         * xx xx xx CB 0B D8 xx xx   custom
-         * xx xx xx 77 5F D8 xx xx	 Eagle
-         * xx xx xx B4 CF 3C xx xx   Juguar
-         * xx xx xx C7 A3 C0 xx xx   Buteo
-         * xx xx xx 28 22 38 xx xx   Tercel
+         * xx xx xx D1 19 C4 xx xx
+         * xx xx xx CB 0B D8 xx xx
+         * xx xx xx 77 5F D8 xx xx
+         * xx xx xx B4 CF 3C xx xx
+         * xx xx xx C7 A3 C0 xx xx
+         * xx xx xx 28 22 38 xx xx
          *
          * so, it need to do shift
          */
@@ -183,8 +183,8 @@ _CODE_MAC_ void generateIEEEAddr(void)
             (addr[3] == 0xCB && addr[4] == 0x0B && addr[5] == 0xD8) || \
             (addr[3] == 0x77 && addr[4] == 0x5F && addr[5] == 0xD8) || \
             (addr[3] == 0xB4 && addr[4] == 0xCF && addr[5] == 0x3C) || \
-			(addr[3] == 0xC7 && addr[4] == 0xA3 && addr[5] == 0xC0) || \
-			(addr[3] == 0x28 && addr[4] == 0x22 && addr[5] == 0x38)) {
+            (addr[3] == 0xC7 && addr[4] == 0xA3 && addr[5] == 0xC0) || \
+            (addr[3] == 0x28 && addr[4] == 0x22 && addr[5] == 0x38)) {
             flash_read(CFG_MAC_ADDRESS, 6, addr + 2);
             flash_read(CFG_MAC_ADDRESS + 6, 2, addr);
         }

@@ -23,7 +23,7 @@
  *******************************************************************************************************/
 #pragma once
 
-
+#include "chip_config.h"
 #include "lib/include/plic.h"
 #include "lib/include/pm/pm.h"
 #include "lib/include/rf/rf_common.h"
@@ -35,7 +35,9 @@
 
 #include "lib/include/emi.h"
 #include "lib/include/efuse.h"
+#if(COMPATIBLE_WITH_TL321X_AND_TL323X == 0)
 #include "audio.h"
+#endif
 #include "lib/include/analog.h"
 #include "dma.h"
 #include "gpio.h"
@@ -44,7 +46,9 @@
 #include "pwm.h"
 #include "timer.h"
 #include "flash.h"
+#if(COMPATIBLE_WITH_TL321X_AND_TL323X == 0)
 #include "usbhw.h"
+#endif
 #include "watchdog.h"
 #include "lib/include/core.h"
 
@@ -60,4 +64,7 @@
 #include "plmt.h"
 #include "flash/flash_type.h"
 #include "flash/flash_common.h"
+#if(COMPATIBLE_WITH_TL321X_AND_TL323X == 0)
 #include "ir_learn.h"
+#endif
+#include "cache.h"

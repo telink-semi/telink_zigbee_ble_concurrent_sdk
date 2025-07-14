@@ -24,7 +24,8 @@
 #ifndef ACL_CONN_H_
 #define ACL_CONN_H_
 
-
+#define blc_ll_getCurrentMasterRoleNumber   blc_ll_getCurrentCentralRoleNumber
+#define blc_ll_getCurrentSlaveRoleNumber    blc_ll_getCurrentPeripheralRoleNumber
 /**
  * @brief      This function is used to get the current number of ACL connections.
  * @param[in]  none.
@@ -46,7 +47,7 @@ int blc_ll_getSupportedMaxConnNumber(void);
  * @param[in]  none.
  * @return     The number of currently connected master ACLs.
  */
-int blc_ll_getCurrentMasterRoleNumber(void); //master role number
+int blc_ll_getCurrentCentralRoleNumber(void); //master role number
 
 
 /**
@@ -54,7 +55,7 @@ int blc_ll_getCurrentMasterRoleNumber(void); //master role number
  * @param[in]  none.
  * @return     The number of currently connected slave ACLs.
  */
-int blc_ll_getCurrentSlaveRoleNumber(void); //slave  role number
+int blc_ll_getCurrentPeripheralRoleNumber(void); //slave  role number
 
 
 /**
@@ -180,7 +181,7 @@ void blc_ll_setDataLengthReqSendingTime_after_connCreate(int time_ms);
  * @return     status, 0x00:  succeed
  *                     other: failed
  */
-ble_sts_t blc_ll_setPhy(u16 connHandle, le_phy_prefer_mask_t all_phys, le_phy_prefer_type_t tx_phys, le_phy_prefer_type_t rx_phys, le_ci_prefer_t phy_options);
+ble_sts_t blc_ll_setPhy(u16 connHandle, le_phy_prefer_mask_t all_phys, le_phy_prefer_type_t tx_phys, le_phy_prefer_type_t rx_phys, le_phy_option_prefer_t phy_options);
 
 
 /**

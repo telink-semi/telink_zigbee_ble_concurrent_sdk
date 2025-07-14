@@ -379,7 +379,7 @@ void audio_rx_dma_config(dma_chn_e chn, unsigned short *dst_addr, unsigned int d
 }
 
 /**
- * @brief     This function serves to set rx dma chain transfer
+ * @brief     This function serves to set rx dma chain transfer.
  * @param[in] config_addr - the head of list of llp_pointer.
  * @param[in] llpointer   - the next element of llp_pointer.
  * @param[in] dst_addr    - the dma address of destination.
@@ -1040,7 +1040,7 @@ void audio_set_debug_clk_as_mclk(audio_clk_dbg_e clk)
 
 /**
  * @brief     This function serves to set sampling rate when i2s as master.
- * @param[in] i2s_select                    - i2s channel select
+ * @param[in] i2s_select                    - i2s channel select.
  * @param[in] i2s_clk_config                 i2s_clk_config[2]   i2s_clk_config[3]-->lrclk_adc(sampling rate)
                                                   ||                  ||
  *  pll(240M default)------->div---->i2s_clk--->2*div(div=0,bypass)--->blck----->div
@@ -1123,6 +1123,9 @@ void audio_i2s_config_init(audio_i2s_config_t *i2s_config)
     i2s_set_pin(i2s_config->i2s_select, i2s_config->pin_config);
     if (i2s_config->master_slave_mode == I2S_AS_MASTER_EN) {
         audio_set_i2s_clock(i2s_config->i2s_select, i2s_config->sample_rate);
+    } else {
+        /* * When using i2s slave mode, just i2s src clk should be enabled. * add by jiawei.shi, confirmed by ting.fang 20250310 */
+        audio_i2s_src_clk_en(i2s_config->i2s_select);
     }
     audio_i2s_config(i2s_config->i2s_select, i2s_config->i2s_mode, i2s_config->data_width, i2s_config->master_slave_mode, &audio_i2s_invert_config[i2s_config->i2s_select]);
 }

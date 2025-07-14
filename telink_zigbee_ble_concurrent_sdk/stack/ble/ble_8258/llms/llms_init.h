@@ -3,7 +3,7 @@
  *
  * @brief    This is the header file for 8258 BLE SDK
  *
- * @author	 BLE GROUP
+ * @author   BLE GROUP
  * @date         12,2021
  *
  * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
@@ -20,32 +20,17 @@
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
  *******************************************************************************************************/
-
 #ifndef LLMS_INIT_H_
 #define LLMS_INIT_H_
 
-
-
-
-
-
-
-
-extern	int blms_create_connection;
-extern	u32 blms_timeout_connectDevice;
-extern	u32	blms_tick_connectDevice;
-
-
+extern  int blms_create_connection;
+extern  u32 blms_timeout_connectDevice;
+extern  u32 blms_tick_connectDevice;
 
 /************************************ User Interface  ******************************************************/
 
 
-
-
 /*********************************** Stack Interface, user can not use!!! **********************************/
 int  blt_llms_procInitPkt(u8 *raw_pkt);
-
-
-
 
 #endif /* LLMS_INIT_H_ */

@@ -68,7 +68,7 @@ extern "C" {
 #define LED_POWER               LED_R
 #define LED_PERMIT              LED_G
 
-#define VOLTAGE_DETECT_ADC_PIN          GPIO_PC5
+#define VOLTAGE_DETECT_ADC_PIN  GPIO_PC5
 
 // UART
 #if ZBHCI_UART

@@ -326,7 +326,7 @@ typedef struct _attribute_packed_ {
  * @brief  the hci command format to set test data to get the percent received
  *
  * */
-typedef struct {
+typedef struct _attribute_packed_ {
     u16 dstAddr;
     u8  srcEp;
     u8  dstEp;
@@ -336,13 +336,13 @@ typedef struct {
     u8  payload[6];
 } txrx_performce_test_req_t;
 
-typedef struct {
+typedef struct _attribute_packed_ {
     u16 dstAddr;
     u16 sendCnt;
     u16 ackCnt;
 } txrx_performce_test_rsp_t;
 
-typedef struct {
+typedef struct _attribute_packed_ {
     u16 dstAddr;
     u8  srcEp;
     u8  dstEp;
@@ -351,7 +351,7 @@ typedef struct {
     u8  payload[];
 } zbhci_afDataSend_req_t;
 
-typedef struct {
+typedef struct _attribute_packed_ {
     u16 srcAddr;
     u8  srcEp;
     u8  dstEp;
@@ -364,7 +364,7 @@ typedef struct {
     addrExt_t macAddr;
 } zbhci_mgmt_nodeDeleteReq_t;
 
-typedef struct {
+typedef struct _attribute_packed_ {
     u16 totalCnt;
     addrExt_t macAddr;
 } zbhci_nodeLeaveInd_t;

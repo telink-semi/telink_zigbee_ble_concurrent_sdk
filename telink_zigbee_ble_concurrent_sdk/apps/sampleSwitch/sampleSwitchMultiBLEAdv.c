@@ -34,6 +34,7 @@ _attribute_ble_data_retention_      int central_smp_pending = 0;        // SMP: 
 _attribute_data_retention_  unsigned int  tlk_flash_mid = 0;
 _attribute_data_retention_  unsigned int  tlk_flash_vendor = 0;
 _attribute_data_retention_  unsigned char tlk_flash_capacity;
+_attribute_data_retention_ u32 flash_sector_mac_address = FLASH_ADDR_OF_MAC_ADDR_2M;
 
 _attribute_data_retention_  u32 task_begin_tick;
 _attribute_data_retention_  u8 ble_no_task_deepsleep;
@@ -217,8 +218,7 @@ int app_host_event_callback (u32 h, u8 *para, int n)
 
     u8 event = h & 0xFF;
 
-    switch(event)
-    {
+    switch (event) {
         case GAP_EVT_SMP_PAIRING_BEGIN:
         {
 
@@ -292,17 +292,6 @@ int app_host_event_callback (u32 h, u8 *para, int n)
     return 0;
 }
 
-
-/*
- *B91:  VVWWXX 775FD8 YYZZ
- *B92:  VVWWXX B4CF3C YYZZ
-
- * public_mac:
- *              B91 : VVWWXX 775FD8
- *              B92 : VVWWXX B4CF3C
- *
- * random_static_mac: VVWWXXYYZZ C0
- */
 /**
  * @brief       This function is used to initialize the MAC address
  * @param[in]   flash_addr - flash address for MAC address
@@ -310,61 +299,62 @@ int app_host_event_callback (u32 h, u8 *para, int n)
  * @param[in]   mac_random_static - random static MAC address
  * @return      none
  */
-_attribute_no_inline_
-void blc_initMacAddress(int flash_addr, u8 *mac_public, u8 *mac_random_static)
+_attribute_no_inline_ void blc_initMacAddress(int flash_addr, u8 *mac_public, u8 *mac_random_static)
 {
+	flash_sector_mac_address = flash_addr;
+
     int rand_mac_byte3_4_read_OK = 0;
-    u8 mac_read[8];
+    u8  mac_read[8];
     flash_read_page(flash_addr, 8, mac_read);
 
     u8 value_rand[5];
     generateRandomNum(5, value_rand);
 
     u8 ff_six_byte[6] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
-    if ( memcmp(mac_read, ff_six_byte, 6) ) { //read MAC address on flash success
-        memcpy(mac_public, mac_read, 6);  //copy public address from flash
+    if (memcmp(mac_read, ff_six_byte, 6)) { //read MAC address on flash success
+        memcpy(mac_public, mac_read, 6);    //copy public address from flash
 
-        if(mac_read[6] != 0xFF && mac_read[7] != 0xFF){
-            mac_random_static[3] = mac_read[6];
-            mac_random_static[4] = mac_read[7];
+        if (mac_read[6] != 0xFF && mac_read[7] != 0xFF) {
+            mac_random_static[3]     = mac_read[6];
+            mac_random_static[4]     = mac_read[7];
             rand_mac_byte3_4_read_OK = 1;
         }
-    } else {  //no MAC address on flash
-        #if (BUILT_IN_MAC_ON_EFUSE)
-            if (efuse_get_mac_address(mac_read, 8)) {//read MAC address on Efuse success
+    } else {                                       //no MAC address on flash
 
-                memcpy(mac_public, mac_read, 6);  //copy public address from Efuse
+#if (BUILT_IN_MAC_ON_DEVICE)
+        if (get_device_mac_address(mac_read, 8)) { //read device MAC address
+            memcpy(mac_public, mac_read, 6);       //copy public address from device
 
-                mac_random_static[3] = mac_read[6];
-                mac_random_static[4] = mac_read[7];
-                rand_mac_byte3_4_read_OK = 1;
-            }
-            else
-        #endif
-            {
-                mac_public[0] = value_rand[0];
-                mac_public[1] = value_rand[1];
-                mac_public[2] = value_rand[2];
+            mac_random_static[3]     = mac_read[6];
+            mac_random_static[4]     = mac_read[7];
+            rand_mac_byte3_4_read_OK = 1;
+        } else
+#endif
+        {
+            mac_public[0] = value_rand[0];
+            mac_public[1] = value_rand[1];
+            mac_public[2] = value_rand[2];
 
-                /* company id */
-                mac_public[3] = U32_BYTE0(PDA_COMPANY_ID);
-                mac_public[4] = U32_BYTE1(PDA_COMPANY_ID);
-                mac_public[5] = U32_BYTE2(PDA_COMPANY_ID);
+            /* company id */
+            mac_public[3] = U32_BYTE0(PDA_COMPANY_ID);
+            mac_public[4] = U32_BYTE1(PDA_COMPANY_ID);
+            mac_public[5] = U32_BYTE2(PDA_COMPANY_ID);
 
-                flash_write_page (flash_addr, 6, mac_public); //store public address on flash for future use
-            }
+            flash_write_page(flash_addr, 6, mac_public); //store public address on flash for future use
+        }
     }
+
 
     mac_random_static[0] = mac_public[0];
     mac_random_static[1] = mac_public[1];
     mac_random_static[2] = mac_public[2];
-    mac_random_static[5] = 0xC0;            //for random static
+    mac_random_static[5] = 0xC0; //for random static
 
     if (!rand_mac_byte3_4_read_OK) {
         mac_random_static[3] = value_rand[3];
         mac_random_static[4] = value_rand[4];
 
-        flash_write_page (flash_addr + 6, 2, (u8 *)(mac_random_static + 3) ); //store random address on flash for future use
+        flash_write_page(flash_addr + 6, 2, (u8 *)(mac_random_static + 3)); //store random address on flash for future use
     }
 }
 
@@ -401,13 +391,30 @@ _attribute_ram_code_ void  app_set_kb_wakeup (u8 e, u8 *p, int n)
     #endif
 }
 
+/**
+ * @brief      callBack function of LinkLayer Event "BLT_EV_FLAG_SUSPEND_EXIT"
+ * @param[in]  e - LinkLayer Event type
+ * @param[in]  p - data pointer of event
+ * @param[in]  n - data length of event
+ * @return     none
+ */
+_attribute_ram_code_ void user_set_flag_suspend_exit(u8 e, u8 *p, int n)
+{
+    (void)e;
+    (void)p;
+    (void)n;
+
+	extern void secondClockRun(void);
+	secondClockRun();
+}
 
 /** newadd
  * @brief       user initialization when MCU power on or wake_up from deepSleep mode
  * @param[in]   none
  * @return      none
  */
-void user_ble_normal_init(void){
+void user_ble_normal_init(void)
+{
 //////////////////////////// BLE stack Initialization  Begin //////////////////////////////////
 
 #if (TLKAPI_DEBUG_ENABLE)
@@ -425,6 +432,7 @@ void user_ble_normal_init(void){
     blc_ll_initBasicMCU();
 
     blc_ll_initStandby_module(mac_public);
+    blc_ll_setRandomAddr(mac_random_static);
 
     blc_ll_initLegacyAdvertising_module();
     //////////// LinkLayer Initialization  End /////////////////////////
@@ -432,6 +440,7 @@ void user_ble_normal_init(void){
     //////////// HCI Initialization  Begin /////////////////////////
     blc_hci_registerControllerEventHandler(app_controller_event_callback); //controller hci event to host all processed in this func
 
+    blc_ll_registerTelinkControllerEventCallback(BLT_EV_FLAG_SUSPEND_EXIT, &user_set_flag_suspend_exit);
     //bluetooth event
     blc_hci_setEventMask_cmd (HCI_EVT_MASK_DISCONNECTION_COMPLETE);
 

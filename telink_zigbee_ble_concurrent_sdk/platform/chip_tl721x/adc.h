@@ -47,14 +47,15 @@ extern unsigned char g_adc_rx_fifo_index;
 
 typedef enum
 {
-    ADC_VREF_GPIO_1P2V = 0x01,
-    ADC_VREF_VBAT_1P2V = 0x02,
+    ADC_VREF_1P2V = 0x01,
+    ADC_VREF_ANTI_AGING = 0x03,
 } adc_ref_vol_e;
 
 typedef enum
 {
     ADC_VBAT_DIV_OFF = 0,
     ADC_VBAT_DIV_1F4 = 0x01,
+    ADC_VBAT_DIV_1F2 = 0x03,
 } adc_vbat_div_e;
 
 typedef enum
@@ -68,7 +69,7 @@ typedef enum
     ADC_GPIO_PB5N      = 0x06,
     ADC_GPIO_PB6N      = 0x07,
     ADC_GPIO_PB7N      = 0x08,
-    ADC_GPIO_PD0N      = 0x09,//PD0, PD1 not recommended, sampling bias at 50-100mv, still in debug.
+    ADC_GPIO_PD0N      = 0x09,
     ADC_GPIO_PD1N      = 0x0a,
     ADC_TEMPSENSORN_EE = 0x0e,
     GND                = 0x0f,
@@ -85,7 +86,7 @@ typedef enum
     ADC_GPIO_PB5P      = 0x06,
     ADC_GPIO_PB6P      = 0x07,
     ADC_GPIO_PB7P      = 0x08,
-    ADC_GPIO_PD0P      = 0x09,//PD0, PD1 not recommended, sampling bias at 50-100mv, still in debug.
+    ADC_GPIO_PD0P      = 0x09,
     ADC_GPIO_PD1P      = 0x0a,
     ADC_TEMPSENSORP_EE = 0x0e,
     ADC_VBAT           = 0x0f,
@@ -108,7 +109,12 @@ typedef enum
     ADC_GPIO_PB5 = GPIO_PB5 | (0x6 << 12),
     ADC_GPIO_PB6 = GPIO_PB6 | (0x7 << 12),
     ADC_GPIO_PB7 = GPIO_PB7 | (0x8 << 12),
-    ADC_GPIO_PD0 = GPIO_PD0 | (0x9 << 12),//PD0, PD1 not recommended, sampling bias at 50-100mv, still in debug.
+    /*
+     * Without software filtering, PD0 and PD1 do not perform as well as PB0 as acquisition pins, with acquisition values fluctuating in the range of 50~100mV.
+     * PD0 is an audio port. Due to the internal influence of the PGA, a current of about 0.6uA flows through PD0 in the floating state,
+     * so the dividing result may be disturbed when connecting an external divider circuit. Therefore, it is not recommended to connect a voltage divider to this pin.
+     */
+    ADC_GPIO_PD0 = GPIO_PD0 | (0x9 << 12),
     ADC_GPIO_PD1 = GPIO_PD1 | (0xa << 12),
 } adc_input_pin_def_e;
 
@@ -143,8 +149,10 @@ typedef enum
 {
     NDMA_M_CHN    = 1 | (0 << 4),
     DMA_M_CHN     = 1 | (1 << 4),
+#if INTERNAL_TEST_FUNC_EN
     DMA_M_L_CHN   = 2 | (1 << 4),
     DMA_M_L_R_CHN = 3 | (1 << 4),
+#endif
 } adc_chn_cnt_e;
 
 /**
@@ -205,8 +213,8 @@ typedef enum
 
 typedef enum
 {
-    ADC_PRESCALE_1 = 0x00, //Only used for vbat sampling
-                           //  ADC_PRESCALE_1F2 = 0x01,//Only for internal testing
+    ADC_PRESCALE_1 = 0x00, //Only used for temperature sensor sampling
+    ADC_PRESCALE_1F2 = 0x01,
     ADC_PRESCALE_1F4 = 0x02,
     //  ADC_PRESCALE_1F8 = 0x03,//Only for internal testing
 } adc_pre_scale_e;
@@ -239,11 +247,12 @@ typedef enum
  *                                         DMA and NDMA common interface                                              *
  **********************************************************************************************************************/
 /**
- * @brief    This function is used to power on sar_adc.
+ * @brief    This function is used topower on  sar_adc.
  * @return   none.
- * @note     -# User need to wait >30us after adc_power_on() for ADC to be stable.
- *           -# If you calling adc_power_off(), because all analog circuits of ADC are turned off after adc_power_off(),
- *            it is necessary to wait >30us after re-adc_power_on() for ADC to be stable.
+ * @note     -# When gpio samples, the user needs to wait >200us after adc_power_on () for the ADC to stabilize.
+ *           -# When vbat samples, the user needs to wait >300us after adc_power_on () for the ADC to stabilize.
+ *           -# If you call adc_power_off(), the analog circuits of the ADC are powered down. After calling adc_power_on() again,
+ *           it is necessary to wait for a period of time to allow the ADC to stabilize.
  */
 /*!< BLE USED */
 _attribute_ram_code_
@@ -289,6 +298,7 @@ void adc_set_diff_pin(adc_sample_chn_e chn, adc_input_pin_def_e p_pin, adc_input
  * @param[in]  chn - enum variable of ADC sample channel
  * @param[in]  vbat_div - enum variable of Vbat division factor.
  * @return     none
+ * @note       adc_set_vbat_divider() does not take effect immediately after configuration, it needs to be delayed 30us after calling adc_dig_clk_en().
  */
 void adc_set_vbat_divider(adc_sample_chn_e chn, adc_vbat_div_e vbat_div);
 
@@ -349,8 +359,8 @@ unsigned short adc_calculate_temperature(unsigned short adc_code);
 /**
  * @brief This function serves to calculate voltage from adc sample code.
  * @param[in]   chn - enum variable of ADC sample channel.
- * @param[in]   adc_code    - the adc sample code.
- * @return      adc_vol_mv  - the average value of adc voltage value.
+ * @param[in]   adc_code    - the adc sample code(should be positive value.)
+ * @return      adc_vol_mv  - the average value of adc voltage value(adc voltage value >= 0).
  */
 /*!< BLE USED */
 _attribute_ram_code_
@@ -429,15 +439,15 @@ _attribute_ram_code_sec_noinline_ void adc_clr_irq_status_dma(void);
  *                                                NDMA only interface                                                 *
  **********************************************************************************************************************/
 /**
- * @brief This function serves to directly get an adc sample code from analog registers.
+ * @brief This function serves to directly get an adc sample code from fifo.
  * @return  adc_code    - the adc sample code.
- * @note   If you want to get the sampling results twice in succession,
- *         must ensure that the sampling interval is more than 2 times the sampling period.
+ *                      - Bit[11:15] of the adc code read from reg_adc_rxfifo_dat are sign bits,if the adc code is positive, bits [11:15] are all 1's,
+ *                        if the adc code is negative, bits [11:15] are all 0's and valid data bits are Bit[0:10],the valid range is 0~0x7FF.
  */
 /*!< BLE USED */
 _attribute_ram_code_
 /*!< BLE USED END */
-unsigned short adc_get_code(void);
+unsigned short adc_get_raw_code(void);
 
 /**
  * @brief     Get the irq status of ADC.
@@ -505,3 +515,17 @@ static inline void adc_clr_rx_fifo_cnt(void)
     reg_soft_control |= FLD_FIFO_CLR;
     adc_clr_rx_index();
 }
+
+/** 
+ * @brief   This function is designed to prevent the aging of the ADC reference voltage during deep sleep.
+ * @return  none
+ * @note    The reference voltage value of ADC Vref decreases with time, which can be avoided by calling this interface.
+ */
+_attribute_flash_code_sec_noinline_ void adc_anti_aging_mode_flashcode_for_asm(void);
+
+/**
+ * @brief   This function is designed to prevent the aging of the ADC reference voltage during deep retention sleep.
+ * @return  none
+ * @note    The reference voltage value of ADC Vref decreases with time, which can be avoided by calling this interface.
+ */
+_attribute_ram_code_sec_noinline_ void adc_anti_aging_mode_ramcode_for_asm(void);

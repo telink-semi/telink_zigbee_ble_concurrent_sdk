@@ -26,17 +26,13 @@
 
 #include "stack/ble/ble_common.h"
 
-
-/** @addtogroup SMP first pairing or connecting back definition
- * @{
+/**
+ * @brief SMP first pairing or connecting back definition
  */
 #define SMP_STANDARD_PAIR 0
 #define SMP_FAST_CONNECT  1
-/** @} end of group SMP first pairing or connecting back */
-
-
-/** @addtogroup SMP pairing fail reason definition
- * @{
+/**
+ * @brief    SMP pairing fail reason definition
  */
 #define PAIRING_FAIL_REASON_PASSKEY_ENTRY            0x01
 #define PAIRING_FAIL_REASON_OOB_NOT_AVAILABLE        0x02
@@ -56,10 +52,9 @@
 #define PAIRING_FAIL_REASON_CONN_DISCONNECT          0x81 //TLK defined
 #define PAIRING_FAIL_REASON_SUPPORT_NC_ONLY          0x82 //TLK defined
 
-/** @} end of group SMP pairing fail reason */
-
-
-// "SecReq" refer to "security request"
+/**
+ * @brief    "SecReq" refer to "security request"
+ */
 typedef enum
 {
     SecReq_NOT_SEND  = 0,      // do not send "security request" after link layer connection established
@@ -67,14 +62,18 @@ typedef enum
     SecReq_PEND_SEND = BIT(1), //"PEND" refer to pending,  pending "security request" for some time after link layer connection established, when pending time arrived. send it
 } secReq_cfg;
 
-// "PairReq" refer to "pairing request"
+/**
+ * @brief    "PairReq" refer to "pairing request"
+ */
 typedef enum
 {
     PairReq_SEND_upon_SecReq = 0, // central send "pairing request" when received peripheral's "security request"
     PairReq_AUTO_SEND        = 1, // central send "pairing request" automatically, regardless of "security request"
 } PairReq_cfg;
 
-//See the Core_v5.0(Vol 3/Part C/10.2, Page 2067) for more information.
+/**
+ * @brief    refer to BLE Core Specification: Vol 3, Part C, "10.2 LE SECURITY MODES" for more information.
+ */
 typedef enum
 {
     LE_Security_Mode_1_Level_1                                 = BIT(0),
@@ -95,26 +94,37 @@ typedef enum
     LE_Security_Mode_1 = (LE_Security_Mode_1_Level_1 | LE_Security_Mode_1_Level_2 | LE_Security_Mode_1_Level_3 | LE_Security_Mode_1_Level_4)
 } le_security_mode_level_t;
 
+/**
+ * @brief    Enumeration defining ECDH key distribution modes.
+ */
 typedef enum
 {
     non_debug_mode = 0, // ECDH distribute private/public key pairs
     debug_mode     = 1, // ECDH use debug mode private/public key pairs
 } ecdh_keys_mode_t;
 
+/**
+ * @brief    Enumeration defining bonding modes.
+ */
 typedef enum
 {
     Non_Bondable_Mode = 0,
     Bondable_Mode     = 1,
 } bonding_mode_t;
 
-//Pairing Methods select
-//See the Core_v5.0(Vol 3/Part H/2.3) for more information.
+/**
+ * @brief    Pairing Methods select
+ *           refer to BLE Core Specification: Vol 3, Part H, "2.3 PAIRING METHODS" for more information.
+ */
 typedef enum
 {
     LE_Legacy_Pairing    = 0, // BLE 4.0/4.2
     LE_Secure_Connection = 1, // BLE 4.2/5.0/5.1
 } pairing_methods_t;
 
+/**
+ * @brief   Enumeration defining input and output capabilities for Bluetooth Low Energy pairing.
+ */
 typedef enum
 {
     IO_CAPABILITY_UNKNOWN            = 0xff,
@@ -125,7 +135,9 @@ typedef enum
     IO_CAPABILITY_KEYBOARD_DISPLAY   = 4,
 } io_capability_t;
 
-//Keypress Notification type
+/**
+ * @brief    Keypress Notification type
+ */
 typedef enum
 {
     KEYPRESS_NTF_PKE_START         = 0x00,
@@ -135,7 +147,9 @@ typedef enum
     KEYPRESS_NTF_PKE_COMPLETED     = 0x04,
 } keypress_notify_t;
 
-//SC OOB local ECDH key
+/**
+ * @brief    SC OOB local ECDH key
+ */
 typedef struct
 {
     /** Public Key. */
@@ -144,7 +158,9 @@ typedef struct
     u8 private_key[32]; //big--endian
 } smp_sc_oob_key_t;
 
-//SC OOB data
+/**
+ * @brief    SC OOB data
+ */
 typedef struct
 {
     /** Random Number. */

@@ -22,10 +22,8 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-
 #ifndef ZCL_MULTISTATE_OUTPUT_H
 #define ZCL_MULTISTATE_OUTPUT_H
-
 
 
 /*********************************************************************
@@ -33,7 +31,7 @@
  */
 
 /**
- *  @brief  multistate output cluster Attribute IDs
+ *  @brief	multistate output cluster Attribute IDs
  */
 #define ZCL_MULTISTATE_OUTPUT_ATTRID_STATE_TEXT                 0x000E
 #define ZCL_MULTISTATE_OUTPUT_ATTRID_DESCRIPTION                0x001C
@@ -100,4 +98,4 @@ extern const u8 zcl_multistate_output_attrNum;
 
 status_t zcl_multistate_output_Attribute_register(u8 endpoint, u16 manuCode, u8 attrNum, const zclAttrInfo_t attrTbl[], cluster_forAppCb_t cb);
 
-#endif  /* ZCL_MULTISTATE_OUTPUT_H */
+#endif	/* ZCL_MULTISTATE_OUTPUT_H */

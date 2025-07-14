@@ -22,7 +22,6 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-
 #include "types.h"
 #include "string.h"
 #include "assert.h"
@@ -32,7 +31,7 @@
 char *strcpy(char *dst0, const char *src0)
 {
     char *s = dst0;
-    while((*dst0++ = *src0++));
+    while ((*dst0++ = *src0++));
     return s;
 }
 
@@ -42,12 +41,12 @@ char *strchr(const char *s, int c)
         if (*s == c) {
             return (char *)s;
         }
-    } while(*s++);
+    } while (*s++);
 
     return (0);
 }
 
-int memcmp(const void * m1, const void *m2, unsigned int n)
+int memcmp(const void *m1, const void *m2, unsigned int n)
 {
     unsigned char *s1 = (unsigned char *)m1;
     unsigned char *s2 = (unsigned char *)m2;
@@ -80,14 +79,16 @@ void *memmove(void *dest, const void *src, unsigned int n)
     char *s = (char *)src;
 
     if (d < s) {
-        while(n--)
+        while (n--) {
             *d++ = *s++;
+        }
     } else {
         d = d + (n - 1);
         s = s + (n - 1);
 
-        while(n--)
+        while (n--) {
             *d-- = *s--;
+        }
     }
 
     return dest;
@@ -99,18 +100,18 @@ static void bcopy_(register char *src, register char *dest, int len)
     char *d = (char *)dest;
 
     if (d < s) {
-        while(len--)
+        while (len--) {
             *d++ = *s++;
+        }
     } else {
         s = s + (len - 1);
         d = d + (len - 1);
 
-        while(len--)
+        while (len--) {
             *d-- = *s--;
+        }
     }
 }
-
-
 
 #if 1
 void *memset(void *dest, int val, unsigned int len)
@@ -121,8 +122,9 @@ void *memset(void *dest, int val, unsigned int len)
     }
 
     register unsigned char *ptr = (unsigned char *)dest;
-    while(len-- > 0)
+    while (len-- > 0) {
         *ptr++ = (unsigned char)val;
+    }
     return dest;
 }
 
@@ -150,11 +152,11 @@ void *mymemset(void *dest, int val, unsigned int len, unsigned int line)
     }
 
     if (is_ev_buf(dest) && (len > LARGE_BUFFER)) {
-        ZB_EXCEPTION_POST(SYS_EXCEPTTION_COMMON_MEM_ACCESS);
+    	ZB_EXCEPTION_POST(SYS_EXCEPTTION_COMMON_MEM_ACCESS);
     }
 
     if (is_zb_buf(dest) && (len > ZB_BUF_SIZE)) {
-        ZB_EXCEPTION_POST(SYS_EXCEPTTION_COMMON_MEM_ACCESS);
+    	ZB_EXCEPTION_POST(SYS_EXCEPTTION_COMMON_MEM_ACCESS);
     }
 
     register unsigned char *ptr = (unsigned char *)dest;
@@ -182,11 +184,11 @@ void *mymemcpy(void *out, const void *in, unsigned int length, unsigned int line
     }
 
     if (is_ev_buf(out) && (length > LARGE_BUFFER)) {
-        ZB_EXCEPTION_POST(SYS_EXCEPTTION_COMMON_MEM_ACCESS);
+    	ZB_EXCEPTION_POST(SYS_EXCEPTTION_COMMON_MEM_ACCESS);
     }
 
     if (is_zb_buf(out) && (length > ZB_BUF_SIZE) && (length != (ZB_BUF_SIZE + sizeof(zb_buf_hdr_t) - 1))) {
-        ZB_EXCEPTION_POST(SYS_EXCEPTTION_COMMON_MEM_ACCESS);
+    	ZB_EXCEPTION_POST(SYS_EXCEPTTION_COMMON_MEM_ACCESS);
     }
 
     bcopy_((char *)in, (char *)out, (int)length);
@@ -194,16 +196,19 @@ void *mymemcpy(void *out, const void *in, unsigned int length, unsigned int line
 }
 #endif
 
-// for performance, assume length % 4 == 0,  and no memory overlapped
+// for performance, assume length % 4 == 0, and no memory overlapped
 void memcpy4(void *d, const void *s, unsigned int length)
 {
     int *dst = (int *)d;
     int *src = (int *)s;
-    assert((((int)dst) >> 2) << 2 == ((int)dst));           // address must alighn to 4
-    assert((((int)src) >> 2) << 2 == ((int)src));           // address must alighn to 4
-    assert((length >> 2) << 2 == length);                   // length % 4 == 0
-    assert(( ((char *)dst) + length <= (const char *)src) || (((const char *)src) + length <= (char *)dst));    //  no overlapped
+
+    assert((((int)dst) >> 2) << 2 == ((int)dst));       //address must alighn to 4
+    assert((((int)src) >> 2) << 2 == ((int)src));       //address must alighn to 4
+    assert((length >> 2) << 2 == length);               //length % 4 == 0
+    assert((((char *)dst) + length <= (const char *)src) || (((const char *)src) + length <= (char *)dst)); //no overlapped
+
     unsigned int len = length >> 2;
+
     while (len --) {
         *dst++ = *src++;
     }
@@ -299,5 +304,3 @@ void zeromem4(void *data, unsigned int len)
 {
     memset4(data, 0, len);
 }
-
-

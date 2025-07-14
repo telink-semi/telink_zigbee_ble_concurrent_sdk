@@ -22,10 +22,8 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-
 #ifndef ZCL_TEMPERATURE_MEASUREMENT_H
 #define ZCL_TEMPERATURE_MEASUREMENT_H
-
 
 
 /*********************************************************************
@@ -33,12 +31,12 @@
  */
 
 /**
- *  @brief  temperature measurement cluster Attribute IDs
+ *  @brief	temperature measurement cluster Attribute IDs
  */
-#define ZCL_TEMPERATURE_MEASUREMENT_ATTRID_MEASUREDVALUE     0x0000
-#define ZCL_TEMPERATURE_MEASUREMENT_ATTRID_MINMEASUREDVALUE  0x0001
-#define ZCL_TEMPERATURE_MEASUREMENT_ATTRID_MAXMEASUREDVALUE  0x0002
-#define ZCL_TEMPERATURE_MEASUREMENT_ATTRID_TOLERANCE         0x0003
+#define ZCL_TEMPERATURE_MEASUREMENT_ATTRID_MEASUREDVALUE        0x0000
+#define ZCL_TEMPERATURE_MEASUREMENT_ATTRID_MINMEASUREDVALUE     0x0001
+#define ZCL_TEMPERATURE_MEASUREMENT_ATTRID_MAXMEASUREDVALUE     0x0002
+#define ZCL_TEMPERATURE_MEASUREMENT_ATTRID_TOLERANCE            0x0003
 
 
 #if 0
@@ -62,4 +60,4 @@ extern const u8 zcl_temperature_measurement_attrNum;
 
 status_t zcl_temperature_measurement_register(u8 endpoint, u16 manuCode, u8 attrNum, const zclAttrInfo_t attrTbl[], cluster_forAppCb_t cb);
 
-#endif  /* ZCL_TEMPERATURE_MEASUREMENT_H */
+#endif	/* ZCL_TEMPERATURE_MEASUREMENT_H */

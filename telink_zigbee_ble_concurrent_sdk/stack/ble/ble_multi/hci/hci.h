@@ -160,6 +160,8 @@ typedef int (*hci_iso_data_handle_t)(u8 *, int);
 // hci event
 extern u32                   hci_eventMask;
 extern u32                   hci_eventMask_2;
+extern u32                   hci_eventMaskPage2;
+extern u32                   hci_eventMaskPage2_2;
 extern u32                   hci_le_eventMask;
 extern u32                   hci_le_eventMask_2;
 extern hci_event_handler_t   blc_hci_event_handler;
@@ -252,7 +254,11 @@ int blc_hci_proc(void);
  */
 ble_sts_t blc_hci_setEventMask_cmd(u32 evtMask); //eventMask: BT/EDR
 
+ble_sts_t blc_hci_setEventMask_2_cmd(u32 evtMask_2);
 
+ble_sts_t blc_hci_setEventMaskPage2_cmd(u32 evtMask);
+
+ble_sts_t blc_hci_setEventMaskPage2_2_cmd(u32 evtMask_2);
 /**
  * @brief      this function is used to set HCI LE EVENT mask
  * @param[in]  evtMask  -  HCI LE EVENT mask(BIT<0-31>)

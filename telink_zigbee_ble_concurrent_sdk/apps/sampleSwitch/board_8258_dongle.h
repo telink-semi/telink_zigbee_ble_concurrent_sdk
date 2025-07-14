@@ -118,7 +118,7 @@ extern "C" {
 #endif
 
 // DEBUG
-#if UART_PRINTF_MODE
+#if (TLKAPI_DEBUG_ENABLE)
     #define	DEBUG_INFO_TX_PIN       GPIO_PC6//print
 #endif
 /*******************************************************************************************************

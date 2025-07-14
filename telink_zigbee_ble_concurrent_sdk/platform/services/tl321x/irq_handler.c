@@ -53,7 +53,9 @@ _attribute_ram_code_ void rf_irq_handler(void)
         }
     } else {
         T_DBG_testIrq[12]++;
-        blc_sdk_irq_handler ();
+        if(rf_get_irq_status(FLD_RF_IRQ_ALL)){
+            blc_sdk_irq_handler ();
+        }
     }
 }
 

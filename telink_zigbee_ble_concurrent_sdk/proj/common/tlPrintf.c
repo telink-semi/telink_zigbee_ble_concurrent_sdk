@@ -29,11 +29,11 @@
 #else
     typedef char *va_list;
 
-    #define _INTSIZEOF(n)       ( (sizeof(n) + sizeof(int) - 1) & ~(sizeof(int) - 1) )
+    #define _INTSIZEOF(n)       ((sizeof(n) + sizeof(int) - 1) & ~(sizeof(int) - 1))
 
-    #define va_start(ap,v)      ( ap = (va_list)&v + _INTSIZEOF(v) )
-    #define va_arg(ap,t)        ( *(t *)((ap += _INTSIZEOF(t)) - _INTSIZEOF(t)) )
-    #define va_end(ap)          ( ap = (va_list)0 )
+    #define va_start(ap, v)     (ap = (va_list)&v + _INTSIZEOF(v))
+    #define va_arg(ap, t)       (*(t *)((ap += _INTSIZEOF(t)) - _INTSIZEOF(t)))
+    #define va_end(ap)          (ap = (va_list)0)
 
     #define DECIMAL_OUTPUT      10
     #define OCTAL_OUTPUT        8
@@ -76,9 +76,9 @@ static void puti(unsigned int num, int base, int w)
         *--addr = re[num % base];
         num /= base;
         cnt++;
-    } while(num != 0 && cnt < 49);
+    } while (num != 0 && cnt < 49);
 
-    for (; w > cnt; --w) {
+    for ( ; w > cnt; --w) {
         *--addr = '0';
     }
 
@@ -103,7 +103,7 @@ int tl_printf(const char *format, ...)
             span = *(format++);
 
             w = 0;
-            for (; span >= '0' && span <= '9'; span = *(format++)) {
+            for ( ; span >= '0' && span <= '9'; span = *(format++)) {
                 w *= 10;
                 w += span - '0';
             }
@@ -111,7 +111,7 @@ int tl_printf(const char *format, ...)
             if (span == 'c') {
                 j = va_arg(arg_ptr, int);//get value of char
                 drv_putchar(j);
-            } else if(span == 'd') {
+            } else if (span == 'd') {
                 m = va_arg(arg_ptr, int);//get value of char
                 if (m < 0) {
                     drv_putchar('-');
@@ -121,13 +121,13 @@ int tl_printf(const char *format, ...)
             } else if (span == 's') {
                 s = va_arg(arg_ptr, char *);//get string value
                 put_s(s);
-            } else if(span == 'o') {
+            } else if (span == 'o') {
                 j = va_arg(arg_ptr, unsigned int);//get octal value
                 puti(j, OCTAL_OUTPUT, w);
-            } else if(span == 'x') {
+            } else if (span == 'x') {
                 j = va_arg(arg_ptr, unsigned int);//get hex value
                 puti(j, HEX_OUTPUT, w);
-            } else if(span == 0) {
+            } else if (span == 0) {
                 break;
             } else {
                 drv_putchar(span);
@@ -140,4 +140,3 @@ int tl_printf(const char *format, ...)
     return 0;
 }
 #endif
-

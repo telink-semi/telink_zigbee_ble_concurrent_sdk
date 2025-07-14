@@ -3,7 +3,7 @@
  *
  * @brief    This is the header file for b91 BLE SDK
  *
- * @author	 BLE GROUP
+ * @author   BLE GROUP
  * @date         12,2021
  *
  * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
@@ -20,12 +20,10 @@
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
  *******************************************************************************************************/
-
 #pragma once
 
-
 /**
- * @brief	device_char_uuid Device Information Characteristic UUID
+ * @brief   device_char_uuid Device Information Characteristic UUID
  */
 #define CHARACTERISTIC_UUID_MANU_NAME_STRING                    0x2A29
 #define CHARACTERISTIC_UUID_MODEL_NUM_STRING                    0x2A24

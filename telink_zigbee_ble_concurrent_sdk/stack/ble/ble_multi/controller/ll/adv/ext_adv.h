@@ -32,7 +32,9 @@
 
 
 /* extended ADV parameters buffer length for each ADV set */
-#define ADV_SET_PARAM_LENGTH (536) //user can't modify this value !!!
+#ifndef ADV_SET_PARAM_LENGTH
+#define ADV_SET_PARAM_LENGTH (540) //user can't modify this value !!!
+#endif
 
 
 /**
@@ -99,6 +101,15 @@ ble_sts_t blc_ll_setExtAdvParam(u8 adv_handle, advEvtProp_type_t adv_evt_prop, u
  */
 ble_sts_t blc_ll_setExtAdvData(u8 adv_handle, int advData_len, const u8 *advData);
 
+/**
+ * @brief  This function is used to set the ADV_DECISION_IND data.
+ * @param  adv_handle      - Used to identify an advertising set
+ * @param  decisionType    - set the decision type.such as whether a Resolvable Tag subfield is present in the decision data.
+ * @param  decisionDataLen - The number of octets in the Decision_Data parameter. the range: 0~8
+ * @param  decisionData    - Decision data.
+ * @return Status - 0x00: command succeeded; 0x01-0xFF: command failed
+ */
+ble_sts_t blc_ll_setDecisionData(u8 adv_handle, u8 decisionType, int decisionDataLen, const u8 *decisionData);
 
 /**
  * @brief      This function is used to provide scan response data used in scanning response PDUs.

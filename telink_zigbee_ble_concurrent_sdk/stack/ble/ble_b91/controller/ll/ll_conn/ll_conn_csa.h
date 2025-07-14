@@ -3,7 +3,7 @@
  *
  * @brief    This is the header file for b91 BLE SDK
  *
- * @author	 BLE GROUP
+ * @author   BLE GROUP
  * @date         12,2021
  *
  * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
@@ -20,24 +20,13 @@
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
  *******************************************************************************************************/
-
 #ifndef LL_CONN_CSA_H_
 #define LL_CONN_CSA_H_
 
-
-
-
 /**
  * @brief      this function is used to initialize channel selection algorithm #2 feature
- * @param	   none
+ * @param      none
  * @return     none
  */
 void blc_ll_initChannelSelectionAlgorithm_2_feature(void);
-
-
-
-
-
-
-
 #endif /* LL_CONN_CSA_H_ */

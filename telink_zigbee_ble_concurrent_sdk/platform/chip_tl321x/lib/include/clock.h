@@ -66,16 +66,19 @@ typedef enum
  *          the maximum speed needs to be tested at the highest and lowest voltage of the board,
  *          and the high and low temperature long-term stability test speed is no problem.
  */
-#define PLL_192M_CCLK_96M_HCLK_48M_PCLK_48M_MSPI_64M clock_init(BASEBAND_PLL, CLK_DIV2, CCLK_DIV2_TO_HCLK_DIV2_TO_PCLK, CLK_DIV3)
-
-#define PLL_192M_CCLK_96M_HCLK_48M_PCLK_48M_MSPI_48M clock_init(BASEBAND_PLL, CLK_DIV2, CCLK_DIV2_TO_HCLK_DIV2_TO_PCLK, CLK_DIV4)
-#define PLL_192M_CCLK_96M_HCLK_48M_PCLK_24M_MSPI_48M clock_init(BASEBAND_PLL, CLK_DIV2, CCLK_DIV2_TO_HCLK_DIV4_TO_PCLK, CLK_DIV4)
+// For TL321X, deleted the clock frequency starting with `PLL_192M_CCLK_96M` to enhance stability.
+//#define PLL_192M_CCLK_96M_HCLK_48M_PCLK_48M_MSPI_64M clock_init(BASEBAND_PLL, CLK_DIV2, CCLK_DIV2_TO_HCLK_DIV2_TO_PCLK, CLK_DIV3)
+//
+//#define PLL_192M_CCLK_96M_HCLK_48M_PCLK_48M_MSPI_48M clock_init(BASEBAND_PLL, CLK_DIV2, CCLK_DIV2_TO_HCLK_DIV2_TO_PCLK, CLK_DIV4)
+//#define PLL_192M_CCLK_96M_HCLK_48M_PCLK_24M_MSPI_48M clock_init(BASEBAND_PLL, CLK_DIV2, CCLK_DIV2_TO_HCLK_DIV4_TO_PCLK, CLK_DIV4)
 
 #define PLL_192M_CCLK_48M_HCLK_48M_PCLK_48M_MSPI_48M clock_init(BASEBAND_PLL, CLK_DIV4, CCLK_DIV1_TO_HCLK_DIV1_TO_PCLK, CLK_DIV4)
 #define PLL_192M_CCLK_48M_HCLK_48M_PCLK_24M_MSPI_48M clock_init(BASEBAND_PLL, CLK_DIV4, CCLK_DIV1_TO_HCLK_DIV2_TO_PCLK, CLK_DIV4)
 #define PLL_192M_CCLK_48M_HCLK_48M_PCLK_12M_MSPI_48M clock_init(BASEBAND_PLL, CLK_DIV4, CCLK_DIV1_TO_HCLK_DIV4_TO_PCLK, CLK_DIV4)
 #define PLL_192M_CCLK_48M_HCLK_24M_PCLK_24M_MSPI_48M clock_init(BASEBAND_PLL, CLK_DIV4, CCLK_DIV2_TO_HCLK_DIV2_TO_PCLK, CLK_DIV4)
 #define PLL_192M_CCLK_48M_HCLK_24M_PCLK_12M_MSPI_48M clock_init(BASEBAND_PLL, CLK_DIV4, CCLK_DIV2_TO_HCLK_DIV4_TO_PCLK, CLK_DIV4)
+
+#define PLL_192M_CCLK_32M_HCLK_16M_PCLK_16M_MSPI_48M clock_init(BASEBAND_PLL, CLK_DIV6, CCLK_DIV2_TO_HCLK_DIV2_TO_PCLK, CLK_DIV4)
 
 #define PLL_192M_CCLK_24M_HCLK_12M_PCLK_12M_MSPI_48M clock_init(BASEBAND_PLL, CLK_DIV8, CCLK_DIV2_TO_HCLK_DIV2_TO_PCLK, CLK_DIV4)
 #define PLL_192M_CCLK_24M_HCLK_24M_PCLK_12M_MSPI_48M clock_init(BASEBAND_PLL, CLK_DIV8, CCLK_DIV1_TO_HCLK_DIV2_TO_PCLK, CLK_DIV4)
@@ -253,7 +256,7 @@ _attribute_ram_code_sec_noinline_ void clock_32k_init(clk_32k_type_e src);
 unsigned char clock_kick_32k_xtal(unsigned char xtal_times);
 
 /**
- * @brief     This function performs to select 24M as the system clock source.
+ * @brief     This function serves to calibrate 24M RC.
  *            24M RC is inaccurate, and it is greatly affected by temperature, if need use it so real-time calibration is required
  *            The 24M RC needs to be calibrated before the pm_sleep_wakeup function,
  *            because this clock will be used to kick 24m xtal start after wake up,
@@ -263,21 +266,20 @@ unsigned char clock_kick_32k_xtal(unsigned char xtal_times);
 _attribute_ram_code_sec_noinline_ void clock_cal_24m_rc(void);
 
 /**
- * @brief     This function performs to select 32K as the system clock source.
+ * @brief     This function serves to calibrate 32K RC.
  * @return    none.
  */
 void clock_cal_32k_rc(void);
 
 /**
- * @brief  This function serves to get the 32k tick.
- * @return none.
+ * @brief  This function serves to get the 32k tick currently.
+ * @return the current 32k tick.
  */
-
 _attribute_ram_code_sec_optimize_o2_noinline_ unsigned int clock_get_32k_tick (void);
 
 
 /**
- * @brief  This function serves to set the 32k tick.
+ * @brief  This function serves to set the 32k tick for sleep.
  * @param  tick - the value of to be set to 32k.
  * @return none.
  */

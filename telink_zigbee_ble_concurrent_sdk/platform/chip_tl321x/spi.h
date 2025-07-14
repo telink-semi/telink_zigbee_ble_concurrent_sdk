@@ -560,7 +560,8 @@ static inline void spi_tx_fifo_clr(spi_sel_e spi_sel)
 {
     BM_SET(reg_spi_status(spi_sel), FLD_SPI_TXF_CLR_LEVEL);
     BM_CLR(reg_spi_ctrl3(spi_sel), FLD_SPI_DMATX_SOF_CLRTXF_EN);
-    while (FLD_SPI_TXF_CLR_LEVEL == (reg_spi_status(spi_sel) & FLD_SPI_TXF_CLR_LEVEL));
+    while (FLD_SPI_TXF_CLR_LEVEL == (reg_spi_status(spi_sel) & FLD_SPI_TXF_CLR_LEVEL))
+        ;
 }
 
 /**
@@ -572,7 +573,8 @@ static inline void spi_rx_fifo_clr(spi_sel_e spi_sel)
 {
     BM_SET(reg_spi_status(spi_sel), FLD_SPI_RXF_CLR_LEVEL);
     BM_CLR(reg_spi_ctrl3(spi_sel), FLD_SPI_DMARX_EOF_CLRRXF_EN);
-    while (FLD_SPI_RXF_CLR_LEVEL == (reg_spi_status(spi_sel) & FLD_SPI_RXF_CLR_LEVEL));
+    while (FLD_SPI_RXF_CLR_LEVEL == (reg_spi_status(spi_sel) & FLD_SPI_RXF_CLR_LEVEL))
+        ;
 }
 
 /**

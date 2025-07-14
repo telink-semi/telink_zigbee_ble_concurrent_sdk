@@ -29,11 +29,7 @@
     #define ADC_SAMPLE_FREQ                     ADC_SAMPLE_FREQ_96K
     #define ADC_SAMPLE_NDMA_DELAY_TIME          ((1000 / ( 6 * (2 << (ADC_SAMPLE_FREQ)))) + 1)//delay 2 sample cycle
     #define ADC_PRESCALE                        ADC_PRESCALE_1F4
-#if defined(MCU_CORE_TL721X)
-    #define ADC_VREF                            ADC_VREF_GPIO_1P2V
-#else//b91/b92/tl321x
     #define ADC_VREF                            ADC_VREF_1P2V
-#endif
 #endif
 
 #if defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
@@ -51,7 +47,7 @@ static u16 adc_get_voltage(void)
     while (1) {
         u8 sample_cnt = adc_get_rxfifo_cnt();
         if (sample_cnt > 0) {
-            adc_sample_data= adc_get_code();
+            adc_sample_data= adc_get_raw_code();
             break;
         }
     }
@@ -135,7 +131,7 @@ void drv_adc_mode_pin_set(drv_adc_mode_e mode, adc_input_pin_def_e pin)
     }
 }
 #elif defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
-void drv_adc_mode_pin_set(drv_adc_mode_e mode, adc_input_pch_e pin)
+void drv_adc_mode_pin_set(drv_adc_mode_e mode, adc_input_pin_def_e pin)
 {
     if (mode == DRV_ADC_BASE_MODE) {
         adc_gpio_cfg_t adc_gpio_cfg_m;

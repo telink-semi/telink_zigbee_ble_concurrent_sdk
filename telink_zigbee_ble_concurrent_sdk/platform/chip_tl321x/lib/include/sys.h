@@ -137,15 +137,14 @@ typedef enum
 {
     INTERNAL_CAP_XTAL24M = 0, /**<    Use the chip's internal crystal capacitors,
                                  <p>  hardware boards can not have 24M crystal matching capacitors */
-    //    EXTERNAL_CAP_XTAL24M = 1, /**<    Use an external crystal capacitor,
-    //                                 <p>  the hardware board needs to have a matching capacitor for the 24M crystal,
-    //                                 <p>  the program will turn off the chip's internal capacitor */
+    EXTERNAL_CAP_XTAL24M = 1, /**<    Use an external crystal capacitor,
+                                <p>  the hardware board needs to have a matching capacitor for the 24M crystal,
+                                <p>  the program will turn off the chip's internal capacitor */
 } cap_typedef_e;
 
 /**
  * @brief   Power type for different application
- * @note    Chip version A0 don't support DCDC_1P25_LDO_1P8 mode, only A1 can use.
- *          Chip version A0/A1 don't support DCDC_1P25_DCDC_1P8 mode, only A2 can use.
+ * @note    Chip version A0 don't support DCDC_1P25_LDO_1P8 mode.
  */
 typedef enum
 {

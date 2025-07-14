@@ -3,7 +3,7 @@
  *
  * @brief    This is the header file for b91 BLE SDK
  *
- * @author	 BLE GROUP
+ * @author   BLE GROUP
  * @date         12,2021
  *
  * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
@@ -24,7 +24,6 @@
 #ifndef BLE_H_
 #define BLE_H_
 
-
 #include "ble_common.h"
 #include "ble_format.h"
 
@@ -43,12 +42,10 @@
 #include "service/hids.h"
 #include "service/uuid.h"
 
-
 /*********************************************************/
 //Remove when file merge to SDK //
 
 #include "service/ota/ota_stack.h"
-/*********************************************************/
-
+/********************************************************/
 
 #endif /* BLE_H_ */

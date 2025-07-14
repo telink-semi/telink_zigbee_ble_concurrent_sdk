@@ -29,7 +29,7 @@
 #pragma once
 
 #ifndef NULL
-#define NULL  0
+#define NULL    0
 #endif
 
 void *memmove(void *dest, const void *src, unsigned int n);
@@ -39,11 +39,11 @@ void *memcpy(void *des_ptr, const void *src_ptr, unsigned int);
 #else
 void *mymemset(void *d, int c, unsigned int n,unsigned int);
 void *mymemcpy(void *des_ptr, const void *src_ptr, unsigned int, unsigned int);
-#define memcpy(x,y,z)           mymemcpy(x,y,z,__LINE__)
-#define memset(x,y,z)           mymemset(x,y,z,__LINE__)
+#define	memcpy(x, y, z) mymemcpy(x, y, z, __LINE__)
+#define	memset(x, y, z) mymemset(x, y, z, __LINE__)
 #endif
 
-// do not return void*,  otherwise, we must use a variable to store the dest porinter, that is not performance 
+//do not return void*, otherwise, we must use a variable to store the dest porinter, that is not performance
 void memcpy4(void *dest, const void *src, unsigned int);
 void *memchr(const void *_s, int _c, unsigned int _n);
 int memcmp(const void *_s1, const void *_s2, unsigned int _n);
@@ -71,5 +71,3 @@ int ismemzero4(void *data, unsigned int len);
 int ismemf4(void *data, unsigned int len);
 void *memset4(void *dest, int val, unsigned int len);
 void zeromem4(void *data, unsigned int len);
-
-

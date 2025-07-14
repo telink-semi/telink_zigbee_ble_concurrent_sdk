@@ -3,7 +3,7 @@
  *
  * @brief    This is the header file for 8258 BLE SDK
  *
- * @author	 BLE GROUP
+ * @author   BLE GROUP
  * @date         12,2021
  *
  * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
@@ -20,7 +20,6 @@
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
  *******************************************************************************************************/
-
 #pragma once
 
 #include "tl_common.h"
@@ -129,13 +128,9 @@ extern u16         devInfo_attrSize;
 /** @} end of group DEVICE_INFORMATION_Variables */
 
 
-
-
  /** @addtogroup  PUBLIC_FUNCTION Device Information APIs
  *  @{
  */
-
-
 
 /** @} end of group PUBLIC_FUNCTION */
 

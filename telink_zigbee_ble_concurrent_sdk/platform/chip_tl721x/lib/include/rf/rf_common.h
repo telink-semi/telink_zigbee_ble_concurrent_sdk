@@ -46,7 +46,7 @@
 /**
  * @brief       This macro is defined to distinguish between A1 and A2 versions of tx power list.
  */
-#define RF_TX_POWER_A2 1
+#define RF_TX_POWER_A2_A3 1
 
 /**
  *  @brief This define serve to calculate the DMA length of packet.
@@ -59,7 +59,7 @@
  *Note:Depending on the given scheme of the design, the software DCOC must be turned on, and this macro definition is only used
  *for internal debugging.Set this macro to 0 when the hardware DCOC needs to be restored(Modified by zhiwei,confirmed by kaixin,20250108)
  */
-#define        RF_RX_DCOC_SOFTWARE_CAL_EN        0 //BLE SDK move the macro here
+#define        RF_RX_DCOC_SOFTWARE_CAL_EN        1 //BLE SDK move the macro here
 /**********************************************************************************************************************
  *                                       RF global data type                                                          *
  *********************************************************************************************************************/
@@ -192,7 +192,6 @@ typedef struct
  */
 typedef struct
 {
-    unsigned char RCCAL_CODE;
     unsigned char CBPF_CCODE_L;
     unsigned char CBPF_CCODE_H;
 } rf_rccal_cal_t;
@@ -205,7 +204,6 @@ typedef struct
     rf_rccal_cal_t rccal_cal;
     unsigned char  tx_fcal[8];
     unsigned char  rx_fcal[8];
-    unsigned char  fcal[8];
 } rf_fast_settle_t;
 
 /**
@@ -249,7 +247,7 @@ typedef enum
 typedef enum
 {
 
-#if RF_TX_POWER_A2
+#if RF_TX_POWER_A2_A3
     /*VBAT*/
     #ifdef GREATER_TX_POWER_EN
     RF_POWER_P12p11dBm = 63, /**<  12.1 dbm */
@@ -393,7 +391,7 @@ typedef enum
 typedef enum
 {
 
-#if RF_TX_POWER_A2
+#if RF_TX_POWER_A2_A3
     /*VBAT*/
     #ifdef GREATER_TX_POWER_EN
     RF_POWER_INDEX_P12p11dBm, /**<  12.1 dbm */
@@ -546,7 +544,7 @@ typedef enum
     RF_MODE_PRI_GENERIC_500K = BIT(18),       /**< private generic 500K mode */
     RF_MODE_PRI_GENERIC_1M   = BIT(19),       /**< private generic 1M mode */
     RF_MODE_PRI_GENERIC_2M   = BIT(20),       /**< private generic 2M mode */
-#if (0)
+    // For Channel sounding.
     RF_MODE_ANT                    = BIT(10), /**< ant mode */
     RF_MODE_HYBEE_1M               = BIT(12), /**< hybee 1M mode */
     RF_MODE_HYBEE_2M               = BIT(13), /**< hybee 2M mode */
@@ -566,7 +564,6 @@ typedef enum
     RF_MODE_HYBEE_2M_2BYTE_SFD     = BIT(29), /**< hybee 2M 2byte sfd mode*/
     RF_MODE_HYBEE_2M_2BYTE_SFD_NEW = BIT(30), /**< hybee 2M 2byte sfd mode new*/
     RF_MODE_HR_2M                  = BIT(31), /**< hr 2M mode*/
-#endif
 
 } rf_mode_e;
 
@@ -609,24 +606,18 @@ typedef enum
     RF_RX_HIGH_PERFORMANCE   = 1,
 } rf_rx_performance_e;
 
-/**
- * @brief Define TX energy modes RF_TX_NORMAL_POWER and RF_TX_HIGH_POWER
- * @note  Defaults to RF_TX_NORMAL_POWER for A2.
- *        RF_TX_HIGH_POWER mode can increase TX power.
- */
-typedef enum    /*!< BLE Move Here */
+/**********************************************************************************************************************
+ *                                         RF global constants                                                        *
+ *********************************************************************************************************************/
+extern _attribute_data_retention_ volatile rf_power_level_e rf_power_Level_list[70];
+extern rf_mode_e              g_rfmode;
+extern rf_crc_config_t        rf_crc_config[3];
+
+typedef enum    //BLE SDK move the macro here
 {
     RF_TX_NORMAL_POWER = 0,
     RF_TX_HIGH_POWER   = 1,
 } rf_tx_power_e;
-
-/**********************************************************************************************************************
- *                                         RF global constants                                                        *
- *********************************************************************************************************************/
-extern _attribute_data_retention_ volatile rf_power_level_e       rf_power_Level_list[70];
-extern rf_mode_e                       g_rfmode;
-extern rf_crc_config_t                 rf_crc_config[3];
-
 /**********************************************************************************************************************
  *                                         RF function declaration                                                    *
  *********************************************************************************************************************/
@@ -1461,5 +1452,51 @@ void rf_rx_fast_settle_get_cal_val(rf_rx_fast_settle_time_e rx_settle_time, unsi
  *  @return     none
 */
 void rf_rx_fast_settle_set_cal_val(rf_rx_fast_settle_time_e rx_settle_time, unsigned char chn, rf_fast_settle_t *fs_cv);
+
+/**
+ *  @brief      This function is used to perform a linear fit on the RF calibration tlinear fit.able data.
+ *  @param[in]  fs_cv    - A pointer to the rf_fast_settle_t structure containing the calibration table.
+ *  @return     none
+ *  @note       This function uses the least squares method to calculate the slope and intercept of the best-fit line.
+ *              The x-values are predefined as {4, 14, 24, 34, 44, 54, 64, 74}.
+ *              The corresponding y-values are taken from the calibration table in the fs_cv structure.
+*/
+void rf_cali_linear_fit(rf_fast_settle_t *fs_cv);
+
+/**
+ * @brief      This function serves to optimize RF performance
+ *             This function must be called every time rx is turned on,
+ *             and is called by an internal function.
+ *             If there are other requirements that need to be called,
+ *             turn off rx first, then call it again to make sure the Settings take effect
+ * @param[in]  none
+ * @return     none
+ * @note       1.Call this function after turning on rx 30us, and the calibration value set by the function
+ *                will take effect after calling rf_ldot_ldo_rxtxlf_bypass_en;if automatic calibration is
+ *                required, you can use rf_ldot_ldo_rxtxlf_bypass_dis to turn off the bypass function; how to
+ *                use it can refer to bqb.c file or rf_emi_rx in emi.c
+ *             2. After using rf_ldot_ldo_rxtxlf_bypass_dis to turn off the bypass function and enter tx/rx
+ *                automatic calibration, to use this function again, you need to call the rf_set_rxpara function
+ *                again after entering rx 30us.
+ *
+ */
+
+void rf_set_rxpara(void);
+
+/**
+ * @brief       This function is used to enable the ldo rxtxlf bypass function, and the calibration value
+ *              written by the software will take effect after enabling.
+ * @param[in]   none.
+ * @return      none.
+ */
+void rf_ldot_ldo_rxtxlf_bypass_en(void);
+
+/**
+ * @brief       This function is used to close the ldo rxtxlf bypass function, and the hardware will
+ *              automatically perform the calibration function after closing.
+ * @param[in]   none.
+ * @return      none.
+ */
+void rf_ldot_ldo_rxtxlf_bypass_dis(void);
 
 #endif

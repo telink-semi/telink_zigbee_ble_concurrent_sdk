@@ -40,17 +40,20 @@ typedef enum
 
     STK_LOG_SMP_LTK = BIT(10),
 
-    STK_LOG_PRF_CS = BIT(12),
-
     STK_LOG_OTA_FLOW = BIT(15),
     STK_LOG_OTA_DATA = BIT(16),
 
-    STK_LOG_HCI_CS = BIT(20),
-    STK_LOG_EBQ_CS = BIT(21),
-    STK_LOG_LL_CS  = BIT(22),
+    STK_LOG_HCI_CS  = BIT(20),
+    STK_LOG_EBQ_CS  = BIT(21),
+    STK_LOG_LL_CS   = BIT(22),
+    STK_LOG_ALGO_CS = BIT(23),
 
     STK_LOG_LL_RX = BIT(26),
     STK_LOG_LL_TX = BIT(27),
+    STK_LOG_HCI_HDT = BIT(28),
+    STK_LOG_LL_HDT  = BIT(29),
+    STK_LOG_SNIF_ACL = BIT(30),
+    STK_LOG_SNIF_CS  = BIT(31),
 
     STK_LOG_ALL = 0xFFFFFFFF,
 } stk_log_msk_t;

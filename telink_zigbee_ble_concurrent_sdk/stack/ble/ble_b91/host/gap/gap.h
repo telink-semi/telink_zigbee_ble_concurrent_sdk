@@ -3,7 +3,7 @@
  *
  * @brief    This is the header file for b91 BLE SDK
  *
- * @author	 BLE GROUP
+ * @author   BLE GROUP
  * @date         12,2021
  *
  * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
@@ -20,10 +20,7 @@
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
  *******************************************************************************************************/
-
 #pragma once
-
-
 
 #define GAP_ADTYPE_FLAGS                        0x01 //!< Discovery Mode: @ref GAP_ADTYPE_FLAGS_MODES
 #define GAP_ADTYPE_16BIT_INCOMPLETE             0x02 //!< Incomplete List of 16-bit Service Class UUIDs
@@ -60,35 +57,15 @@
 #define GAP_ADTYPE_3D_INFORMATION_DATA          0x3D //!< 3D Synchronization Profile, v1.0 or later
 #define GAP_ADTYPE_MANUFACTURER_SPECIFIC        0xFF //!< Manufacturer Specific Data: first 2 octets contain the Company Identifier Code followed by the additional manufacturer specific data
 
-
-
 #define GAP_ADTYPE_LE_LIMITED_DISCOVERABLE_MODE_BIT       0x01
 #define GAP_ADTYPE_LE_GENERAL_DISCOVERABLE_MODE_BIT       0x02
 #define GAP_ADTYPE_LMP_BIT37_BIT                          0x04
 
-
-
 #define GAP_APPEARE_UNKNOWN                     0x0000 //!< Unknown
-
-
-
-
 
 /**
  * @brief      this  function is used to initialize GAP Peripheral
- * @param	   none
+ * @param      none
  * @return     none
  */
-void 		blc_gap_peripheral_init(void);
-
-
-
-
-
-
-
-
-
-
-
-
+void        blc_gap_peripheral_init(void);

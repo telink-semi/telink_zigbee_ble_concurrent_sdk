@@ -3,7 +3,7 @@
  *
  * @brief    This is the header file for 8258 BLE SDK
  *
- * @author	 BLE GROUP
+ * @author   BLE GROUP
  * @date         12,2021
  *
  * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
@@ -20,12 +20,11 @@
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
  *******************************************************************************************************/
-
 #ifndef _AES_H_
 #define _AES_H_
   
-typedef unsigned char           word8;	
-typedef unsigned short          word16;	
+typedef unsigned char           word8;  
+typedef unsigned short          word16; 
 typedef unsigned long           word32;
 
 static const word8 aes_sw_S[256] =
@@ -81,8 +80,5 @@ void _rijndaelEncrypt(unsigned char *a);
 void _rijndaelDecrypt (unsigned char *a);
 
 
-
 void tn_aes_128(unsigned char *key, unsigned char *plaintext, unsigned char *result);
-
-
 #endif

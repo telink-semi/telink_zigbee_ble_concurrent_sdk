@@ -26,4 +26,3 @@
 
 void drv_calibration(void);
 bool drv_get_primary_ieee_addr(u8 *addr);
-

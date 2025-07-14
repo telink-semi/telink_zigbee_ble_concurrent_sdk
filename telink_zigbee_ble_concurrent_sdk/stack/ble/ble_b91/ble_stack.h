@@ -20,17 +20,12 @@
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
  *******************************************************************************************************/
-
 #ifndef BLE_STACK_H_
 #define BLE_STACK_H_
-
-
-
 
 /**
  *  @brief  Definition for Link Layer Feature Support
  */
-
 #define LL_FEATURE_MASK_LL_ENCRYPTION                        			BIT(0) //core_4.0
 #define LL_FEATURE_MASK_CONNECTION_PARA_REQUEST_PROCEDURE  	 			BIT(1) //core_4.1
 #define LL_FEATURE_MASK_EXTENDED_REJECT_INDICATION           			BIT(2) //core_4.1
@@ -71,11 +66,7 @@
 #define LL_FEATURE_MASK_LE_POWER_CHANGE_INDICATION	  					BIT(2)	//core_5.2
 #define LL_FEATURE_MASK_LE_PATH_LOSS_MONITORING	  						BIT(3)	//core_5.2
 
-
-
-
 /////////////////////////////////////////////////////////////////////////////
-
 #define         VENDOR_ID                       0x0211
 #define         VENDOR_ID_HI_B                  U16_HI(VENDOR_ID)
 #define         VENDOR_ID_LO_B                  U16_LO(VENDOR_ID)
@@ -91,7 +82,6 @@
 #define			BLUETOOTH_VER					BLUETOOTH_VER_5_0
 #endif
 
-
 #if (BLUETOOTH_VER == BLUETOOTH_VER_4_2)
 	#define			BLUETOOTH_VER_SUBVER			0x22BB
 #elif (BLUETOOTH_VER == BLUETOOTH_VER_5_0)
@@ -99,9 +89,6 @@
 #else
 	#define			BLUETOOTH_VER_SUBVER			0x4103
 #endif
-
-
-
 
 #if (BLUETOOTH_VER == BLUETOOTH_VER_4_0)
 	#define LL_FEATURE_ENABLE_LE_ENCRYPTION								1
@@ -114,7 +101,6 @@
 	#define	LL_FEATURE_ENABLE_LE_PING									1
 
 	#define LL_CMD_MAX						   							LL_PING_RSP
-
 #elif (BLUETOOTH_VER == BLUETOOTH_VER_4_2)
 
 	#define LL_FEATURE_ENABLE_LE_ENCRYPTION								1
@@ -125,7 +111,6 @@
 	#define	LL_FEATURE_ENABLE_LL_PRIVACY								0
 
 	#define LL_CMD_MAX						  							LL_LENGTH_RSP
-
 #elif (BLUETOOTH_VER == BLUETOOTH_VER_5_0)
 
 	#define LL_FEATURE_ENABLE_LE_ENCRYPTION								1
@@ -143,13 +128,9 @@
 
 	#define	LL_FEATURE_ENABLE_LE_EXTENDED_SCAN							0 //vendor define
 	#define LL_CMD_MAX						   							LL_MIN_USED_CHN_IND
-
-	
-
 #elif (BLUETOOTH_VER == BLUETOOTH_VER_5_1)
 
 #elif (BLUETOOTH_VER == BLUETOOTH_VER_5_2)
-
 	#define LL_FEATURE_ENABLE_LE_ENCRYPTION								1
 	#define	LL_FEATURE_ENABLE_EXTENDED_REJECT_INDICATION				1
 	#define	LL_FEATURE_ENABLE_SLAVE_INITIATED_FEATURES_EXCHANGE			1
@@ -166,10 +147,9 @@
 	#define	LL_FEATURE_ENABLE_ISOCHRONOUS_BROADCASTER					LL_FEATURE_SUPPORT_ISOCHRONOUS_BROADCASTER
 	#define	LL_FEATURE_ENABLE_SYNCHRONIZED_RECEIVER						LL_FEATURE_SUPPORT_SYNCHRONIZED_RECEIVER
 	#define	LL_FEATURE_ENABLE_ISOCHRONOUS_CHANNELS						LL_FEATURE_SUPPORT_ISOCHRONOUS_CHANNELS
-
-
 	#define LL_FEATURE_ENABLE_CONNECTED_ISO								(     LL_FEATURE_ENABLE_CONNECTED_ISOCHRONOUS_STREAM_MASTER \
 																			| LL_FEATURE_ENABLE_CONNECTED_ISOCHRONOUS_STREAM_SLAVE     )
+
 
 	#define LL_FEATURE_ENABLE_CONNECTIONLESS_ISO  						(	  LL_FEATURE_ENABLE_ISOCHRONOUS_BROADCASTER				\
 																			| LL_FEATURE_ENABLE_SYNCHRONIZED_RECEIVER )
@@ -186,12 +166,7 @@
 	#define LL_FEATURE_BIT_NUMBER_ISOCHRONOUS_CHANNELS					32
 
 #else
-
-
 #endif
-
-
-
 
 #ifndef		 LL_FEATURE_ENABLE_LE_ENCRYPTION
 #define		 LL_FEATURE_ENABLE_LE_ENCRYPTION							0
@@ -283,9 +258,6 @@
 #endif
 
 
-
-
-
 //BIT<0:31>
 // feature below is configured by application layer or HCI command
 // <8>  : LL_FEATURE_ENABLE_LE_2M_PHY
@@ -335,19 +307,9 @@ extern u32 LL_FEATURE_MASK_1;
 #define LL_FEATURE_BYTE_6												U32_BYTE2(LL_FEATURE_MASK_1)
 #define LL_FEATURE_BYTE_7												U32_BYTE3(LL_FEATURE_MASK_1)
 
-
-
-
-
-
-
-
-
-
 /******************************************** Link Layer **************************************************************/
 #define 				BLE_T_IFS					150	//unit: uS
 #define 				BLE_T_MSS					150	//unit: uS
-
 
 /**
  *  @brief  Definition for LLID of Data Physical Channel PDU header field
@@ -356,15 +318,6 @@ extern u32 LL_FEATURE_MASK_1;
 #define 				LLID_DATA_CONTINUE			0x01
 #define 				LLID_DATA_START				0x02
 #define 				LLID_CONTROL				0x03
-
-
-
-
-
-
-
-
-
 
 //Extended Header BIT
 #define 		EXTHD_BIT_ADVA         							BIT(0)
@@ -375,7 +328,6 @@ extern u32 LL_FEATURE_MASK_1;
 #define 		EXTHD_BIT_SYNC_INFO	    						BIT(5)
 #define 		EXTHD_BIT_TX_POWER	     						BIT(6)
 
-
 //Extended Header Length
 #define			EXTHD_LEN_6_ADVA								6
 #define			EXTHD_LEN_6_TARGETA								6
@@ -385,26 +337,15 @@ extern u32 LL_FEATURE_MASK_1;
 #define			EXTHD_LEN_18_SYNC_INFO							18
 #define			EXTHD_LEN_1_TX_POWER							1
 
-
 #define 		LL_EXTADV_MODE_NON_CONN_NON_SCAN    			(0x00)
 #define 		LL_EXTADV_MODE_CONN        						(0x01)		//connectable, none_scannable
 #define 		LL_EXTADV_MODE_SCAN        						(0x02)      //scannable,   none_connectable
-
-
-
 
 #define			EXT_ADV_PDU_AUXPTR_OFFSET_UNITS_30_US			0
 #define			EXT_ADV_PDU_AUXPTR_OFFSET_UNITS_300_US			1
 
 #define			EXT_ADV_PDU_AUXPTR_CA_51_500_PPM				0
 #define			EXT_ADV_PDU_AUXPTR_CA_0_50_PPM					1
-
-
-
-
-
-
-
 
 // Advertise channel PDU Type
 typedef enum advChannelPDUType_e {
@@ -420,9 +361,6 @@ typedef enum advChannelPDUType_e {
 	LL_TYPE_AUX_CONNECT_RSP = 0x08,
 } advChannelPDUType_t;
 
-
-
-
 /**
  *  @brief  Definition for LLID of Connected Isochronous PDU header field
  */
@@ -433,9 +371,6 @@ typedef enum{
 	CIS_LLID_RESERVED 								= 0x03,
 }cis_llid_type;
 
-
-
-
 /**
  *  @brief  Definition for BIG Control PDU Opcode
  */
@@ -443,23 +378,12 @@ typedef enum{
 	BIG_CHANNEL_MAP_IND	= 0x00,
 	BIG_TERMINATE_IND	= 0x01,
 }big_ctrl_op;
-
-
-
-
-
 /******************************************** L2CAP **************************************************************/
 
 // l2cap pb flag type
 #define L2CAP_FIRST_PKT_H2C              0x00
 #define L2CAP_CONTINUING_PKT             0x01
 #define L2CAP_FIRST_PKT_C2H              0x02
-
-
-
-
-
-
 
 /**
  *  @brief  Definition for Error Response of signal packet
@@ -493,19 +417,12 @@ typedef enum{
 	L2CAP_RECONFIG_FAIL_OTHER_UNACCEPTABLE_PARAMETERS = 4,
 }l2cap_credit_based_reconfigure_rsp_result;
 
-
 /******************************************** ATT ***************************************************************/
-
-
-
-
-
 /**
  *  @brief  Definition for Error Response of ATTRIBUTE PROTOCOL PDUS
  *  See the Core_v5.0(Vol 3/Part F/3.4.1.1, "Error Response") for more information.
  */
 typedef enum {
-
 	ATT_SUCCESS = 0,
 
     ATT_ERR_INVALID_HANDLE,                              //!< The attribute handle given was not valid on this server
@@ -525,12 +442,7 @@ typedef enum {
     ATT_ERR_INSUFFICIENT_ENCRYPT,                        //!< The attribute requires encryption before it can be read or written
     ATT_ERR_UNSUPPORTED_GRP_TYPE,                        //!< The attribute type is not a supported grouping attribute as defined by a higher layer specification
     ATT_ERR_INSUFFICIENT_RESOURCES,                      //!< Insufficient Resources to complete the request
-
-
-
 }att_err_t;
-
-
 
 void smemset(void * dest, int val, int len);
 void smemcpy(void *pd, void *ps, int len);

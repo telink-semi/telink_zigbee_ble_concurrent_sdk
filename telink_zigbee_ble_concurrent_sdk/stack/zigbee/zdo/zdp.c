@@ -22,7 +22,6 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-
 #include "../common/includes/zb_common.h"
 
 
@@ -61,7 +60,6 @@ const zdp_funcList_t g_zdpClientFunc[] = {
     {MGMT_NWK_UPDATE_REQ_CLID,          FALSE,  zdo_mgmtNwkUpdateIndicate}
 };
 
-
 const u16 zdoIncluster[7] = {
     NWK_ADDR_RSP_CLID,
     IEEE_ADDR_RSP_CLID,
@@ -84,15 +82,15 @@ const u16 zdoOutCluster[8] = {
 };
 
 const af_simple_descriptor_t zdoSd = {
-    ZDO_PROFILE_ID,         /* Profile id */
-    0,                      /* Application device identifier */
-    ZDO_EP,                 /* EP */
-    0,                      /* Application device version */
-    0,                      /* Reserved */
-    7,                      /* Application input cluster count */
-    8,                      /* Application output cluster count */
-    (u16 *)zdoIncluster,    /* Application input cluster list */
-    (u16 *)zdoOutCluster,   /* Application output cluster list */
+    ZDO_PROFILE_ID,             /* Profile id */
+    0,                          /* Application device identifier */
+    ZDO_EP,                     /* EP */
+    0,                          /* Application device version */
+    0,                          /* Reserved */
+    7,                          /* Application input cluster count */
+    8,                          /* Application output cluster count */
+    (u16 *)zdoIncluster,        /* Application input cluster list */
+    (u16 *)zdoOutCluster,       /* Application output cluster list */
 };
 
 
@@ -112,8 +110,7 @@ _CODE_ZDO_ void zdp_serverCmdHandler(void *ind)
         zdo_parentAnnounceNotify(ind);
         zb_buf_free((zb_buf_t *)ind);
         return;
-    } else if (p->cluster_id == NWK_ADDR_RSP_CLID || \
-               p->cluster_id == IEEE_ADDR_RSP_CLID) {
+    } else if (p->cluster_id == NWK_ADDR_RSP_CLID || p->cluster_id == IEEE_ADDR_RSP_CLID) {
         zdo_remoteAddrNotify(ind);
     }
 #endif
@@ -143,10 +140,8 @@ _CODE_ZDO_ static void zdp_clientCmdHandler(void *ind)
     for (u32 i = 0; i < sizeof(g_zdpClientFunc)/sizeof(zdp_funcList_t); i++) {
         if ((g_zdpClientFunc[i].clusterId == p->cluster_id) && g_zdpClientFunc[i].func) {
             /* Check configuration mode. */
-            if ((g_zdpClientFunc[i].restricted == TRUE) && \
-                (APS_IB().aps_zdo_restricted_mode == TRUE) && \
-                ((p->src_short_addr != NWK_NIB().managerAddr) || \
-                 !(p->security_status & SECURITY_IN_APSLAYER))) {
+            if ((g_zdpClientFunc[i].restricted == TRUE) && (APS_IB().aps_zdo_restricted_mode == TRUE) &&
+               ((p->src_short_addr != NWK_NIB().managerAddr) || !(p->security_status & SECURITY_IN_APSLAYER))) {
                 sta = ZDO_NOT_AUTHORIZED;
                 break;
             }
@@ -156,8 +151,7 @@ _CODE_ZDO_ static void zdp_clientCmdHandler(void *ind)
         }
     }
 
-    if((p->dst_addr_mode == APS_SHORT_DSTADDR_WITHEP) && \
-        ZB_NWK_IS_ADDRESS_BROADCAST(p->dst_addr)) {
+    if ((p->dst_addr_mode == APS_SHORT_DSTADDR_WITHEP) && ZB_NWK_IS_ADDRESS_BROADCAST(p->dst_addr)) {
         zb_buf_free((zb_buf_t *)ind);
         return;
     }
@@ -268,4 +262,3 @@ _CODE_ZDO_ void zdo_userDescIndicate(void *buf)
     zb_buf_free((zb_buf_t *)zzr.buff_addr);
 }
 #endif
-

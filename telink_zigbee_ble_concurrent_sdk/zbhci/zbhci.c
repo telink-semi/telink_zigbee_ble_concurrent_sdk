@@ -84,7 +84,8 @@ u8 crc8Calculate(u16 type, u16 length, u8 *data)
 }
 
 #if ZBHCI_BLE_CONTROLLER
-u8 hci_txMsg(u16 u16Type, u16 u16Length, u8 *pu8Data){
+u8 hci_txMsg(u16 u16Type, u16 u16Length, u8 *pu8Data)
+{
     u32 header = HCI_FLAG_EVENT_BT_STD;
     u8 reLength = u16Length + 7;
 //	u8 sendData[72] = {0};

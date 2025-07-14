@@ -54,5 +54,5 @@ _CODE_ZCL_ status_t zcl_binary_output_register(u8 endpoint, u16 manuCode, u8 att
     return zcl_registerCluster(endpoint, ZCL_CLUSTER_GEN_BINARY_OUTPUT_BASIC, manuCode, attrNum, attrTbl, NULL, cb);
 }
 
-#endif  /* ZCL_BINARY_OUTPUT */
+#endif	/* ZCL_BINARY_OUTPUT */
 

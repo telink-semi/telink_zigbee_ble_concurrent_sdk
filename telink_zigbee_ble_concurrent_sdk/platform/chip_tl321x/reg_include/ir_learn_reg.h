@@ -7,7 +7,6 @@
  * @date    2024
  *
  * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- *          All rights reserved.
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -22,6 +21,8 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
+#include "chip_config.h"
+#if(COMPATIBLE_WITH_TL321X_AND_TL323X == 0)
 #ifndef IR_LEARN_REG_H
 #define IR_LEARN_REG_H
 #include "soc.h"
@@ -126,4 +127,5 @@ typedef enum
     FLD_IR_LEARN_FIFO_RX_DONE  = BIT(6),
 } ir_learn_fifo_sta_e;
 
+#endif
 #endif

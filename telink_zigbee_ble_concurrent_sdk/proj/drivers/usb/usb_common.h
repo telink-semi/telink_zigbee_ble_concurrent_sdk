@@ -22,7 +22,6 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-
 #pragma once
 
 #include "usb.h"
@@ -35,5 +34,3 @@
 #if (__PROJECT_TL_SNIFFER__)
 #include "app/usbsniffer.h"
 #endif
-
-

@@ -75,7 +75,7 @@ _attribute_ram_code_ void switch_to_ble_context(void)
     /* switch tx power for ble mode */
     ZB_RADIO_TX_POWER_SET(g_ble_txPowerSet);
 
-    ZB_RADIO_RX_ENABLE;
+//    ZB_RADIO_RX_ENABLE;
 
     CURRENT_SLOT_SET(DUALMODE_SLOT_BLE);
 }
@@ -130,7 +130,12 @@ void zb_task(void)
     tl_zbTaskProcedure();
 
 #if BLE_SUPPORT_CONTROLLER_ONLY
-    HCI_TxHandler();
+    extern void HCI_Handler(void);
+    if(APP_BLE_STATE_IDLE()){
+    	HCI_Tr_H4RxHandler();
+    }
+    HCI_Handler();
+
 #endif
 }
 
@@ -178,14 +183,9 @@ void zb_ble_switch_proc(void)
 
          r = drv_disable_irq();
 
-#if BLE_SUPPORT_CONTROLLER_ONLY
-         if (((get_ble_event_state() && is_switch_to_zigbee()) || APP_BLE_STATE_IDLE()) && \
-             (!HCI_RxHaveData()) && \
-             (!switch_to_ble)){
-#else
+
          if(((get_ble_event_state() && is_switch_to_zigbee()) || APP_BLE_STATE_IDLE()) && \
             (!switch_to_ble)){
-#endif
              /*
               * ready to switch to ZIGBEE mode
               *
@@ -211,7 +211,7 @@ void zb_ble_switch_proc(void)
          r = drv_disable_irq();
 #if BLE_SUPPORT_CONTROLLER_ONLY
          if (!zb_rfTxDoing() && \
-            ((is_switch_to_ble() && !APP_BLE_STATE_IDLE()) || HCI_RxHaveData() || switch_to_ble)){
+            (((is_switch_to_ble() || HCI_RxHaveData()) && !APP_BLE_STATE_IDLE()) || switch_to_ble)){
 #else
          if (!zb_rfTxDoing() && ((is_switch_to_ble() && !APP_BLE_STATE_IDLE()) || switch_to_ble)) {
 #endif

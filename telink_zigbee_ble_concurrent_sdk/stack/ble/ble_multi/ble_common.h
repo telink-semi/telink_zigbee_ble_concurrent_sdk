@@ -180,6 +180,7 @@ typedef enum
 
 } ble_sts_t;
 
+#if !HOST_V2_ENABLE
 /**
  *  @brief  Definition for Error Response of ATTRIBUTE PROTOCOL PDUS
  *  See the Core_v5.0(Vol 3/Part F/3.4.1.1, "Error Response") for more information.
@@ -216,6 +217,7 @@ typedef enum
     ATT_ERR_OUT_OF_RANGE,                         //!< Out of Range
 
 } att_err_t;
+#endif
 
 /**
  *  @brief  error code for user initialization error
@@ -288,8 +290,11 @@ typedef enum
 } init_err_t;
 
 /////////////////////////////// BLE  MAC ADDRESS //////////////////////////////////////////////
-#define BLE_ADDR_PUBLIC  0
-#define BLE_ADDR_RANDOM  1
+#define BLE_ADDR_PUBLIC         0 //BDA: Public
+#define BLE_ADDR_RANDOM         1 //BDA: Random
+#define BLE_ADDR_PUBLIC_ID      2 //BDA: Public Identity Address, RPA
+#define BLE_ADDR_RANDOM_ID      3 //BDA: Random (Static) Identity Address, RPA
+
 #define BLE_ADDR_INVALID 0xff
 #define BLE_ADDR_LEN     6
 
@@ -484,16 +489,15 @@ unsigned short blt_Crc16ComputeInternal (unsigned char *pD, int len);
 
 
 /**
- * @brief      get SDK and Lib version. Now the version is 16Bytes.
- *                      Struction               Example
- *                  - SDK Version (4B)      :   "04 00 01 01" means V4.0.1.1
- *                  - Patch Version (1B)    :   "01" means Patch_01
- *                  - Lib built date (5B)   :   "44 65 63 14 23" means Dec 14 2023
- *                  - Lib built time (2B)   :   "20 56" means 20:46
- *                  - Reserved (4B)         :   "FF FF FF FF"
- * @param[in]  pbuf - the pointer to the verion buffer.
- * @param[in]  number - the value is reserved for future use.
- * @return     the length or version char array.
+ * @brief      get SDK and library version information
+ * @param[in]  pbuf - the pointer to the version information string.
+ *             eg. "V4.0.4.4_P0001 C0.0 Develop 105b2c862 Thu Jun 19 21:09:30 2025 +0800 Dirty 2025-06-19 23:29:58"
+ *             The format is
+ *                SDK Version: V4.0.4.4_P0001
+ *                Custom Version: C0.0    //Only specific customers will use this
+ *                Lib version: Branch CID LogTime GitStatus BuildTime     //When users feedback issues, this will be more helpful
+ * @param[in]  number - the size of the string user give.
+ * @return     the actual length or version information string.
  */
 unsigned char blc_get_sdk_version(unsigned char *pbuf, unsigned char number);
 

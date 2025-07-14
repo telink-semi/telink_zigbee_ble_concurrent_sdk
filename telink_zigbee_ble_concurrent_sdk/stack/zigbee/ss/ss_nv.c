@@ -34,7 +34,7 @@ _CODE_SS_ void zdo_ssInfoSaveToFlash(void)
      * ss_ib.nwkSecurMaterialSet[0].key and ss_ib.nwkSecurMaterialSet[1].key
      *
      * */
-    nv_flashWriteNew(1, NV_MODULE_APS, NV_ITEM_APS_SSIB, sizeof(ss_ib), (u8*)&ss_ib);
+    nv_flashWriteNew(1, NV_MODULE_APS, NV_ITEM_APS_SSIB, sizeof(ss_ib), (u8 *)&ss_ib);
 #endif
 }
 
@@ -58,8 +58,8 @@ _CODE_SS_ u8 zdo_ssInfoKeyGet(void)
     u8 ret = NV_ITEM_NOT_FOUND;
 #if NV_ENABLE
     ss_info_base_t ss;
-    ret = nv_flashReadNew(1, NV_MODULE_APS, NV_ITEM_APS_SSIB, sizeof(ss_ib), (u8*)&ss);
-    if(ret == NV_SUCC){
+    ret = nv_flashReadNew(1, NV_MODULE_APS, NV_ITEM_APS_SSIB, sizeof(ss_ib), (u8 *)&ss);
+    if (ret == NV_SUCC) {
         ret = ss.activeSecureMaterialIndex;
     }
 #endif
@@ -67,4 +67,3 @@ _CODE_SS_ u8 zdo_ssInfoKeyGet(void)
 }
 
 #endif
-

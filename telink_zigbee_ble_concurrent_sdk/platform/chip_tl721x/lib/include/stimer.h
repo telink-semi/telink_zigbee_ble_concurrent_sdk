@@ -397,7 +397,8 @@ static _always_inline void stimer_set_update_upon_nxt_32k_disable(void)
  */
 static _always_inline void stimer_wait_write_done(void)
 {
-    while ((reg_system_st & FLD_SYSTEM_CMD_SET_DLY_DONE) == 0);
+    while ((reg_system_st & FLD_SYSTEM_CMD_SET_DLY_DONE) == 0)
+        ;
 }
 
 /**
@@ -471,7 +472,8 @@ static _always_inline void stimer_set_32k_read_mode(void)
  */
 static _always_inline void stimer_wait_read_32k_done(void)
 {
-    while (reg_system_st & FLD_SYSTEM_RD_BUSY);
+    while (reg_system_st & FLD_SYSTEM_RD_BUSY)
+        ;
 }
 
 /**
@@ -498,7 +500,8 @@ static _always_inline void stimer_set_32k_tick_write_trig(void)
  */
 static _always_inline void stimer_wait_write_32k_done(void)
 {
-    while (reg_system_st & FLD_SYSTEM_CMD_SYNC);
+    while (reg_system_st & FLD_SYSTEM_CMD_SYNC)
+        ;
 }
 
 /**

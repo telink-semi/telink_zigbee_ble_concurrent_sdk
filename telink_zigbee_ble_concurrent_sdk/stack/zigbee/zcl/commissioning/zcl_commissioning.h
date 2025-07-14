@@ -22,10 +22,8 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-
 #ifndef ZCL_COMMISSIONING_H
 #define ZCL_COMMISSIONING_H
-
 
 
 /** @addtogroup  TELINK_ZIGBEE_STACK TELINK ZigBee Stack
@@ -49,16 +47,16 @@
  */
 
 // Client generated command
-#define ZCL_CMD_RESTART_DEVICE                            0x00
-#define ZCL_CMD_SAVE_STARTUP_PARAMETERS                   0x01
-#define ZCL_CMD_RESTORE_STARTUP_PARAMETERS                0x02
-#define ZCL_CMD_RESET_STARTUP_PARAMETERS                  0x03
+#define ZCL_CMD_RESTART_DEVICE                          0x00
+#define ZCL_CMD_SAVE_STARTUP_PARAMETERS                 0x01
+#define ZCL_CMD_RESTORE_STARTUP_PARAMETERS              0x02
+#define ZCL_CMD_RESET_STARTUP_PARAMETERS                0x03
 
 // Server generated command
-#define ZCL_CMD_RESTART_DEVICE_RSP                        0x00
-#define ZCL_CMD_SAVE_STARTUP_PARAMETERS_RSP               0x01
-#define ZCL_CMD_RESTORE_STARTUP_PARAMETERS_RSP            0x02
-#define ZCL_CMD_RESET_STARTUP_PARAMETERS_RSP              0x03
+#define ZCL_CMD_RESTART_DEVICE_RSP                      0x00
+#define ZCL_CMD_SAVE_STARTUP_PARAMETERS_RSP             0x01
+#define ZCL_CMD_RESTORE_STARTUP_PARAMETERS_RSP          0x02
+#define ZCL_CMD_RESET_STARTUP_PARAMETERS_RSP            0x03
 
 /** @} end of group zcl_commissioning_cmdId */
 
@@ -112,19 +110,19 @@
 /**
  *  @brief  Definition for commissioning command callback format
  */
-typedef void (*zcl_restartDeviceCb_t)( u8 options, u8 delay, u8 jitter );
-typedef void (*zcl_saveStartupParamsCb_t)( u8 options, u8 index );
-typedef void (*zcl_restoreStartupParamsCb_t)( u8 options, u8 index );
-typedef void (*zcl_resetStartupParamsCb_t)( u8 options, u8 index );
+typedef void (*zcl_restartDeviceCb_t)(u8 options, u8 delay, u8 jitter);
+typedef void (*zcl_saveStartupParamsCb_t)(u8 options, u8 index);
+typedef void (*zcl_restoreStartupParamsCb_t)(u8 options, u8 index);
+typedef void (*zcl_resetStartupParamsCb_t)(u8 options, u8 index);
 
 /**
  *  @brief  Structure definition for commands callback functions in commissioning cluster
  */
 typedef struct {
-    zcl_restartDeviceCb_t    restartDeviceCbFunc;
-    zcl_saveStartupParamsCb_t    saveStartupParamsCbFunc;
-    zcl_restoreStartupParamsCb_t    restoreStartupParamsCbFunc;
-    zcl_resetStartupParamsCb_t    resetStartupParamsCbFunc;
+    zcl_restartDeviceCb_t restartDeviceCbFunc;
+    zcl_saveStartupParamsCb_t saveStartupParamsCbFunc;
+    zcl_restoreStartupParamsCb_t restoreStartupParamsCbFunc;
+    zcl_resetStartupParamsCb_t resetStartupParamsCbFunc;
 } zcl_commissioning_AppCallbacks_t;
 
 /** @} end of group ZCL_COMMISSIONING_Callbacks */
@@ -139,7 +137,7 @@ typedef struct {
  */
 
 /* Startup attributes set*/
-    /* General startup attributes */
+/* General startup attributes */
 extern u16 zcl_attr_short_address;
 extern extPANId_t zcl_attr_extended_PAN_id;
 extern u16 zcl_attr_PAN_id;
@@ -148,7 +146,7 @@ extern u8 zcl_attr_protocol_version;
 extern u8 zcl_attr_stack_profile;
 extern u8 zcl_attr_startup_control;
 
-    /* Security attributes */
+/* Security attributes */
 extern addrExt_t zcl_attr_trust_center_address;
 extern u8 zcl_attr_trust_center_master_key[16];
 extern u8 zcl_attr_network_key[16];
@@ -212,4 +210,4 @@ status_t zcl_commissioning_register(u8 endpoint, u8 attrNum, const zclAttrInfo_t
 void zcl_initialize_startup_attributes();
 
 
-#endif  /* ZCL_COMMISSIONING_H */
+#endif	/* ZCL_COMMISSIONING_H */

@@ -50,24 +50,6 @@ typedef struct
     unsigned int  rf_pkt_mask_high;
 } rf_pkt_flt_t;
 
-/**
- *  @brief  set the modulation index.
- */
-typedef enum
-{
-    RF_MI_P0p00  = 0,    /**< MI = 0 */
-    RF_MI_P0p076 = 76,   /**< MI = 0.076 */
-    RF_MI_P0p32  = 320,  /**< MI = 0.32 */
-    RF_MI_P0p50  = 500,  /**< MI = 0.5 */
-    RF_MI_P0p60  = 600,  /**< MI = 0.6 */
-    RF_MI_P0p70  = 700,  /**< MI = 0.7 */
-    RF_MI_P0p80  = 800,  /**< MI = 0.8 */
-    RF_MI_P0p90  = 900,  /**< MI = 0.9 */
-    RF_MI_P1p20  = 1200, /**< MI = 1.2 */
-    RF_MI_P1p30  = 1300, /**< MI = 1.3 */
-    RF_MI_P1p40  = 1400, /**< MI = 1.4 */
-} rf_mi_value_e;
-
 /**********************************************************************************************************************
  *                                         RF_PRIVATE global macro                                                    *
  *********************************************************************************************************************/
@@ -260,25 +242,5 @@ void rf_set_pri_generic_noack_start_bit(unsigned char noack_start_bit);
  * @return    none.
  */
 void rf_set_pri_generic_noack_en(void);
-
-/**
-  * @brief      This function is used to  set the modulation index of the receiver.
-  *              This function is common to all modes,the order of use requirement:configure mode first,
-  *              then set the the modulation index,default is 0.5 in drive,both sides need to be consistent
-  *              otherwise performance will suffer,if don't specifically request,don't need to call this function.
-  * @param[in]  mi_value- the value of modulation_index*100.
-  * @return     none.
-  */
-void rf_set_rx_modulation_index(rf_mi_value_e mi_value);
-
-/**
-  * @brief      This function is used to  set the modulation index of the sender.
-  *              This function is common to all modes,the order of use requirement:configure mode first,
-  *              then set the the modulation index,default is 0.5 in drive,both sides need to be consistent
-  *              otherwise performance will suffer,if don't specifically request,don't need to call this function.
-  * @param[in]  mi_value- the value of modulation_index*100.
-  * @return     none.
-  */
-void rf_set_tx_modulation_index(rf_mi_value_e mi_value);
 
 #endif

@@ -33,6 +33,7 @@ _attribute_ble_data_retention_      int central_smp_pending = 0;        // SMP: 
 _attribute_data_retention_  unsigned int  tlk_flash_mid = 0;
 _attribute_data_retention_  unsigned int  tlk_flash_vendor = 0;
 _attribute_data_retention_  unsigned char tlk_flash_capacity;
+_attribute_data_retention_ u32 flash_sector_mac_address = FLASH_ADDR_OF_MAC_ADDR_2M;
 
 /********************* ACL connection LinkLayer TX & RX data FIFO allocation, Begin ************************************************/
 /**
@@ -43,7 +44,6 @@ _attribute_data_retention_  unsigned char tlk_flash_capacity;
  * 2. for CIS peripheral, receive ll_cis_req(36Byte), must be equal to or greater than 36
  */
 #define ACL_CONN_MAX_RX_OCTETS          27  //user set value
-
 
 /**
  * @brief   connMaxTxOctets
@@ -112,7 +112,6 @@ _attribute_data_retention_  unsigned char tlk_flash_capacity;
 
 #define PERIPHR_L2CAP_BUFF_SIZE         CAL_L2CAP_BUFF_SIZE(PERIPHR_ATT_RX_MTU) //user can not change !!!
 
-
 /********************* ACL connection LinkLayer TX & RX data FIFO allocation, Begin *******************************/
 
 /**
@@ -179,30 +178,23 @@ int app_controller_event_callback (u32 h, u8 *p, int n)
         u8 evtCode = h & 0xff;
 
         //------------ disconnect -------------------------------------
-        if (evtCode == HCI_EVT_DISCONNECTION_COMPLETE) { //connection terminate
+        if (evtCode == HCI_EVT_DISCONNECTION_COMPLETE) {  //connection terminate
 
         } else if (evtCode == HCI_EVT_LE_META) {  //LE Event
             u8 subEvt_code = p[0];
-
             //------hci le event: le connection complete event---------------------------------
             if (subEvt_code == HCI_SUB_EVT_LE_CONNECTION_COMPLETE) {  // connection complete
 
-
-            }
-            //--------hci le event: le adv report event ----------------------------------------
-            else if (subEvt_code == HCI_SUB_EVT_LE_ADVERTISING_REPORT)  // ADV packet
-            {
-
-            }
-            //------hci le event: le connection update complete event-------------------------------
-            else if (subEvt_code == HCI_SUB_EVT_LE_CONNECTION_UPDATE_COMPLETE)  // connection update
-            {
+            } else if (subEvt_code == HCI_SUB_EVT_LE_ADVERTISING_REPORT) {
+                //after controller is set to scan state, it will report all the adv packet it received by this event
+            } else if (subEvt_code == HCI_SUB_EVT_LE_CONNECTION_UPDATE_COMPLETE) {
 
             } else if (subEvt_code == HCI_SUB_EVT_LE_ADVERTISING_SET_TERMINATED) {
                 printf("Recv conn request and the adv stop....\n");
             }
         }
     }
+
     return 0;
 }
 
@@ -220,8 +212,7 @@ int app_host_event_callback (u32 h, u8 *para, int n)
     u8 event = h & 0xFF;
     tlkapi_send_string_data(APP_LOG_EN, "[APP][EVT] host event", &event, 1);
 
-    switch(event)
-    {
+    switch (event) {
         case GAP_EVT_SMP_PAIRING_BEGIN:
         {
 
@@ -295,16 +286,6 @@ int app_host_event_callback (u32 h, u8 *para, int n)
     return 0;
 }
 
-/*
- *B91:  VVWWXX 775FD8 YYZZ
- *B92:  VVWWXX B4CF3C YYZZ
-
- * public_mac:
- *              B91 : VVWWXX 775FD8
- *              B92 : VVWWXX B4CF3C
- *
- * random_static_mac: VVWWXXYYZZ C0
- */
 /**
  * @brief       This function is used to initialize the MAC address
  * @param[in]   flash_addr - flash address for MAC address
@@ -312,62 +293,62 @@ int app_host_event_callback (u32 h, u8 *para, int n)
  * @param[in]   mac_random_static - random static MAC address
  * @return      none
  */
-_attribute_no_inline_
-void blc_initMacAddress(int flash_addr, u8 *mac_public, u8 *mac_random_static)
+_attribute_no_inline_ void blc_initMacAddress(int flash_addr, u8 *mac_public, u8 *mac_random_static)
 {
+	flash_sector_mac_address = flash_addr;
+
     int rand_mac_byte3_4_read_OK = 0;
-    u8 mac_read[8];
+    u8  mac_read[8];
     flash_read_page(flash_addr, 8, mac_read);
 
     u8 value_rand[5];
     generateRandomNum(5, value_rand);
 
     u8 ff_six_byte[6] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
-    if ( memcmp(mac_read, ff_six_byte, 6) ) { //read MAC address on flash success
-        memcpy(mac_public, mac_read, 6);  //copy public address from flash
+    if (memcmp(mac_read, ff_six_byte, 6)) { //read MAC address on flash success
+        memcpy(mac_public, mac_read, 6);    //copy public address from flash
 
-        if(mac_read[6] != 0xFF && mac_read[7] != 0xFF){
-            mac_random_static[3] = mac_read[6];
-            mac_random_static[4] = mac_read[7];
+        if (mac_read[6] != 0xFF && mac_read[7] != 0xFF) {
+            mac_random_static[3]     = mac_read[6];
+            mac_random_static[4]     = mac_read[7];
             rand_mac_byte3_4_read_OK = 1;
         }
-    } else {  //no MAC address on flash
+    } else {                                       //no MAC address on flash
 
-        #if (BUILT_IN_MAC_ON_EFUSE)
-            if(efuse_get_mac_address(mac_read, 8)) //read MAC address on Efuse success
-            {
-                memcpy(mac_public, mac_read, 6);  //copy public address from Efuse
+#if (BUILT_IN_MAC_ON_DEVICE)
+        if (get_device_mac_address(mac_read, 8)) { //read device MAC address
+            memcpy(mac_public, mac_read, 6);       //copy public address from device
 
-                mac_random_static[3] = mac_read[6];
-                mac_random_static[4] = mac_read[7];
-                rand_mac_byte3_4_read_OK = 1;
-            }
-            else
-        #endif
-            {
-                mac_public[0] = value_rand[0];
-                mac_public[1] = value_rand[1];
-                mac_public[2] = value_rand[2];
+            mac_random_static[3]     = mac_read[6];
+            mac_random_static[4]     = mac_read[7];
+            rand_mac_byte3_4_read_OK = 1;
+        } else
+#endif
+        {
+            mac_public[0] = value_rand[0];
+            mac_public[1] = value_rand[1];
+            mac_public[2] = value_rand[2];
 
-                /* company id */
-                mac_public[3] = U32_BYTE0(PDA_COMPANY_ID);
-                mac_public[4] = U32_BYTE1(PDA_COMPANY_ID);
-                mac_public[5] = U32_BYTE2(PDA_COMPANY_ID);
+            /* company id */
+            mac_public[3] = U32_BYTE0(PDA_COMPANY_ID);
+            mac_public[4] = U32_BYTE1(PDA_COMPANY_ID);
+            mac_public[5] = U32_BYTE2(PDA_COMPANY_ID);
 
-                flash_write_page (flash_addr, 6, mac_public); //store public address on flash for future use
-            }
+            flash_write_page(flash_addr, 6, mac_public); //store public address on flash for future use
+        }
     }
+
 
     mac_random_static[0] = mac_public[0];
     mac_random_static[1] = mac_public[1];
     mac_random_static[2] = mac_public[2];
-    mac_random_static[5] = 0xC0;            //for random static
+    mac_random_static[5] = 0xC0; //for random static
 
     if (!rand_mac_byte3_4_read_OK) {
         mac_random_static[3] = value_rand[3];
         mac_random_static[4] = value_rand[4];
 
-        flash_write_page (flash_addr + 6, 2, (u8 *)(mac_random_static + 3) ); //store random address on flash for future use
+        flash_write_page(flash_addr + 6, 2, (u8 *)(mac_random_static + 3)); //store random address on flash for future use
     }
 }
 
@@ -393,7 +374,6 @@ void blc_flash_read_mid_get_vendor_set_capacity(void)
 void user_ble_init(void)
 {
 //////////////////////////// BLE stack Initialization  Begin //////////////////////////////////
-
 #if (TLKAPI_DEBUG_ENABLE)
     tlkapi_debug_init();
     blc_debug_enableStackLog(STK_LOG_NONE);
@@ -409,6 +389,7 @@ void user_ble_init(void)
     blc_ll_initBasicMCU();
 
     blc_ll_initStandby_module(mac_public);
+    blc_ll_setRandomAddr(mac_random_static);
 
     blc_ll_initLegacyAdvertising_module();
 

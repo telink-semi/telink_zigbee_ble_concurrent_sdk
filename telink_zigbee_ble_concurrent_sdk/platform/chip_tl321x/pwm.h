@@ -366,7 +366,8 @@ static inline void pwm_set_pwm0_ir_fifo_cfg_data(unsigned short pulse_num, unsig
 {
     static unsigned char index    = 0;
     unsigned short       cfg_data = pwm_cal_pwm0_ir_fifo_cfg_data(pulse_num, use_shadow, carrier_en);
-    while (pwm_get_pwm0_ir_fifo_is_full());
+    while (pwm_get_pwm0_ir_fifo_is_full())
+        ;
     reg_pwm_ir_fifo_dat(index) = cfg_data;
     index++;
     index &= 0x01;

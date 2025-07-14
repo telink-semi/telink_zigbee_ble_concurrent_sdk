@@ -65,6 +65,9 @@
 
 #define MTU_SIZE_SETTING                        64
 
+static u16 g_appBleInterval = CONN_INTERVAL_50MS;
+static u16 g_appBleLatency = 19;
+
 typedef enum {
     ATT_H_START = 0,
 
@@ -305,19 +308,14 @@ void app_switch_to_indirect_adv(u8 e, u8 *p, int n)
  */
 void    task_connect (u8 e, u8 *p, int n)
 {
-//  bls_l2cap_requestConnParamUpdate (8, 8, 19, 200);  // 200mS
-    bls_l2cap_requestConnParamUpdate (8, 8, 99, 400);  // 1 S
-//  bls_l2cap_requestConnParamUpdate (8, 8, 149, 600);  // 1.5 S
-//  bls_l2cap_requestConnParamUpdate (8, 8, 199, 800);  // 2 S
-//  bls_l2cap_requestConnParamUpdate (8, 8, 249, 800);  // 2.5 S
-//  bls_l2cap_requestConnParamUpdate (8, 8, 299, 800);  // 3 S
+    bls_l2cap_requestConnParamUpdate(g_appBleInterval, g_appBleInterval, g_appBleLatency, 400);  // 1 S
 
     latest_user_event_tick = clock_time();
 
     device_in_connection_state = 1;//
 
 #if (UI_LED_ENABLE && !TEST_CONN_CURRENT_ENABLE)
-    gpio_write(GPIO_LED_RED, LED_ON_LEVAL);  //yellow light on
+    drv_gpio_write(GPIO_LED_RED, LED_ON_LEVAL);  //yellow light on
 #endif
 }
 
@@ -358,10 +356,6 @@ void    task_terminate(u8 e,u8 *p, int n) //*p is terminate reason
     }
 }
 
-_attribute_ram_code_ void   user_set_rf_power (u8 e, u8 *p, int n)
-{
-    rf_set_power_level_index (g_ble_txPowerSet);
-}
 
 /**
  * @brief      callback function of LinkLayer Event "BLT_EV_FLAG_SUSPEND_EXIT"
@@ -540,7 +534,6 @@ void user_ble_normal_init(void)
     /* Host Initialization */
     /* GAP initialization must be done before any other host feature initialization !!! */
     blc_gap_peripheral_init();    //gap initialization
-    //extern void my_att_init ();
     my_att_init (); //gatt initialization
 
     /* L2CAP Initialization */
@@ -610,7 +603,7 @@ void user_ble_normal_init(void)
     bls_ll_setAdvEnable(BLC_ADV_ENABLE);  //adv enable
 
     //set rf power index, user must set it after every suspend wakeup, cause relative setting will be reset in suspend
-    user_set_rf_power(0, 0, 0);
+    rf_set_power_level_index (g_ble_txPowerSet);
 
     bls_app_registerEventCallback (BLT_EV_FLAG_CONNECT, &task_connect);
     bls_app_registerEventCallback (BLT_EV_FLAG_TERMINATE, &task_terminate);

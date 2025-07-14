@@ -24,7 +24,8 @@
  *******************************************************************************************************/
 #include "../tl_common.h"
 
-void drv_pwm_init(void){
+void drv_pwm_init(void)
+{
 #if defined(MCU_CORE_B91) || defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
     pwm_set_clk(0);
 #endif

@@ -24,6 +24,9 @@
 #ifndef SCAN_H_
 #define SCAN_H_
 
+/**
+ * @brief Enumeration defining different scan strategies.
+ */
 typedef enum
 {
     SCAN_STRATEGY_0 = 0, /*!< The number of scans corresponds to the number of connections,
@@ -34,6 +37,12 @@ typedef enum
                                   "blc_ll_setExtScanEnable" or "blc_ll_setScanEnable". >!*/
 } scan_en_strtg_t;
 
+/**
+ * @brief      This function is used to configure scan enable by API.
+ *                e.g. M4S4, even master connection number is 4, scan still work
+ * @param[in]  scanStrategy - scan enable strategy
+ * @return     none
+ */
 void blc_ll_configScanEnableStrategy(scan_en_strtg_t scanStrategy);
 
 

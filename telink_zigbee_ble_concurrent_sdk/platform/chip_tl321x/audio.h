@@ -31,6 +31,8 @@
  *  ===============
  *  Header File: audio.h
  */
+#include "chip_config.h"
+#if(COMPATIBLE_WITH_TL321X_AND_TL323X == 0)
 #ifndef audio_H
 #define audio_H
 
@@ -2046,4 +2048,5 @@ void audio_set_i2s_ascl_en(audio_i2s_select_e i2s_select);
  */
 void audio_codec_clr_input_pop(unsigned char t_ms);
 /** @} */
+#endif
 #endif

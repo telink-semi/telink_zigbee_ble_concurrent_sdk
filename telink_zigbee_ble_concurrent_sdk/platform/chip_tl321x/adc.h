@@ -47,7 +47,9 @@ extern unsigned char g_adc_rx_fifo_index;
 
 typedef enum
 {
+#if(COMPATIBLE_WITH_TL321X_AND_TL323X == 0)
     ADC_VREF_0P9V = 0x01, //Only for internal testing,not recommended.
+#endif
     ADC_VREF_1P2V = 0x02,
 } adc_ref_vol_e;
 
@@ -55,6 +57,7 @@ typedef enum
 {
     ADC_VBAT_DIV_OFF = 0,
     ADC_VBAT_DIV_1F4 = 0x01,
+
 } adc_vbat_div_e;
 
 typedef enum
@@ -101,6 +104,7 @@ typedef enum
 typedef enum
 {
     ADC_GPIO_PB0 = GPIO_PB0 | (0x1 << 12),
+#if(COMPATIBLE_WITH_TL321X_AND_TL323X == 0)
     ADC_GPIO_PB1 = GPIO_PB1 | (0x2 << 12),
     ADC_GPIO_PB2 = GPIO_PB2 | (0x3 << 12),
     ADC_GPIO_PB3 = GPIO_PB3 | (0x4 << 12),
@@ -110,6 +114,7 @@ typedef enum
     ADC_GPIO_PB7 = GPIO_PB7 | (0x8 << 12),
     ADC_GPIO_PD0 = GPIO_PD0 | (0x9 << 12),
     ADC_GPIO_PD1 = GPIO_PD1 | (0xa << 12),
+#endif
 } adc_input_pin_def_e;
 
 typedef enum
@@ -128,8 +133,10 @@ typedef enum
 typedef enum
 {
     ADC_M_CHANNEL,
+#if(COMPATIBLE_WITH_TL321X_AND_TL323X == 0)
     ADC_L_CHANNEL,
     ADC_R_CHANNEL,
+#endif
 } adc_sample_chn_e;
 
 /**
@@ -200,14 +207,18 @@ typedef enum
      * to solve the problem of the first code abnormality after adc power on.(jira:BUT-8) (Confirmed by haitao.gu, added by xiaobin.huang at 20240903)
      */
     ADC_SAMPLE_FREQ_23K  = (0 << 24) | (1023 << 8) | (ADC_SAMPLE_CYC_48 << 4) | 15,
+#if(COMPATIBLE_WITH_TL321X_AND_TL323X == 0)
     ADC_SAMPLE_FREQ_48K  = (1 << 24) | (490 << 8) | (ADC_SAMPLE_CYC_48 << 4) | 10,
     ADC_SAMPLE_FREQ_96K  = (2 << 24) | (240 << 8) | (ADC_SAMPLE_CYC_27 << 4) | 10,
     ADC_SAMPLE_FREQ_192K = (3 << 24) | (115 << 8) | (ADC_SAMPLE_CYC_6 << 4) | 10,//When you select ADC_SAMPLE_FREQ_192K, the first code of the vbat sample mode is an exception and needs to be discarded.
+#endif
 } adc_sample_freq_e;
 
 typedef enum
 {
+#if(COMPATIBLE_WITH_TL321X_AND_TL323X == 0)
     ADC_PRESCALE_1 = 0x00,
+#endif
     //  ADC_PRESCALE_1F2 = 0x01,//Only for internal testing
     ADC_PRESCALE_1F4 = 0x02,
     //  ADC_PRESCALE_1F8 = 0x03,//Only for internal testing
@@ -243,7 +254,7 @@ typedef enum
 /**
  * @brief    This function is used to power on sar_adc.
  * @return   none.
- * @note     -# User need to wait >30us after adc_power_on() for ADC to be stable.
+ * @note     -# User need to wait >100us after adc_power_on() for ADC to be stable.
  *           -# If you calling adc_power_off(), because all analog circuits of ADC are turned off after adc_power_off(),
  *            it is necessary to wait >30us after re-adc_power_on() for ADC to be stable.
  */
@@ -316,13 +327,14 @@ void adc_init(adc_chn_cnt_e channel_cnt);
 _attribute_ram_code_
 /*!< BLE USED END */
 void adc_gpio_sample_init(adc_sample_chn_e chn, adc_gpio_cfg_t cfg);
+#if(COMPATIBLE_WITH_TL321X_AND_TL323X == 0)
 /**
  * @brief This function is used to initialize the ADC for vbat sampling.
  * @param[in]  chn -structure for configuring ADC channel.
  * @return none
  */
 void adc_vbat_sample_init(adc_sample_chn_e chn);
-
+#endif
 /**
  * @brief  This function is used to initialize the ADC for gpio sampling to indirectly sample the vbat voltage.
  * @param[in]  chn -the channel to be configured.
@@ -351,8 +363,8 @@ unsigned short adc_calculate_temperature(unsigned short adc_code);
 /**
  * @brief This function serves to calculate voltage from adc sample code.
  * @param[in]   chn - enum variable of ADC sample channel.
- * @param[in]   adc_code    - the adc sample code.
- * @return      adc_vol_mv  - the average value of adc voltage value.
+ * @param[in]   adc_code    - the adc sample code(should be positive value.)
+ * @return      adc_vol_mv  - the average value of adc voltage value(adc voltage value >= 0).
  */
 /*!< BLE USED */
 _attribute_ram_code_
@@ -435,15 +447,15 @@ _attribute_ram_code_sec_noinline_ void adc_clr_irq_status_dma(void);
  *                                                NDMA only interface                                                 *
  **********************************************************************************************************************/
 /**
- * @brief This function serves to directly get an adc sample code from analog registers.
+ * @brief This function serves to directly get an adc sample code from fifo.
  * @return  adc_code    - the adc sample code.
- * @note   If you want to get the sampling results twice in succession,
- *         must ensure that the sampling interval is more than 2 times the sampling period.
+ *                      - Bit[11:15] of the adc code read from reg_adc_rxfifo_dat are sign bits,if the adc code is positive, bits [11:15] are all 1's,
+ *                        if the adc code is negative, bits [11:15] are all 0's and valid data bits are Bit[0:10],the valid range is 0~0x7FF.
  */
 /*!< BLE USED */
 _attribute_ram_code_
 /*!< BLE USED END */
-unsigned short adc_get_code(void);
+unsigned short adc_get_raw_code(void);
 
 /**
  * @brief     Get the irq status of ADC.
@@ -479,6 +491,13 @@ void adc_start_sample_nodma(void);
  * @return  none
  */
 void adc_stop_sample_nodma(void);
+
+/**
+ * @brief     This function serves to get adc DMA sample status.
+ * @return      0: the sample is in progress.
+ *              !0: the sample is finished.
+ */
+unsigned char adc_get_sample_status_dma(void);
 
 /**
  * @brief     Get the rxfifo cnt,when data enters rxfifo, the rxfifo cnt increases; when reading data from rx_fifo, rxfifo cnt decays.

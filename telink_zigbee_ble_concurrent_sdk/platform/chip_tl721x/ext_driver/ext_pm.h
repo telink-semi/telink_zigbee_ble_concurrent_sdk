@@ -110,26 +110,7 @@ static inline int pm_get_mcu_status(void)
     return g_pm_status_info.mcu_status;
 }
 
-#ifndef GENERATE_LIB_FOR_GOOGLE
-#define GENERATE_LIB_FOR_GOOGLE              0
-#endif
 
-#if GENERATE_LIB_FOR_GOOGLE
-/**
- * @brief      This function serves to update the boot info of mcu.
- *             User can get the boot info by pm_get_mcu_status() and pm_get_reboot_event().
- * @param[in]  none.
- * @return     none.
- */
-void pm_update_boot_info(void);
-
-/**
- * @brief      This function serves to clear the boot info for next boot.
- * @param[in]  none.
- * @return     none.
- */
-void pm_clear_boot_info(void);
-#endif /* GENERATE_LIB_FOR_GOOGLE */
 #define cpu_set_gpio_wakeup             pm_set_gpio_wakeup
 
 

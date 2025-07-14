@@ -25,7 +25,6 @@
 #define BLE_H_
 
 
-
 #include "ble_common.h"
 #include "ble_format.h"
 
@@ -34,7 +33,6 @@
 
 #include "hci/hci.h"
 #include "hci/hci_const.h"
-#include "hci/hci_vendor.h"
 #include "hci/hci_cmd.h"
 #include "hci/hci_event.h"
 

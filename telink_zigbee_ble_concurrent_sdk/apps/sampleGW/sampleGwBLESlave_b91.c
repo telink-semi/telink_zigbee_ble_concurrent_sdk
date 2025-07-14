@@ -302,7 +302,6 @@ void app_switch_to_indirect_adv(u8 e, u8 *p, int n)
  */
 void task_connect (u8 e, u8 *p, int n)
 {
-//  bls_l2cap_requestConnParamUpdate (8, 8, 99, 400);  // 1 S
     bls_l2cap_requestConnParamUpdate (g_appBleInterval, g_appBleInterval, g_appBleLatency, 400);  // 1 S
 
     latest_user_event_tick = clock_time();
@@ -310,7 +309,7 @@ void task_connect (u8 e, u8 *p, int n)
     device_in_connection_state = 1;//
 
 #if (UI_LED_ENABLE && !TEST_CONN_CURRENT_ENABLE)
-    gpio_write(GPIO_LED_RED, LED_ON_LEVAL);  //yellow light on
+    drv_gpio_write(GPIO_LED_RED, LED_ON_LEVAL);  //yellow light on
 #endif
 }
 
@@ -344,24 +343,11 @@ void task_terminate(u8 e,u8 *p, int n)//*p is terminate reason
 
 
 #if (UI_LED_ENABLE && !TEST_CONN_CURRENT_ENABLE)
-    gpio_write(GPIO_LED_RED, !LED_ON_LEVAL);  //yellow light off
+    drv_gpio_write(GPIO_LED_RED, !LED_ON_LEVAL);  //yellow light off
 #endif
 
     advertise_begin_tick = clock_time();
 }
-
-/**
- * @brief      callback function of LinkLayer Event "BLT_EV_FLAG_SUSPEND_EXIT"
- * @param[in]  e - LinkLayer Event type
- * @param[in]  p - data pointer of event
- * @param[in]  n - data length of event
- * @return     none
- */
-_attribute_ram_code_ void   user_set_rf_power (u8 e, u8 *p, int n)
-{
-    rf_set_power_level_index (g_ble_txPowerSet);
-}
-
 
 /*
  *Kite:     VVWWXX38C1A4YYZZ
@@ -540,30 +526,13 @@ void user_ble_init(void)
 
     bls_ll_setAdvEnable(BLC_ADV_ENABLE);  //adv enable
 
-    //set rf power index, user must set it after every suspend wakeup, cause relative setting will be reset in suspend
-    user_set_rf_power(0, 0, 0);
+    rf_set_power_level_index (g_ble_txPowerSet);
 
     bls_app_registerEventCallback (BLT_EV_FLAG_CONNECT, &task_connect);
     bls_app_registerEventCallback (BLT_EV_FLAG_TERMINATE, &task_terminate);
-    bls_app_registerEventCallback (BLT_EV_FLAG_SUSPEND_EXIT, &user_set_rf_power);
 
     ///////////////////// Power Management initialization///////////////////
-#if(BLE_APP_PM_ENABLE)
-    blc_ll_initPowerManagement_module();
-
-    #if (PM_DEEPSLEEP_RETENTION_ENABLE)
-        bls_pm_setSuspendMask (SUSPEND_ADV | DEEPSLEEP_RETENTION_ADV | SUSPEND_CONN | DEEPSLEEP_RETENTION_CONN);
-        blc_pm_setDeepsleepRetentionThreshold(95, 95);
-        blc_pm_setDeepsleepRetentionEarlyWakeupTiming(TEST_CONN_CURRENT_ENABLE ? 370 : 400);
-        //blc_pm_setDeepsleepRetentionType(DEEPSLEEP_MODE_RET_SRAM_LOW64K); //default use 32k deep retention
-    #else
-        bls_pm_setSuspendMask (SUSPEND_ADV | SUSPEND_CONN);
-    #endif
-
-    bls_app_registerEventCallback (BLT_EV_FLAG_SUSPEND_ENTER, &ble_remote_set_sleep_wakeup);
-#else
     bls_pm_setSuspendMask (SUSPEND_DISABLE);
-#endif
 
     advertise_begin_tick = clock_time();
 }

@@ -20,7 +20,6 @@
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
  *******************************************************************************************************/
-
 #ifndef STACK_BLE_LL_LL_CONN_CONN_STACK_H_
 #define STACK_BLE_LL_LL_CONN_CONN_STACK_H_
 
@@ -29,35 +28,23 @@
 #include "stack/ble/ble_b91/controller/phy/phy_stack.h"
 #include "stack/ble/ble_b91/algorithm/aes_ccm/aes_ccm.h"
 
-
 /******************************* ll_conn start ************************************************************************/
-
-
-
-
-#define			LMP_PROCEDURE_RESPONSE_TIMEOUT					40000000 //40S LL response timeout
-
-#define			HANDLE_STK_FLAG									BIT(15)
+#define	LMP_PROCEDURE_RESPONSE_TIMEOUT					40000000 //40S LL response timeout
+#define	HANDLE_STK_FLAG									BIT(15)
 
 /////////////////////////////////////////////////////////////////////////////
-#define			MAX_OCTETS_DATA_LEN_27							27
-#define			MAX_OCTETS_DATA_LEN_EXTENSION					251
+#define	MAX_OCTETS_DATA_LEN_27							27
+#define	MAX_OCTETS_DATA_LEN_EXTENSION					251
+#define	LL_PACKET_OCTET_TIME(n)							((n) * 8 + 112)
 
-
-#define			LL_PACKET_OCTET_TIME(n)							((n) * 8 + 112)
-
-#define 		DATA_LENGTH_REQ_PENDING							1
-#define			DATA_LENGTH_REQ_DONE							2
+#define DATA_LENGTH_REQ_PENDING							1
+#define	DATA_LENGTH_REQ_DONE							2
 
 /////////////////////////////////////////////////////////////////////////////
-
-
 
 
 /////////////////////////////////////////////////////////////////////////////
 #define 		FLG_RF_CONN_DONE 		 						(FLD_RF_IRQ_CMD_DONE | FLD_RF_IRQ_FSM_TIMEOUT | FLD_RF_IRQ_FIRST_TIMEOUT | FLD_RF_IRQ_RX_TIMEOUT | FLD_RF_IRQ_RX_CRC_2)
-
-
 
 #define			BLE_STACK_USED_TX_FIFIO_NUM						2
 
@@ -97,21 +84,14 @@ typedef struct {
 
 	u8		chn_tbl[40];
 
-}st_ll_conn_t ;
+} st_ll_conn_t ;
 extern _attribute_aligned_(4) st_ll_conn_t		blttcon;
 extern st_ll_conn_t	   *blt_pconn;
-
 
 typedef bool (*ll_push_fifo_handler_t) (int, u8 *);
 extern  ll_push_fifo_handler_t				ll_push_tx_fifo_handler;
 
-
-
 extern u8 blt_tx_empty_packet[6];
-
-
-
-
 
 int 		blt_ll_connect_common(st_ll_conn_t *pc, rf_packet_connect_t * pInit);
 int 		blt_ll_start_common  (st_ll_conn_t *pc);
@@ -120,43 +100,19 @@ int 		blt_ll_start_common  (st_ll_conn_t *pc);
 ble_sts_t 	blc_hci_ltkRequestNegativeReply (u16 connHandle);
 ble_sts_t  	blc_hci_ltkRequestReply (u16 connHandle,  u8*ltk);
 
-
 typedef int (*blt_LTK_req_callback_t)(u16 handle, u8* rand, u16 ediv);
 void 		blc_ll_registerLtkReqEvtCb(blt_LTK_req_callback_t evtCbFunc);
 
 int  		blt_ll_conn_main_loop_post(void);
 void		blc_procPendingEvent(void);
 
-
 ble_sts_t	blt_ll_unknown_rsp(u16 connHandle, u8 op_code );
 
 void 		blt_ll_channelTable_calc(u8* chm, u8 hop, u8 *ptbl);
 
-
-
 /******************************* ll_conn end **************************************************************************/
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /******************************* ll_slave start ************************************************************************/
-
-
 #define					SLAVE_LL_ENC_OFF						0
 #define					SLAVE_LL_ENC_REQ						1
 #define					SLAVE_LL_ENC_RSP_T						2
@@ -168,10 +124,7 @@ void 		blt_ll_channelTable_calc(u8* chm, u8 hop, u8 *ptbl);
 #define					SLAVE_LL_ENC_PAUSE_RSP					8
 #define					SLAVE_LL_REJECT_IND_T					9
 
-
 #define 				TRY_FIX_ERR_BY_ADD_BRX_WAIT				1
-
-
 
 typedef struct {
 	u8		time_update_st;
@@ -244,19 +197,10 @@ typedef struct {
 	u32		conn_establish_pending_timeout;;
 	u32		conn_establish_pending_flag;
 #endif
-
-
 } st_ll_conn_slave_t;
-
-
-
 
 extern _attribute_aligned_(4) st_ll_conn_slave_t		bltc;
 #define 	IS_LL_CONNECTION_VALID(handle)  ( bltc.connHandle == (handle) && bltc.connHandle != BLE_INVALID_CONNECTION_HANDLE )
-
-
-
-
 
 bool		bls_ll_pushTxFifo (int handle, u8 *p);
 ble_sts_t  	bls_hci_reset(void);
@@ -266,8 +210,6 @@ ble_sts_t 	bls_hci_le_getRemoteSupportedFeatures(u16 connHandle);
 
 void		blt_push_fifo_hold (u8 *p);
 void 		blt_terminate_proc(void);
-
-
 
 extern ble_crypt_para_t 	blc_cyrpt_para;
 static inline int  bls_ll_isConnectionEncrypted(u16 connHandle)
@@ -287,22 +229,7 @@ static inline int  bls_ll_isConnectionEncrypted(u16 connHandle)
 		return CONN_SHORT_TOLERANCE_TIME;
 	}
 #endif
-
-
-
-
-
 /******************************* ll_slave end **************************************************************************/
-
-
-
-
-
-
-
-
-
-
 
 
 /******************************* ll_master start ***********************************************************************/
@@ -334,12 +261,10 @@ static inline int  bls_ll_isConnectionEncrypted(u16 connHandle)
 #define			MASTER_LL_ENC_SMP_INFO_S		10
 #define			MASTER_LL_ENC_SMP_INFO_E		11
 
-
 #define  		BLM_WINSIZE						4
 #define  		BLM_WINOFFSET					5
 #define  		BLM_MID_WINSIZE					2500
 #define 		CONN_REQ_WAIT_ACK_NUM			6
-
 
 #define 		TX_FIFO_DEFINED_IN_APP			1
 #define 		STACK_FIFO_NUM					2  //user 6, stack 2
@@ -422,7 +347,6 @@ typedef struct {
 #endif
 } st_ll_conn_master_t;
 
-
 extern 	int		blm_create_connection;
 
 ble_sts_t	blm_ll_enc_proc_disconnect(u16 handle, u8 reason);
@@ -445,48 +369,24 @@ ble_sts_t	blm_ll_readRemoteFeature (u16 handle);
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 /******************************* ll_conn_phy start *********************************************************************/
-
-
 #if (LL_FEATURE_ENABLE_LE_2M_PHY | LL_FEATURE_ENABLE_LE_CODED_PHY)
 
 ll_conn_phy_t*	blt_ll_get_conn_phy_ptr(u16 connHandle);
 extern _attribute_aligned_(4) ll_conn_phy_t blt_conn_phy;
-
 
 typedef int (*ll_conn_phy_update_callback_t)(void);
 typedef int (*ll_conn_phy_switch_callback_t)(void);
 
 extern 	ll_conn_phy_update_callback_t	ll_conn_phy_update_cb;
 extern 	ll_conn_phy_switch_callback_t	ll_conn_phy_switch_cb;
-
 #endif
-
-
-
 
 //2M/Coded PHY
 void 		blt_ll_sendPhyReq(void);
 int 		blt_ll_updateConnPhy(void);
 int 		blt_ll_switchConnPhy(void);
-
-
 /******************************* ll_conn_phy end ***********************************************************************/
-
-
-
-
 
 
 /******************************* ll_conn_csa start *********************************************************************/
@@ -497,23 +397,11 @@ typedef enum {
 	CHANNAL_SELECTION_ALGORITHM_2      	=	0x01,
 } channel_algorithm_t;
 
-
-
-
 typedef u8 (*ll_chn_index_calc_callback_t)(u8*, u16, u16);
 extern ll_chn_index_calc_callback_t	ll_chn_index_calc_cb;
 
-
-
 u8	blc_calc_remapping_table(u8 chm[5]);
-
 u8	blc_ll_channel_index_calc_csa2(u8 chm[5], u16 event_cntr, u16 channel_id);
-
-
 /******************************* ll_conn_csa end ***********************************************************************/
-
-
-
-
 
 #endif /* STACK_BLE_LL_LL_CONN_CONN_STACK_H_ */

@@ -3,7 +3,7 @@
  *
  * @brief    This is the header file for b91 BLE SDK
  *
- * @author	 BLE GROUP
+ * @author   BLE GROUP
  * @date         12,2021
  *
  * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
@@ -20,20 +20,16 @@
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
  *******************************************************************************************************/
-
 #ifndef BLE_CONTROLLER_H_
 #define BLE_CONTROLLER_H_
 
-
 #include "stack/ble/ble_b91/ble_common.h"
 #include "stack/ble/ble_b91/ble_format.h"
-
 
 #include "stack/ble/ble_b91/hci/hci.h"
 #include "stack/ble/ble_b91/hci/hci_const.h"
 #include "stack/ble/ble_b91/hci/hci_cmd.h"
 #include "stack/ble/ble_b91/hci/hci_event.h"
-
 
 #include "stack/ble/ble_b91/controller/ll/ll.h"
 #include "stack/ble/ble_b91/controller/ll/ll_adv.h"
@@ -52,15 +48,12 @@
 
 #include "stack/ble/ble_b91/controller/ll/ll_ext_adv.h"
 
-
 #include "phy/phy.h"
 #include "phy/phy_stack.h"
 #include "phy/phy_test.h"
 
-
 #include "stack/ble/ble_b91/algorithm/ecc/ecc_ll.h"
 #include "stack/ble/ble_b91/algorithm/aes_ccm/aes_ccm.h"
-
 
 /*********************************************************/
 //Remove when file merge to SDK //

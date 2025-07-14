@@ -55,7 +55,6 @@ _CODE_ZCL_ status_t zcl_thermostat_register(u8 endpoint, u16 manuCode, u8 arrtNu
     return zcl_registerCluster(endpoint, ZCL_CLUSTER_HAVC_THERMOSTAT, manuCode, arrtNum, attrTbl, zcl_thermostat_cmdHandler, cb);
 }
 
-
 _CODE_ZCL_ status_t zcl_thermostat_setpointRaiseLowerCmd(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, zcl_thermostat_setpointRaiseLowerCmd_t *pCmd)
 {
     u8 buf[2];
@@ -65,7 +64,7 @@ _CODE_ZCL_ status_t zcl_thermostat_setpointRaiseLowerCmd(u8 srcEp, epInfo_t *pDs
     *pBuf++ = pCmd->amount;
 
     return zcl_sendCmd(srcEp, pDstEpInfo, ZCL_CLUSTER_HAVC_THERMOSTAT, ZCL_CMD_THERMOSTAT_SETPOINT_RAISE_LOWER, TRUE,
-                        ZCL_FRAME_CLIENT_SERVER_DIR, disableDefaultRsp, 0, seqNo, 2, buf);
+                       ZCL_FRAME_CLIENT_SERVER_DIR, disableDefaultRsp, 0, seqNo, 2, buf);
 }
 
 _CODE_ZCL_ status_t zcl_thermostat_setWeeklyScheduleCmd(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, zcl_thermostat_setWeeklyScheduleCmd_t *pCmd)
@@ -73,17 +72,17 @@ _CODE_ZCL_ status_t zcl_thermostat_setWeeklyScheduleCmd(u8 srcEp, epInfo_t *pDst
     u8 status = ZCL_STA_SUCCESS;
     u8 len = 3;
 
-    if( (pCmd->modeForSequence == HEAT_SERPOINT_FIELD_PRESENT) ||
-        (pCmd->modeForSequence == COOL_SETPOINT_FIELD_PRESENT) ){
+    if ((pCmd->modeForSequence == HEAT_SERPOINT_FIELD_PRESENT) ||
+        (pCmd->modeForSequence == COOL_SETPOINT_FIELD_PRESENT)) {
         len += pCmd->numOfTransForSequence * 4;
-    }else if(pCmd->modeForSequence == BOTH_SETPOINT_FIELD_PRESENT){
+    } else if (pCmd->modeForSequence == BOTH_SETPOINT_FIELD_PRESENT) {
         len += pCmd->numOfTransForSequence * 6;
-    }else{
+    } else {
         return ZCL_STA_FAILURE;
     }
 
     u8 *buf = (u8 *)ev_buf_allocate(len);
-    if(!buf){
+    if (!buf) {
         return ZCL_STA_INSUFFICIENT_SPACE;
     }
 
@@ -92,32 +91,32 @@ _CODE_ZCL_ status_t zcl_thermostat_setWeeklyScheduleCmd(u8 srcEp, epInfo_t *pDst
     *pBuf++ = pCmd->numOfTransForSequence;
     *pBuf++ = pCmd->dayOfWeekForSequence;
     *pBuf++ = pCmd->modeForSequence;
-    for(u8 i = 0; i < pCmd->numOfTransForSequence; i++){
-        if(pCmd->modeForSequence == HEAT_SERPOINT_FIELD_PRESENT){
+    for (u8 i = 0; i < pCmd->numOfTransForSequence; i++) {
+        if (pCmd->modeForSequence == HEAT_SERPOINT_FIELD_PRESENT) {
             *pBuf++ = LO_UINT16(pCmd->sequenceMode.pHeatMode[i].transTime);
             *pBuf++ = HI_UINT16(pCmd->sequenceMode.pHeatMode[i].transTime);
             *pBuf++ = LO_UINT16(pCmd->sequenceMode.pHeatMode[i].heatSetpoint);
             *pBuf++ = HI_UINT16(pCmd->sequenceMode.pHeatMode[i].heatSetpoint);
-        }else if(pCmd->modeForSequence == COOL_SETPOINT_FIELD_PRESENT){
+        } else if (pCmd->modeForSequence == COOL_SETPOINT_FIELD_PRESENT) {
             *pBuf++ = LO_UINT16(pCmd->sequenceMode.pCoolMode[i].transTime);
             *pBuf++ = HI_UINT16(pCmd->sequenceMode.pCoolMode[i].transTime);
             *pBuf++ = LO_UINT16(pCmd->sequenceMode.pCoolMode[i].coolSetpoint);
             *pBuf++ = HI_UINT16(pCmd->sequenceMode.pCoolMode[i].coolSetpoint);
-        }else if(pCmd->modeForSequence == BOTH_SETPOINT_FIELD_PRESENT){
+        } else if (pCmd->modeForSequence == BOTH_SETPOINT_FIELD_PRESENT) {
             *pBuf++ = LO_UINT16(pCmd->sequenceMode.pBothMode[i].transTime);
             *pBuf++ = HI_UINT16(pCmd->sequenceMode.pBothMode[i].transTime);
             *pBuf++ = LO_UINT16(pCmd->sequenceMode.pBothMode[i].heatSetpoint);
             *pBuf++ = HI_UINT16(pCmd->sequenceMode.pBothMode[i].heatSetpoint);
             *pBuf++ = LO_UINT16(pCmd->sequenceMode.pBothMode[i].coolSetpoint);
             *pBuf++ = HI_UINT16(pCmd->sequenceMode.pBothMode[i].coolSetpoint);
-        }else{
+        } else {
             status = ZCL_STA_FAILURE;
         }
     }
 
-    if(status != ZCL_STA_FAILURE){
+    if (status != ZCL_STA_FAILURE) {
         status = zcl_sendCmd(srcEp, pDstEpInfo, ZCL_CLUSTER_HAVC_THERMOSTAT, ZCL_CMD_THERMOSTAT_SET_WEEKLY_SCHEDULE, TRUE,
-                        ZCL_FRAME_CLIENT_SERVER_DIR, disableDefaultRsp, 0, seqNo, len, buf);
+                             ZCL_FRAME_CLIENT_SERVER_DIR, disableDefaultRsp, 0, seqNo, len, buf);
     }
 
     ev_buf_free(buf);
@@ -134,19 +133,19 @@ _CODE_ZCL_ status_t zcl_thermostat_getWeeklyScheduleCmd(u8 srcEp, epInfo_t *pDst
     *pBuf++ = pCmd->modeToReturn;
 
     return zcl_sendCmd(srcEp, pDstEpInfo, ZCL_CLUSTER_HAVC_THERMOSTAT, ZCL_CMD_THERMOSTAT_GET_WEEKLY_SCHEDULE, TRUE,
-                        ZCL_FRAME_CLIENT_SERVER_DIR, disableDefaultRsp, 0, seqNo, 2, buf);
+                       ZCL_FRAME_CLIENT_SERVER_DIR, disableDefaultRsp, 0, seqNo, 2, buf);
 }
 
 _CODE_ZCL_ status_t zcl_thermostat_clearWeeklyScheduleCmd(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo)
 {
     return zcl_sendCmd(srcEp, pDstEpInfo, ZCL_CLUSTER_HAVC_THERMOSTAT, ZCL_CMD_THERMOSTAT_CLEAR_WEEKLY_SCHEDULE, TRUE,
-                        ZCL_FRAME_CLIENT_SERVER_DIR, disableDefaultRsp, 0, seqNo, 0, NULL);
+                       ZCL_FRAME_CLIENT_SERVER_DIR, disableDefaultRsp, 0, seqNo, 0, NULL);
 }
 
 _CODE_ZCL_ status_t zcl_thermostat_getRelayStatusLogCmd(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo)
 {
     return zcl_sendCmd(srcEp, pDstEpInfo, ZCL_CLUSTER_HAVC_THERMOSTAT, ZCL_CMD_THERMOSTAT_GET_RELAY_STATUS_LOG, TRUE,
-                        ZCL_FRAME_CLIENT_SERVER_DIR, disableDefaultRsp, 0, seqNo, 0, NULL);
+                       ZCL_FRAME_CLIENT_SERVER_DIR, disableDefaultRsp, 0, seqNo, 0, NULL);
 }
 
 _CODE_ZCL_ status_t zcl_thermostat_getWeeklyScheduleRspCmd(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, zcl_thermostat_getWeeklyScheduleRspCmd_t *pCmd)
@@ -154,17 +153,17 @@ _CODE_ZCL_ status_t zcl_thermostat_getWeeklyScheduleRspCmd(u8 srcEp, epInfo_t *p
     u8 status = ZCL_STA_SUCCESS;
     u8 len = 3;
 
-    if( (pCmd->modeForSequence == HEAT_SERPOINT_FIELD_PRESENT) ||
-        (pCmd->modeForSequence == COOL_SETPOINT_FIELD_PRESENT) ){
+    if ((pCmd->modeForSequence == HEAT_SERPOINT_FIELD_PRESENT) ||
+        (pCmd->modeForSequence == COOL_SETPOINT_FIELD_PRESENT)) {
         len += pCmd->numOfTransForSequence * 4;
-    }else if(pCmd->modeForSequence == BOTH_SETPOINT_FIELD_PRESENT){
+    } else if (pCmd->modeForSequence == BOTH_SETPOINT_FIELD_PRESENT) {
         len += pCmd->numOfTransForSequence * 6;
-    }else{
+    } else {
         return ZCL_STA_FAILURE;
     }
 
     u8 *buf = (u8 *)ev_buf_allocate(len);
-    if(!buf){
+    if (!buf) {
         return ZCL_STA_INSUFFICIENT_SPACE;
     }
 
@@ -173,32 +172,32 @@ _CODE_ZCL_ status_t zcl_thermostat_getWeeklyScheduleRspCmd(u8 srcEp, epInfo_t *p
     *pBuf++ = pCmd->numOfTransForSequence;
     *pBuf++ = pCmd->dayOfWeekForSequence;
     *pBuf++ = pCmd->modeForSequence;
-    for(u8 i = 0; i < pCmd->numOfTransForSequence; i++){
-        if(pCmd->modeForSequence == HEAT_SERPOINT_FIELD_PRESENT){
+    for (u8 i = 0; i < pCmd->numOfTransForSequence; i++) {
+        if (pCmd->modeForSequence == HEAT_SERPOINT_FIELD_PRESENT) {
             *pBuf++ = LO_UINT16(pCmd->sequenceMode.pHeatMode[i].transTime);
             *pBuf++ = HI_UINT16(pCmd->sequenceMode.pHeatMode[i].transTime);
             *pBuf++ = LO_UINT16(pCmd->sequenceMode.pHeatMode[i].heatSetpoint);
             *pBuf++ = HI_UINT16(pCmd->sequenceMode.pHeatMode[i].heatSetpoint);
-        }else if(pCmd->modeForSequence == COOL_SETPOINT_FIELD_PRESENT){
+        } else if (pCmd->modeForSequence == COOL_SETPOINT_FIELD_PRESENT) {
             *pBuf++ = LO_UINT16(pCmd->sequenceMode.pCoolMode[i].transTime);
             *pBuf++ = HI_UINT16(pCmd->sequenceMode.pCoolMode[i].transTime);
             *pBuf++ = LO_UINT16(pCmd->sequenceMode.pCoolMode[i].coolSetpoint);
             *pBuf++ = HI_UINT16(pCmd->sequenceMode.pCoolMode[i].coolSetpoint);
-        }else if(pCmd->modeForSequence == BOTH_SETPOINT_FIELD_PRESENT){
+        } else if (pCmd->modeForSequence == BOTH_SETPOINT_FIELD_PRESENT) {
             *pBuf++ = LO_UINT16(pCmd->sequenceMode.pBothMode[i].transTime);
             *pBuf++ = HI_UINT16(pCmd->sequenceMode.pBothMode[i].transTime);
             *pBuf++ = LO_UINT16(pCmd->sequenceMode.pBothMode[i].heatSetpoint);
             *pBuf++ = HI_UINT16(pCmd->sequenceMode.pBothMode[i].heatSetpoint);
             *pBuf++ = LO_UINT16(pCmd->sequenceMode.pBothMode[i].coolSetpoint);
             *pBuf++ = HI_UINT16(pCmd->sequenceMode.pBothMode[i].coolSetpoint);
-        }else{
+        } else {
             status = ZCL_STA_FAILURE;
         }
     }
 
-    if(status != ZCL_STA_FAILURE){
+    if (status != ZCL_STA_FAILURE) {
         status = zcl_sendCmd(srcEp, pDstEpInfo, ZCL_CLUSTER_HAVC_THERMOSTAT, ZCL_CMD_THERMOSTAT_GET_WEEKLY_SCHEDULE_RSP, TRUE,
-                    ZCL_FRAME_SERVER_CLIENT_DIR, disableDefaultRsp, 0, seqNo, len, buf);
+                             ZCL_FRAME_SERVER_CLIENT_DIR, disableDefaultRsp, 0, seqNo, len, buf);
     }
 
     ev_buf_free(buf);
@@ -224,7 +223,7 @@ _CODE_ZCL_ status_t zcl_thermostat_getRelayStatusLogRspCmd(u8 srcEp, epInfo_t *p
     *pBuf++ = HI_UINT16(pCmd->unreadEntries);
 
     return zcl_sendCmd(srcEp, pDstEpInfo, ZCL_CLUSTER_HAVC_THERMOSTAT, ZCL_CMD_THERMOSTAT_GET_RELAY_STATUS_LOG_RSP, TRUE,
-                    ZCL_FRAME_SERVER_CLIENT_DIR, disableDefaultRsp, 0, seqNo, 11, buf);
+                       ZCL_FRAME_SERVER_CLIENT_DIR, disableDefaultRsp, 0, seqNo, 11, buf);
 }
 
 
@@ -234,7 +233,7 @@ _CODE_ZCL_ static status_t zcl_thermostat_setpointRaiseLowerPrc(zclIncoming_t *p
     status_t status = ZCL_STA_SUCCESS;
     u8 *pData = pInMsg->pData;
 
-    if(pInMsg->clusterAppCb){
+    if (pInMsg->clusterAppCb) {
         zcl_thermostat_setpointRaiseLowerCmd_t cmd;
         TL_SETSTRUCTCONTENT(cmd, 0);
 
@@ -242,7 +241,7 @@ _CODE_ZCL_ static status_t zcl_thermostat_setpointRaiseLowerPrc(zclIncoming_t *p
         cmd.amount = *pData++;
 
         status = pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, &cmd);
-    }else{
+    } else {
         status = ZCL_STA_FAILURE;
     }
 
@@ -254,25 +253,25 @@ _CODE_ZCL_ static status_t zcl_thermostat_setWeeklySchedulePrc(zclIncoming_t *pI
     status_t status = ZCL_STA_SUCCESS;
     u8 *pData = pInMsg->pData;
 
-    if(pInMsg->clusterAppCb){
+    if (pInMsg->clusterAppCb) {
         zcl_thermostat_setWeeklyScheduleCmd_t cmd;
         TL_SETSTRUCTCONTENT(cmd, 0);
 
         cmd.numOfTransForSequence = *pData++;
         cmd.dayOfWeekForSequence = *pData++;
         cmd.modeForSequence = *pData++;
-        if(cmd.numOfTransForSequence){
-            if(cmd.modeForSequence == HEAT_SERPOINT_FIELD_PRESENT){
+        if (cmd.numOfTransForSequence) {
+            if (cmd.modeForSequence == HEAT_SERPOINT_FIELD_PRESENT) {
                 cmd.sequenceMode.pHeatMode = (heatMode_t *)pData;
-            }else if(cmd.modeForSequence == COOL_SETPOINT_FIELD_PRESENT){
+            } else if (cmd.modeForSequence == COOL_SETPOINT_FIELD_PRESENT) {
                 cmd.sequenceMode.pCoolMode = (coolMode_t *)pData;
-            }else if(cmd.modeForSequence == BOTH_SETPOINT_FIELD_PRESENT){
+            } else if (cmd.modeForSequence == BOTH_SETPOINT_FIELD_PRESENT) {
                 cmd.sequenceMode.pBothMode = (bothMode_t *)pData;
             }
         }
 
         status = pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, &cmd);
-    }else{
+    } else {
         status = ZCL_STA_FAILURE;
     }
 
@@ -284,7 +283,7 @@ _CODE_ZCL_ static status_t zcl_thermostat_getWeeklySchedulePrc(zclIncoming_t *pI
     status_t status = ZCL_STA_SUCCESS;
     u8 *pData = pInMsg->pData;
 
-    if(pInMsg->clusterAppCb){
+    if (pInMsg->clusterAppCb) {
         zcl_thermostat_getWeeklyScheduleCmd_t cmd;
         TL_SETSTRUCTCONTENT(cmd, 0);
 
@@ -292,7 +291,7 @@ _CODE_ZCL_ static status_t zcl_thermostat_getWeeklySchedulePrc(zclIncoming_t *pI
         cmd.modeToReturn = *pData++;
 
         status = pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, &cmd);
-    }else{
+    } else {
         status = ZCL_STA_FAILURE;
     }
 
@@ -303,9 +302,9 @@ _CODE_ZCL_ static status_t zcl_thermostat_clearWeeklySchedulePrc(zclIncoming_t *
 {
     status_t status = ZCL_STA_SUCCESS;
 
-    if(pInMsg->clusterAppCb){
+    if (pInMsg->clusterAppCb) {
         status = pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, NULL);
-    }else{
+    } else {
         status = ZCL_STA_FAILURE;
     }
 
@@ -316,11 +315,11 @@ _CODE_ZCL_ static status_t zcl_thermostat_getRelayStatusLogPrc(zclIncoming_t *pI
 {
     status_t status = ZCL_STA_SUCCESS;
 
-    if(pInMsg->clusterAppCb){
+    if (pInMsg->clusterAppCb) {
         //no payload.
 
         status = pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, NULL);
-    }else{
+    } else {
         status = ZCL_STA_FAILURE;
     }
 
@@ -332,25 +331,25 @@ _CODE_ZCL_ static status_t zcl_thermostat_getWeeklyScheduleRspPrc(zclIncoming_t 
     status_t status = ZCL_STA_SUCCESS;
     u8 *pData = pInMsg->pData;
 
-    if(pInMsg->clusterAppCb){
+    if (pInMsg->clusterAppCb) {
         zcl_thermostat_getWeeklyScheduleRspCmd_t cmd;
         TL_SETSTRUCTCONTENT(cmd, 0);
 
         cmd.numOfTransForSequence = *pData++;
         cmd.dayOfWeekForSequence = *pData++;
         cmd.modeForSequence = *pData++;
-        if(cmd.numOfTransForSequence){
-            if(cmd.modeForSequence == HEAT_SERPOINT_FIELD_PRESENT){
+        if (cmd.numOfTransForSequence) {
+            if (cmd.modeForSequence == HEAT_SERPOINT_FIELD_PRESENT) {
                 cmd.sequenceMode.pHeatMode = (heatMode_t *)pData;
-            }else if(cmd.modeForSequence == COOL_SETPOINT_FIELD_PRESENT){
+            } else if (cmd.modeForSequence == COOL_SETPOINT_FIELD_PRESENT) {
                 cmd.sequenceMode.pCoolMode = (coolMode_t *)pData;
-            }else if(cmd.modeForSequence == BOTH_SETPOINT_FIELD_PRESENT){
+            } else if (cmd.modeForSequence == BOTH_SETPOINT_FIELD_PRESENT) {
                 cmd.sequenceMode.pBothMode = (bothMode_t *)pData;
             }
         }
 
         status = pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, &cmd);
-    }else{
+    } else {
         status = ZCL_STA_FAILURE;
     }
 
@@ -362,7 +361,7 @@ _CODE_ZCL_ static status_t zcl_thermostat_getRelayStatusLogRspPrc(zclIncoming_t 
     status_t status = ZCL_STA_SUCCESS;
     u8 *pData = pInMsg->pData;
 
-    if(pInMsg->clusterAppCb){
+    if (pInMsg->clusterAppCb) {
         zcl_thermostat_getRelayStatusLogRspCmd_t cmd;
         TL_SETSTRUCTCONTENT(cmd, 0);
 
@@ -379,7 +378,7 @@ _CODE_ZCL_ static status_t zcl_thermostat_getRelayStatusLogRspPrc(zclIncoming_t 
         pData += 2;
 
         status = pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, &cmd);
-    }else{
+    } else {
         status = ZCL_STA_FAILURE;
     }
 
@@ -390,26 +389,25 @@ _CODE_ZCL_ static status_t zcl_thermostat_clientCmdHandler(zclIncoming_t *pInMsg
 {
     u8 status = ZCL_STA_SUCCESS;
 
-    switch(pInMsg->hdr.cmd)
-    {
-        case ZCL_CMD_THERMOSTAT_SETPOINT_RAISE_LOWER:
-            status = zcl_thermostat_setpointRaiseLowerPrc(pInMsg);
-            break;
-        case ZCL_CMD_THERMOSTAT_SET_WEEKLY_SCHEDULE:
-            status = zcl_thermostat_setWeeklySchedulePrc(pInMsg);
-            break;
-        case ZCL_CMD_THERMOSTAT_GET_WEEKLY_SCHEDULE:
-            status = zcl_thermostat_getWeeklySchedulePrc(pInMsg);
-            break;
-        case ZCL_CMD_THERMOSTAT_CLEAR_WEEKLY_SCHEDULE:
-            status = zcl_thermostat_clearWeeklySchedulePrc(pInMsg);
-            break;
-        case ZCL_CMD_THERMOSTAT_GET_RELAY_STATUS_LOG:
-            status = zcl_thermostat_getRelayStatusLogPrc(pInMsg);
-            break;
-        default:
-            status = ZCL_STA_UNSUP_CLUSTER_COMMAND;
-            break;
+    switch (pInMsg->hdr.cmd) {
+    case ZCL_CMD_THERMOSTAT_SETPOINT_RAISE_LOWER:
+        status = zcl_thermostat_setpointRaiseLowerPrc(pInMsg);
+        break;
+    case ZCL_CMD_THERMOSTAT_SET_WEEKLY_SCHEDULE:
+        status = zcl_thermostat_setWeeklySchedulePrc(pInMsg);
+        break;
+    case ZCL_CMD_THERMOSTAT_GET_WEEKLY_SCHEDULE:
+        status = zcl_thermostat_getWeeklySchedulePrc(pInMsg);
+        break;
+    case ZCL_CMD_THERMOSTAT_CLEAR_WEEKLY_SCHEDULE:
+        status = zcl_thermostat_clearWeeklySchedulePrc(pInMsg);
+        break;
+    case ZCL_CMD_THERMOSTAT_GET_RELAY_STATUS_LOG:
+        status = zcl_thermostat_getRelayStatusLogPrc(pInMsg);
+        break;
+    default:
+        status = ZCL_STA_UNSUP_CLUSTER_COMMAND;
+        break;
     }
 
     return status;
@@ -419,17 +417,16 @@ _CODE_ZCL_ static status_t zcl_thermostat_serverCmdHandler(zclIncoming_t *pInMsg
 {
     u8 status = ZCL_STA_SUCCESS;
 
-    switch(pInMsg->hdr.cmd)
-    {
-        case ZCL_CMD_THERMOSTAT_GET_WEEKLY_SCHEDULE_RSP:
-            status = zcl_thermostat_getWeeklyScheduleRspPrc(pInMsg);
-            break;
-        case ZCL_CMD_THERMOSTAT_GET_RELAY_STATUS_LOG_RSP:
-            status = zcl_thermostat_getRelayStatusLogRspPrc(pInMsg);
-            break;
-        default:
-            status = ZCL_STA_UNSUP_CLUSTER_COMMAND;
-            break;
+    switch (pInMsg->hdr.cmd) {
+    case ZCL_CMD_THERMOSTAT_GET_WEEKLY_SCHEDULE_RSP:
+        status = zcl_thermostat_getWeeklyScheduleRspPrc(pInMsg);
+        break;
+    case ZCL_CMD_THERMOSTAT_GET_RELAY_STATUS_LOG_RSP:
+        status = zcl_thermostat_getRelayStatusLogRspPrc(pInMsg);
+        break;
+    default:
+        status = ZCL_STA_UNSUP_CLUSTER_COMMAND;
+        break;
     }
 
     return status;
@@ -437,11 +434,11 @@ _CODE_ZCL_ static status_t zcl_thermostat_serverCmdHandler(zclIncoming_t *pInMsg
 
 _CODE_ZCL_ static status_t zcl_thermostat_cmdHandler(zclIncoming_t *pInMsg)
 {
-    if(pInMsg->hdr.frmCtrl.bf.dir == ZCL_FRAME_CLIENT_SERVER_DIR){
+    if (pInMsg->hdr.frmCtrl.bf.dir == ZCL_FRAME_CLIENT_SERVER_DIR) {
         return zcl_thermostat_clientCmdHandler(pInMsg);
-    }else{
+    } else {
         return zcl_thermostat_serverCmdHandler(pInMsg);
     }
 }
 
-#endif  /* ZCL_THERMOSTAT */
+#endif	/* ZCL_THERMOSTAT */

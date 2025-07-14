@@ -50,20 +50,20 @@
  */
 #define ACL_CONN_MAX_TX_OCTETS          27
 
-#define     MY_APP_ADV_CHANNEL          BLT_ENABLE_ADV_ALL
-#define     MY_ADV_INTERVAL_MIN         ADV_INTERVAL_300MS
-#define     MY_ADV_INTERVAL_MAX         ADV_INTERVAL_305MS
+#define MY_APP_ADV_CHANNEL              BLT_ENABLE_ADV_ALL
+#define MY_ADV_INTERVAL_MIN             ADV_INTERVAL_300MS
+#define MY_ADV_INTERVAL_MAX             ADV_INTERVAL_305MS
 
-#define     ADV_IDLE_ENTER_DEEP_TIME            60  //60 s
-#define     CONN_IDLE_ENTER_DEEP_TIME           60  //60 s
+#define ADV_IDLE_ENTER_DEEP_TIME        60  //60 s
+#define CONN_IDLE_ENTER_DEEP_TIME       60  //60 s
 
-#define     MY_DIRECT_ADV_TMIE                  2000000
+#define MY_DIRECT_ADV_TMIE               2000000
 
-#define     MY_RF_POWER_INDEX                   RF_POWER_INDEX_P2p79dBm
+#define MY_RF_POWER_INDEX                RF_POWER_INDEX_P2p79dBm
 
-#define     BLE_DEVICE_ADDRESS_TYPE             BLE_DEVICE_ADDRESS_PUBLIC
+#define BLE_DEVICE_ADDRESS_TYPE          BLE_DEVICE_ADDRESS_PUBLIC
 
-#define MTU_SIZE_SETTING                        64
+#define MTU_SIZE_SETTING                 64
 
 typedef enum{
     ATT_H_START = 0,
@@ -243,7 +243,7 @@ const attribute_t my_Attributes[] = {
     {0,ATT_PERMISSIONS_READ, 2,sizeof (my_OtaName),(u8*)(&userdesc_UUID), (u8*)(my_OtaName), 0},
 };
 
-static u8  g_appBleInterval = 40;
+static u8  g_appBleInterval = CONN_INTERVAL_50MS;
 static u16 g_appBleLatency = 19;
 
 _attribute_data_retention_  own_addr_type_t     app_own_address_type = OWN_ADDRESS_PUBLIC;
@@ -328,7 +328,7 @@ void task_connect (u8 e, u8 *p, int n)
     device_in_connection_state = 1;//
 
 #if (UI_LED_ENABLE && !TEST_CONN_CURRENT_ENABLE)
-    gpio_write(GPIO_LED_RED, LED_ON_LEVAL);  //yellow light on
+    drv_gpio_write(GPIO_LED_RED, LED_ON_LEVAL);  //yellow light on
 #endif
 }
 
@@ -362,24 +362,11 @@ void task_terminate(u8 e,u8 *p, int n) //*p is terminate reason
 
 
 #if (UI_LED_ENABLE && !TEST_CONN_CURRENT_ENABLE)
-    gpio_write(GPIO_LED_RED, !LED_ON_LEVAL);  //yellow light off
+    drv_gpio_write(GPIO_LED_RED, !LED_ON_LEVAL);  //yellow light off
 #endif
 
     advertise_begin_tick = clock_time();
 }
-
-/**
- * @brief      callback function of LinkLayer Event "BLT_EV_FLAG_SUSPEND_EXIT"
- * @param[in]  e - LinkLayer Event type
- * @param[in]  p - data pointer of event
- * @param[in]  n - data length of event
- * @return     none
- */
-_attribute_ram_code_ void   user_set_rf_power (u8 e, u8 *p, int n)
-{
-    rf_set_power_level_index (g_ble_txPowerSet);
-}
-
 
 /*
  *Kite:     VVWWXX38C1A4YYZZ
@@ -605,30 +592,13 @@ void user_ble_init(void)
     blc_ll_addScanningInAdvState();  //add scan in adv state
 #endif
 
-    //set rf power index, user must set it after every suspend wakeup, cause relative setting will be reset in suspend
-    user_set_rf_power(0, 0, 0);
+    rf_set_power_level_index (g_ble_txPowerSet);
 
     bls_app_registerEventCallback (BLT_EV_FLAG_CONNECT, &task_connect);
     bls_app_registerEventCallback (BLT_EV_FLAG_TERMINATE, &task_terminate);
-    bls_app_registerEventCallback (BLT_EV_FLAG_SUSPEND_EXIT, &user_set_rf_power);
 
     ///////////////////// Power Management initialization///////////////////
-#if(BLE_APP_PM_ENABLE)
-    blc_ll_initPowerManagement_module();
-
-    #if (PM_DEEPSLEEP_RETENTION_ENABLE)
-        bls_pm_setSuspendMask (SUSPEND_ADV | DEEPSLEEP_RETENTION_ADV | SUSPEND_CONN | DEEPSLEEP_RETENTION_CONN);
-        blc_pm_setDeepsleepRetentionThreshold(95, 95);
-        blc_pm_setDeepsleepRetentionEarlyWakeupTiming(TEST_CONN_CURRENT_ENABLE ? 370 : 400);
-        //blc_pm_setDeepsleepRetentionType(DEEPSLEEP_MODE_RET_SRAM_LOW64K); //default use 32k deep retention
-    #else
-        bls_pm_setSuspendMask (SUSPEND_ADV | SUSPEND_CONN);
-    #endif
-
-    bls_app_registerEventCallback (BLT_EV_FLAG_SUSPEND_ENTER, &ble_remote_set_sleep_wakeup);
-#else
     bls_pm_setSuspendMask (SUSPEND_DISABLE);
-#endif
 
     advertise_begin_tick = clock_time();
 }

@@ -129,6 +129,23 @@ typedef struct __attribute__((packed))
     u16 connHandle;
 } hci_le_encryptKeyRefreshEvt_t;
 
+
+//    HDT EVENT    //
+typedef struct __attribute__((packed))
+{
+    hci_le_encryptEnableEvt_t encryptEnable;
+    u8 encryptionKeySize;
+    u8 micLength;
+    u8 pfs_dbg_key;
+} hci_encryptEnableV3Evt_t;
+
+typedef struct __attribute__((packed))
+{
+    hci_le_encryptKeyRefreshEvt_t keyFresh;
+    u8  micLength;
+    u8  pfs_dbg_key;
+} hci_encryptKeyRefreshV2Evt_t;
+
 /**
  *  @brief  Event Parameters for "7.7.65.1 LE Connection Complete event"
  */
@@ -717,6 +734,37 @@ typedef struct __attribute__((packed))
     u16 isoIntvl;
 } hci_le_cisEstablishedEvt_t;
 
+typedef struct __attribute__((packed))
+{
+    u8  subEventCode;
+    u8  status;
+    u16 cisHandle;
+    u8  cigSyncDly[3];
+    u8  cisSyncDly[3];
+    u8  transLaty_m2s[3];
+    u8  transLaty_s2m[3];
+    u8  phy_m2s; // le_phy_type_t: 0x01/0x02/0x03
+    u8  phy_s2m; // le_phy_type_t: 0x01/0x02/0x03
+    u8  nse;
+    u8  bn_m2s;
+    u8  bn_s2m;
+    u8  ft_m2s;
+    u8  ft_s2m;
+    u16 maxPDU_m2s;
+    u16 maxPDU_s2m;
+    u16 isoIntvl;
+    u8  sub_interval[3];
+    u16 maxSdu_c2p;
+    u16 maxSdu_p2c;
+    u8  sduIntvl_c2p[3];
+    u8  sduIntvl_p2c[3];
+    u8  framing;
+    u8  rates_c2p;
+    u8  rates_p2c;
+    u8  encrypt_en;
+    u8  mic_length;
+} hci_le_cisEstablishedV4Evt_t;
+
 /**
  *  @brief  Event Parameters for "7.7.65.26 LE CIS Request event"
  */
@@ -749,6 +797,27 @@ typedef struct __attribute__((packed))
     u8  numBis;
     u16 bisHandles[1]; //LL_BIS_IN_PER_BIG_BCST_NUM_MAX];
 } hci_le_createBigCompleteEvt_t;
+
+typedef struct __attribute__((packed))
+{
+    u8  subEventCode;
+    u8  status;
+    u8  bigHandle;
+    u8  bigSyncDly[3];
+    u8  transLatyBig[3];
+    u8  phy;
+    u8  nse;
+    u8  bn;
+    u8  pto;
+    u8  irc;
+    u16 maxPDU;
+    u16 isoIntvl;
+    u16 rates;
+    u8  encrypt_en;
+    u8  mic_length;
+    u8  numBis;
+    u16 bisHandles[1]; //LL_BIS_IN_PER_BIG_BCST_NUM_MAX];
+} hci_le_createBigCompleteV2Evt_t;
 
 /**
  *  @brief  Event Parameters for "7.7.65.28 LE Terminate BIG Complete event"
@@ -1067,6 +1136,43 @@ typedef struct __attribute__((packed))
     u8 Status;
 } hci_le_csTestEndCompleteEvt_t;
 
+
+enum fsu_initiator {
+    FSU_INITIATOR_LOCAL_HOST = 0x00,
+    FSU_INITIATOR_LOCAL_CONTROLLER = 0x01,
+    FSU_INITIATOR_PEER = 0x02,
+};
+
+/* Monitored Advertisers report event condition type */
+typedef enum
+{
+    RSSI_BELOW_LOW_RSSI_THRESHOLD_TIMEOUT     = 0x00,
+    SRRI_GREATER_HIGH_THRESHOLD  = 0x01,
+} monitoredAdvertisersReportEventConditionType_t;
+
+typedef struct __attribute__((packed))
+{
+    u8 subEventCode;
+    u8 addr_type;
+    u8 address[6];
+    u8 condition;   //see monitoredAdvertisersReportEventConditionType_t
+} hci_le_monitioredAdvertisersReportEvt_t;
+
+/**
+ *  @brief  Event Parameters for "7.7.65.48 LE Frame Space Update Complete event"
+ */
+typedef struct __attribute__((packed))
+{
+    u8  subEventCode;
+    u8  status;
+    u16 connHandle;
+
+    u8  initiator;   //refer to 'enum fsu_initiator'
+    u16 frame_space; //The new frame space value being used, in microseconds Range: 0x0000 to 0x2710
+    u8  phy_mask;
+    u16 spacing_types;
+} hci_le_frameSpaceUpdateCompleteEvt_t;
+
 /**
  *  @brief  Event Parameters for Telink Private "LE Connection Establish event"
  */
@@ -1149,9 +1255,19 @@ int hci_le_csSubeventResult_evt(u16 connhandle, u8 config_id, u8 *data, u32 data
 int hci_le_csSubeventResultContinue_evt(u16 connhandle, u8 config_id, u8 *dtat, u32 data_length);
 int hci_le_csTestEndComplete_evt(u8 status);
 
+int hci_le_monitoredAdvertisersReport_evt(u8 addr_type, u8* addr, u8 condition);
+
 
 int hci_tlk_connectionEstablish_evt(u8 status, u16 connHandle, u8 role, u8 peerAddrType, u8 *peerAddr, u16 connInterval, u16 periphr_Latency, u16 supervisionTimeout, u8 masterClkAccuracy);
 
 int hci_tlk_createConnectionFail_evt(u8 fail_reason, u8 create_conn_cnt);
 
+int hci_encryptChangeV3_evt(u16 connhandle, u8 encrypt_en, u8 encrypt_keysize, u8 mic_length, u8 pfs_dbg_key);
+int hci_encryptKeyRefreshV2_evt(u16 connhandle, u8 mic_length ,u8 pfs_dbg_key);
+int hci_le_cisEstablishedV4_evt(u8 status, u16 cisHandle, u8 cigSyncDly[3], u8 cisSyncDly[3], u8 transLaty_m2s[3], u8 transLaty_s2m[3],
+                                u8 phy_m2s, u8 phy_s2m, u8 nse, u8 bn_m2s, u8 bn_s2m, u8 ft_m2s, u8 ft_s2m, u16 maxPDU_m2s,
+                                u16 maxPDU_s2m, u16 isoIntvl, u8 sub_interval[3], u16 maxSdu_c2p, u16 maxSdu_p2c, u8 sduIntvl_c2p[3],
+                                u8 sduIntvl_p2c[3], u8 framing, u8 rates_c2p, u8 rates_p2c, u8 encrypt_en, u8 mic_length);
+int hci_le_createBigCompleteV2_evt(u8 status, u8 bigHandle, u8 bigSyncDly[3], u8 transLatyBig[3], u8 phy, u8 nse,u8 bn, u8 pto, u8 irc,
+                                   u16 maxPDU, u16 isoIntvl, u16 rates, u8 encrypt_en, u8 mic_length, u8 numBis, u16 *bisHandles);
 #endif /* HCI_EVENT_H_ */

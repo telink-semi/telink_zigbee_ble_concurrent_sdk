@@ -23,7 +23,8 @@
  *******************************************************************************************************/
 #include <stddef.h>
 #include "usbhw.h"
-
+#include "chip_config.h"
+#if(COMPATIBLE_WITH_TL321X_AND_TL323X == 0)
 /**
  * @brief      This function serves to enable USB power and clock.
  * @return     none.
@@ -191,3 +192,4 @@ void usb_set_pin(bool dp_through_swire)
      */
     dp_through_swire_en(dp_through_swire);
 }
+#endif

@@ -435,7 +435,10 @@ typedef struct __attribute__((packed))
 typedef enum
 {
     INITIATE_FP_ADV_SPECIFY = 0x00, //connect ADV specified by host
-    INITIATE_FP_ADV_WL      = 0x01, //connect ADV in whiteList
+    INITIATE_FP_ADV_WL      = 0x01, EXT_INIT_FP_ADV_IGNORED_DECISION_AND_WL4OTHERPDU  = 0x01,//connect ADV in whiteList
+    EXT_INIT_FP_ADV_ONLY_DECISION_AND_NO_WL           = 0x02,
+    EXT_INIT_FP_ADV_WL4ALLPDU                         = 0x03,
+    EXT_INIT_FP_ADV_DECISION_AND_WL4OTHERPDU          = 0x04,
 } init_fp_t;
 
 /**
@@ -750,9 +753,11 @@ typedef struct __attribute__((packed))
 
 typedef enum
 {
-    BLE_PHY_1M    = 0x01,
-    BLE_PHY_2M    = 0x02,
-    BLE_PHY_CODED = 0x03,
+    BLE_PHY_1M      = 0x01,
+    BLE_PHY_2M      = 0x02,
+    BLE_PHY_CODED   = 0x03,
+    BLE_PHY_CODED_S2= 0x04,
+    BLE_PHY_HDT     = 0x05,
 } le_phy_type_t;
 
 typedef enum
@@ -787,7 +792,28 @@ typedef enum
     PHY_PREFER_1M    = BIT(0),
     PHY_PREFER_2M    = BIT(1),
     PHY_PREFER_CODED = BIT(2),
+    PHY_PREFER_HDT   = BIT(4),
 } le_phy_prefer_type_t;
+
+typedef enum
+{
+    PHY_PREFER_HDT2M    = BIT(0),
+    PHY_PREFER_HDT3M    = BIT(1),
+    PHY_PREFER_HDT4M    = BIT(2),
+    PHY_PREFER_HDT6M    = BIT(3),
+    PHY_PREFER_HDT7P5M  = BIT(4),
+} le_hdt_phy_prefer_type_t;
+
+typedef enum
+{
+    PHY_PREFER_CODEDS8    = BIT(0),
+    PHY_PREFER_CODEDS2    = BIT(1),
+} le_coded_phy_prefer_type_t;
+
+#ifndef CODED_PHY_RATES_SUPPORTED
+    #define CODED_PHY_RATES_SUPPORTED         (PHY_PREFER_CODEDS2 | PHY_PREFER_CODEDS8)
+#endif
+
 
 typedef enum
 {
@@ -803,6 +829,18 @@ typedef enum
     CODED_PHY_PREFER_S2   = 1,
     CODED_PHY_PREFER_S8   = 2,
 } le_ci_prefer_t; //LE coding indication prefer
+
+typedef enum
+{
+    CODEDPHY_PREFER_NONE = 0,
+    CODEDPHY_PREFER_S2   = 1,
+    CODEDPHY_PREFER_S8   = 2,
+    HDTPHY_PREFER_2M     = BIT(2),
+    HDTPHY_PREFER_3M     = BIT(3),
+    HDTPHY_PREFER_4M     = BIT(4),
+    HDTPHY_PREFER_6M     = BIT(5),
+    HDTPHY_PREFER_7P5M   = BIT(6),
+} le_phy_option_prefer_t;
 
 /**
  *  @brief  Command Parameters for "7.8.53 LE Set Extended Advertising Parameters command"
@@ -845,6 +883,10 @@ typedef enum
     ADVEVT_PROP_MASK_LEGACY      = BIT(4),
     ADVEVT_PROP_MASK_ANON_ADV    = BIT(5),
     ADVEVT_PROP_MASK_INC_TX_PWR  = BIT(6),
+
+    ADVEVT_PROP_MASK_USE_DECISION_PDU                   =   BIT(7),
+    ADVEVT_PROP_MASK_DECISION_PDU_INC_ADVA              =   BIT(8),
+    ADVEVT_PROP_MASK_DECISION_PDU_INC_ADI               =   BIT(9),
 } advEvtProp_mask_t;
 
 #define ADVEVT_PROP_MASK_CONNECTABLE_SCANNABLE        (0x0003) // ADVEVT_PROP_MASK_CONNECTABLE | ADVEVT_PROP_MASK_SCANNABLE
@@ -874,6 +916,9 @@ typedef enum
     ADV_EVT_PROP_EXTENDED_MASK_ANONYMOUS_ADV    = 0x0020,                    //if this mask on(only extended ADV event can mask it), anonymous advertising
     ADV_EVT_PROP_EXTENDED_MASK_TX_POWER_INCLUDE = 0x0040,                    //if this mask on(only extended ADV event can mask it), TX power include
 
+    ADV_EVT_PROP_EXTENDED_MASK_USE_DECISION_PDU      = 0x0080,
+    ADV_EVT_PROP_EXTENDED_MASK_DECISION_PDU_INC_ADVA = 0x0100,
+    ADV_EVT_PROP_EXTENDED_MASK_DECISION_PDU_INC_ADI  = 0x0200,
 } advEvtProp_type_t;
 
 /* Advertising_TX_Power */
@@ -1518,6 +1563,29 @@ typedef struct __attribute__((packed))
     u8  cteType;
 } hci_le_dftPastParamsCmdParams_t;
 
+/* Mode parameter for hci_le_dftPastParamsCmdParams_t. */
+typedef enum
+{
+    PAST_MODE_OFF                        = 0, /*!< LE_Periodic_Advertising_Sync_Transfer_Received event is disabled. */
+    PAST_MODE_RPT_DISABLED               = 1, /*!< LE_Periodic_Advertising_Sync_Transfer_Received event is enabled, LE_Periodic_Advertising_Report events is disabled. */
+    PAST_MODE_RPT_ENABLED_DUP_FILTER_DIS = 2, /*!< LE_Periodic_Advertising_Sync_Transfer_Received event is enabled, LE_Periodic_Advertising_Report events is enabled with duplicate filtering disabled. */
+    PAST_MODE_RPT_ENABLED_DUP_FILTER_EN  = 3, /*!< LE_Periodic_Advertising_Sync_Transfer_Received event is enabled, LE_Periodic_Advertising_Report events is enabled with duplicate filtering enabled. */
+    PAST_MODE_TOTAL                      = PAST_MODE_RPT_ENABLED_DUP_FILTER_EN
+} past_mode_t;
+
+/* CteType parameter for hci_le_dftPastParamsCmdParams_t. */
+typedef enum
+{
+    PAST_CTE_TYPE_NOT_SYNC_TO_AOA     = BIT(0), /*!< Do not sync to packets with an AoA Constant Tone Extension. */
+    PAST_CTE_TYPE_NOT_SYNC_TO_AOD_1US = BIT(1), /*!< Do not sync to packets with an AoD Constant Tone Extension with 1 s slots. */
+    PAST_CTE_TYPE_NOT_SYNC_TO_AOD_2US = BIT(2), /*!< Do not sync to packets with an AoD Constant Tone Extension with 2 s slots. */
+    PAST_CTE_TYPE_ONLY_SYNC_TO_CTE    = BIT(4), /*!< Do not sync to packets without a Constant Tone Extension. */
+
+    PAST_CTE_TYPE_SYNC_TO_WITHOUT_CTE = PAST_CTE_TYPE_NOT_SYNC_TO_AOA |
+                                        PAST_CTE_TYPE_NOT_SYNC_TO_AOD_1US |
+                                        PAST_CTE_TYPE_NOT_SYNC_TO_AOD_2US,
+} cteType_t;
+
 typedef struct __attribute__((packed))
 {
     u8  cis_id;
@@ -2092,6 +2160,23 @@ typedef struct __attribute__((packed))
     u16 advHandle;
 } hci_le_setPeridAdvSubeventDataRetParams_t;
 
+
+typedef struct __attribute__((packed))
+{
+    u8 test_flag;
+    u8 test_field;
+    u8 test_param[16];
+} dec_ins_t;
+
+typedef struct __attribute__((packed)){
+    u8 num_test;
+    u8 group_num;
+    u8 testNum_perGroup[8];//DECISION_INSTRUCTION_SUPPORT_MAX_NUM
+    u8 rsvd[2];
+
+    dec_ins_t *pTestData;
+}decision_test_t;
+
 /**
  *  @brief  Command Parameters for "7.8.126 LE Set Periodic Advertising Response Data command"
  */
@@ -2125,6 +2210,28 @@ typedef struct __attribute__((packed))
     u8 num_subevent;
     u8 subeventIdx[0];
 } hci_le_setPeriodicSyncSubevent_cmdParam_t;
+
+/**
+ *  @brief  Command Parameters for "7.8.150 LE Read Monitored Advertisers List Size command"
+ */
+typedef struct __attribute__((packed))
+{
+    u8 status;
+    u8 number;
+
+} hci_le_readMonitoredAdvertisersListSizeStatusParam_t;
+
+/**
+ *  @brief  Command Parameters for "7.8.146 LE Add Device To Monitored Advertisers List command"
+ */
+typedef struct __attribute__((packed))
+{
+    u8 adr_type;
+    u8 addr[6];
+    s8 RSSI_Threshold_Low;
+    s8 RSSI_Threshold_High;
+    u8 timeout;
+} hci_le_addDeviceToMonitoredAdvertisersListcmdParam_t;
 
 /**
  * @brief      get current connection channel map
@@ -2388,5 +2495,200 @@ typedef struct __attribute__((packed))
     u8  Override_Parameters_Data[0];
 } hci_le_cs_test_cmdParam_t;
 
+typedef struct __attribute__((packed))
+{
+    u8  cis_id;
+    u16 max_sdu_m2s;
+    u16 max_sdu_s2m;
+    u8  phy_m2s; // le_phy_prefer_type_t: BIT(0) BIT(1) BIT(2)
+    u8  phy_s2m; // le_phy_prefer_type_t: BIT(0) BIT(1) BIT(2)
+    u8  rtn_m2s;
+    u8  rtn_s2m;
+    u16 code_rates_m2s;
+    u16 code_rates_s2m;
+    u16 hdt_rates_m2s;
+    u16 hdt_rates_s2m;
+} cigParam_cisCfgV3_t;
+
+typedef struct __attribute__((packed))
+{
+    u8  cig_id;
+    u8  sdu_int_m2s[3]; //unit: uS
+    u8  sdu_int_s2m[3]; //unit: uS
+    u8  sca;
+    u8  packing;
+    u8  framing;
+    u16 max_trans_lat_m2s; //unit: mS
+    u16 max_trans_lat_s2m; //unit: mS
+    u8  cis_count;         //15 B above
+    cigParam_cisCfgV3_t cisCfg[1];
+} hci_le_setCigParamV3_cmdParam_t;
+
+typedef struct __attribute__((packed))
+{
+    u8  cis_id;
+    u8  nse;
+    u16 max_sdu_m2s;
+    u16 max_sdu_s2m;
+    u16 max_pdu_m2s;
+    u16 max_pdu_s2m;
+    u8  phy_m2s; // le_phy_prefer_type_t: BIT(0) BIT(1) BIT(2)
+    u8  phy_s2m; // le_phy_prefer_type_t: BIT(0) BIT(1) BIT(2)
+    u8  bn_m2s;
+    u8  bn_s2m;
+    u16 code_rates_m2s;
+    u16 code_rates_s2m;
+    u16 hdt_rates_m2s;
+    u16 hdt_rates_s2m;
+} cigParamTestV3_cisCfg_t;
+
+typedef struct __attribute__((packed))
+{
+    u8  cig_id;
+    u8  sdu_int_m2s[3]; //unit: uS
+    u8  sdu_int_s2m[3]; //unit: uS
+    u8  ft_m2s;
+    u8  ft_s2m;
+    u16 iso_intvl;
+    u8  sca;
+    u8  packing;
+    u8  framing;
+    u8  cis_count; //15 B above
+    cigParamTestV3_cisCfg_t cisCfg[0]; //14 B for one CIS configuration
+} hci_le_setCigParamTestV3_cmdParam_t;
+
+typedef struct __attribute__((packed))
+{
+    u8  big_handle;         /* Used to identify the BIG */
+    u8  adv_handle;         /* Used to identify the periodic advertising train */
+    u8  num_bis;            /* Total number of BISes in the BIG */
+    u8  sdu_intvl[3];       /* The interval, in microseconds, of BIS SDUs */
+    u16 max_sdu;            /* Maximum size of an SDU, in octets */
+    u16 max_trans_lat;      /* Maximum time, in milliseconds, for transmitting an SDU */
+    u8  rtn;                /* The maximum number of times that every BIS Data PDU should be retransmitted */
+    u8  phy;                /* The transmitter PHY of packets */
+    u8  packing;            //refer to 'packing_type_t'
+    u8  framing;            //refer to 'framing_t'
+    u8  enc;                /* Encryption flag */
+    u8  broadcast_code[16]; /* The code used to derive the session key that is used to encrypt and decrypt BIS payloads */
+    u16 code_rates;
+    u16 hdt_rates;
+    u8  mic_length;
+} hci_le_createBigParamsV2_t;
+
+typedef struct __attribute__((packed))
+{
+    u8  big_handle;         /* Used to identify the BIG */
+    u8  adv_handle;         /* Used to identify the periodic advertising train */
+    u8  num_bis;            /* Total number of BISes in the BIG */
+    u8  sdu_intvl[3];       /* The interval, in microseconds, of periodic SDUs */
+    u16 iso_intvl;          /* The time between consecutive BIG anchor points, Time = N * 1.25 ms */
+    u8  nse;                /* The total number of subevents in each interval of each BIS in the BIG */
+    u16 max_sdu;            /* Maximum size of an SDU, in octets */
+    u16 max_pdu;            /* Maximum size, in octets, of payload */
+    u8  phy;                /* The transmitter PHY of packets, BIT(0): LE 1M; BIT(1): LE 2M; BIT(3): LE Coded PHY */
+    u8  packing;
+    u8  framing;
+    u8  bn;                 /* The number of new payloads in each interval for each BIS */
+    u8  irc;                /* The number of times the scheduled payload(s) are transmitted in a given event*/
+    u8  pto;                /* Offset used for pre-transmissions */
+    u8  enc;                /* Encryption flag */
+    u8  broadcast_code[16]; /* The code used to derive the session key that is used to encrypt and decrypt BIS payloads */
+    u16 code_rates;
+    u16 hdt_rates;
+    u8  mic_length;
+} hci_le_createBigParamsTestV2_t;
+
+typedef struct __attribute__((packed))
+{
+    unsigned char txChn;
+    unsigned char testDataLen;
+    unsigned char pktPayload;
+    unsigned char phy;
+    unsigned char cte_len;
+    unsigned char cte_type;
+    unsigned char switching_pattern_len;
+    unsigned char antenna_ids[1];
+} hci_le_transmitterTestV5_cmdParam_t;
+
+typedef struct __attribute__((packed))
+{
+    unsigned char  txPowerLevel;
+    unsigned char  hdtRateInd;
+    unsigned char  hdtPfi;
+    unsigned short hdtHeaderlen;
+    unsigned char  hdtPhyIntvl;
+    unsigned char  hdtNumBlocks[4];
+    unsigned short  hdtBlockSize[4];
+    unsigned short  hdtFinalBlockSize[4];
+} hci_le_transmitterTestV5_remain_cmdParam_t;
+
+typedef struct __attribute__((packed))
+{
+    u8  phy;
+} hci_le_readMaxDataLengthV2_cmdParam_t;
+
+typedef struct __attribute__((packed))
+{
+    u8  status;
+    u16 support_max_tx_octets;
+    u16 support_max_tx_time;
+    u16 support_max_rx_octets;
+    u16 support_max_rx_time;
+    u16 support_max_tx_payload_per_packet;
+    u16 support_max_rx_payload_per_packet;
+} hci_le_readMaxDataLengthV2_retParam_t;
+
+typedef struct __attribute__((packed))
+{
+    u8  preferred_mic_length;
+} hci_le_setHdtDftParam_cmdParam_t;
+
+typedef struct __attribute__((packed))
+{
+    u8  status;
+} hci_le_setHdtDftParam_retParam_t;
+
+typedef struct __attribute__((packed))
+{
+    u16 conn_handle;
+    u8  packet_format;
+    u8  max_tx_payload_window_size;
+    u8  max_rx_payload_window_size;
+    u8  block_per_payload;
+} hci_le_setHdtParamTest_cmdParam_t;
+
+typedef struct __attribute__((packed))
+{
+    u8  status;
+    u16 conn_handle;
+} hci_le_setHdtParamTest_retParam_t;
+
+typedef struct __attribute__((packed))
+{
+    u16 conn_handle;
+    u8  mic_length;
+} hci_refreshEncryptKeyV2_cmdParam_t;
+
+typedef struct __attribute__((packed))
+{
+    u16 connHandle;
+    u8  random_number[8];
+    u8  enc_div[2];
+    u8  long_term_key[16];
+    u8  hdt_mic_length;
+    u8  encrypt_type;
+    u8  pfs_dbg_flg;
+} hci_le_enableEncryptionV2_cmdParam_t;
+
+ble_sts_t blc_hci_le_setCigParams_V3(hci_le_setCigParamV3_cmdParam_t *pCmdParam,  hci_le_setCigParam_retParam_t *pRetParam);
+ble_sts_t blc_hci_le_setCigParamsTest_V3(hci_le_setCigParamTestV3_cmdParam_t *pCmdParam, hci_le_setCigParam_retParam_t *pRetParam);
+ble_sts_t blc_hci_le_createBigParams_V2(hci_le_createBigParamsV2_t *pCmdParam);
+ble_sts_t blc_hci_le_createBigParamsTest_V2(hci_le_createBigParamsTestV2_t *pCmdParam);
+ble_sts_t blc_hci_le_readMaxDataLength_V2(hci_le_readMaxDataLengthV2_cmdParam_t *pCmdParam, hci_le_readMaxDataLengthV2_retParam_t *pRetParam);
+ble_sts_t blc_hci_le_setHdtDftParams(hci_le_setHdtDftParam_cmdParam_t *pCmdParam);
+ble_sts_t blc_hci_le_setHdtParamsTest(hci_le_setHdtParamTest_cmdParam_t *pCmdParam,  hci_le_setHdtParamTest_retParam_t *pRetParam);
+ble_sts_t blc_hci_refreshEncyptKey_V2(hci_refreshEncryptKeyV2_cmdParam_t *pCmdParam);
+ble_sts_t blc_hci_le_enableEncryption_V2(hci_le_enableEncryptionV2_cmdParam_t *pCmdParam);
 
 #endif /* HCI_CMD_H_ */

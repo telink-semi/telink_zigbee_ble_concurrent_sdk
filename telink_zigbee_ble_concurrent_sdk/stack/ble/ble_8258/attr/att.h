@@ -3,7 +3,7 @@
  *
  * @brief    This is the header file for 8258 BLE SDK
  *
- * @author	 BLE GROUP
+ * @author   BLE GROUP
  * @date         12,2021
  *
  * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
@@ -43,30 +43,30 @@
 #define ATT_OP_EXCHANGE_MTU_REQ             0x02 //!< Exchange MTU Request op code
 #define ATT_OP_EXCHANGE_MTU_RSP             0x03 //!< Exchange MTU Response op code
 #define ATT_OP_FIND_INFO_REQ                0x04 //!< Find Information Request op code
-#define ATT_OP_FIND_INFO_RSP                0x05 //!< Find Information Response op code		----Information Data 4 to (ATT_MTU-2)
-#define ATT_OP_FIND_BY_TYPE_VALUE_REQ       0x06 //!< Find By Type Value Request op code			Attribute Value 0 to (ATT_MTU-7)
-#define ATT_OP_FIND_BY_TYPE_VALUE_RSP       0x07 //!< Find By Type Value Response op code	----Handles Information List 4 to (ATT_MTU-1)
+#define ATT_OP_FIND_INFO_RSP                0x05 //!< Find Information Response op code     ----Information Data 4 to (ATT_MTU-2)
+#define ATT_OP_FIND_BY_TYPE_VALUE_REQ       0x06 //!< Find By Type Value Request op code            Attribute Value 0 to (ATT_MTU-7)
+#define ATT_OP_FIND_BY_TYPE_VALUE_RSP       0x07 //!< Find By Type Value Response op code   ----Handles Information List 4 to (ATT_MTU-1)
 #define ATT_OP_READ_BY_TYPE_REQ             0x08 //!< Read By Type Request op code
-#define ATT_OP_READ_BY_TYPE_RSP             0x09 //!< Read By Type Response op code			----Attribute Data List 2 to (ATT_MTU- 2)
+#define ATT_OP_READ_BY_TYPE_RSP             0x09 //!< Read By Type Response op code         ----Attribute Data List 2 to (ATT_MTU- 2)
 #define ATT_OP_READ_REQ                     0x0a //!< Read Request op code
-#define ATT_OP_READ_RSP                     0x0b //!< Read Response op code					@@--Attribute Value 0 to (ATT_MTU-1)
+#define ATT_OP_READ_RSP                     0x0b //!< Read Response op code                 @@--Attribute Value 0 to (ATT_MTU-1)
 #define ATT_OP_READ_BLOB_REQ                0x0c //!< Read Blob Request op code
-#define ATT_OP_READ_BLOB_RSP                0x0d //!< Read Blob Response op code			@@--Part Attribute Value 0 to (ATT_MTU-1)
-#define ATT_OP_READ_MULTI_REQ               0x0e //!< Read Multiple Request op code				Set Of Handles 4 to (ATT_MTU-1)
-#define ATT_OP_READ_MULTI_RSP               0x0f //!< Read Multiple Response op code		----Set Of Values 0 to (ATT_MTU-1)
+#define ATT_OP_READ_BLOB_RSP                0x0d //!< Read Blob Response op code            @@--Part Attribute Value 0 to (ATT_MTU-1)
+#define ATT_OP_READ_MULTI_REQ               0x0e //!< Read Multiple Request op code             Set Of Handles 4 to (ATT_MTU-1)
+#define ATT_OP_READ_MULTI_RSP               0x0f //!< Read Multiple Response op code        ----Set Of Values 0 to (ATT_MTU-1)
 #define ATT_OP_READ_BY_GROUP_TYPE_REQ       0x10 //!< Read By Group Type Request op code
-#define ATT_OP_READ_BY_GROUP_TYPE_RSP       0x11 //!< Read By Group Type Response op code	----Attribute Data List 4 to (ATT_MTU- 2)
-#define ATT_OP_WRITE_REQ                    0x12 //!< Write Request op code						Attribute Value 0 to (ATT_MTU-3)
+#define ATT_OP_READ_BY_GROUP_TYPE_RSP       0x11 //!< Read By Group Type Response op code   ----Attribute Data List 4 to (ATT_MTU- 2)
+#define ATT_OP_WRITE_REQ                    0x12 //!< Write Request op code                     Attribute Value 0 to (ATT_MTU-3)
 #define ATT_OP_WRITE_RSP                    0x13 //!< Write Response op code
-#define ATT_OP_PREPARE_WRITE_REQ            0x16 //!< Prepare Write Request op code				Part Attribute Value 0 to (ATT_MTU-5)
-#define ATT_OP_PREPARE_WRITE_RSP            0x17 //!< Prepare Write Response op code		----Part Attribute Value 0 to (ATT_MTU-5)
+#define ATT_OP_PREPARE_WRITE_REQ            0x16 //!< Prepare Write Request op code             Part Attribute Value 0 to (ATT_MTU-5)
+#define ATT_OP_PREPARE_WRITE_RSP            0x17 //!< Prepare Write Response op code        ----Part Attribute Value 0 to (ATT_MTU-5)
 #define ATT_OP_EXECUTE_WRITE_REQ            0x18 //!< Execute Write Request op code
 #define ATT_OP_EXECUTE_WRITE_RSP            0x19 //!< Execute Write Response op code
-#define ATT_OP_HANDLE_VALUE_NOTI            0x1b //!< Handle Value Notification op code			Attribute Value 0 to (ATT_MTU-3)
-#define ATT_OP_HANDLE_VALUE_IND             0x1d //!< Handle Value Indication op code			Attribute Value 0 to (ATT_MTU-3)
+#define ATT_OP_HANDLE_VALUE_NOTI            0x1b //!< Handle Value Notification op code         Attribute Value 0 to (ATT_MTU-3)
+#define ATT_OP_HANDLE_VALUE_IND             0x1d //!< Handle Value Indication op code           Attribute Value 0 to (ATT_MTU-3)
 #define ATT_OP_HANDLE_VALUE_CFM             0x1e //!< Handle Value Confirmation op code
-#define ATT_OP_WRITE_CMD                    0x52 //!< ATT Write Command							Attribute Value 0 to (ATT_MTU-3)
-#define ATT_OP_SIGNED_WRITE_CMD				0xd2 //!< ATT Signed Write Command					Attribute Value 0 to (ATT_MTU - 15)
+#define ATT_OP_WRITE_CMD                    0x52 //!< ATT Write Command                         Attribute Value 0 to (ATT_MTU-3)
+#define ATT_OP_SIGNED_WRITE_CMD             0xd2 //!< ATT Signed Write Command                  Attribute Value 0 to (ATT_MTU - 15)
 
 
 
@@ -75,36 +75,36 @@
  * @{
  * (See the Core_v5.0(Vol 3/Part C/10.3.1/Table 10.2) for more information)
  */
-#define ATT_PERMISSIONS_AUTHOR				 0x10 //Attribute access(Read & Write) requires Authorization
-#define ATT_PERMISSIONS_ENCRYPT				 0x20 //Attribute access(Read & Write) requires Encryption
-#define ATT_PERMISSIONS_AUTHEN				 0x40 //Attribute access(Read & Write) requires Authentication(MITM protection)
-#define ATT_PERMISSIONS_SECURE_CONN			 0x80 //Attribute access(Read & Write) requires Secure_Connection
-#define ATT_PERMISSIONS_SECURITY			 (ATT_PERMISSIONS_AUTHOR | ATT_PERMISSIONS_ENCRYPT | ATT_PERMISSIONS_AUTHEN | ATT_PERMISSIONS_SECURE_CONN)
+#define ATT_PERMISSIONS_AUTHOR               0x10 //Attribute access(Read & Write) requires Authorization
+#define ATT_PERMISSIONS_ENCRYPT              0x20 //Attribute access(Read & Write) requires Encryption
+#define ATT_PERMISSIONS_AUTHEN               0x40 //Attribute access(Read & Write) requires Authentication(MITM protection)
+#define ATT_PERMISSIONS_SECURE_CONN          0x80 //Attribute access(Read & Write) requires Secure_Connection
+#define ATT_PERMISSIONS_SECURITY             (ATT_PERMISSIONS_AUTHOR | ATT_PERMISSIONS_ENCRYPT | ATT_PERMISSIONS_AUTHEN | ATT_PERMISSIONS_SECURE_CONN)
 
 //user can choose permission below
 #define ATT_PERMISSIONS_READ                 0x01 //!< Attribute is Readable
 #define ATT_PERMISSIONS_WRITE                0x02 //!< Attribute is Writable
-#define ATT_PERMISSIONS_RDWR	             (ATT_PERMISSIONS_READ | ATT_PERMISSIONS_WRITE)   //!< Attribute is Readable & Writable
+#define ATT_PERMISSIONS_RDWR                 (ATT_PERMISSIONS_READ | ATT_PERMISSIONS_WRITE)   //!< Attribute is Readable & Writable
 
 
-#define ATT_PERMISSIONS_ENCRYPT_READ         (ATT_PERMISSIONS_READ  | ATT_PERMISSIONS_ENCRYPT) 		//!< Read requires Encryption
-#define ATT_PERMISSIONS_ENCRYPT_WRITE        (ATT_PERMISSIONS_WRITE | ATT_PERMISSIONS_ENCRYPT) 		//!< Write requires Encryption
-#define ATT_PERMISSIONS_ENCRYPT_RDWR         (ATT_PERMISSIONS_RDWR  | ATT_PERMISSIONS_ENCRYPT) 		//!< Read & Write requires Encryption
+#define ATT_PERMISSIONS_ENCRYPT_READ         (ATT_PERMISSIONS_READ  | ATT_PERMISSIONS_ENCRYPT)      //!< Read requires Encryption
+#define ATT_PERMISSIONS_ENCRYPT_WRITE        (ATT_PERMISSIONS_WRITE | ATT_PERMISSIONS_ENCRYPT)      //!< Write requires Encryption
+#define ATT_PERMISSIONS_ENCRYPT_RDWR         (ATT_PERMISSIONS_RDWR  | ATT_PERMISSIONS_ENCRYPT)      //!< Read & Write requires Encryption
 
 
-#define ATT_PERMISSIONS_AUTHEN_READ          (ATT_PERMISSIONS_READ  | ATT_PERMISSIONS_ENCRYPT | ATT_PERMISSIONS_AUTHEN) 		//!< Read requires Authentication
-#define ATT_PERMISSIONS_AUTHEN_WRITE         (ATT_PERMISSIONS_WRITE | ATT_PERMISSIONS_ENCRYPT | ATT_PERMISSIONS_AUTHEN) 		//!< Write requires Authentication
-#define ATT_PERMISSIONS_AUTHEN_RDWR          (ATT_PERMISSIONS_RDWR  | ATT_PERMISSIONS_ENCRYPT | ATT_PERMISSIONS_AUTHEN) 		//!< Read & Write requires Authentication
+#define ATT_PERMISSIONS_AUTHEN_READ          (ATT_PERMISSIONS_READ  | ATT_PERMISSIONS_ENCRYPT | ATT_PERMISSIONS_AUTHEN)         //!< Read requires Authentication
+#define ATT_PERMISSIONS_AUTHEN_WRITE         (ATT_PERMISSIONS_WRITE | ATT_PERMISSIONS_ENCRYPT | ATT_PERMISSIONS_AUTHEN)         //!< Write requires Authentication
+#define ATT_PERMISSIONS_AUTHEN_RDWR          (ATT_PERMISSIONS_RDWR  | ATT_PERMISSIONS_ENCRYPT | ATT_PERMISSIONS_AUTHEN)         //!< Read & Write requires Authentication
 
 
-#define ATT_PERMISSIONS_SECURE_CONN_READ	 (ATT_PERMISSIONS_READ  | ATT_PERMISSIONS_SECURE_CONN | ATT_PERMISSIONS_ENCRYPT | ATT_PERMISSIONS_AUTHEN)   //!< Read requires Secure_Connection
+#define ATT_PERMISSIONS_SECURE_CONN_READ     (ATT_PERMISSIONS_READ  | ATT_PERMISSIONS_SECURE_CONN | ATT_PERMISSIONS_ENCRYPT | ATT_PERMISSIONS_AUTHEN)   //!< Read requires Secure_Connection
 #define ATT_PERMISSIONS_SECURE_CONN_WRITE    (ATT_PERMISSIONS_WRITE | ATT_PERMISSIONS_SECURE_CONN | ATT_PERMISSIONS_ENCRYPT | ATT_PERMISSIONS_AUTHEN)  //!< Write requires Secure_Connection
-#define ATT_PERMISSIONS_SECURE_CONN_RDWR	 (ATT_PERMISSIONS_RDWR  | ATT_PERMISSIONS_SECURE_CONN | ATT_PERMISSIONS_ENCRYPT | ATT_PERMISSIONS_AUTHEN)   //!< Read & Write requires Secure_Connection
+#define ATT_PERMISSIONS_SECURE_CONN_RDWR     (ATT_PERMISSIONS_RDWR  | ATT_PERMISSIONS_SECURE_CONN | ATT_PERMISSIONS_ENCRYPT | ATT_PERMISSIONS_AUTHEN)   //!< Read & Write requires Secure_Connection
 
 
-#define ATT_PERMISSIONS_AUTHOR_READ          (ATT_PERMISSIONS_READ | ATT_PERMISSIONS_AUTHOR) 		//!< Read requires Authorization
-#define ATT_PERMISSIONS_AUTHOR_WRITE         (ATT_PERMISSIONS_WRITE | ATT_PERMISSIONS_AUTHEN) 		//!< Write requires Authorization
-#define ATT_PERMISSIONS_AUTHOR_RDWR          (ATT_PERMISSIONS_RDWR | ATT_PERMISSIONS_AUTHOR) 		//!< Read & Write requires Authorization
+#define ATT_PERMISSIONS_AUTHOR_READ          (ATT_PERMISSIONS_READ | ATT_PERMISSIONS_AUTHOR)        //!< Read requires Authorization
+#define ATT_PERMISSIONS_AUTHOR_WRITE         (ATT_PERMISSIONS_WRITE | ATT_PERMISSIONS_AUTHEN)       //!< Write requires Authorization
+#define ATT_PERMISSIONS_AUTHOR_RDWR          (ATT_PERMISSIONS_RDWR | ATT_PERMISSIONS_AUTHOR)        //!< Read & Write requires Authorization
 
 
 /** @} End GAP_ATT_PERMISSIONS_BITMAPS */
@@ -114,7 +114,7 @@
 //See the Core_v5.0(Vol 3/Part F/3.4.1.1, "Error Response") for more information.
 typedef enum {
 
-	ATT_SUCCESS = 0,
+    ATT_SUCCESS = 0,
 
     ATT_ERR_INVALID_HANDLE,                              //!< The attribute handle given was not valid on this server
     ATT_ERR_READ_NOT_PERMITTED,                          //!< The attribute cannot be read
@@ -133,28 +133,18 @@ typedef enum {
     ATT_ERR_INSUFFICIENT_ENCRYPT,                        //!< The attribute requires encryption before it can be read or written
     ATT_ERR_UNSUPPORTED_GRP_TYPE,                        //!< The attribute type is not a supported grouping attribute as defined by a higher layer specification
     ATT_ERR_INSUFFICIENT_RESOURCES,                      //!< Insufficient Resources to complete the request
-
-
-
 }att_err_t;
 
-
-
-
 //TELINK MTU no longer than 256, so 1 byte is enough
-typedef struct{
-	u8 init_MTU;
-	u8 effective_MTU;
-	u8 Data_pending_time;    //10ms unit
-	u8 Data_permission_check;
-}att_para_t;
+typedef struct {
+    u8 init_MTU;
+    u8 effective_MTU;
+    u8 Data_pending_time;    //10ms unit
+    u8 Data_permission_check;
+} att_para_t;
 extern att_para_t bltAtt;
 
-
-
-
-typedef struct
-{
+typedef struct {
   u8 len;                    //!< Length of UUID
   u8 uuid[16];               //!< UUID
 } uuid_t;
@@ -162,8 +152,7 @@ typedef struct
 /**
  * Error Response 
  */
-typedef struct
-{
+typedef struct {
     u8 reqOpcodeInErr; //!< The request that generated this error response
     u8 errCode;   //!< The reason why the request has generated an error response
     u16 attHandleInErr;   //!< The attribute handle that generated this error response
@@ -172,24 +161,21 @@ typedef struct
 /**
  * Exchange MTU Request 
  */
-typedef struct
-{
+typedef struct {
     u16 clientRxMTU; //!< Attribute client receive MTU size 
 } exchangeMTUReq_t;
 
 /**
  * Exchange MTU Response 
  */
-typedef struct
-{
+typedef struct {
     u16 serverRxMTU; //!< Attribute server receive MTU size
 } exchangeMTURsp_t;
 
 /**
  * Find Information Request 
  */
-typedef struct
-{
+typedef struct {
     u16 startingHandle;       //!< First requested handle number
     u16 endingHandle;         //!< Last requested handle number
 } findInformationReq_t;
@@ -197,8 +183,7 @@ typedef struct
 /**
  * Handle(s) and 16-bit Bluetooth UUID(s)
  */
-typedef struct
-{
+typedef struct {
     u16 handle;                //!< Handle
     u8 uuid[ATT_16BIT_UUID_LEN]; //!< 16 bit UUID
 } handleBtUUID_t;
@@ -206,8 +191,7 @@ typedef struct
 /**
  * Handle(s) and 128-bit UUID(s)
  */
-typedef struct
-{
+typedef struct {
     u16 handle;             //!< Handle
     u8 uuid[ATT_128BIT_UUID_LEN]; //!< 128 bit UUID
 } handleUUID_t;
@@ -215,8 +199,7 @@ typedef struct
 /**
  * Find Information Response 
  */
-typedef struct
-{
+typedef struct {
     u8 format;       //!< Format of information
     u8 infoNum;      //!< information num
     u8 info[1];      //!< information
@@ -225,8 +208,7 @@ typedef struct
 /**
  * Find By Type Value Request 
  */
-typedef struct
-{
+typedef struct {
   u16  startingHandle;          //!< First requested handle number 
   u16  endingHandle;            //!< Last requested handle number
   u16  uuid;                    //!< UUID to find
@@ -237,8 +219,7 @@ typedef struct
 /**
  * Handles Information list element
  */
-typedef struct
-{
+typedef struct {
   u8 handle;         //!< Found attribute handle
   u8 groupEndHandle; //!< Group end handle
 } handleInfo_t;
@@ -246,8 +227,7 @@ typedef struct
 /**
  * Find By Type Value Response 
  */
-typedef struct
-{
+typedef struct {
   u8 handleInfoNum;                                       //!< Number of handles information below
   handleInfo_t handleInfo[1] ; //!< A list of 1 or more Handle Information
 } findByTypeValueRsp_t;
@@ -255,8 +235,7 @@ typedef struct
 /**
  * Read By Type Request 
  */
-typedef struct
-{
+typedef struct {
   u16 startingHandle; //!< First requested handle number
   u16 endingHandle;   //!< Last requested handle number
   uuid_t attrType;    //!< 2 or 16 octet UUID
@@ -265,8 +244,7 @@ typedef struct
 /**
  * Read By Type Response 
  */
-typedef struct
-{
+typedef struct {
   u8 numData;                  //!< Number of attribute data list item
   u8 len;                      //!< The size of each attribute handle-value pair
   u8 data[1];     //!< Attribute Data List
@@ -275,16 +253,14 @@ typedef struct
 /**
  * Read Request 
  */
-typedef struct
-{
+typedef struct {
   u16 handle;               //!< The handle of the attribute to be read
 } readReq_t;
 
 /**
  * Read Response 
  */
-typedef struct
-{
+typedef struct {
   u8 len;                   //!< Length of value
   u8 attrValue[1];          //!< Value of the attribute with the handle given
 } readRsp_t;
@@ -292,8 +268,7 @@ typedef struct
 /**
  * Read Blob Req 
  */
-typedef struct
-{
+typedef struct {
   u16 handle; //!< The handle of the attribute to be read
   u16 offset; //!< The offset of the first octet to be read
 } readBlobReq_t;
@@ -301,8 +276,7 @@ typedef struct
 /**
  * Read Blob Response 
  */
-typedef struct
-{
+typedef struct {
   u8 len;      //!< Length of value
   u8 attrValue[1]; //!< Part of the value of the attribute with the handle given
 } readBlobRsp_t;
@@ -310,8 +284,7 @@ typedef struct
 /**
  * Read Multiple Request
  */
-typedef struct
-{
+typedef struct {
   u8  numHandles; //!< Number of attribute handles
   u16 handle[1];  //!< A set of two or more attribute handles
 } readMultipleReq_t;
@@ -319,8 +292,7 @@ typedef struct
 /**
  * Read Multiple Response 
  */
-typedef struct
-{
+typedef struct {
   u8 len;       //!< Length of values
   u8 values[1]; //!< A set of two or more values
 } readMultiRsp_t;
@@ -328,8 +300,7 @@ typedef struct
 /**
  * Read By Group Type Request 
  */
-typedef struct
-{
+typedef struct {
   u16 startingHandle; //!< First requested handle number (must be first field)
   u16 endingHandle;   //!< Last requested handle number
   uuid_t attrType;     //!< 2 or 16 octet UUID
@@ -338,8 +309,7 @@ typedef struct
 /**
  * Read By Group Type Response 
  */
-typedef struct
-{
+typedef struct {
   u8 grpNum;                  //!< The number of attributes in this group
   u8 len;                      //!< Length of each attribute handle
   u8 data[1];                 //!< Attribute Data
@@ -348,8 +318,7 @@ typedef struct
 /**
  * Write Request 
  */
-typedef struct
-{
+typedef struct {
   u16 handle;                            //!< The handle of the attribute to be written (must be first field)
   u8 len;                                //!< Length of value
   u8 value[1];            //!< The value to be written to the attribute
@@ -358,8 +327,7 @@ typedef struct
 /**
  * Write Command 
  */
-typedef struct
-{
+typedef struct {
   u16 handle;                         //!< The handle of the attribute to be written (must be first field)
   u8 len;                             //!< Length of value
   u8 value[1];         //!< The value to be written to the attribute
@@ -369,8 +337,7 @@ typedef struct
 /**
  * Prepare Write Request 
  */
-typedef struct
-{
+typedef struct {
   u16 handle;                 //!< Handle of the attribute to be written (must be first field)
   u16 offset;                 //!< Offset of the first octet to be written
   u8 len;                     //!< Length of value
@@ -380,8 +347,7 @@ typedef struct
 /**
  * Prepare Write Response 
  */
-typedef struct
-{
+typedef struct {
   u16 handle;                       //!< The handle of the attribute to be written
   u16 offset;                       //!< The offset of the first octet to be written
   u8 len;                           //!< Length of value
@@ -391,16 +357,14 @@ typedef struct
 /**
  * Execute Write Request 
  */
-typedef struct
-{
+typedef struct {
   u8 flags;   //!< 0x00 - cancel all prepared writes 0x01 - immediately write all pending prepared values
 } executeWriteReq_t;
 
 /**
  * Handle Value Notification 
  */
-typedef struct
-{
+typedef struct {
   u16 handle;               //!< The handle of the attribute
   u8 len;                   //!< Length of value
   u8 value[1];              //!< The current value of the attribute
@@ -409,24 +373,20 @@ typedef struct
 /**
  * Handle Value Indication 
  */
-typedef struct
-{
+typedef struct {
   u16 handle;               //!< The handle of the attribute
   u8 len;                   //!< Length of value
   u8 value[1];              //!< The current value of the attribute
 } handleValueInd_t;
 
-typedef union attOpCode{
-    struct{
+typedef union attOpCode {
+    struct {
         u8 method:6;
         u8 cmdFlag:1;
         u8 authSigFlag:1;
     }bitField;
     u8 byte;
 }attOpCode_t;
-
-
-
 
 /////////////////////////////
 // gatt.h
@@ -471,8 +431,7 @@ typedef int (*att_mtuSizeExchange_callback_t)(u16, u16);
 typedef int (*att_handleValueConfirm_callback_t)(void);
 typedef int (*att_readwrite_callback_t)(void* p);
 
-typedef struct attribute
-{
+typedef struct attribute {
   u16  attNum;
   u8   perm;
   u8   uuidLen;
@@ -484,64 +443,44 @@ typedef struct attribute
 } attribute_t;
 
 
-
-
-
-
-extern u16	blt_indicate_handle;
-
-
-
+extern u16  blt_indicate_handle;
 
 /******************************* User Interface  ************************************/
 ble_sts_t  bls_att_pushNotifyData (u16 attHandle, u8 *p, int len);
-ble_sts_t	 bls_att_pushIndicateData (u16 attHandle, u8 *p, int len);
-void		 bls_att_setAttributeTable (u8 *p);
-
-
+ble_sts_t    bls_att_pushIndicateData (u16 attHandle, u8 *p, int len);
+void         bls_att_setAttributeTable (u8 *p);
 
 //mtu size
 ble_sts_t  blc_att_setRxMtuSize(u16 mtu_size);
 
-ble_sts_t	 blc_att_requestMtuSizeExchange (u16 connHandle, u16 mtu_size);
-ble_sts_t	 blc_att_responseMtuSizeExchange (u16 connHandle, u16 mtu_size);
+ble_sts_t    blc_att_requestMtuSizeExchange (u16 connHandle, u16 mtu_size);
+ble_sts_t    blc_att_responseMtuSizeExchange (u16 connHandle, u16 mtu_size);
+
+        // 0x04: ATT_OP_FIND_INFO_REQ
+void    att_req_find_info(u8 *dat, u16 start_attHandle, u16 end_attHandle);
+        // 0x06: ATT_OP_FIND_BY_TYPE_VALUE_REQ
+void    att_req_find_by_type (u8 *dat, u16 start_attHandle, u16 end_attHandle, u8 *uuid, u8* attr_value, int len);
+        // 0x08: ATT_OP_READ_BY_TYPE_REQ
+void    att_req_read_by_type (u8 *dat, u16 start_attHandle, u16 end_attHandle, u8 *uuid, int uuid_len);
+        // 0x0a: ATT_OP_READ_REQ
+void    att_req_read (u8 *dat, u16 attHandle);
+        // 0x0c: ATT_OP_READ_BLOB_REQ
+void    att_req_read_blob (u8 *dat, u16 attHandle, u16 offset);
+        // 0x10: ATT_OP_READ_BY_GROUP_TYPE_REQ
+void    att_req_read_by_group_type (u8 *dat, u16 start_attHandle, u16 end_attHandle, u8 *uuid, int uuid_len);
+        // 0x12: ATT_OP_WRITE_REQ
+void    att_req_write (u8 *dat, u16 attHandle, u8 *buf, int len);
+        // 0x52: ATT_OP_WRITE_CMD
+void    att_req_write_cmd (u8 *dat, u16 attHandle, u8 *buf, int len);
+
+ble_sts_t   bls_att_setDeviceName(u8* pName,u8 len);  //only module/mesh/hci use
+
+int  att_register_idle_func (void *p);
+int  l2cap_att_client_handler (u16 conn, u8 *p);
 
 
-		// 0x04: ATT_OP_FIND_INFO_REQ
-void 	att_req_find_info(u8 *dat, u16 start_attHandle, u16 end_attHandle);
-		// 0x06: ATT_OP_FIND_BY_TYPE_VALUE_REQ
-void 	att_req_find_by_type (u8 *dat, u16 start_attHandle, u16 end_attHandle, u8 *uuid, u8* attr_value, int len);
-		// 0x08: ATT_OP_READ_BY_TYPE_REQ
-void 	att_req_read_by_type (u8 *dat, u16 start_attHandle, u16 end_attHandle, u8 *uuid, int uuid_len);
-		// 0x0a: ATT_OP_READ_REQ
-void 	att_req_read (u8 *dat, u16 attHandle);
-		// 0x0c: ATT_OP_READ_BLOB_REQ
-void 	att_req_read_blob (u8 *dat, u16 attHandle, u16 offset);
-		// 0x10: ATT_OP_READ_BY_GROUP_TYPE_REQ
-void 	att_req_read_by_group_type (u8 *dat, u16 start_attHandle, u16 end_attHandle, u8 *uuid, int uuid_len);
-		// 0x12: ATT_OP_WRITE_REQ
-void 	att_req_write (u8 *dat, u16 attHandle, u8 *buf, int len);
-		// 0x52: ATT_OP_WRITE_CMD
-void 	att_req_write_cmd (u8 *dat, u16 attHandle, u8 *buf, int len);
-
-
-
-
-ble_sts_t 	bls_att_setDeviceName(u8* pName,u8 len);  //only module/mesh/hci use
-
-
-int 		att_register_idle_func (void *p);
-int 		l2cap_att_client_handler (u16 conn, u8 *p);
-
-
-
-
-ble_sts_t	blc_att_requestMtuSizeExchange (u16 connHandle, u16 mtu_size);
-ble_sts_t	blc_att_responseMtuSizeExchange (u16 connHandle, u16 mtu_size);
-
-
-
-
+ble_sts_t   blc_att_requestMtuSizeExchange (u16 connHandle, u16 mtu_size);
+ble_sts_t   blc_att_responseMtuSizeExchange (u16 connHandle, u16 mtu_size);
 
 
 /************************* Stack Interface, user can not use!!! ***************************/
@@ -551,17 +490,17 @@ u8 * l2cap_att_handler(u16 connHandle, u8 * p);
 
 static inline u16  blc_att_getEffectiveMtuSize(u16 connHandle)
 {
-	return bltAtt.effective_MTU;
+    return bltAtt.effective_MTU;
 }
 
 static inline void  blt_att_setEffectiveMtuSize(u16 connHandle, u8 effective_mtu)
 {
-	bltAtt.effective_MTU = effective_mtu;
+    bltAtt.effective_MTU = effective_mtu;
 }
 
 static inline void  blt_att_resetEffectiveMtuSize(u16 connHandle)
 {
-	bltAtt.effective_MTU = ATT_MTU_SIZE;
+    bltAtt.effective_MTU = ATT_MTU_SIZE;
 }
 
 void blt_att_procHoldAttributeCommand(void);

@@ -3,7 +3,7 @@
  *
  * @brief    This is the header file for 8258 BLE SDK
  *
- * @author	 BLE GROUP
+ * @author   BLE GROUP
  * @date         12,2021
  *
  * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
@@ -20,7 +20,6 @@
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
  *******************************************************************************************************/
-
 #pragma  once
 
 #include "../ll/ll.h"
@@ -28,7 +27,7 @@
 #define AES_BLOCK_SIZE     16
 
 
-//#define		SUCCESS			0
+//#define       SUCCESS         0
 enum {
     AES_SUCC = SUCCESS,
     AES_NO_BUF,               
@@ -73,7 +72,7 @@ void aes_ecb_decryption(u8 *key, u8 *encrypted_data, u8 *decrypted_data);
 void aes_ll_encryption(u8 *key, u8 *plaintext, u8 *result);
 void aes_ll_ccm_encryption_init (u8 *ltk, u8 *skdm, u8 *skds, u8 *ivm, u8 *ivs, ble_crypt_para_t *pd);
 void aes_ll_ccm_encryption(u8 *pkt, int master, ble_crypt_para_t *pd);
-int aes_ll_ccm_decryption(u8 *pkt, int master, ble_crypt_para_t *pd);		//OK return 0
+int aes_ll_ccm_decryption(u8 *pkt, int master, ble_crypt_para_t *pd);       //OK return 0
 u8 aes_att_encryption_packet(u8 *key, u8 *iv, u8 *mic, u8 mic_len, u8 *ps, u8 len);
 u8 aes_att_decryption_packet(u8 *key, u8 *iv, u8 *mic, u8 mic_len, u8 *ps, u8 len);
 

@@ -22,10 +22,8 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-
 #ifndef ZCL_ALARM_H
 #define ZCL_ALARM_H
-
 
 
 /** @addtogroup  TELINK_ZIGBEE_STACK TELINK ZigBee Stack
@@ -48,25 +46,25 @@
  *  @brief  Size of ZCL alarm table 
  */
 #ifndef ZCL_ALARM_TABLE_NUM
-#define ZCL_ALARM_TABLE_NUM                            5
+#define ZCL_ALARM_TABLE_NUM                     5
 #endif
 
 /** @addtogroup zcl_alarm_cmdId ALARMS Command Ids
  * @{
  */
-#define ZCL_CMD_ALARM_RESET_ALARM                      0x00
-#define ZCL_CMD_ALARM_RESET_ALL                        0x01
-#define ZCL_CMD_ALARM_GET_ALARM                        0x02
-#define ZCL_CMD_ALARM_RESET_ALARM_LOG                  0x03
+#define ZCL_CMD_ALARM_RESET_ALARM               0x00
+#define ZCL_CMD_ALARM_RESET_ALL                 0x01
+#define ZCL_CMD_ALARM_GET_ALARM                 0x02
+#define ZCL_CMD_ALARM_RESET_ALARM_LOG           0x03
 
-#define ZCL_CMD_ALARM_ALARM                            0x00
-#define ZCL_CMD_ALARM_GET_ALARM_RSP                    0x01
+#define ZCL_CMD_ALARM_ALARM                     0x00
+#define ZCL_CMD_ALARM_GET_ALARM_RSP             0x01
 /** @} end of group zcl_alarm_cmdId */
 
 /** @addtogroup zcl_alarm_attrId ALARMS Attribute Ids
  * @{
  */
-#define ZCL_ATTRID_ALARM_COUNT                       0x0000
+#define ZCL_ATTRID_ALARM_COUNT                  0x0000
 /** @} end of group zcl_alarm_attrId */
 
 /** @} end of group ZCL_Alarm_Constant */
@@ -79,26 +77,26 @@
  *  @brief  Structure definition for reset alarm in alarm cluster
  */
 typedef struct {
-    u8  alarmCode;                       //!< alarm code
-    u16 clusterId;                       //!< cluster id
+    u8 alarmCode;       //!< alarm code
+    u16 clusterId;      //!< cluster id
 } resetAlarm_t;
 
 /**
  *  @brief  Structure definition for alarm in alarm cluster
  */
 typedef struct {
-    u8  alarmCode;                       //!< alarm code
-    u16 clusterId;                       //!< cluster id
+    u8 alarmCode;       //!< alarm code
+    u16 clusterId;      //!< cluster id
 } alarm_t;
 
 /**
  *  @brief  Structure definition for get alarm response command in alarm cluster
  */
 typedef struct {
-    u8  status;                          //!< status code
-    u8  alarmCode;                       //!< Identifying code for the cause of the alarm
-    u16 clusterId;                       //!< The identifier of the cluster whose attribute generated this alarm
-    u32 timeStamp;                       //!< The time at which the alarm occurred
+    u8 status;          //!< status code
+    u8 alarmCode;       //!< Identifying code for the cause of the alarm
+    u16 clusterId;      //!< The identifier of the cluster whose attribute generated this alarm
+    u32 timeStamp;      //!< The time at which the alarm occurred
 } getAlarmRsp_t;
 /** @} end of group ZCL_ALARM_Types */
 
@@ -106,16 +104,16 @@ typedef struct {
 /**
  *  @brief  Structure definition for alarm table entry in alarm cluster
  */
-typedef struct _attribute_packed_{
-    u8  alarmCode;                       //!< Identifying code for the cause of the alarm
-    u16 clusterId;                       //!< The identifier of the cluster whose attribute generated this alarm
-    u32 timeStamp;                       //!< The time at which the alarm occurred
+typedef struct _attribute_packed_ {
+    u8 alarmCode;       //!< Identifying code for the cause of the alarm
+    u16 clusterId;      //!< The identifier of the cluster whose attribute generated this alarm
+    u32 timeStamp;      //!< The time at which the alarm occurred
 } zcl_alarmEntry_t;
 
 /**
  *  @brief  Structure definition for alarm table
  */
-typedef struct _attribute_packed_{
+typedef struct _attribute_packed_ {
     u8 used;
     u8 endpoint;
     zcl_alarmEntry_t alarm;
@@ -143,12 +141,12 @@ typedef void (*zcl_alarmGetAlarmRspCb_t)(apsdeDataInd_t *pApsdeInd, getAlarmRsp_
  *  @brief  Structure definition for commands callback functions in Alarm cluster
  */
 typedef struct {
-    zcl_alarmResetAlarmCb_t       alarmResetCbFunc;
-    zcl_alarmResetAllCb_t         alarmResetAllCbFunc;
-    zcl_alarmGetAlarmCb_t         alarmGetAlarmCbFunc;
-    zcl_alarmResetAlarmLogCb_t    alarmResetLogCbFunc;
-    zcl_alarmRecvAlarmCb_t        alarmRecvAlarmCbFunc;
-    zcl_alarmGetAlarmRspCb_t      alarmGetAlarmRspFunc;
+    zcl_alarmResetAlarmCb_t alarmResetCbFunc;
+    zcl_alarmResetAllCb_t alarmResetAllCbFunc;
+    zcl_alarmGetAlarmCb_t alarmGetAlarmCbFunc;
+    zcl_alarmResetAlarmLogCb_t alarmResetLogCbFunc;
+    zcl_alarmRecvAlarmCb_t alarmRecvAlarmCbFunc;
+    zcl_alarmGetAlarmRspCb_t alarmGetAlarmRspFunc;
 } zcl_alarm_AppCallbacks_t;
 
 /** @} end of group ZCL_ALARM_Callbacks */
@@ -200,7 +198,7 @@ status_t zcl_alarm_register(u8 endpoint, u16 manuCode, u8 attrNum, const zclAttr
  * @return      status_t
  */
 status_t zcl_alarm_alarm(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, alarm_t *pAlarm);
-#define zcl_alarm_alarmCmd(a,b,c,d)     (zcl_alarm_alarm((a), (b), (c), ZCL_SEQ_NUM, (d)))
+#define zcl_alarm_alarmCmd(a,b,c,d)             (zcl_alarm_alarm((a), (b), (c), ZCL_SEQ_NUM, (d)))
 
 /**
  * @brief       API to send reset alarm command in ALARM cluster
@@ -240,7 +238,7 @@ status_t zcl_alarm_resetAllAlarm(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefau
  * @return      status_t
  */
 status_t zcl_alarm_getAlarm(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo);
-#define zcl_alarm_getAlarmCmd(a,b,c)        (zcl_alarm_getAlarm((a), (b), (c), ZCL_SEQ_NUM))
+#define zcl_alarm_getAlarmCmd(a,b,c)            (zcl_alarm_getAlarm((a), (b), (c), ZCL_SEQ_NUM))
 
 /**
  * @brief       API to send reset alarm log command in ALARM cluster
@@ -277,4 +275,4 @@ status_t zcl_alarm_AddAlarmTab(u8 endpoint, u8 alarmCode, u16 clusterId, u32 tim
 
 /** @} end of group TELINK_ZIGBEE_STACK */
 
-#endif  /* ZCL_ALARM_H */
+#endif	/* ZCL_ALARM_H */

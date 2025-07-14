@@ -3,7 +3,7 @@
  *
  * @brief    This is the header file for 8258 BLE SDK
  *
- * @author	 BLE GROUP
+ * @author   BLE GROUP
  * @date         12,2021
  *
  * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
@@ -20,56 +20,55 @@
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
  *******************************************************************************************************/
-
 #pragma once
 
 //#include <application/usbstd/CDCClassCommon.h>
 
 enum {
-	BTUSB_USB_STRING_LANGUAGE = 0,
-	BTUSB_USB_STRING_VENDOR,
-	BTUSB_USB_STRING_PRODUCT,
-	BTUSB_USB_STRING_SERIAL,
+    BTUSB_USB_STRING_LANGUAGE = 0,
+    BTUSB_USB_STRING_VENDOR,
+    BTUSB_USB_STRING_PRODUCT,
+    BTUSB_USB_STRING_SERIAL,
 };
 
 typedef struct {
-	USB_Descriptor_Configuration_Hdr_t Config;
-	USB_Descriptor_Interface_Association_t intfa;
+    USB_Descriptor_Configuration_Hdr_t Config;
+    USB_Descriptor_Interface_Association_t intfa;
 
-	USB_Descriptor_Interface_t intf0;
-	USB_Descriptor_Endpoint_t irq_in;
-	USB_Descriptor_Endpoint_t bulk_in;
-	USB_Descriptor_Endpoint_t bulk_out;
+    USB_Descriptor_Interface_t intf0;
+    USB_Descriptor_Endpoint_t irq_in;
+    USB_Descriptor_Endpoint_t bulk_in;
+    USB_Descriptor_Endpoint_t bulk_out;
 
-	USB_Descriptor_Interface_t intf1_0;
-	USB_Descriptor_Endpoint_t iso_in;
-	USB_Descriptor_Endpoint_t iso_out;
+    USB_Descriptor_Interface_t intf1_0;
+    USB_Descriptor_Endpoint_t iso_in;
+    USB_Descriptor_Endpoint_t iso_out;
 
-	USB_Descriptor_Interface_t intf1_1;
-	USB_Descriptor_Endpoint_t iso_in1;
-	USB_Descriptor_Endpoint_t iso_out1;
+    USB_Descriptor_Interface_t intf1_1;
+    USB_Descriptor_Endpoint_t iso_in1;
+    USB_Descriptor_Endpoint_t iso_out1;
 
-	USB_Descriptor_Interface_t intf_prn;
-	USB_Descriptor_Endpoint_t endp0;
-	USB_Descriptor_Endpoint_t endp1;
+    USB_Descriptor_Interface_t intf_prn;
+    USB_Descriptor_Endpoint_t endp0;
+    USB_Descriptor_Endpoint_t endp1;
 } BTUSB_Descriptor_Configuration_with_Printer_t;
 
 typedef struct {
-	USB_Descriptor_Configuration_Hdr_t Config;
-	USB_Descriptor_Interface_Association_t intfa;
+    USB_Descriptor_Configuration_Hdr_t Config;
+    USB_Descriptor_Interface_Association_t intfa;
 
-	USB_Descriptor_Interface_t intf0;
-	USB_Descriptor_Endpoint_t irq_in;
-	USB_Descriptor_Endpoint_t bulk_in;
-	USB_Descriptor_Endpoint_t bulk_out;
+    USB_Descriptor_Interface_t intf0;
+    USB_Descriptor_Endpoint_t irq_in;
+    USB_Descriptor_Endpoint_t bulk_in;
+    USB_Descriptor_Endpoint_t bulk_out;
 
-	USB_Descriptor_Interface_t intf1_0;
-	USB_Descriptor_Endpoint_t iso_in;
-	USB_Descriptor_Endpoint_t iso_out;
+    USB_Descriptor_Interface_t intf1_0;
+    USB_Descriptor_Endpoint_t iso_in;
+    USB_Descriptor_Endpoint_t iso_out;
 
-	USB_Descriptor_Interface_t intf1_1;
-	USB_Descriptor_Endpoint_t iso_in1;
-	USB_Descriptor_Endpoint_t iso_out1;
+    USB_Descriptor_Interface_t intf1_1;
+    USB_Descriptor_Endpoint_t iso_in1;
+    USB_Descriptor_Endpoint_t iso_out1;
 } BTUSB_Descriptor_Configuration_t;
 
 u8* btusb_usbdesc_get_language(void);
@@ -85,9 +84,9 @@ void btusb_select_cdc_device (int en);
 ///////////////////////////////////////////////////////////////////////////////
 //typedef void (*usb_bulk_out_callback_t)(u8 *p, int n, int offset);
 
-void myusb_bulk_drv_init (void *p);	//initialization
-int myusb_bulk_in (u8 *p, int n);		//send status
-int myusb_bulk_proc ();				//called in main loop
+void myusb_bulk_drv_init (void *p); //initialization
+int myusb_bulk_in (u8 *p, int n);       //send status
+int myusb_bulk_proc ();             //called in main loop
 void myusb_bulk_out_command (u8 *p, int n, int offset);
 
 #define CMD_GET_VERSION                 0 //0x00

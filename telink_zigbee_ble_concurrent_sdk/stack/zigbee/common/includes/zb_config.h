@@ -95,18 +95,18 @@
     defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
     #if ZB_ROUTER_ROLE
         #if ZB_COORDINATOR_ROLE
-	        #define NWK_ROUTE_RECORD_TABLE_NUM				127//300
+            #define NWK_ROUTE_RECORD_TABLE_NUM          127//300
         #endif
-	    #define TL_ZB_NWK_ADDR_MAP_NUM					128//301
-	    #define ROUTING_TABLE_NUM						48//250
+        #define TL_ZB_NWK_ADDR_MAP_NUM              128//301
+        #define ROUTING_TABLE_NUM                   48//250
     #endif
 #else
     #if ZB_ROUTER_ROLE
         #if ZB_COORDINATOR_ROLE
-	        #define NWK_ROUTE_RECORD_TABLE_NUM				64
+            #define NWK_ROUTE_RECORD_TABLE_NUM  64
         #endif
-	    #define TL_ZB_NWK_ADDR_MAP_NUM					64
-	    #define ROUTING_TABLE_NUM						24
+        #define TL_ZB_NWK_ADDR_MAP_NUM          64
+        #define ROUTING_TABLE_NUM               24
     #endif
 #endif
 

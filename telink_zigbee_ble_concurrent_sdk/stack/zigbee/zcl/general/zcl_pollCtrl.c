@@ -56,11 +56,10 @@ _CODE_ZCL_ status_t zcl_pollCtrl_register(u8 endpoint, u16 manuCode, u8 attrNum,
     return zcl_registerCluster(endpoint, ZCL_CLUSTER_GEN_POLL_CONTROL, manuCode, attrNum, attrTbl, zcl_pollCtrl_cmdHandler, cb);
 }
 
-
 _CODE_ZCL_ status_t zcl_pollCtrl_chkIn(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo)
 {
     return zcl_sendCmd(srcEp, pDstEpInfo, ZCL_CLUSTER_GEN_POLL_CONTROL, ZCL_CMD_CHK_IN, TRUE,
-                    ZCL_FRAME_SERVER_CLIENT_DIR, disableDefaultRsp, 0, seqNo, 0, NULL);
+                       ZCL_FRAME_SERVER_CLIENT_DIR, disableDefaultRsp, 0, seqNo, 0, NULL);
 }
 
 _CODE_ZCL_ status_t zcl_pollCtrl_chkInRsp(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, zcl_chkInRsp_t *pCheckInRsp)
@@ -72,13 +71,13 @@ _CODE_ZCL_ status_t zcl_pollCtrl_chkInRsp(u8 srcEp, epInfo_t *pDstEpInfo, u8 dis
     buf[2] = HI_UINT16(pCheckInRsp->fastPollTimeout);
 
     return zcl_sendCmd(srcEp, pDstEpInfo, ZCL_CLUSTER_GEN_POLL_CONTROL, ZCL_CMD_CHK_IN_RSP, TRUE,
-                    ZCL_FRAME_CLIENT_SERVER_DIR, disableDefaultRsp, 0, seqNo, 3, buf);
+                       ZCL_FRAME_CLIENT_SERVER_DIR, disableDefaultRsp, 0, seqNo, 3, buf);
 }
 
 _CODE_ZCL_ status_t zcl_pollCtrl_fastPollStop(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo)
 {
     return zcl_sendCmd(srcEp, pDstEpInfo, ZCL_CLUSTER_GEN_POLL_CONTROL, ZCL_CMD_FAST_POLL_STOP, TRUE,
-                    ZCL_FRAME_CLIENT_SERVER_DIR, disableDefaultRsp, 0, seqNo, 0, NULL);
+                       ZCL_FRAME_CLIENT_SERVER_DIR, disableDefaultRsp, 0, seqNo, 0, NULL);
 }
 
 _CODE_ZCL_ status_t zcl_pollCtrl_setLongPollInterval(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, zcl_setLongPollInterval_t *pSetLongPollInterval)
@@ -91,7 +90,7 @@ _CODE_ZCL_ status_t zcl_pollCtrl_setLongPollInterval(u8 srcEp, epInfo_t *pDstEpI
     buf[3] = U32_BYTE3(pSetLongPollInterval->newLongPollInterval);
 
     return zcl_sendCmd(srcEp, pDstEpInfo, ZCL_CLUSTER_GEN_POLL_CONTROL, ZCL_CMD_SET_LONG_POLL_INTERVAL, TRUE,
-                    ZCL_FRAME_CLIENT_SERVER_DIR, disableDefaultRsp, 0, seqNo, 4, buf);
+                       ZCL_FRAME_CLIENT_SERVER_DIR, disableDefaultRsp, 0, seqNo, 4, buf);
 }
 
 _CODE_ZCL_ status_t zcl_pollCtrl_setShortPollInterval(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, zcl_setShortPollInterval_t *pSetShortPollInterval)
@@ -102,20 +101,20 @@ _CODE_ZCL_ status_t zcl_pollCtrl_setShortPollInterval(u8 srcEp, epInfo_t *pDstEp
     buf[1] = HI_UINT16(pSetShortPollInterval->newShortPollInterval);
 
     return zcl_sendCmd(srcEp, pDstEpInfo, ZCL_CLUSTER_GEN_POLL_CONTROL, ZCL_CMD_SET_LONG_POLL_INTERVAL, TRUE,
-                    ZCL_FRAME_CLIENT_SERVER_DIR, disableDefaultRsp, 0, seqNo, 2, buf);
+                       ZCL_FRAME_CLIENT_SERVER_DIR, disableDefaultRsp, 0, seqNo, 2, buf);
 }
 
 _CODE_ZCL_ static status_t zcl_pollCtrl_chkInRspPrc(zclIncoming_t *pInMsg)
 {
     u8 status = ZCL_STA_SUCCESS;
 
-    if(pInMsg->clusterAppCb){
+    if (pInMsg->clusterAppCb) {
         zcl_chkInRsp_t payload;
         payload.startFastPolling = pInMsg->pData[0];
         payload.fastPollTimeout = BUILD_U16(pInMsg->pData[1], pInMsg->pData[2]);
 
         status = pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, &payload);
-    }else{
+    } else {
         status = ZCL_STA_FAILURE;
     }
 
@@ -126,9 +125,9 @@ _CODE_ZCL_ static status_t zcl_pollCtrl_fastPollStopPrc(zclIncoming_t *pInMsg)
 {
     u8 status = ZCL_STA_SUCCESS;
 
-    if(pInMsg->clusterAppCb){
+    if (pInMsg->clusterAppCb) {
         status = pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, NULL);
-    }else{
+    } else {
         status = ZCL_STA_FAILURE;
     }
 
@@ -139,12 +138,12 @@ _CODE_ZCL_ static status_t zcl_pollCtrl_setLongPollIntervalPrc(zclIncoming_t *pI
 {
     u8 status = ZCL_STA_SUCCESS;
 
-    if(pInMsg->clusterAppCb){
+    if (pInMsg->clusterAppCb) {
         zcl_setLongPollInterval_t payload;
         payload.newLongPollInterval = BUILD_U32(pInMsg->pData[0], pInMsg->pData[1], pInMsg->pData[2], pInMsg->pData[3]);
 
         status = pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, &payload);
-    }else{
+    } else {
         status = ZCL_STA_FAILURE;
     }
 
@@ -155,12 +154,12 @@ _CODE_ZCL_ static status_t zcl_pollCtrl_setShortPollIntervalPrc(zclIncoming_t *p
 {
     u8 status = ZCL_STA_SUCCESS;
 
-    if(pInMsg->clusterAppCb){
+    if (pInMsg->clusterAppCb) {
         zcl_setShortPollInterval_t payload;
         payload.newShortPollInterval = BUILD_U16(pInMsg->pData[0], pInMsg->pData[1]);
 
         status = pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, &payload);
-    }else{
+    } else {
         status = ZCL_STA_FAILURE;
     }
 
@@ -171,9 +170,9 @@ _CODE_ZCL_ static status_t zcl_pollCtrl_chkInPrc(zclIncoming_t *pInMsg)
 {
     u8 status = ZCL_STA_SUCCESS;
 
-    if(pInMsg->clusterAppCb){
+    if (pInMsg->clusterAppCb) {
         status = pInMsg->clusterAppCb(&(pInMsg->addrInfo), pInMsg->hdr.cmd, NULL);
-    }else{
+    } else {
         status = ZCL_STA_FAILURE;
     }
 
@@ -184,23 +183,22 @@ _CODE_ZCL_ static status_t zcl_pollCtrl_clientCmdHandler(zclIncoming_t *pInMsg)
 {
     u8 status = ZCL_STA_SUCCESS;
 
-    switch(pInMsg->hdr.cmd)
-    {
-        case ZCL_CMD_CHK_IN_RSP:
-            status = zcl_pollCtrl_chkInRspPrc(pInMsg);
-            break;
-        case ZCL_CMD_FAST_POLL_STOP:
-            status = zcl_pollCtrl_fastPollStopPrc(pInMsg);
-            break;
-        case ZCL_CMD_SET_LONG_POLL_INTERVAL:
-            status = zcl_pollCtrl_setLongPollIntervalPrc(pInMsg);
-            break;
-        case ZCL_CMD_SET_SHORT_POLL_INTERVAL:
-            status = zcl_pollCtrl_setShortPollIntervalPrc(pInMsg);
-            break;
-        default:
-            status = ZCL_STA_UNSUP_CLUSTER_COMMAND;
-            break;
+    switch (pInMsg->hdr.cmd) {
+    case ZCL_CMD_CHK_IN_RSP:
+        status = zcl_pollCtrl_chkInRspPrc(pInMsg);
+        break;
+    case ZCL_CMD_FAST_POLL_STOP:
+        status = zcl_pollCtrl_fastPollStopPrc(pInMsg);
+        break;
+    case ZCL_CMD_SET_LONG_POLL_INTERVAL:
+        status = zcl_pollCtrl_setLongPollIntervalPrc(pInMsg);
+        break;
+    case ZCL_CMD_SET_SHORT_POLL_INTERVAL:
+        status = zcl_pollCtrl_setShortPollIntervalPrc(pInMsg);
+        break;
+    default:
+        status = ZCL_STA_UNSUP_CLUSTER_COMMAND;
+        break;
     }
 
     return status;
@@ -210,14 +208,13 @@ _CODE_ZCL_ static status_t zcl_pollCtrl_serverCmdHandler(zclIncoming_t *pInMsg)
 {
     u8 status = ZCL_STA_SUCCESS;
 
-    switch(pInMsg->hdr.cmd)
-    {
-        case ZCL_CMD_CHK_IN:
-            status = zcl_pollCtrl_chkInPrc(pInMsg);
-            break;
-        default:
-            status = ZCL_STA_UNSUP_CLUSTER_COMMAND;
-            break;
+    switch (pInMsg->hdr.cmd) {
+    case ZCL_CMD_CHK_IN:
+        status = zcl_pollCtrl_chkInPrc(pInMsg);
+        break;
+    default:
+        status = ZCL_STA_UNSUP_CLUSTER_COMMAND;
+        break;
     }
 
     return status;
@@ -225,9 +222,9 @@ _CODE_ZCL_ static status_t zcl_pollCtrl_serverCmdHandler(zclIncoming_t *pInMsg)
 
 _CODE_ZCL_ static status_t zcl_pollCtrl_cmdHandler(zclIncoming_t *pInMsg)
 {
-    if(pInMsg->hdr.frmCtrl.bf.dir == ZCL_FRAME_CLIENT_SERVER_DIR){
+    if (pInMsg->hdr.frmCtrl.bf.dir == ZCL_FRAME_CLIENT_SERVER_DIR) {
         return zcl_pollCtrl_clientCmdHandler(pInMsg);
-    }else{
+    } else {
         return zcl_pollCtrl_serverCmdHandler(pInMsg);
     }
 }

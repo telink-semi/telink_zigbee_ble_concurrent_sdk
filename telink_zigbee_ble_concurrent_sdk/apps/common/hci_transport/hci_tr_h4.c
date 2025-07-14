@@ -29,7 +29,15 @@
 
 #if HCI_TR_EN
 
-    #define HCI_Tr_H4TimerEnable()  hciH4TrCB.flushTimer = clock_time() | 1
+    // #define HCI_Tr_H4TimerEnable()  hciH4TrCB.flushTimer = clock_time() | 1
+    #define HCI_Tr_H4TimerEnable()                                                                         \
+        do {                                                                                               \
+            if (hciH4TrCB.flushTimer == 0) {  \
+                hciH4TrCB.flushTimer = clock_time() | 1;                                                   \
+            }                                                                                              \
+        } while (0)
+
+
     #define HCI_Tr_H4TimerDisable() hciH4TrCB.flushTimer = 0
     #define HCI_Tr_H4FlushHandler()                                                                        \
         do {                                                                                               \
@@ -119,7 +127,7 @@ _attribute_ram_code_
     u8 *pBuf      = hciH4TrCB.pBackUpBuf;
     u8  backupLen = hciH4TrCB.backupCnt;
 
-    if (backupLen == 0) {
+    if ((backupLen == 0) && (len <= HCI_H4_TR_RX_BUF_SIZE)) {
     #if (TIFS_VARIATION_WORKAROUND_MLP_CODE_IN_RAM)
         smemcpy(pBuf, pPacket, len);
     #else
@@ -338,7 +346,7 @@ _attribute_ram_code_
 
     while (len) {
         if (hciH4TrCB.backupCnt) {
-            u8 res = HCI_Tr_H4BackUpHandler(pPacket, len);
+            u32 res = HCI_Tr_H4BackUpHandler(pPacket, len);
             pPacket += res;
             len -= res;
 
@@ -392,6 +400,11 @@ _attribute_ram_code_
             pBuf += 1; //skip evtCode
             BSTREAM_TO_UINT8(paramLen, pBuf);
             pktLen = 1 + HCI_EVT_HEAD_LEN + paramLen;
+            if(len < pktLen )
+            {
+                len = 0;
+                continue;
+            }
             len -= pktLen;
             pktLen = 0;
             continue;
@@ -404,6 +417,11 @@ _attribute_ram_code_
             pBuf += 2; //skip connHandler
             BSTREAM_TO_UINT8(paramLen, pBuf);
             pktLen = 1 + HCI_SCO_HEAD_LEN + paramLen;
+            if(len < pktLen )
+            {
+                len = 0;
+                continue;
+            }
             len -= pktLen;
             pktLen = 0;
             continue;
@@ -427,7 +445,11 @@ _attribute_ram_code_
     #endif
             pHciRxFifo->wptr++;
 //            tlkapi_send_string_data(1, "[I] ACL to HCI RX FIFO", p, pktLen);
-
+            if(len < pktLen )
+            {
+                len = 0;
+                continue;
+            }
             len -= pktLen;
             pPacket += pktLen;
         } else if (pktLen && len < pktLen) {
@@ -459,7 +481,7 @@ _attribute_ram_code_ void HCI_Tr_H4UartRxIRQHandler(unsigned int *param)
         return;                                           //have no memory.
     }
     BSTREAM_TO_UINT32(rxLen, p);
-    if (rxLen) {
+    if (rxLen>0 && rxLen<(HCI_H4_TR_RX_BUF_SIZE-4)) {
         pRxFifo->wptr++;
         p = pRxFifo->p + (pRxFifo->wptr & pRxFifo->mask) * pRxFifo->size;
     }

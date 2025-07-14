@@ -53,7 +53,4 @@ _CODE_ZCL_ status_t zcl_time_register(u8 endpoint, u16 manuCode, u8 attrNum, con
     return zcl_registerCluster(endpoint, ZCL_CLUSTER_GEN_TIME, manuCode, attrNum, attrTbl, NULL, cb);
 }
 
-#endif  /* ZCL_TIME */
-
-
-                                                  
+#endif	/* ZCL_TIME */

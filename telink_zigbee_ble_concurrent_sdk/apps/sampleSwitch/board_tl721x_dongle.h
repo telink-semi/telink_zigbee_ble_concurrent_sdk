@@ -74,7 +74,6 @@ extern "C" {
 #define PF6_INPUT_ENABLE        0
 
 #define LED_POWER               LED_R
-#define LED_PERMIT              LED_G
 
 #define	PM_WAKEUP_LEVEL         PM_WAKEUP_LEVEL_LOW
 
@@ -91,7 +90,7 @@ extern "C" {
 
 // DEBUG
 #if (TLKAPI_DEBUG_ENABLE)
-#define	DEBUG_INFO_TX_PIN       GPIO_PC4//print
+#define	DEBUG_INFO_TX_PIN       GPIO_PA0//print
 #endif
 
 enum {

@@ -7,7 +7,6 @@
  * @date    2024
  *
  * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- *          All rights reserved.
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -167,7 +166,7 @@ static inline void ir_learn_dis(void)
 static inline void ir_learn_ana_rx_en(void)
 {
     analog_write_reg8(0x0f, (analog_read_reg8(0x0f) | 0x08));
-    if (g_chip_version == CHIP_VERSION_A2) {
+    if (g_chip_version == CHIP_VERSION_A2 || g_chip_version == CHIP_VERSION_A3) {
         analog_write_reg8(0x14, (analog_read_reg8(0x14) | 0x08));
         delay_us(1);
         analog_write_reg8(0x14, (analog_read_reg8(0x14) & 0xf7));

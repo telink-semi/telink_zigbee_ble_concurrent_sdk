@@ -36,7 +36,7 @@ typedef enum
 } dev_exceed_max_strategy_t;
 
 /*
- * smp parameter need save to flash.
+ * @brief   smp parameter need save to flash.
  */
 typedef struct
 {
@@ -183,7 +183,7 @@ u32 blc_smp_loadBondingInfoByAddr(u8 isCentral, u8 perDevIdx, u8 addr_type, u8 *
  *                        if user set a value not equal to 0, SDK code will change it to 0 automatically to avoid error.
  * @return     0: The number of bound devices is 0; others: Number of bound devices.
  */
-u8 blc_smp_param_getCurrentBondingDeviceNumber(u8 isCentral, u8 perDevIdx);
+u16 blc_smp_param_getCurrentBondingDeviceNumber(u8 isCentral, u8 perDevIdx);
 
 
 /**
@@ -204,7 +204,7 @@ u8 blc_smp_param_getCurrentBondingDeviceNumber(u8 isCentral, u8 perDevIdx);
  * @param[out] smp_param_load - bonding information.
  * @return     0: Failed to find the binding information; others: FLASH address of the bonding information area.
  */
-u32 blc_smp_loadBondingInfoFromFlashByIndex(u8 isCentral, u8 perDevIdx, u8 index, smp_param_save_t *smp_param_load);
+u32 blc_smp_loadBondingInfoFromFlashByIndex(u8 isCentral, u8 perDevIdx, u16 index, smp_param_save_t *smp_param_load);
 
 
 #endif /* SMP_STORAGE_H_ */

@@ -147,6 +147,8 @@ void gpio_setup_up_down_resistor(gpio_pin_e gpio, gpio_pull_type up_down);
  */
 void rf_drv_ble_init(void);
 
+void rf_drv_dcoc_cali_sw(void);
+
 #define RF_POWER_P3dBm   RF_POWER_INDEX_P3p04dBm
 #define RF_POWER_P0dBm   RF_POWER_INDEX_P0p03dBm
 #define RF_POWER_P9dBm   RF_POWER_INDEX_P9p10dBm
@@ -279,7 +281,7 @@ void generateRandomNum(int len, unsigned char *data);
 *
 */
 
-#define     CS_EXTRAINFO_LEN                                                 62
+#define     CS_EXTRAINFO_LEN                                                 80
 #define     CS_ALIGN_16(len)                                                 (((len + 15)>>4) <<4)
 #define     CS_RX_MODE0_FIFO_SIZE_MAX                                        CS_ALIGN_16(80*20 + CS_EXTRAINFO_LEN + 4)
 #define     CS_RX_MODE1_FIFO_SIZE_MAX                                        CS_ALIGN_16((5 + 44 + 128 + 15)*20 + CS_EXTRAINFO_LEN + 4)
@@ -295,6 +297,25 @@ enum{//todo: SunWei &YeYang
     FLD_IRQ_ZB_RT_EN = 15,
 };
 /******************************* plic_end ********************************************************************/
+
+/******************************* cs_ant_switch_start *********************************************************/
+typedef struct{
+    gpio_pin_e  pin;
+    gpio_func_e  pin_fun;
+}rf_cs_ant_switch_ctrl;
+
+/**
+ * @brief        * This function initializes the GPIO pins used for antenna switching according to the specified configuration.
+ *                 It disables the input and output functions of the GPIO pins, sets the pull-down resistance, and configures
+ *                 the multiplexing function of the pins.
+ *
+ * @param[in]   switch_ctrl    - Pointer to the antenna switch control structure array.
+ * @param[in]   num            - Number of antenna switch pins
+ * @return      none.
+ */
+void rf_cs_ant_switch_pin_init(rf_cs_ant_switch_ctrl *switch_ctrl, u8 num);
+
+/******************************* cs_ant_switch_end **********************************************************/
 
 
 #endif /* DRIVERS_TL721X_EXT_MISC_H_ */

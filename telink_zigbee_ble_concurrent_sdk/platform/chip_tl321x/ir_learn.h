@@ -7,7 +7,6 @@
  * @date    2024
  *
  * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- *          All rights reserved.
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -37,6 +36,8 @@
  *  ===============
  *  Header File: ir_learn.h
  */
+#include "chip_config.h"
+#if(COMPATIBLE_WITH_TL321X_AND_TL323X == 0)
 #ifndef __IR_LEARN_H__
 #define __IR_LEARN_H__
 #include "gpio.h"
@@ -495,3 +496,4 @@ void ir_learn_rx_dma_add_list_element(dma_chn_e chn, dma_chain_config_t *config_
 void ir_learn_set_dma_chain_llp(dma_chn_e chn, unsigned char *dst_addr, unsigned int data_len, dma_chain_config_t *head_of_list);
 
 #endif /* __IR_LEARN_H__ */
+#endif

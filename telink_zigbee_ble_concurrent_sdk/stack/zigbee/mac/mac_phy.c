@@ -36,7 +36,7 @@
 /**********************************************************************
  * LOCAL CONSTANTS
  */
-#define LOGICCHANNEL_TO_PHYSICAL(p)             (((p)-10)*5)
+#define	LOGICCHANNEL_TO_PHYSICAL(p)             (((p)-10)*5)
 
 #define RF_DROP_REASON_INVALID_CRC              0x01
 #define RF_DROP_REASON_RF_BUSY                  0x02
@@ -177,7 +177,7 @@ _attribute_ram_code_ u32 mac_currentTickGet(void)
  */
 void rf_reset(void)
 {
-    rf_setTrxState(RF_STATE_TX);
+    rf_setTrxState(RF_STATE_OFF);
 
     rf_setTxPower(g_zb_txPowerSet);
 
@@ -204,8 +204,8 @@ static void rf_edDetect(void)
     //soft_rssi = rssi;//(rssi + soft_rssi)/2;
     sum_rssi += rssi;
     if (++cnt_rssi >= 0xfffffe) {
-        sum_rssi = sum_rssi / cnt_rssi;
-        cnt_rssi = 1;
+    	sum_rssi = sum_rssi / cnt_rssi;
+    	cnt_rssi = 1;
     }
 }
 
@@ -442,7 +442,7 @@ u8 rf_stopEDScan(void)
     u8 ed;
 
     if(cnt_rssi == 0) cnt_rssi = 1;
-    soft_rssi = sum_rssi/cnt_rssi;
+    soft_rssi = sum_rssi / cnt_rssi;
 
     ev_disable_poll(EV_POLL_ED_DETECT);/*WISE_FIX_ME*/
     /* Transfer the RSSI value to ED value */
@@ -796,7 +796,9 @@ inline bool zb_rfTxDoing(void)
 void restore_zb_rf_context(void)
 {
 #if defined(MCU_CORE_TL321X) || defined(MCU_CORE_TL721X)
+    rf_clr_dig_logic_state();
     rf_reset_register_value();
+    rf_dma_reset();
 #else
     rf_baseband_reset();
 #endif

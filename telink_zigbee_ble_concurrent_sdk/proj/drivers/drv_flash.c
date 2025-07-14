@@ -22,7 +22,6 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-
 #include "../tl_common.h"
 
 #if FLASH_PROTECT_ENABLE
@@ -78,7 +77,8 @@ const drv_flash_opt_t c_flashOptList[] = {
 #define FLASH_OPT_LIST_NUM      (sizeof(c_flashOptList) / sizeof(drv_flash_opt_t))
 #endif	/* FLASH_PROTECT_ENABLE */
 
-void flash_loadOpt(void){
+void flash_loadOpt(void)
+{
 #if FLASH_PROTECT_ENABLE
 #if defined(MCU_CORE_8258) || defined(MCU_CORE_B91) || defined(MCU_CORE_TL321X)
     u32 mid = flash_read_mid();
@@ -106,7 +106,8 @@ void flash_loadOpt(void){
 #endif
 }
 
-void flash_lock(void){
+void flash_lock(void)
+{
 #if FLASH_PROTECT_ENABLE
     if (pFlashOpt && pFlashOpt->lock) {
         if (g_flashLocked) {
@@ -126,7 +127,8 @@ void flash_lock(void){
 #endif
 }
 
-void flash_unlock(void){
+void flash_unlock(void)
+{
 #if FLASH_PROTECT_ENABLE
     if (pFlashOpt && pFlashOpt->unlock) {
         if (!g_flashLocked) {
@@ -146,7 +148,8 @@ void flash_unlock(void){
 #endif
 }
 
-void flash_write(u32 addr, u32 len, u8 *buf){
+void flash_write(u32 addr, u32 len, u8 *buf)
+{
 #if (MODULE_WATCHDOG_ENABLE)
     drv_wd_clear();
 #endif
@@ -158,7 +161,8 @@ void flash_write(u32 addr, u32 len, u8 *buf){
     flash_write_page(addr, len, buf);
 }
 
-bool flash_writeWithCheck(u32 addr, u32 len, u8 *buf){
+bool flash_writeWithCheck(u32 addr, u32 len, u8 *buf)
+{
     s32 toalLen = (s32)len;
     s8 copyLen = 48;
     u8 pTemp[48];
@@ -193,11 +197,13 @@ bool flash_writeWithCheck(u32 addr, u32 len, u8 *buf){
 }
 
 
-void flash_read(u32 addr, u32 len, u8 *buf){
+void flash_read(u32 addr, u32 len, u8 *buf)
+{
     flash_read_page(addr, len, buf);
 }
 
-void flash_erase(u32 addr){
+void flash_erase(u32 addr)
+{
 #if (MODULE_WATCHDOG_ENABLE)
     drv_wd_clear();
 #endif

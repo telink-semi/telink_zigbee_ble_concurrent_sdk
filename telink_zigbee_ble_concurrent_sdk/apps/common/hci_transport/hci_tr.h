@@ -61,7 +61,7 @@
     #endif
 
     #ifndef HCI_TR_BAUDRATE
-        #define HCI_TR_BAUDRATE 1000000
+        #define HCI_TR_BAUDRATE 115200
     #endif
 
 

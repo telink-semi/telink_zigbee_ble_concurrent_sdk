@@ -97,9 +97,7 @@
 #define SERVICE_UUID_ELECTRONIC_SHELF_LABEL         0x1857 //Electronic Shelf Label Service
 #define SERVICE_UUID_GAMING_AUDIO                   0x1858 //Gaming Audio Service
 #define SERVICE_UUID_MESH_PROXY_SOLICITATION        0x1859 //Mesh Proxy Solicitation Service
-//#define SERVICE_UUID_RANGING                                  0x185A //Ranging Service
-//For IOP purpose only
-#define SERVICE_UUID_RANGING 0x185B //Ranging Service
+#define SERVICE_UUID_RANGING                        0x185B //Ranging Service
 //TODO: Ultra Low Latency HID service has not been confirmed yet. by qihang.mou
 #define SERVICE_UUID_ULL_HID 0x7F8D //Ultra Low Latency HID Service
 
@@ -342,6 +340,7 @@
 #define CHARACTERISTIC_UUID_CHROMATIC_DIST_FROM_PLANCKIAN       0x2AE3 //Chromatic Distance from Planckian
 #define CHARACTERISTIC_UUID_CHROMATICITY_COORDINATES            0x2AE4 //Chromaticity Coordinates
 #define CHARACTERISTIC_UUID_CHROMATICITYIN_CCT_DUV_VALUES       0x2AE5 //Chromaticityin CCT and Duv Values
+#define CHARACTERISTIC_UUID_CHROMATICITY_IN_CCT_DUV_VALUES      0x2AE5 //Chromaticityin CCT and Duv Values
 #define CHARACTERISTIC_UUID_CHROMATICITY_TOLERANCE              0x2AE6 //Chromaticity Tolerance
 #define CHARACTERISTIC_UUID_CIE13_3_1995_COLOR_INDEX            0x2AE7 //CIE13.3-1995 Color Rendering Index
 #define CHARACTERISTIC_UUID_COEFFICIENT                         0x2AE8 //Coefficient
@@ -422,6 +421,7 @@
 #define CHARACTERISTIC_UUID_ACS_CONTROL_POINT                   0x2B33 //ACS Control Point
 #define CHARACTERISTIC_UUID_ENHANCED_BP_MEASUREMENT             0x2B34 //Enhanced Blood Pressure Measurement
 #define CHARACTERISTIC_UUID_ENHANCED_INTERMEDIATE_CUFF_PRESSURE 0x2B35 //Enhanced Intermediate Cuff Pressure
+#define CHARACTERISTIC_UUID_ENHANCED_INTERM_CUFF_PRESSURE       0x2B35 //Enhanced Intermediate Cuff Pressure
 #define CHARACTERISTIC_UUID_BLOOD_PRESSURE_RECORD               0x2B36 //Blood Pressure Record
 #define CHARACTERISTIC_UUID_REGISTERED_USER                     0x2B37 //Registered User
 #define CHARACTERISTIC_UUID_BR_EDR_HANDOVER_DATA                0x2B38 //BR-EDR Handover Data
@@ -514,6 +514,7 @@
 #define CHARACTERISTIC_UUID_BEARER_UCI                          0x2BB4 //Bearer UCI
 #define CHARACTERISTIC_UUID_BEARER_TECHNOLOGY                   0x2BB5 //Bearer Technology
 #define CHARACTERISTIC_UUID_BEARER_URI_SCHEMES_SUPPRTED_LIST    0x2BB6 //Bearer URI Schemes Supported List
+#define CHARACTERISTIC_UUID_BEARER_URI_SCHEMES_SUPPORTED_LIST   0x2BB6 //Bearer URI Schemes Supported List
 #define CHARACTERISTIC_UUID_BEARER_SS                           0x2BB7 //Bearer Signal Strength
 #define CHARACTERISTIC_UUID_BEARER_SS_REPORTING_INTERVAL        0x2BB8 //Bearer Signal Strength Reporting Interval
 #define CHARACTERISTIC_UUID_BEARER_LIST_CURRENT_CALLS           0x2BB9 //Bearer List Current Calls
@@ -592,17 +593,17 @@
 #define CHARACTERISTIC_UUID_UGT_FEATURES                        0x2C02 //UGT Features
 #define CHARACTERISTIC_UUID_BGS_FEATURES                        0x2C03 //BGS Features
 #define CHARACTERISTIC_UUID_BGR_FEATURES                        0x2C04 //BGR Features
-//TODO: Ranging profile has not been confirmed yet.
-//For IOP purpose only
-#define CHARACTERISTIC_UUID_RAS_FEATURE              0x2C14 //RAS feature
-#define CHARACTERISTIC_UUID_REAL_TIME_PROCEDURE_DATA 0x2C15 //Real Time Procedure Data
-#define CHARACTERISTIC_UUID_ON_DEMAND_PROCEDURE_DATA 0x2C16 //On Demand Procedure Data
-#define CHARACTERISTIC_UUID_CONTROL_POINT            0x2C17 //Control Point
-#define CHARACTERISTIC_UUID_RANGING_DATA_READY       0x2C18 //Ranging Data Ready
-#define CHARACTERISTIC_UUID_RANGING_DATA_OVERWRITTEN 0x2C19 //Ranging Data Overwritten
+#define CHARACTERISTIC_UUID_RAS_FEATURE                         0x2C14 //RAS feature
+#define CHARACTERISTIC_UUID_REAL_TIME_PROCEDURE_DATA            0x2C15 //Real Time Procedure Data
+#define CHARACTERISTIC_UUID_ON_DEMAND_PROCEDURE_DATA            0x2C16 //On Demand Procedure Data
+#define CHARACTERISTIC_UUID_CONTROL_POINT                       0x2C17 //Control Point
+#define CHARACTERISTIC_UUID_RANGING_DATA_READY                  0x2C18 //Ranging Data Ready
+#define CHARACTERISTIC_UUID_RANGING_DATA_OVERWRITTEN            0x2C19 //Ranging Data Overwritten
 //TODO: Ultra Low Latency HID service has not been confirmed yet. by qihang.mou
 #define CHARACTERISTIC_UUID_ULL_HID_PROPERTIES    0x7F8C //Ultra Low Latency HID Properties
 #define CHARACTERISTIC_UUID_LE_HID_OPERATION_MODE 0x7F8B //LE HID Operation mode
+//TODO: Coordinated Set Name Characteristic has not been confirmed yet.
+#define CHARACTERISTIC_UUID_COORDINATED_SET_NAME 0x7FE6 //Coordinated Set Name
 
 ///////////////////////
 //old UUID define
@@ -672,6 +673,9 @@
 #define AUDIO_GOOGL_RX_CHAR_UUID      0x64, 0xB6, 0x17, 0xF6, 0x01, 0xAF, 0x7D, 0xBC, 0x05, 0x4F, 0x21, 0x5A, 0x03, 0x00, 0x5E, 0xAB
 #define AUDIO_GOOGL_CTL_CHAR_UUID     0x64, 0xB6, 0x17, 0xF6, 0x01, 0xAF, 0x7D, 0xBC, 0x05, 0x4F, 0x21, 0x5A, 0x04, 0x00, 0x5E, 0xAB
 
+// google defined 128bit uuid for special ranging seeting
+#define CHARACTERISTIC_UUID_SRS_READ_CAP   0xF1, 0x35, 0x9C, 0x5F, 0x80, 0x00, 0x00, 0x80, 0x00, 0x10,0x00, 0x00, 0x01, 0x8F, 0x00, 0x00
+#define CHARACTERISTIC_UUID_SRS_SEND_CMD   0xF1, 0x35, 0x9C, 0x5F, 0x80, 0x00, 0x00, 0x80, 0x00, 0x10,0x00, 0x00, 0x02, 0x8F, 0x00, 0x00
 
 extern const unsigned char serviceGenericAccessUuid[ATT_16_UUID_LEN];
 extern const unsigned char serviceGenericAttributeUuid[ATT_16_UUID_LEN];
@@ -1230,6 +1234,8 @@ extern const unsigned char characteristicOnDemandProcedureDataUuid[ATT_16_UUID_L
 extern const unsigned char characteristicControlPointUuid[ATT_16_UUID_LEN];
 extern const unsigned char characteristicRangingDataReadyUuid[ATT_16_UUID_LEN];
 extern const unsigned char characteristicRangingDataOverwrittenUuid[ATT_16_UUID_LEN];
+extern const unsigned char characteristicGoogleSrsReadCapUuid[ATT_128_UUID_LEN];
+extern const unsigned char characteristicGoogleSrsSendCmdUuid[ATT_128_UUID_LEN];
 //TODO: Ultra Low Latency HID service has not been confirmed yet. by qihang.mou
 extern const unsigned char characteristicUllHidPropertiesUuid[ATT_16_UUID_LEN];
 extern const unsigned char characteristicLeHidOperationModeUuid[ATT_16_UUID_LEN];

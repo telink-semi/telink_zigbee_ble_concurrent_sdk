@@ -52,5 +52,5 @@ _CODE_ZCL_ status_t zcl_powerCfg_register(u8 endpoint, u16 manuCode, u8 attrNum,
     return zcl_registerCluster(endpoint, ZCL_CLUSTER_GEN_POWER_CFG, manuCode, attrNum, attrTbl, NULL, cb);
 }
 
-#endif  /* ZCL_POWER_CFG */
+#endif	/* ZCL_POWER_CFG */
 

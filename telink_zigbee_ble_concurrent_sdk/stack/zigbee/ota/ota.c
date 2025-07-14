@@ -41,13 +41,13 @@
 typedef struct _attribute_packed_ {
     addrExt_t extAddr;
     u16 profileId;
-    u8  endpoint;
-    u8  txOptions;
+    u8 endpoint;
+    u8 txOptions;
 } ota_serverAddr_t;
 
 typedef struct _attribute_packed_ {
-    ota_hdrFields_t     hdrInfo;
-    ota_serverAddr_t    otaServerAddrInfo;
+    ota_hdrFields_t hdrInfo;
+    ota_serverAddr_t otaServerAddrInfo;
 } ota_updateInfo_t;
 
 #if 0
@@ -62,8 +62,7 @@ u8 ota_upgradeEndRspHandler(apsdeDataInd_t *pInd, ota_upgradeEndRsp_t *pUpgradeE
 u8 ota_queryDevSpecFileReqHandler(apsdeDataInd_t *pInd, ota_querySpecFileReq_t *pQueryDevSpecFileReq);
 u8 ota_queryDevSpecFileRspHandler(apsdeDataInd_t *pInd, ota_querySpecFileRsp_t *pQueryDevSpecFileRsp);
 
-zcl_ota_AppCallbacks_t zcl_otaCb =
-{
+zcl_ota_AppCallbacks_t zcl_otaCb = {
     ota_imageNotifyHandler,
     ota_queryNextImageReqHandler,
     ota_queryNextImageRspHandler,
@@ -83,10 +82,14 @@ zcl_ota_AppCallbacks_t zcl_otaCb =
 
 //boot address flag
 u32 mcuBootAddr = 0;
-const u8 otaHdrMagic[] = {0x1e, 0xf1, 0xee, 0x0b};
+const u8 otaHdrMagic[] = {
+    0x1e, 0xf1, 0xee, 0x0b
+};
 
-const u8 otaAesKey[16] = {0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
-                          0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff};
+const u8 otaAesKey[16] = {
+    0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
+    0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff
+};
 
 ota_ctx_t g_otaCtx;
 ota_callBack_t *otaCb = NULL;
@@ -99,6 +102,7 @@ ota_updateInfo_t *pOtaUpdateInfo = NULL;
 ota_preamble_t otaServerBinInfo;
 
 bool g_otaEncryptionNeeded = 0;
+
 
 /**********************************************************************
  * LOCAL VARIABLES
@@ -117,10 +121,10 @@ void ota_upgradeWait(u32 seconds);
 void ota_upgradeComplete(u8 status);
 
 /**********************************************************************
- * @brief       get mcu boot address
+ * @brief		get mcu boot address
  *
- * return       boot form 0x0 or FLASH_ADDR_OF_OTA_IMAGE
- *              all 0xFF means invalid
+ * return 		boot form 0x0 or FLASH_ADDR_OF_OTA_IMAGE
+ * 				all 0xFF means invalid
  */
 u32 mcuBootAddrGet(void)
 {
@@ -132,7 +136,7 @@ u32 mcuBootAddrGet(void)
 
     flash_read(0 + FLASH_TLNK_FLAG_OFFSET, 4, (u8 *)&flashInfo);
     if (flashInfo == TL_START_UP_FLAG_WHOLE) {
-        bootAddr = 0;
+            bootAddr = 0;
     } else {
         flash_read(FLASH_ADDR_OF_OTA_IMAGE + FLASH_TLNK_FLAG_OFFSET, 4, (u8 *)&flashInfo);
         if (flashInfo == TL_START_UP_FLAG_WHOLE) {
@@ -143,7 +147,6 @@ u32 mcuBootAddrGet(void)
     return bootAddr;
 #endif
 }
-
 
 bool ota_newImageValid(u32 new_image_addr)
 {
@@ -182,7 +185,7 @@ bool ota_newImageValid(u32 new_image_addr)
             oft += wLen;
         }
 
-        if(curCRC == crcVal){
+        if (curCRC == crcVal) {
             ret = TRUE;
         }
     }
@@ -235,13 +238,13 @@ void ota_mcuReboot(void)
     flash_lock();
 #endif
 
-    if(reboot){
+    if (reboot) {
         SYSTEM_RESET();
     }
 }
 
 /**********************************************************************
- * @brief       server IEEE address preprogrammed for application
+ * @brief		server IEEE address preprogrammed for application
  *
  */
 void ota_serverAddrPerprogrammed(addrExt_t ieeeAddr, u8 srvEndPoint)
@@ -298,13 +301,13 @@ void ota_clientInfoRecover(void)
                 g_otaCtx.otaServerEpInfo.txOptions = pInfo->otaServerAddrInfo.txOptions;
             }
         }
+
         ev_buf_free((u8 *)pInfo);
     }
 }
 
-
 /**********************************************************************
- * @brief       ota init
+ * @brief		ota init
  *
  */
 void ota_init(ota_type_e type, af_simple_descriptor_t *simpleDesc, ota_preamble_t *otaPreamble, ota_callBack_t *cb)
@@ -362,7 +365,7 @@ void ota_wwah_useTrustCenter(u8 endpoint)
     ota_updateInfo_t *pInfo = (ota_updateInfo_t *)ev_buf_allocate(sizeof(ota_updateInfo_t));
     if (pInfo) {
         if (nv_flashReadNew(1, NV_MODULE_OTA, NV_ITEM_OTA_HDR_SERVERINFO, sizeof(ota_updateInfo_t), (u8 *)pInfo) == NV_SUCC) {
-            if (ZB_IEEE_ADDR_CMP(pInfo->otaServerAddrInfo.extAddr, ss_ib.trust_center_address) && \
+            if (ZB_IEEE_ADDR_CMP(pInfo->otaServerAddrInfo.extAddr, ss_ib.trust_center_address) &&
                (pInfo->otaServerAddrInfo.endpoint == endpoint)) {
                 ev_buf_free((u8 *)pInfo);
                 return;
@@ -391,8 +394,8 @@ static void ota_ieeeAddrRspCb(void *arg)
         ZB_IEEE_ADDR_COPY(zcl_attr_upgradeServerID, rsp->ieee_addr_remote);
     }
 
-    if ((zcl_attr_imageUpgradeStatus != IMAGE_UPGRADE_STATUS_DOWNLOAD_IN_PROGRESS) || \
-       (otaClientInfo.clientOtaFlg >= OTA_FLAG_IMAGE_MAGIC_0)) {
+    if ((zcl_attr_imageUpgradeStatus != IMAGE_UPGRADE_STATUS_DOWNLOAD_IN_PROGRESS) ||
+        (otaClientInfo.clientOtaFlg >= OTA_FLAG_IMAGE_MAGIC_0)) {
         return;
     }
 
@@ -400,7 +403,6 @@ static void ota_ieeeAddrRspCb(void *arg)
     ev_unon_timer(&otaTimer);
 
     if ((rsp->status == ZDO_SUCCESS)) {
-
         //stop server query start timer
 
         ota_sendImageBlockReq(NULL);
@@ -408,7 +410,7 @@ static void ota_ieeeAddrRspCb(void *arg)
         if (otaCb) {
             otaCb->processMsgCbFunc(OTA_EVT_START, ZCL_STA_SUCCESS);
         }
-    }else{
+    } else {
         ota_upgradeComplete(ZCL_STA_ABORT);
     }
 }
@@ -450,8 +452,8 @@ static void ota_ieeeAddrReqSend(void *arg)
     ev_on_timer(&otaTimer, OTA_IEEE_ADDR_RSP_WAIT_TIME * 1000);
 }
 
-
-static s32 ota_queryNextImageReqDelay(void *arg){
+static s32 ota_queryNextImageReqDelay(void *arg)
+{
     ota_queryNextImageReq(g_otaCtx.otaServerEpInfo.dstEp, g_otaCtx.otaServerEpInfo.dstAddr.shortAddr, g_otaCtx.otaServerEpInfo.profileId);
     return -1;
 }
@@ -558,9 +560,9 @@ s32 ota_periodicQueryServerCb(void *arg)
 }
 
 /**********************************************************************
- * @brief       ota query start
+ * @brief		ota query start
  *
- * @param       period - in seconds
+ * @param		period - in seconds
  *
  */
 void ota_queryStart(u16 seconds)
@@ -573,7 +575,7 @@ void ota_queryStart(u16 seconds)
             u16 jitter = 0;
             do {
                 jitter = zb_random() % OTA_QUERY_START_JITTER;
-            } while(jitter == 0);
+            } while (jitter == 0);
 
             ev_on_timer(&otaTimer, (seconds * 1000) + jitter);
         }
@@ -603,8 +605,8 @@ void ota_upgradeComplete(u8 status)
         /*
          * if the image is invalid, all the information shall be reset,
          * so that the OTA will restart from address of 0
-         * 
-        */
+         *
+         */
         if (status == ZCL_STA_INVALID_IMAGE) {
             nv_resetModule(NV_MODULE_OTA);
 
@@ -651,6 +653,7 @@ s32 ota_imageBlockRspWait(void *arg)
          * The function "ota_imageBlockRspWait" is the callback of the timer event otaTimer,
          * so that the timer event(otaTimer) modified via otaCb->processMsgCbFunc():ota_queryStart()
          * will be killed when it returns -1.
+         *
          * */
         TL_SCHEDULE_TASK(ota_imageBlockRspTimeout, NULL);  //ota_upgradeComplete(ZCL_STA_ABORT);
     } else {
@@ -737,7 +740,7 @@ void ota_upgrade(void)
         }
     } else if (zcl_attr_imageUpgradeStatus == IMAGE_UPGRADE_STATUS_COUNT_DOWN) {
         ota_upgradeComplete(ZCL_STA_SUCCESS);
-    } else if (zcl_attr_imageUpgradeStatus == IMAGE_UPGRADE_STATUS_WAITING_TO_UPGRADE){
+    } else if (zcl_attr_imageUpgradeStatus == IMAGE_UPGRADE_STATUS_WAITING_TO_UPGRADE) {
         if (++g_otaCtx.upgradeEndRetry >= OTA_MAX_UPGRADE_END_REQ_RETRIES) {
             ota_upgradeComplete(ZCL_STA_SUCCESS);
         } else {
@@ -781,7 +784,7 @@ void ota_saveUpdateInfo2NV(void *arg)
 {
     static u8 cnt = 0;
 
-    if ((++cnt >= FLASH_WRITE_COUNT_GET(g_otaCtx.downloadImageSize) || \
+    if ((++cnt >= FLASH_WRITE_COUNT_GET(g_otaCtx.downloadImageSize) ||
         (zcl_attr_imageUpgradeStatus == IMAGE_UPGRADE_STATUS_DOWNLOAD_COMPLETE))) {
         cnt = 0;
         nv_flashWriteNew(1, NV_MODULE_OTA, NV_ITEM_OTA_CODE, sizeof(ota_clientInfo_t), (u8 *)&otaClientInfo);
@@ -800,322 +803,320 @@ u8 ota_imageDataProcess(u8 len, u8 *pData)
     }
 
     for (u8 i = 0; i < len; i++) {
-        switch (otaClientInfo.clientOtaFlg)
-        {
-            case OTA_FLAG_IMAGE_MAGIC_0:
-                if (pData[i] != otaHdrMagic[i] || !pOtaUpdateInfo) {
+        switch (otaClientInfo.clientOtaFlg) {
+        case OTA_FLAG_IMAGE_MAGIC_0:
+            if (pData[i] != otaHdrMagic[i] || !pOtaUpdateInfo) {
+                return ZCL_STA_INVALID_IMAGE;
+            } else {
+                pOtaUpdateInfo->hdrInfo.otaUpgradeFileID = pData[i];
+            }
+            otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_MAGIC_1;
+            break;
+        case OTA_FLAG_IMAGE_MAGIC_1:
+            if (pData[i] != otaHdrMagic[i]|| !pOtaUpdateInfo) {
+                return ZCL_STA_INVALID_IMAGE;
+            } else {
+                pOtaUpdateInfo->hdrInfo.otaUpgradeFileID |= ((u32)pData[i] << 8) & 0xff00;
+            }
+            otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_MAGIC_2;
+            break;
+        case OTA_FLAG_IMAGE_MAGIC_2:
+            if (pData[i] != otaHdrMagic[i]|| !pOtaUpdateInfo) {
+                return ZCL_STA_INVALID_IMAGE;
+            } else {
+                pOtaUpdateInfo->hdrInfo.otaUpgradeFileID |= ((u32)pData[i] << 16) & 0xff0000;
+            }
+            otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_MAGIC_3;
+            break;
+        case OTA_FLAG_IMAGE_MAGIC_3:
+            if (pData[i] != otaHdrMagic[i]) {
+                return ZCL_STA_INVALID_IMAGE;
+            } else {
+                if (!pOtaUpdateInfo) {
                     return ZCL_STA_INVALID_IMAGE;
-                } else {
-                    pOtaUpdateInfo->hdrInfo.otaUpgradeFileID = pData[i];
                 }
-                otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_MAGIC_1;
-                break;
-            case OTA_FLAG_IMAGE_MAGIC_1:
-                if (pData[i] != otaHdrMagic[i]|| !pOtaUpdateInfo) {
+                pOtaUpdateInfo->hdrInfo.otaUpgradeFileID |= ((u32)pData[i] << 24) & 0xff000000;
+            }
+            otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_HDR_VER1;
+            break;
+        case OTA_FLAG_IMAGE_HDR_VER1:
+            if (!pOtaUpdateInfo) {
+                return ZCL_STA_INVALID_IMAGE;
+            }
+            pOtaUpdateInfo->hdrInfo.otaHdrVer = pData[i];
+            otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_HDR_VER2;
+            break;
+        case OTA_FLAG_IMAGE_HDR_VER2:
+            if (!pOtaUpdateInfo) {
+                return ZCL_STA_INVALID_IMAGE;
+            }
+            pOtaUpdateInfo->hdrInfo.otaHdrVer |= ((u16)pData[i] << 8) & 0xff00;
+            otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_HDR_LEN1;
+            break;
+        case OTA_FLAG_IMAGE_HDR_LEN1:
+            //get header length
+            if (!pOtaUpdateInfo) {
+                return ZCL_STA_INVALID_IMAGE;
+            }
+            if (zcl_attr_fileOffset == OTA_HDR_LEN_OFFSET) {
+                pOtaUpdateInfo->hdrInfo.otaHdrLen = pData[i];
+                otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_HDR_LEN2;
+            }
+            break;
+        case OTA_FLAG_IMAGE_HDR_LEN2:
+            if (!pOtaUpdateInfo) {
+                return ZCL_STA_INVALID_IMAGE;
+            }
+            pOtaUpdateInfo->hdrInfo.otaHdrLen |= ((u16)pData[i] << 8) & 0xff00;
+            otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_HDR_FC1;
+            break;
+        case OTA_FLAG_IMAGE_HDR_FC1:
+            if (!pOtaUpdateInfo) {
+                return ZCL_STA_INVALID_IMAGE;
+            }
+            pOtaUpdateInfo->hdrInfo.otaHdrFC = pData[i];
+            otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_HDR_FC2;
+            break;
+        case OTA_FLAG_IMAGE_HDR_FC2:
+            if (!pOtaUpdateInfo) {
+                return ZCL_STA_INVALID_IMAGE;
+            }
+            pOtaUpdateInfo->hdrInfo.otaHdrFC |= ((u16)pData[i] << 8) & 0xff00;
+            otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_MANU_CODE1;
+            break;
+        case OTA_FLAG_IMAGE_MANU_CODE1:
+            if (!pOtaUpdateInfo) {
+                return ZCL_STA_INVALID_IMAGE;
+            }
+            pOtaUpdateInfo->hdrInfo.manufacturerCode = pData[i];
+            otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_MANU_CODE2;
+            break;
+        case OTA_FLAG_IMAGE_MANU_CODE2:
+            if (!pOtaUpdateInfo) {
+                return ZCL_STA_INVALID_IMAGE;
+            }
+            pOtaUpdateInfo->hdrInfo.manufacturerCode |= ((u16)pData[i] << 8) & 0xff00;
+            otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_TYPE1;
+            break;
+        case OTA_FLAG_IMAGE_TYPE1:
+            if (!pOtaUpdateInfo) {
+                return ZCL_STA_INVALID_IMAGE;
+            }
+            pOtaUpdateInfo->hdrInfo.imageType = pData[i];
+            otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_TYPE2;
+            break;
+        case OTA_FLAG_IMAGE_TYPE2:
+            if (!pOtaUpdateInfo) {
+                return ZCL_STA_INVALID_IMAGE;
+            }
+            pOtaUpdateInfo->hdrInfo.imageType |= ((u16)pData[i] << 8) & 0xff00;
+            otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_FILE_VER1;
+            break;
+        case OTA_FLAG_IMAGE_FILE_VER1:
+            if (!pOtaUpdateInfo) {
+                return ZCL_STA_INVALID_IMAGE;
+            }
+            pOtaUpdateInfo->hdrInfo.fileVer = pData[i];
+            otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_FILE_VER2;
+            break;
+        case OTA_FLAG_IMAGE_FILE_VER2:
+            if (!pOtaUpdateInfo) {
+                return ZCL_STA_INVALID_IMAGE;
+            }
+            pOtaUpdateInfo->hdrInfo.fileVer |= ((u32)pData[i] << 8) & 0xff00;
+            otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_FILE_VER3;
+            break;
+        case OTA_FLAG_IMAGE_FILE_VER3:
+            if (!pOtaUpdateInfo) {
+                return ZCL_STA_INVALID_IMAGE;
+            }
+            pOtaUpdateInfo->hdrInfo.fileVer |= ((u32)pData[i] << 16) & 0xff0000;
+            otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_FILE_VER4;
+            break;
+        case OTA_FLAG_IMAGE_FILE_VER4:
+            if (!pOtaUpdateInfo) {
+                return ZCL_STA_INVALID_IMAGE;
+            }
+            pOtaUpdateInfo->hdrInfo.fileVer |= ((u32)pData[i] << 24) & 0xff000000;
+            otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_STACK_VER1;
+            break;
+        case OTA_FLAG_IMAGE_STACK_VER1:
+            //get stack ver
+            if (!pOtaUpdateInfo) {
+                return ZCL_STA_INVALID_IMAGE;
+            }
+            if (zcl_attr_fileOffset == OTA_STACK_VER_OFFSET) {
+                pOtaUpdateInfo->hdrInfo.zbStackVer = pData[i];
+                otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_STACK_VER2;
+            }
+            break;
+        case OTA_FLAG_IMAGE_STACK_VER2:
+            if (!pOtaUpdateInfo) {
+                return ZCL_STA_INVALID_IMAGE;
+            }
+            pOtaUpdateInfo->hdrInfo.zbStackVer |= ((u16)pData[i] << 8) & 0xff00;
+            if (pOtaUpdateInfo->hdrInfo.zbStackVer != ZB_STACKVER_PRO) {
+                return ZCL_STA_INVALID_IMAGE;
+            } else {
+                zcl_attr_downloadZigbeeStackVer = pOtaUpdateInfo->hdrInfo.zbStackVer;
+            }
+            otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_CONT_HDR;
+            break;
+        case OTA_FLAG_IMAGE_CONT_HDR:
+            //complete header
+            if (zcl_attr_fileOffset >= sizeof(ota_hdrFields_t) || !pOtaUpdateInfo) {
+                return ZCL_STA_INVALID_IMAGE;
+            }
+            memcpy((u8 *)&(pOtaUpdateInfo->hdrInfo) + zcl_attr_fileOffset, &pData[i], 1);
+            if (zcl_attr_fileOffset == pOtaUpdateInfo->hdrInfo.otaHdrLen - 1) {
+                //TODO: save ota header to flash
+
+                ZB_IEEE_ADDR_COPY(pOtaUpdateInfo->otaServerAddrInfo.extAddr, zcl_attr_upgradeServerID);
+                pOtaUpdateInfo->otaServerAddrInfo.profileId = g_otaCtx.otaServerEpInfo.profileId;
+                pOtaUpdateInfo->otaServerAddrInfo.endpoint = g_otaCtx.otaServerEpInfo.dstEp;
+                pOtaUpdateInfo->otaServerAddrInfo.txOptions = g_otaCtx.otaServerEpInfo.txOptions;
+
+                if (nv_flashWriteNew(1, NV_MODULE_OTA, NV_ITEM_OTA_HDR_SERVERINFO, sizeof(ota_updateInfo_t), (u8 *)pOtaUpdateInfo) != NV_SUCC) {
                     return ZCL_STA_INVALID_IMAGE;
-                } else {
-                    pOtaUpdateInfo->hdrInfo.otaUpgradeFileID |= ((u32)pData[i] << 8) & 0xff00;
                 }
-                otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_MAGIC_2;
-                break;
-            case OTA_FLAG_IMAGE_MAGIC_2:
-                if (pData[i] != otaHdrMagic[i]|| !pOtaUpdateInfo) {
+                ev_buf_free((u8 *)pOtaUpdateInfo);
+                pOtaUpdateInfo = NULL;
+
+                otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_ELEM_TAG1;
+            }
+            break;
+        case OTA_FLAG_IMAGE_ELEM_TAG1:
+            otaClientInfo.otaElementTag = pData[i];
+            otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_ELEM_TAG2;
+            break;
+        case OTA_FLAG_IMAGE_ELEM_TAG2:
+            otaClientInfo.otaElementTag |= ((u16)pData[i] << 8) & 0xff00;
+            otaClientInfo.otaElementPos = 0;
+            otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_ELEM_LEN1;
+            break;
+        case OTA_FLAG_IMAGE_ELEM_LEN1:
+            otaClientInfo.otaElementLen = pData[i];
+            otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_ELEM_LEN2;
+            break;
+        case OTA_FLAG_IMAGE_ELEM_LEN2:
+            otaClientInfo.otaElementLen |= ((u32)pData[i] << 8) & 0xff00;
+            otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_ELEM_LEN3;
+            break;
+        case OTA_FLAG_IMAGE_ELEM_LEN3:
+            otaClientInfo.otaElementLen |= ((u32)pData[i] << 16) & 0xff0000;
+            otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_ELEM_LEN4;
+            break;
+        case OTA_FLAG_IMAGE_ELEM_LEN4:
+            otaClientInfo.otaElementLen |= ((u32)pData[i] << 24) & 0xff000000;
+            otaClientInfo.clientOtaFlg = (otaClientInfo.otaElementTag == OTA_UPGRADE_IMAGE_AES_TAG_ID) ? OTA_FLAG_IMAGE_ELEM_INFO1
+                                                                                                       : OTA_FLAG_IMAGE_ELEMENT;
+
+            //make sure the length of element is not bigger than the image
+            if ((otaClientInfo.otaElementLen > (g_otaCtx.downloadImageSize - zcl_attr_fileOffset)) ||
+                (otaClientInfo.otaElementLen == 0)) {
+                return ZCL_STA_INVALID_IMAGE;
+            }
+            break;
+        case OTA_FLAG_IMAGE_ELEM_INFO1:
+            otaClientInfo.otaElementInfo1 = pData[i];
+            otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_ELEM_INFO2;
+            break;
+        case OTA_FLAG_IMAGE_ELEM_INFO2:
+            otaClientInfo.otaElementInfo2 = pData[i];
+            otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_ELEMENT;
+            break;
+        case OTA_FLAG_IMAGE_ELEMENT:
+            if ((otaClientInfo.otaElementLen == 0) ||
+                (otaClientInfo.otaElementPos > otaClientInfo.otaElementLen)) {
+                return ZCL_STA_INVALID_IMAGE;
+            }
+
+            if ((otaClientInfo.otaElementTag == OTA_UPGRADE_IMAGE_TAG_ID) ||
+                (otaClientInfo.otaElementTag == OTA_UPGRADE_IMAGE_AES_TAG_ID)) {
+                //if g_otaEncryptionNeeded is set, it will reject the un-encrypted ota image data.
+                if ((otaClientInfo.otaElementTag == OTA_UPGRADE_IMAGE_TAG_ID) &&
+                    g_otaEncryptionNeeded) {
                     return ZCL_STA_INVALID_IMAGE;
-                } else {
-                    pOtaUpdateInfo->hdrInfo.otaUpgradeFileID |= ((u32)pData[i] << 16) & 0xff0000;
                 }
-                otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_MAGIC_3;
-                break;
-            case OTA_FLAG_IMAGE_MAGIC_3:
-                if (pData[i] != otaHdrMagic[i]) {
-                    return ZCL_STA_INVALID_IMAGE;
+
+                u8 dataSize = len - i;
+
+                u8 copyLen = dataSize;
+                if (otaClientInfo.otaElementLen - otaClientInfo.otaElementPos < dataSize) {
+                    copyLen = otaClientInfo.otaElementLen - otaClientInfo.otaElementPos;
+                }
+
+                if (otaClientInfo.otaElementTag == OTA_UPGRADE_IMAGE_AES_TAG_ID) {
+                    u8 tmpBuf[16];
+                    for (u8 j = 0; j < copyLen; j += 16) {
+                        memset(tmpBuf, 0xff, 16);
+                        memcpy(tmpBuf, &pData[i + j], 16);
+                        drv_aes_decrypt((u8 *)otaAesKey, tmpBuf, &pData[i + j]);
+                    }
+                }
+
+                //Calculate CRC value
+                u32 dataEndPos = otaClientInfo.otaElementLen - otaClientInfo.otaElementInfo2;
+                u8 crcLen = 0;
+                if (dataEndPos - otaClientInfo.otaElementPos <= 4) {
+                    crcLen = 0;
+                } else if (dataEndPos - 4 - otaClientInfo.otaElementPos >= dataSize) {
+                    crcLen = dataSize;
                 } else {
-                    if (!pOtaUpdateInfo) {
+                    crcLen = dataEndPos - 4 - otaClientInfo.otaElementPos;
+                }
+                otaClientInfo.crcValue = xcrc32(&pData[i], crcLen, otaClientInfo.crcValue);
+
+                //write image to flash
+                if ((otaClientInfo.otaElementPos < FLASH_TLNK_FLAG_OFFSET + 1) &&
+                   ((otaClientInfo.otaElementPos + dataSize) >= FLASH_TLNK_FLAG_OFFSET + 1)) {
+                    if (pData[i + (FLASH_TLNK_FLAG_OFFSET - otaClientInfo.otaElementPos)] != TL_IMAGE_START_FLAG) {
                         return ZCL_STA_INVALID_IMAGE;
                     }
-                    pOtaUpdateInfo->hdrInfo.otaUpgradeFileID |= ((u32)pData[i] << 24) & 0xff000000;
+                    pData[i + (FLASH_TLNK_FLAG_OFFSET - otaClientInfo.otaElementPos)] = 0xff;
                 }
-                otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_HDR_VER1;
-                break;
-            case OTA_FLAG_IMAGE_HDR_VER1:
-                if (!pOtaUpdateInfo) {
+                u32 baseAddr = (mcuBootAddr) ? 0 : FLASH_ADDR_OF_OTA_IMAGE;
+                if (flash_writeWithCheck(baseAddr + otaClientInfo.otaElementPos, copyLen, &pData[i]) != TRUE) {
                     return ZCL_STA_INVALID_IMAGE;
                 }
-                pOtaUpdateInfo->hdrInfo.otaHdrVer = pData[i];
-                otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_HDR_VER2;
-                break;
-            case OTA_FLAG_IMAGE_HDR_VER2:
-                if (!pOtaUpdateInfo) {
-                    return ZCL_STA_INVALID_IMAGE;
-                }
-                pOtaUpdateInfo->hdrInfo.otaHdrVer |= ((u16)pData[i] << 8) & 0xff00;
-                otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_HDR_LEN1;
-                break;
-            case OTA_FLAG_IMAGE_HDR_LEN1:
-                //get header length
-                if (!pOtaUpdateInfo) {
-                    return ZCL_STA_INVALID_IMAGE;
-                }
-                if (zcl_attr_fileOffset == OTA_HDR_LEN_OFFSET) {
-                    pOtaUpdateInfo->hdrInfo.otaHdrLen = pData[i];
-                    otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_HDR_LEN2;
-                }
-                break;
-            case OTA_FLAG_IMAGE_HDR_LEN2:
-                if (!pOtaUpdateInfo) {
-                    return ZCL_STA_INVALID_IMAGE;
-                }
-                pOtaUpdateInfo->hdrInfo.otaHdrLen |= ((u16)pData[i] << 8) & 0xff00;
-                otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_HDR_FC1;
-                break;
-            case OTA_FLAG_IMAGE_HDR_FC1:
-                if (!pOtaUpdateInfo) {
-                    return ZCL_STA_INVALID_IMAGE;
-                }
-                pOtaUpdateInfo->hdrInfo.otaHdrFC = pData[i];
-                otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_HDR_FC2;
-                break;
-            case OTA_FLAG_IMAGE_HDR_FC2:
-                if (!pOtaUpdateInfo) {
-                    return ZCL_STA_INVALID_IMAGE;
-                }
-                pOtaUpdateInfo->hdrInfo.otaHdrFC |= ((u16)pData[i] << 8) & 0xff00;
-                otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_MANU_CODE1;
-                break;
-            case OTA_FLAG_IMAGE_MANU_CODE1:
-                if (!pOtaUpdateInfo) {
-                    return ZCL_STA_INVALID_IMAGE;
-                }
-                pOtaUpdateInfo->hdrInfo.manufacturerCode = pData[i];
-                otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_MANU_CODE2;
-                break;
-            case OTA_FLAG_IMAGE_MANU_CODE2:
-                if (!pOtaUpdateInfo) {
-                    return ZCL_STA_INVALID_IMAGE;
-                }
-                pOtaUpdateInfo->hdrInfo.manufacturerCode |= ((u16)pData[i] << 8) & 0xff00;
-                otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_TYPE1;
-                break;
-            case OTA_FLAG_IMAGE_TYPE1:
-                if (!pOtaUpdateInfo) {
-                    return ZCL_STA_INVALID_IMAGE;
-                }
-                pOtaUpdateInfo->hdrInfo.imageType = pData[i];
-                otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_TYPE2;
-                break;
-            case OTA_FLAG_IMAGE_TYPE2:
-                if (!pOtaUpdateInfo) {
-                    return ZCL_STA_INVALID_IMAGE;
-                }
-                pOtaUpdateInfo->hdrInfo.imageType |= ((u16)pData[i] << 8) & 0xff00;
-                otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_FILE_VER1;
-                break;
-            case OTA_FLAG_IMAGE_FILE_VER1:
-                if (!pOtaUpdateInfo) {
-                    return ZCL_STA_INVALID_IMAGE;
-                }
-                pOtaUpdateInfo->hdrInfo.fileVer = pData[i];
-                otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_FILE_VER2;
-                break;
-            case OTA_FLAG_IMAGE_FILE_VER2:
-                if (!pOtaUpdateInfo) {
-                    return ZCL_STA_INVALID_IMAGE;
-                }
-                pOtaUpdateInfo->hdrInfo.fileVer |= ((u32)pData[i] << 8) & 0xff00;
-                otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_FILE_VER3;
-                break;
-            case OTA_FLAG_IMAGE_FILE_VER3:
-                if (!pOtaUpdateInfo) {
-                    return ZCL_STA_INVALID_IMAGE;
-                }
-                pOtaUpdateInfo->hdrInfo.fileVer |= ((u32)pData[i] << 16) & 0xff0000;
-                otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_FILE_VER4;
-                break;
-            case OTA_FLAG_IMAGE_FILE_VER4:
-                if (!pOtaUpdateInfo) {
-                    return ZCL_STA_INVALID_IMAGE;
-                }
-                pOtaUpdateInfo->hdrInfo.fileVer |= ((u32)pData[i] << 24) & 0xff000000;
-                otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_STACK_VER1;
-                break;
-            case OTA_FLAG_IMAGE_STACK_VER1:
-                //get stack ver
-                if (!pOtaUpdateInfo) {
-                    return ZCL_STA_INVALID_IMAGE;
-                }
-                if (zcl_attr_fileOffset == OTA_STACK_VER_OFFSET) {
-                    pOtaUpdateInfo->hdrInfo.zbStackVer = pData[i];
-                    otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_STACK_VER2;
-                }
-                break;
-            case OTA_FLAG_IMAGE_STACK_VER2:
-                if (!pOtaUpdateInfo) {
-                    return ZCL_STA_INVALID_IMAGE;
-                }
-                pOtaUpdateInfo->hdrInfo.zbStackVer |= ((u16)pData[i] << 8) & 0xff00;
-                if (pOtaUpdateInfo->hdrInfo.zbStackVer != ZB_STACKVER_PRO) {
-                    return ZCL_STA_INVALID_IMAGE;
-                } else {
-                    zcl_attr_downloadZigbeeStackVer = pOtaUpdateInfo->hdrInfo.zbStackVer;
-                }
-                otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_CONT_HDR;
-                break;
-            case OTA_FLAG_IMAGE_CONT_HDR:
-                //complete header
-                if (zcl_attr_fileOffset >= sizeof(ota_hdrFields_t) || !pOtaUpdateInfo) {
-                    return ZCL_STA_INVALID_IMAGE;
-                }
-                memcpy((u8 *)&(pOtaUpdateInfo->hdrInfo) + zcl_attr_fileOffset, &pData[i], 1);
-                if (zcl_attr_fileOffset == pOtaUpdateInfo->hdrInfo.otaHdrLen - 1) {
-                    //TODO: save ota header to flash
 
-                    ZB_IEEE_ADDR_COPY(pOtaUpdateInfo->otaServerAddrInfo.extAddr, zcl_attr_upgradeServerID);
-                    pOtaUpdateInfo->otaServerAddrInfo.profileId = g_otaCtx.otaServerEpInfo.profileId;
-                    pOtaUpdateInfo->otaServerAddrInfo.endpoint = g_otaCtx.otaServerEpInfo.dstEp;
-                    pOtaUpdateInfo->otaServerAddrInfo.txOptions = g_otaCtx.otaServerEpInfo.txOptions;
+                otaClientInfo.otaElementPos += copyLen;
+                zcl_attr_fileOffset += copyLen;
 
-                    if(nv_flashWriteNew(1, NV_MODULE_OTA, NV_ITEM_OTA_HDR_SERVERINFO, sizeof(ota_updateInfo_t), (u8 *)pOtaUpdateInfo) != NV_SUCC){
+                otaClientInfo.offset = zcl_attr_fileOffset;
+
+                if (otaClientInfo.otaElementPos == otaClientInfo.otaElementLen) {
+                    u16 crcFirmware = 0;
+                    flash_read(baseAddr + 6, 2, (u8 *)&crcFirmware);
+                    if (((crcFirmware & 0xff) == 0x5D) && ((crcFirmware >> 8) & 0xff) == 0x02) {
+                        u32 crcReceived;
+                        flash_read(baseAddr + dataEndPos - 4, 4, (u8 *)&crcReceived);
+
+                        if (crcReceived != otaClientInfo.crcValue) {
+                            return ZCL_STA_INVALID_IMAGE;
+                        }
+                        validChecked = 1;
+                    } else {
                         return ZCL_STA_INVALID_IMAGE;
                     }
-                    ev_buf_free((u8 *)pOtaUpdateInfo);
-                    pOtaUpdateInfo = NULL;
 
                     otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_ELEM_TAG1;
                 }
-                break;
-            case OTA_FLAG_IMAGE_ELEM_TAG1:
-                otaClientInfo.otaElementTag = pData[i];
-                otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_ELEM_TAG2;
-                break;
-            case OTA_FLAG_IMAGE_ELEM_TAG2:
-                otaClientInfo.otaElementTag |= ((u16)pData[i] << 8) & 0xff00;
-                otaClientInfo.otaElementPos = 0;
-                otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_ELEM_LEN1;
-                break;
-            case OTA_FLAG_IMAGE_ELEM_LEN1:
-                otaClientInfo.otaElementLen = pData[i];
-                otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_ELEM_LEN2;
-                break;
-            case OTA_FLAG_IMAGE_ELEM_LEN2:
-                otaClientInfo.otaElementLen |= ((u32)pData[i] << 8) & 0xff00;
-                otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_ELEM_LEN3;
-                break;
-            case OTA_FLAG_IMAGE_ELEM_LEN3:
-                otaClientInfo.otaElementLen |= ((u32)pData[i] << 16) & 0xff0000;
-                otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_ELEM_LEN4;
-                break;
-            case OTA_FLAG_IMAGE_ELEM_LEN4:
-                otaClientInfo.otaElementLen |= ((u32)pData[i] << 24) & 0xff000000;
-                otaClientInfo.clientOtaFlg = (otaClientInfo.otaElementTag == OTA_UPGRADE_IMAGE_AES_TAG_ID) ? OTA_FLAG_IMAGE_ELEM_INFO1
-                                                                                                           : OTA_FLAG_IMAGE_ELEMENT;
 
-                //make sure the length of element is not bigger than the image
-                if ((otaClientInfo.otaElementLen > (g_otaCtx.downloadImageSize - zcl_attr_fileOffset)) || \
-                   (otaClientInfo.otaElementLen == 0)) {
-                    return ZCL_STA_INVALID_IMAGE;
-                }
-                break;
-            case OTA_FLAG_IMAGE_ELEM_INFO1:
-                otaClientInfo.otaElementInfo1 = pData[i];
-                otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_ELEM_INFO2;
-                break;
-            case OTA_FLAG_IMAGE_ELEM_INFO2:
-                otaClientInfo.otaElementInfo2 = pData[i];
-                otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_ELEMENT;
-                break;
-            case OTA_FLAG_IMAGE_ELEMENT:
-                if ((otaClientInfo.otaElementLen == 0) || \
-                   (otaClientInfo.otaElementPos > otaClientInfo.otaElementLen)) {
-                    return ZCL_STA_INVALID_IMAGE;
-                }
-
-                if ((otaClientInfo.otaElementTag == OTA_UPGRADE_IMAGE_TAG_ID) || \
-                   (otaClientInfo.otaElementTag == OTA_UPGRADE_IMAGE_AES_TAG_ID)) {
-                    //if g_otaEncryptionNeeded is set, it will reject the un-encrypted ota image data.
-                    if ((otaClientInfo.otaElementTag == OTA_UPGRADE_IMAGE_TAG_ID) && \
-                        g_otaEncryptionNeeded){
-                        return ZCL_STA_INVALID_IMAGE;
-                    }
-
-                    u8 dataSize = len - i;
-
-                    u8 copyLen = dataSize;
-                    if (otaClientInfo.otaElementLen - otaClientInfo.otaElementPos < dataSize) {
-                        copyLen = otaClientInfo.otaElementLen - otaClientInfo.otaElementPos;
-                    }
-
-                    if (otaClientInfo.otaElementTag == OTA_UPGRADE_IMAGE_AES_TAG_ID) {
-                        u8 tmpBuf[16];
-                        for (u8 j = 0; j < copyLen; j += 16) {
-                            memset(tmpBuf, 0xff, 16);
-                            memcpy(tmpBuf, &pData[i + j], 16);
-                            drv_aes_decrypt((u8 *)otaAesKey, tmpBuf, &pData[i + j]);
-                        }
-                    }
-
-                    //Calculate CRC value
-                    u32 dataEndPos = otaClientInfo.otaElementLen - otaClientInfo.otaElementInfo2;
-                    u8 crcLen = 0;
-                    if (dataEndPos - otaClientInfo.otaElementPos <= 4) {
-                        crcLen = 0;
-                    } else if (dataEndPos - 4 - otaClientInfo.otaElementPos >= dataSize){
-                        crcLen = dataSize;
-                    } else {
-                        crcLen = dataEndPos - 4 - otaClientInfo.otaElementPos;
-                    }
-                    otaClientInfo.crcValue = xcrc32(&pData[i], crcLen, otaClientInfo.crcValue);
-
-                    //write image to flash
-                    if ((otaClientInfo.otaElementPos < FLASH_TLNK_FLAG_OFFSET + 1) && \
-                      ((otaClientInfo.otaElementPos + dataSize) >= FLASH_TLNK_FLAG_OFFSET + 1)) {
-                        if (pData[i + (FLASH_TLNK_FLAG_OFFSET - otaClientInfo.otaElementPos)] != TL_IMAGE_START_FLAG) {
-                            return ZCL_STA_INVALID_IMAGE;
-                        }
-                        pData[i + (FLASH_TLNK_FLAG_OFFSET - otaClientInfo.otaElementPos)] = 0xff;
-                    }
-                    u32 baseAddr = (mcuBootAddr) ? 0 : FLASH_ADDR_OF_OTA_IMAGE;
-                    if (flash_writeWithCheck(baseAddr + otaClientInfo.otaElementPos, copyLen, &pData[i]) != TRUE) {
-                        return ZCL_STA_INVALID_IMAGE;
-                    }
-                    
-                    otaClientInfo.otaElementPos += copyLen;
-                    zcl_attr_fileOffset += copyLen;
-
-                    otaClientInfo.offset = zcl_attr_fileOffset;
-
-                    if (otaClientInfo.otaElementPos == otaClientInfo.otaElementLen) {
-                        u16 crcFirmware = 0;
-                        flash_read(baseAddr + 6, 2, (u8 *)&crcFirmware);
-                        if (((crcFirmware & 0xff) == 0x5D) && ((crcFirmware >> 8) & 0xff) == 0x02) {
-                            u32 crcReceived;
-                            flash_read(baseAddr + dataEndPos - 4, 4, (u8 *)&crcReceived);
-
-                            if (crcReceived != otaClientInfo.crcValue) {
-                                return ZCL_STA_INVALID_IMAGE;
-                            }
-                            validChecked = 1;
-                        } else {
-                            return ZCL_STA_INVALID_IMAGE;
-                        }
-
-                        otaClientInfo.clientOtaFlg = OTA_FLAG_IMAGE_ELEM_TAG1;
-                    }
-
-                    if (copyLen == dataSize) {
-                        i = len - 1;
-                    } else {
-                        i += copyLen - 1;
-                    }
-                    zcl_attr_fileOffset--;
+                if (copyLen == dataSize) {
+                    i = len - 1;
                 } else {
-                    return ZCL_STA_INVALID_IMAGE;
+                    i += copyLen - 1;
                 }
+                zcl_attr_fileOffset--;
+            } else {
+                return ZCL_STA_INVALID_IMAGE;
+            }
 
-                break;
-            default:
-                break;
+            break;
+        default:
+            break;
         }
-
 
         zcl_attr_fileOffset++;
 
@@ -1200,16 +1201,14 @@ void ota_upgradeEndReqSend(ota_upgradeEndReq_t *req)
     zcl_ota_upgradeEndReqCmdSend(g_otaCtx.simpleDesc->endpoint, &dstEpInfo, FALSE, req);
 }
 
-
-
 static status_t ota_queryNextImageReqHandler(zclIncomingAddrInfo_t *pAddrInfo, ota_queryNextImageReq_t *pQueryNextImageReq)
 {
     u8 status = ZCL_STA_NO_IMAGE_AVAILABLE;
     ota_queryNextImageRsp_t rsp;
 
-    if ((otaServerBinInfo.manufacturerCode == pQueryNextImageReq->manuCode) && \
-       (otaServerBinInfo.imageType == pQueryNextImageReq->imageType) && \
-       (otaServerBinInfo.fileVer != pQueryNextImageReq->curFileVer)){
+    if ((otaServerBinInfo.manufacturerCode == pQueryNextImageReq->manuCode) &&
+        (otaServerBinInfo.imageType == pQueryNextImageReq->imageType) &&
+        (otaServerBinInfo.fileVer != pQueryNextImageReq->curFileVer)) {
         status = ZCL_STA_SUCCESS;
     }
 
@@ -1234,17 +1233,16 @@ static status_t ota_queryNextImageReqHandler(zclIncomingAddrInfo_t *pAddrInfo, o
 
 static status_t ota_imageBlockReqHandler(zclIncomingAddrInfo_t *pAddrInfo, ota_imageBlockReq_t *pImageBlockReq)
 {
-    if ((otaServerBinInfo.manufacturerCode != pImageBlockReq->manuCode) || \
-       (otaServerBinInfo.fileVer != pImageBlockReq->fileVer) || \
-       (otaServerBinInfo.imageType != pImageBlockReq->imageType)){
+    if ((otaServerBinInfo.manufacturerCode != pImageBlockReq->manuCode) ||
+        (otaServerBinInfo.fileVer != pImageBlockReq->fileVer) ||
+        (otaServerBinInfo.imageType != pImageBlockReq->imageType)) {
         return ZCL_STA_NO_IMAGE_AVAILABLE;
     }
 
     u8 *buf = NULL;
     ota_imageBlockRsp_t rsp;
 
-    if ((pImageBlockReq->fc & BLOCK_FC_BITMASK_MIN_PERIOD_PRESENT) && \
-        (pImageBlockReq->blockReqDelay != zcl_attr_minBlockPeriod)) {
+    if ((pImageBlockReq->fc & BLOCK_FC_BITMASK_MIN_PERIOD_PRESENT) && (pImageBlockReq->blockReqDelay != zcl_attr_minBlockPeriod)) {
         rsp.st = ZCL_STA_WAIT_FOR_DATA;
         rsp.rsp.wait.currTime = 0;
         rsp.rsp.wait.reqTime = 0;
@@ -1338,16 +1336,16 @@ static status_t ota_imageNotifyHandler(zclIncomingAddrInfo_t *pAddrInfo, ota_ima
     }
 
     if (ZB_NWK_IS_ADDRESS_BROADCAST(pAddrInfo->dstAddr)) {
-        if ((pImageNotify->payloadType >= IMAGE_NOTIFY_QUERT_JITTER_MFG) && \
+        if ((pImageNotify->payloadType >= IMAGE_NOTIFY_QUERT_JITTER_MFG) &&
             (pImageNotify->manuCode != g_otaCtx.pOtaPreamble->manufacturerCode)) {
             return ZCL_STA_SUCCESS;
         }
-        if ((pImageNotify->payloadType >= IMAGE_NOTIFY_QUERY_JITTER_MFG_TYPE) && \
+        if ((pImageNotify->payloadType >= IMAGE_NOTIFY_QUERY_JITTER_MFG_TYPE) &&
             (pImageNotify->imageType != g_otaCtx.pOtaPreamble->imageType)) {
             return ZCL_STA_SUCCESS;
         }
-        if((pImageNotify->payloadType >= IMAGE_NOTIFY_QUERY_JITTER_MFG_TYPE_VER) && \
-           (pImageNotify->newFileVer == zcl_attr_currFileVer)) {
+        if ((pImageNotify->payloadType >= IMAGE_NOTIFY_QUERY_JITTER_MFG_TYPE_VER) &&
+            (pImageNotify->newFileVer == zcl_attr_currFileVer)) {
             return ZCL_STA_SUCCESS;
         }
 
@@ -1381,9 +1379,10 @@ static status_t ota_queryNextImageRspHandler(zclIncomingAddrInfo_t *pAddrInfo, o
 
     g_otaCtx.imageBlockRetry = 0;
 
-    if ((pQueryNextImageRsp->st == ZCL_STA_SUCCESS) && \
-       (pQueryNextImageRsp->imageType == g_otaCtx.pOtaPreamble->imageType) && \
-       (pQueryNextImageRsp->manuCode == g_otaCtx.pOtaPreamble->manufacturerCode)){
+    if ((pQueryNextImageRsp->st == ZCL_STA_SUCCESS) &&
+        (pQueryNextImageRsp->imageType == g_otaCtx.pOtaPreamble->imageType) &&
+        (pQueryNextImageRsp->manuCode == g_otaCtx.pOtaPreamble->manufacturerCode)) {
+
 #ifdef ZCL_WWAH
         bool disable = FALSE;
         u16 len;
@@ -1421,10 +1420,10 @@ static status_t ota_queryNextImageRspHandler(zclIncomingAddrInfo_t *pAddrInfo, o
         flash_unlock();
 #endif
 
-        if ( g_otaCtx.downloadImageSize == pQueryNextImageRsp->imageSize && \
-            zcl_attr_imageTypeID == pQueryNextImageRsp->imageType && \
-            zcl_attr_downloadFileVer == pQueryNextImageRsp->fileVer && \
-            zcl_attr_fileOffset > 4096){
+        if (g_otaCtx.downloadImageSize == pQueryNextImageRsp->imageSize &&
+            zcl_attr_imageTypeID == pQueryNextImageRsp->imageType &&
+            zcl_attr_downloadFileVer == pQueryNextImageRsp->fileVer &&
+            zcl_attr_fileOffset > 4096) {
             /* OTA from offset xxxx */
 
             if (otaClientInfo.offset == g_otaCtx.downloadImageSize) {
@@ -1516,9 +1515,9 @@ static status_t ota_imageBlockRspHandler(zclIncomingAddrInfo_t *pAddrInfo, ota_i
     }
 
     if (pImageBlockRsp->st == ZCL_STA_SUCCESS) {
-        if ((pImageBlockRsp->rsp.success.imageType != g_otaCtx.pOtaPreamble->imageType) || \
-            (pImageBlockRsp->rsp.success.manuCode != g_otaCtx.pOtaPreamble->manufacturerCode) || \
-            (pImageBlockRsp->rsp.success.fileVer != zcl_attr_downloadFileVer)){
+        if ((pImageBlockRsp->rsp.success.imageType != g_otaCtx.pOtaPreamble->imageType) ||
+            (pImageBlockRsp->rsp.success.manuCode != g_otaCtx.pOtaPreamble->manufacturerCode) ||
+            (pImageBlockRsp->rsp.success.fileVer != zcl_attr_downloadFileVer)) {
             status = ZCL_STA_INVALID_IMAGE;
         } else {
             if (pImageBlockRsp->rsp.success.fileOffset != zcl_attr_fileOffset) {
@@ -1608,13 +1607,13 @@ static status_t ota_imageBlockRspHandler(zclIncomingAddrInfo_t *pAddrInfo, ota_i
 
 static status_t ota_upgradeEndRspHandler(zclIncomingAddrInfo_t *pAddrInfo, ota_upgradeEndRsp_t *pUpgradeEndRsp)
 {
-    if ((zcl_attr_imageUpgradeStatus == IMAGE_UPGRADE_STATUS_DOWNLOAD_COMPLETE) || \
-        ((zcl_attr_imageUpgradeStatus == IMAGE_UPGRADE_STATUS_WAITING_TO_UPGRADE) && \
-        (pUpgradeEndRsp->upgradeTime != 0xFFFFFFFF))){
+    if ((zcl_attr_imageUpgradeStatus == IMAGE_UPGRADE_STATUS_DOWNLOAD_COMPLETE) ||
+       ((zcl_attr_imageUpgradeStatus == IMAGE_UPGRADE_STATUS_WAITING_TO_UPGRADE) &&
+        (pUpgradeEndRsp->upgradeTime != 0xFFFFFFFF))) {
 
         if (ota_fileIdCmp(g_otaCtx.pOtaPreamble->manufacturerCode, pUpgradeEndRsp->manuCode,
-                         g_otaCtx.pOtaPreamble->imageType, pUpgradeEndRsp->imageType,
-                         zcl_attr_downloadFileVer, pUpgradeEndRsp->fileVer) == FALSE) {
+                          g_otaCtx.pOtaPreamble->imageType, pUpgradeEndRsp->imageType,
+                          zcl_attr_downloadFileVer, pUpgradeEndRsp->fileVer) == FALSE) {
             return ZCL_STA_SUCCESS;
         }
 
@@ -1673,45 +1672,45 @@ status_t zcl_otaCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayload)
     if (pAddrInfo->dstEp == g_otaCtx.simpleDesc->endpoint) {
         if (pAddrInfo->dirCluster == ZCL_FRAME_CLIENT_SERVER_DIR) {
             switch (cmdId) {
-                case ZCL_CMD_OTA_QUERY_NEXT_IMAGE_REQ:
-                    status = ota_queryNextImageReqHandler(pAddrInfo, (ota_queryNextImageReq_t *)cmdPayload);
-                    break;
-                case ZCL_CMD_OTA_IMAGE_BLOCK_REQ:
-                    status = ota_imageBlockReqHandler(pAddrInfo, (ota_imageBlockReq_t *)cmdPayload);
-                    break;
-                case ZCL_CMD_OTA_IMAGE_PAGE_REQ:
-                    status = ota_imagePageReqHandler(pAddrInfo, (ota_imagePageReq_t *)cmdPayload);
-                    break;
-                case ZCL_CMD_OTA_UPGRADE_END_REQ:
-                    status = ota_upgradeEndReqHandler(pAddrInfo, (ota_upgradeEndReq_t *)cmdPayload);
-                    break;
-                case ZCL_CMD_OTA_QUERY_DEVICE_SPECIFIC_FILE_REQ:
-                    status = ota_queryDevSpecFileReqHandler(pAddrInfo, (ota_querySpecFileReq_t *)cmdPayload);
-                    break;
-                default:
-                    status = ZCL_STA_UNSUP_CLUSTER_COMMAND;
-                    break;
+            case ZCL_CMD_OTA_QUERY_NEXT_IMAGE_REQ:
+                status = ota_queryNextImageReqHandler(pAddrInfo, (ota_queryNextImageReq_t *)cmdPayload);
+                break;
+            case ZCL_CMD_OTA_IMAGE_BLOCK_REQ:
+                status = ota_imageBlockReqHandler(pAddrInfo, (ota_imageBlockReq_t *)cmdPayload);
+                break;
+            case ZCL_CMD_OTA_IMAGE_PAGE_REQ:
+                status = ota_imagePageReqHandler(pAddrInfo, (ota_imagePageReq_t *)cmdPayload);
+                break;
+            case ZCL_CMD_OTA_UPGRADE_END_REQ:
+                status = ota_upgradeEndReqHandler(pAddrInfo, (ota_upgradeEndReq_t *)cmdPayload);
+                break;
+            case ZCL_CMD_OTA_QUERY_DEVICE_SPECIFIC_FILE_REQ:
+                status = ota_queryDevSpecFileReqHandler(pAddrInfo, (ota_querySpecFileReq_t *)cmdPayload);
+                break;
+            default:
+                status = ZCL_STA_UNSUP_CLUSTER_COMMAND;
+                break;
             }
         } else {
             switch (cmdId) {
-                case ZCL_CMD_OTA_IMAGE_NOTIFY:
-                    status = ota_imageNotifyHandler(pAddrInfo, (ota_imageNotify_t *)cmdPayload);
-                    break;
-                case ZCL_CMD_OTA_QUERY_NEXT_IMAGE_RSP:
-                    status = ota_queryNextImageRspHandler(pAddrInfo, (ota_queryNextImageRsp_t *)cmdPayload);
-                    break;
-                case ZCL_CMD_OTA_IMAGE_BLOCK_RSP:
-                    status = ota_imageBlockRspHandler(pAddrInfo, (ota_imageBlockRsp_t *)cmdPayload);
-                    break;
-                case ZCL_CMD_OTA_UPGRADE_END_RSP:
-                    status = ota_upgradeEndRspHandler(pAddrInfo, (ota_upgradeEndRsp_t *)cmdPayload);
-                    break;
-                case ZCL_CMD_OTA_QUERY_DEVICE_SPECIFIC_FILE_RSP:
-                    status = ota_queryDevSpecFileRspHandler(pAddrInfo, (ota_querySpecFileRsp_t *)cmdPayload);
-                    break;
-                default:
-                    status = ZCL_STA_UNSUP_CLUSTER_COMMAND;
-                    break;
+            case ZCL_CMD_OTA_IMAGE_NOTIFY:
+                status = ota_imageNotifyHandler(pAddrInfo, (ota_imageNotify_t *)cmdPayload);
+                break;
+            case ZCL_CMD_OTA_QUERY_NEXT_IMAGE_RSP:
+                status = ota_queryNextImageRspHandler(pAddrInfo, (ota_queryNextImageRsp_t *)cmdPayload);
+                break;
+            case ZCL_CMD_OTA_IMAGE_BLOCK_RSP:
+                status = ota_imageBlockRspHandler(pAddrInfo, (ota_imageBlockRsp_t *)cmdPayload);
+                break;
+            case ZCL_CMD_OTA_UPGRADE_END_RSP:
+                status = ota_upgradeEndRspHandler(pAddrInfo, (ota_upgradeEndRsp_t *)cmdPayload);
+                break;
+            case ZCL_CMD_OTA_QUERY_DEVICE_SPECIFIC_FILE_RSP:
+                status = ota_queryDevSpecFileRspHandler(pAddrInfo, (ota_querySpecFileRsp_t *)cmdPayload);
+                break;
+            default:
+                status = ZCL_STA_UNSUP_CLUSTER_COMMAND;
+                break;
             }
         }
     }
@@ -1719,4 +1718,4 @@ status_t zcl_otaCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayload)
     return status;
 }
 
-#endif  /* ZCL_OTA */
+#endif	/* ZCL_OTA */

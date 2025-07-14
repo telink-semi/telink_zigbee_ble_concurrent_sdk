@@ -22,11 +22,10 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-
 #include "types.h"
 #include "list.h"
 
-struct list{
+struct list {
     struct list *next;
 };
 
@@ -53,9 +52,7 @@ void *listTail(list_t list)
         return NULL;
     }
 
-    for (l = *list; l->next != NULL; l = l->next) {
-        ;
-    }
+    for (l = *list; l->next != NULL; l = l->next);
 
     return l;
 }
@@ -94,9 +91,7 @@ void *listChop(list_t list)
         return l;
     }
 
-    for (l = *list; l->next->next != NULL; l = l->next) {
-    	;
-    }
+    for (l = *list; l->next->next != NULL; l = l->next);
 
     p = l->next;
     l->next = NULL;

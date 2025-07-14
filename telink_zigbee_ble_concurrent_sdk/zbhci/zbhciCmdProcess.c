@@ -451,23 +451,6 @@ void zbhciAppDataSendConfirmPush(void *arg)
     apsdeDataConf_t *pApsDataCnf = (apsdeDataConf_t *)arg;
 
 #if ZB_COORDINATOR_ROLE
-#if 0
-    if (g_nodeTestTimer) {
-        g_afTestReq.sendTotalCnt++;
-        if (pApsDataCnf->status == SUCCESS) {
-            g_afTestReq.sendSuccessCnt++;
-        }
-        if (g_afTestReq.sendTotalCnt >= 100) {
-            txrx_performce_test_rsp_t rsp;
-            COPY_BUFFERTOU16_BE(rsp.dstAddr, (u8 *)&g_afTestReq.dstAddr);
-            COPY_BUFFERTOU16_BE(rsp.sendCnt, (u8 *)&g_afTestReq.sendTotalCnt);
-            COPY_BUFFERTOU16_BE(rsp.ackCnt, (u8 *)&g_afTestReq.sendSuccessCnt);
-
-            zbhciTx(ZBHCI_CMD_TXRX_PERFORMANCE_TEST_RSP, sizeof(txrx_performce_test_rsp_t), (u8 *)&rsp);
-            memset((u8 *)&g_afTestReq, 0, sizeof(zbhci_afTestReq_t));
-        }
-    }
-#else
     u8 *conf = ev_buf_allocate(sizeof(zbhci_app_data_confirm_t));
     if (conf) {
         memset(conf, 0, sizeof(zbhci_app_data_confirm_t));
@@ -499,7 +482,6 @@ void zbhciAppDataSendConfirmPush(void *arg)
 
         ev_buf_free(conf);
     }
-#endif
 #endif
 }
 
@@ -1411,11 +1393,11 @@ void zbhciCmdHandler(u16 msgType, u16 msgLen, u8 *p)
         case ZBHCI_CMD_ZCL_COLOR_MOVE2TEMP:
             TL_SCHEDULE_TASK(zbhci_zclColorCtrlCmdHandle, cmdInfo);
             break;
-
+#ifdef ZCL_OTA
         case ZBHCI_CMD_ZCL_OTA_IMAGE_NOTIFY:
             TL_SCHEDULE_TASK(zbhci_clusterOTAHandle, cmdInfo);
             break;
-
+#endif
         case ZBHCI_CMD_OTA_START_REQUEST:
         case ZBHCI_CMD_OTA_BLOCK_RESPONSE:
             cmdInfo->payloadLen = msgLen;

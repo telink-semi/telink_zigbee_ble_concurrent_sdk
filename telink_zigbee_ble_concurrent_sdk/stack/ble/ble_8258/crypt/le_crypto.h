@@ -3,7 +3,7 @@
  *
  * @brief    This is the header file for 8258 BLE SDK
  *
- * @author	 BLE GROUP
+ * @author   BLE GROUP
  * @date         12,2021
  *
  * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
@@ -20,15 +20,12 @@
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
  *******************************************************************************************************/
-
 #ifndef TN_DTLS_H
 #define TN_DTLS_H
 
-#define		biL			32
+#define     biL         32
 
 #define BITS_TO_LIMBS(i)  ( (i) / 32 + ( (i) % 32 != 0 ) )
-
-
 
 #define TNDTLS_ERR_MPI_BAD_INPUT_DATA                    -0x0004  // Bad input parameters to function.
 #define TNDTLS_ERR_MPI_INVALID_CHARACTER                 -0x0006  // There is an invalid character in the digit string.
@@ -37,34 +34,31 @@
 #define TNDTLS_ERR_MPI_DIVISION_BY_ZERO                  -0x000C  // The input argument for division is zero, which is not allowed.
 #define TNDTLS_ERR_MPI_NOT_ACCEPTABLE                    -0x000E  // The input arguments are not acceptable.
 
-
 typedef struct {
-	int	s;
-	int n;
-	unsigned int p[8];
+    int s;
+    int n;
+    unsigned int p[8];
 } tn_mpi;
 
 typedef struct {
-	int	s;
-	int n;
-	unsigned int p[16];
+    int s;
+    int n;
+    unsigned int p[16];
 } tn_mpi16;
 
-typedef struct
-{
+typedef struct {
     tn_mpi X;
     tn_mpi Y;
     tn_mpi Z;
 } tn_ecp_point;
 
-typedef struct
-{
-	tn_ecp_point	X1X3;			// XsXc
-	tn_ecp_point	X2X4;			//
-	tn_ecp_point	GaGb;			// Peer's G
-    tn_mpi			m2m4;			// private key
-    tn_mpi			xcxs;			// key exchange
-    tn_mpi			s;				// passphrase
+typedef struct {
+    tn_ecp_point    X1X3;           // XsXc
+    tn_ecp_point    X2X4;           //
+    tn_ecp_point    GaGb;           // Peer's G
+    tn_mpi          m2m4;           // private key
+    tn_mpi          xcxs;           // key exchange
+    tn_mpi          s;              // passphrase
 } tn_ecjpake_context;
 
 extern const unsigned int tn_p256_nq[9];
@@ -77,7 +71,7 @@ extern const unsigned int tn_p256_pr[8];
 
 extern const unsigned int tn_p256_p[10];
 
-extern const tn_ecp_point	tn_t[16];
+extern const tn_ecp_point   tn_t[16];
 
 extern const tn_ecp_point tn_p256_ecp_g;
 
@@ -124,12 +118,11 @@ extern void tn_aes_cmac ( unsigned char *key, unsigned char *input, int length,
 extern int tn_crypto_f4 (unsigned char *r, unsigned char u[32], unsigned char v[32], unsigned char x[16], unsigned char z);
 extern unsigned int tn_crypto_g2 (unsigned char u[32], unsigned char v[32], unsigned char x[16], unsigned char y[16]);
 extern int tn_crypto_f5 (unsigned char *mac, unsigned char *ltk, unsigned char w[32], unsigned char n1[16], unsigned char n2[16],
-				  unsigned char a1[7], unsigned char a2[7]);
+                  unsigned char a1[7], unsigned char a2[7]);
 extern int tn_crypto_f6 (unsigned char *e, unsigned char w[16], unsigned char n1[16], unsigned char n2[16],
-				  unsigned char r[16], unsigned char iocap[3], unsigned char a1[7], unsigned char a2[7]);
+                  unsigned char r[16], unsigned char iocap[3], unsigned char a1[7], unsigned char a2[7]);
 extern int tn_crypto_h6 (unsigned char *r, unsigned char key[16], unsigned char id[4]);
 
 extern int test_crypto_func ();
 extern int test_dhkey ();
-
 #endif 

@@ -22,14 +22,12 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-
 #ifndef ZCL_OTA_H
 #define ZCL_OTA_H
 
 
-
 /**
- *  @brief  zcl_ota_cmdId OTA Command Ids
+ *  @brief	zcl_ota_cmdId OTA Command Ids
  */
 #define ZCL_CMD_OTA_IMAGE_NOTIFY                        0x00
 #define ZCL_CMD_OTA_QUERY_NEXT_IMAGE_REQ                0x01
@@ -43,7 +41,7 @@
 #define ZCL_CMD_OTA_QUERY_DEVICE_SPECIFIC_FILE_RSP      0x09
 
 /**
- *  @brief  attributes of OTA upgrade cluster
+ *  @brief	attributes of OTA upgrade cluster
  */
 #define ZCL_ATTRID_OTA_UPGRADE_SERVER_ID                0x0000
 #define ZCL_ATTRID_OTA_FILE_OFFSET                      0x0001
@@ -58,7 +56,7 @@
 #define ZCL_ATTRID_OTA_IMAGE_STAMP                      0x000a
 
 /**
- *  @brief  image upgrade status attribute values
+ *  @brief	image upgrade status attribute values
  */
 #define IMAGE_UPGRADE_STATUS_NORMAL                     0x00
 #define IMAGE_UPGRADE_STATUS_DOWNLOAD_IN_PROGRESS       0x01
@@ -86,108 +84,108 @@
 #define IMAGE_NOTIFY_QUERY_JITTER_MFG_TYPE_VER          0x03
 
 
-typedef struct{
-    u8  payloadType;
-    u8  queryJitter;
+typedef struct {
+    u8 payloadType;
+    u8 queryJitter;
     u16 manuCode;
     u16 imageType;
     u32 newFileVer;
-}ota_imageNotify_t;
+} ota_imageNotify_t;
 
-typedef struct{
-    u8  fc;//BIT(0) hardware version present
+typedef struct {
+    u8 fc;//BIT(0) hardware version present
     u16 manuCode;
     u16 imageType;
     u32 curFileVer;
     u16 hdrwareVer;
-}ota_queryNextImageReq_t;
+} ota_queryNextImageReq_t;
 
-typedef struct{
-    u8  st;
+typedef struct {
+    u8 st;
     u16 manuCode;
     u16 imageType;
     u32 fileVer;
     u32 imageSize;
-}ota_queryNextImageRsp_t;
+} ota_queryNextImageRsp_t;
 
-typedef struct{
-    u8  fc;//b0 req node's IEEE address present; b1 block request delay present
+typedef struct {
+    u8 fc;//b0 req node's IEEE address present; b1 block request delay present
     u16 manuCode;
     u16 imageType;
     u32 fileVer;
     u32 fileOffset;
-    u8  maxDataSize;
+    u8 maxDataSize;
     addrExt_t reqNodeAddr;
     u16 blockReqDelay;
-}ota_imageBlockReq_t;
+} ota_imageBlockReq_t;
 
-typedef struct{
-    u8  fc;//b0 req node's IEEE address present; b1 block request delay present
+typedef struct {
+    u8 fc;//b0 req node's IEEE address present; b1 block request delay present
     u16 manuCode;
     u16 imageType;
     u32 fileVer;
     u32 fileOffset;
-    u8  maxDataSize;
+    u8 maxDataSize;
     u16 pageSize;
     u16 rspSpacing;
     addrExt_t reqNodeAddr;
-}ota_imagePageReq_t;
+} ota_imagePageReq_t;
 
-typedef struct{
-    u8  st;
+typedef struct {
+    u8 st;
     u16 manuCode;
     u16 imageType;
     u32 fileVer;
-}ota_upgradeEndReq_t;
+} ota_upgradeEndReq_t;
 
-typedef struct{
+typedef struct {
     u16 manuCode;
     u16 imageType;
     u32 fileVer;
     u32 currentTime;
     u32 upgradeTime;
-}ota_upgradeEndRsp_t;
+} ota_upgradeEndRsp_t;
 
-typedef struct{
-    addrExt_t       reqNodeAddr;
-    u16             manuCode;
-    u16             imageType;
-    u32             fileVer;
-    u16             zbStackVer;
-}ota_querySpecFileReq_t;
+typedef struct {
+    addrExt_t reqNodeAddr;
+    u16 manuCode;
+    u16 imageType;
+    u32 fileVer;
+    u16 zbStackVer;
+} ota_querySpecFileReq_t;
 
-typedef struct{
-    u8              st;
-    u16             manuCode;
-    u16             imageType;
-    u32             fileVer;
-    u32             imageSize;
-}ota_querySpecFileRsp_t;
+typedef struct {
+    u8 st;
+    u16 manuCode;
+    u16 imageType;
+    u32 fileVer;
+    u32 imageSize;
+} ota_querySpecFileRsp_t;
 
-typedef struct{
+typedef struct {
     u16 manuCode;
     u16 imageType;
     u32 fileVer;
     u32 fileOffset;
-    u8  dataSize;
-    u8  *data;
-}ota_imageBlockRspSuccess_t;
+    u8 dataSize;
+    u8 *data;
+} ota_imageBlockRspSuccess_t;
 
-typedef struct{
+typedef struct {
     u32 currTime;
     u32 reqTime;
     u16 blockReqDelay;
-}ota_imageBlockRspWait_t;
+} ota_imageBlockRspWait_t;
 
-typedef union{
-    ota_imageBlockRspSuccess_t  success;
-    ota_imageBlockRspWait_t     wait;
-}imageBlockRsp_t;
+typedef union {
+    ota_imageBlockRspSuccess_t success;
+    ota_imageBlockRspWait_t wait;
+} imageBlockRsp_t;
 
-typedef struct{
+typedef struct {
     u8 st;
     imageBlockRsp_t rsp;
-}ota_imageBlockRsp_t;
+} ota_imageBlockRsp_t;
 
 #if 0
 /**
@@ -209,17 +207,17 @@ typedef status_t (*zcl_ota_queryDevSpecFileRspCb_t)(apsdeDataInd_t *pInd, ota_qu
  *  @brief  Structure definition for commands callback functions in OTA cluster
  */
 typedef struct {
-    zcl_ota_imageNotifyCb_t         imageNotifyCbFunc;
-    zcl_ota_queryNextImageReqCb_t   queryNextImageReqCbFunc;
-    zcl_ota_queryNextImageRspCb_t   queryNextImageRspCbFunc;
-    zcl_ota_imageBlockReqCb_t       imageBlockReqCbFunc;
-    zcl_ota_imagePageReqCb_t        imagePageReqCbFunc;
-    zcl_ota_imageBlockRspCb_t       imageBlockRspCbFunc;
-    zcl_ota_upgradeEndReqCb_t       upgradeEndReqCbFunc;
-    zcl_ota_upgradeEndRspCb_t       upgradeEndRspCbFunc;
+    zcl_ota_imageNotifyCb_t imageNotifyCbFunc;
+    zcl_ota_queryNextImageReqCb_t queryNextImageReqCbFunc;
+    zcl_ota_queryNextImageRspCb_t queryNextImageRspCbFunc;
+    zcl_ota_imageBlockReqCb_t imageBlockReqCbFunc;
+    zcl_ota_imagePageReqCb_t imagePageReqCbFunc;
+    zcl_ota_imageBlockRspCb_t imageBlockRspCbFunc;
+    zcl_ota_upgradeEndReqCb_t upgradeEndReqCbFunc;
+    zcl_ota_upgradeEndRspCb_t upgradeEndRspCbFunc;
     zcl_ota_queryDevSpecFileReqCb_t queryDevSpecFileReqCbFunc;
     zcl_ota_queryDevSpecFileRspCb_t queryDevSpecFileRspCbFunc;
-}zcl_ota_AppCallbacks_t;
+} zcl_ota_AppCallbacks_t;
 
 
 /**
@@ -247,31 +245,31 @@ extern const u8 zcl_ota_attrNum;
 status_t zcl_ota_register(u8 endpoint, u16 manuCode, u8 arrtNum, const zclAttrInfo_t attrTbl[], cluster_forAppCb_t cb);
 
 status_t zcl_ota_imageNotifySend(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, ota_imageNotify_t *pReq);
-#define zcl_ota_imageNotifyCmdSend(a,b,c,d) (zcl_ota_imageNotifySend((a), (b), (c), ZCL_SEQ_NUM, (d)))
+#define zcl_ota_imageNotifyCmdSend(a,b,c,d)             (zcl_ota_imageNotifySend((a), (b), (c), ZCL_SEQ_NUM, (d)))
 
 status_t zcl_ota_queryNextImageReqSend(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, ota_queryNextImageReq_t *pReq);
-#define zcl_ota_queryNextImageReqCmdSend(a,b,c,d)   (zcl_ota_queryNextImageReqSend((a), (b), (c), ZCL_SEQ_NUM, (d)))
+#define zcl_ota_queryNextImageReqCmdSend(a,b,c,d)       (zcl_ota_queryNextImageReqSend((a), (b), (c), ZCL_SEQ_NUM, (d)))
 
 status_t zcl_ota_queryNextImageRspSend(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, ota_queryNextImageRsp_t *pRsp);
-#define zcl_ota_queryNextImageRspCmdSend(a,b,c,d,e) (zcl_ota_queryNextImageRspSend((a), (b), (c), (d), (e)))
+#define zcl_ota_queryNextImageRspCmdSend(a,b,c,d,e)     (zcl_ota_queryNextImageRspSend((a), (b), (c), (d), (e)))
 
 status_t zcl_ota_imageBlockReqSend(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, ota_imageBlockReq_t *pReq);
-#define zcl_ota_imageBlockReqCmdSend(a,b,c,d)   (zcl_ota_imageBlockReqSend((a), (b), (c), ZCL_SEQ_NUM, (d)))
+#define zcl_ota_imageBlockReqCmdSend(a,b,c,d)           (zcl_ota_imageBlockReqSend((a), (b), (c), ZCL_SEQ_NUM, (d)))
 
 status_t zcl_ota_imagePageReqSend(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, ota_imagePageReq_t *pReq);
 
 status_t zcl_ota_imageBlockRspSend(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, ota_imageBlockRsp_t *pRsp);
-#define zcl_ota_imageBlockRspCmdSend(a,b,c,d,e) (zcl_ota_imageBlockRspSend((a), (b), (c), (d), (e)))
+#define zcl_ota_imageBlockRspCmdSend(a,b,c,d,e)         (zcl_ota_imageBlockRspSend((a), (b), (c), (d), (e)))
 
 status_t zcl_ota_upgradeEndReqSend(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, ota_upgradeEndReq_t *pReq);
-#define zcl_ota_upgradeEndReqCmdSend(a,b,c,d)   (zcl_ota_upgradeEndReqSend((a), (b), (c), ZCL_SEQ_NUM, (d)))
+#define zcl_ota_upgradeEndReqCmdSend(a,b,c,d)           (zcl_ota_upgradeEndReqSend((a), (b), (c), ZCL_SEQ_NUM, (d)))
 
 status_t zcl_ota_upgradeEndRspSend(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, ota_upgradeEndRsp_t *pRsp);
-#define zcl_ota_upgradeEndRspCmdSend(a,b,c,d,e) (zcl_ota_upgradeEndRspSend((a), (b), (c), (d), (e)))
+#define zcl_ota_upgradeEndRspCmdSend(a,b,c,d,e)         (zcl_ota_upgradeEndRspSend((a), (b), (c), (d), (e)))
 
 status_t zcl_ota_queryDevSpecFileReqSend(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, ota_querySpecFileReq_t *pReq);
 
 status_t zcl_ota_queryDevSpecFileRspSend(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, ota_querySpecFileRsp_t *pRsp);
 
 
-#endif  /* ZCL_OTA_H */
+#endif	/* ZCL_OTA_H */

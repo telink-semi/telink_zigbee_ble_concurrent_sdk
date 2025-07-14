@@ -52,6 +52,11 @@
 #define HCI_EVT_HT_ERR_FLAG                   0xF0
 #define HCI_EVT_VENDOR_USE                    0xFF
 
+//HDT EVENT CODE
+#define HCI_EVT_ENCRYPTION_CHANGE_V3                                  0xFC //core_6.x higher data throughput
+#define HCI_EVT_ENCRYPTION_KEY_REFRESH_COMPLETE_V2                    0xFB //core_6.x higher data throughput
+
+
 // LE Meta Event Codes
 #define HCI_SUB_EVT_LE_CONNECTION_COMPLETE                            0x01 //core_4.0
 #define HCI_SUB_EVT_LE_ADVERTISING_REPORT                             0x02 //core_4.0
@@ -105,24 +110,17 @@
 
 #define HCI_SUB_EVT_LE_ENHANCED_CONNECTION_COMPLETE_V2                0x29
 
-/*
-TBD LE CS Read Remote Supported Capabilities Complete event
-TBD LE CS Read Remote FAE Table Complete event
-TBD LE CS Security Enable Complete event
-TBD LE CS Config Complete event
-TBD LE CS Procedure Enable Complete event
-TBD LE CS Subevent Result event
-TBD LE CS Subevent Result Continue event
-TBD LE CS Test End Complete event
- */
-#define HCI_SUB_EVT_LE_CS_READ_REMOTE_SUPPORTED_CAPABILITIES_COMPLETE 0x2C //channel sounding  7.7.Y+0 LE CS Read Remote Supported Capabilities Complete event
-#define HCI_SUB_EVT_LE_CS_READ_REMOTE_FAE_TABLE_COMPLETE              0x2D //channel sounding  7.7.Y+1 LE CS Read Remote FAE Table Complete event
-#define HCI_SUB_EVT_LE_CS_SECURITY_ENABLE_COMPLETE                    0x2E //channel sounding  7.7.Y+2 LE CS Security Enable Complete event
-#define HCI_SUB_EVT_LE_CS_CONFIG_COMPLETE                             0x2F //channel sounding  7.7.Y+3 LE CS Config Complete event
-#define HCI_SUB_EVT_LE_CS_PROCEDURE_ENABLE_COMPLETE                   0x30 //channel sounding  7.7.Y+4 LE CS Procedure Enable Complete event
-#define HCI_SUB_EVT_LE_CS_SUBEVENT_RESULT                             0x31 //channel sounding  7.7.Y+5 LE CS Subevent Result event
-#define HCI_SUB_EVT_LE_CS_SUBEVENT_RESULT_CONTINUE                    0x32 //channel sounding  7.7.Y+6 LE CS Subevent Result Continue event
-#define HCI_SUB_EVT_LE_CS_TEST_END_COMPLETE                           0x33 //channel sounding  7.7.Y+4 LE CS Test End Complete event
+
+#define HCI_SUB_EVT_LE_CS_READ_REMOTE_SUPPORTED_CAPABILITIES_COMPLETE 0x2C //core_6.0  7.7.65.39 LE CS Read Remote Supported Capabilities Complete event
+#define HCI_SUB_EVT_LE_CS_READ_REMOTE_FAE_TABLE_COMPLETE              0x2D //core_6.0  7.7.65.40 LE CS Read Remote FAE Table Complete event
+#define HCI_SUB_EVT_LE_CS_SECURITY_ENABLE_COMPLETE                    0x2E //core_6.0  7.7.65.41 LE CS Security Enable Complete event
+#define HCI_SUB_EVT_LE_CS_CONFIG_COMPLETE                             0x2F //core_6.0  7.7.65.42 LE CS Config Complete event
+#define HCI_SUB_EVT_LE_CS_PROCEDURE_ENABLE_COMPLETE                   0x30 //core_6.0  7.7.65.43 LE CS Procedure Enable Complete event
+#define HCI_SUB_EVT_LE_CS_SUBEVENT_RESULT                             0x31 //core_6.0  7.7.65.44 LE CS Subevent Result event
+#define HCI_SUB_EVT_LE_CS_SUBEVENT_RESULT_CONTINUE                    0x32 //core_6.0  7.7.65.45 LE CS Subevent Result Continue event
+#define HCI_SUB_EVT_LE_CS_TEST_END_COMPLETE                           0x33 //core_6.0  7.7.65.46 LE CS Test End Complete event
+#define HCI_SUB_EVT_LE_MONITORED_ADVERTISERS_REPORT                   0x34 //core_6.0  7.7.65.47 LE Monitored Advertises Report event
+#define HCI_SUB_EVT_LE_FRAME_SPACE_UPDATE_COMPLETE                    0x35 //core_6.0   7.7.65.48 LE Frame Space Update Complete event
 
 
 #define HCI_SUB_EVT_MAX                                               0x24
@@ -130,6 +128,11 @@ TBD LE CS Test End Complete event
 
 #define HCI_SUB_EVT_LE_CONNECTION_ESTABLISH                           0xF0 //Telink private
 #define HCI_SUB_EVT_LE_CONNECTION_FAIL                                0xF1 //Telink private
+
+//HDT LE META SUBEVENT CODE
+#define HCI_SUB_EVT_LE_CIS_ESTABLISHED_V4                             0xF5 //core_6.x higher data throughput
+#define HCI_SUB_EVT_LE_CREATE_BIG_COMPLETE_V2                         0xF9 //core_6.x higher data throughput
+
 
 
 //Event mask - last octet
@@ -147,15 +150,22 @@ TBD LE CS Test End Complete event
 #define HCI_EVT_MASK_READ_REMOTE_SUPPORTED_FEATURES_COMPLETE  0x00000400                      // 10
 #define HCI_EVT_MASK_READ_REMOTE_VERSION_INFORMATION_COMPLETE 0x00000800                      // 11
 
-#define HCI_EVT_MASK_ENCRYPTION_KEY_REFRESH_COMPLETE          (((unsigned long long)1) << 47) // 47
+#define HCI_EVT_MASK_ENCRYPTION_KEY_REFRESH_COMPLETE          (((unsigned long long)1) << (47-32)) // 47
 
-#define HCI_EVT_MASK_LE_META                                  (((unsigned long long)1) << 61) // 61
+#define HCI_EVT_MASK_LE_META                                  (((unsigned long long)1) << (61-32)) // 61
 
 //Event mask page 2
-#define HCI_EVT_MASK_AUTH_PAYLOAD_TIMEOUT_EXPIRED (((unsigned long long)1) << 23)
+#define HCI_EVT_MASK_AUTH_PAYLOAD_TIMEOUT_EXPIRED             (((unsigned long long)1) << 23) // 23
 
-#define HCI_EVT_MASK_DEFAULT                      HCI_EVT_MASK_DISCONNECTION_COMPLETE
+//HDT EVENT MASK (PAGE2)
+#define HCI_EVT_MASK_ENCRYPTION_CHANGE_EVENT_V3               (((unsigned long long)1) << (61-32)) // 61
+#define HCI_EVT_MASK_ENCRYPTION_KEY_REFRESH_COMPLETE_EVENT_V2 (((unsigned long long)1) << (60-32)) // 60
 
+
+#define HCI_EVT_MASK_DEFAULT                        HCI_EVT_MASK_DISCONNECTION_COMPLETE
+#define HCI_EVT_MASK_2_DEFAULT                      HCI_EVT_MASK_LE_META
+#define HCI_EVT_MASK_PAGE2_DEFAULT                  HCI_EVT_MASK_NONE
+#define HCI_EVT_MASK_PAGE2_2_DEFAULT                HCI_EVT_MASK_NONE
 
 // LE Event mask - last octet
 #define HCI_LE_EVT_MASK_NONE                                             0x00000000
@@ -214,12 +224,26 @@ TBD LE CS Test End Complete event
 #define HCI_LE_EVT_MASK_2_CS_SUBEVENT_RESULT_CONTINUE                    0x00020000 //channel sounding bit49
 #define HCI_LE_EVT_MASK_2_CS_TEST_END_COMPLETE                           0x00040000 //channel sounding bit50
 
+#define HCI_LE_EVT_MASK_2_FRAME_SPACE_UPDATE_COMPLETE                    0x00100000 // core6.0 - bit52
+
+//HDT LE EVNET MASK
+#define HCI_LE_EVT_MASK_2_HDT_LE_CIS_ESTABLISHED_V4                      0X04000000 // HIGHER DATA THROUGHPUT BIT58
+#define HCI_LE_EVT_MASK_2_HDT_LE_CREATE_BIG_COMPLETE_V2                  0X40000000 // HIGHER DATA THROUGHPUT BIT62
 
 #define HCI_LE_EVT_MASK_CONNECTION_ESTABLISH                             0x80000000
 
 
 #define HCI_LE_EVT_MASK_DEFAULT                                          0x0000001F
 
+
+#define HCI_LE_EVT_MASK_CS_ALL                                           (HCI_LE_EVT_MASK_2_CS_READ_REMOTE_SUPPORTED_CAPABILITIES_COMPLETE |\
+                                                                         HCI_LE_EVT_MASK_2_CS_READ_REMOTE_FAE_TABLE_COMPLETE |\
+                                                                         HCI_LE_EVT_MASK_2_CS_SECURITY_ENABLE_COMPLETE |\
+                                                                         HCI_LE_EVT_MASK_2_CS_CONFIG_COMPLETE |\
+                                                                         HCI_LE_EVT_MASK_2_CS_PROCEDURE_ENABLE_COMPLETE |\
+                                                                         HCI_LE_EVT_MASK_2_CS_SUBEVENT_RESULT |\
+                                                                         HCI_LE_EVT_MASK_2_CS_SUBEVENT_RESULT_CONTINUE |\
+                                                                         HCI_LE_EVT_MASK_2_CS_TEST_END_COMPLETE)
 
 //Link Control Command
 //-- OGF --
@@ -443,26 +467,62 @@ TBD LE CS Test End Complete event
 #define HCI_CMD_LE_SET_PERIODIC_SYNC_SUBEVENT             0x84 //7.8.127 LE Set Periodic Sync Subevent command
 #define HCI_CMD_LE_EXTENDED_CREATE_CONNECTION_V2          0x85 //7.8.66 LE Extended Create Connection Command [v2]
 #define HCI_CMD_LE_SET_PERIODIC_ADVERTISING_PARAMETERS_V2 0x86 //7.8.61 LE Set Periodic Advertising Parameters Command [v2]
-
 //core_5.4 end
 
-
+//core_6.0 begin
 //channel sounding begin
+#define HCI_CMD_LE_SET_DECISION_DATA                      0x80 //7.8.144 LE Set Decision Data command
+#define HCI_CMD_LE_SET_DECISION_INSTRUCTIONS              0x81 //7.8.145 LE Set Decision Instructions command
+#define HCI_CMD_LE_READ_ALL_SUPPORTED_FEATURES            0x87 //7.8.128 LE Read All Supported Features command
+#define HCI_CMD_LE_READ_ALL_REMOTE_FEATURES               0x88 //7.8.129 LE Read Supported States command
 #define HCI_CMD_LE_CS_READ_LOCAL_SUPPORTED_CAPABILITIES   0x89 //7.8.X+0 LE CS Read Local Supported Capabilities command
 #define HCI_CMD_LE_CS_READ_REMOTE_SUPPORTED_CAPABILITIES  0x8A //7.8.X+1 LE CS Read Remote Supported Capabilities command
 #define HCI_CMD_LE_CS_WRITE_REMOTE_SUPPORTED_CAPABILITIES 0x8B //7.8.X+2 LE CS Write Remote Supported Capabilities command
 #define HCI_CMD_LE_CS_SECURITY_ENABLE                     0x8C //7.8.X+3 LE CS Security Enable command
 #define HCI_CMD_LE_CS_SET_DEFAULT_SETTINGS                0x8D //7.8.X+4 LE CS Set Default Settings command
-#define HCI_CMD_LE_CS_READ_REMOTE_FAE_TABLE               0X8E //7.8.X+6 LE CS Read Remote FAE Table command
-#define HCI_CMD_LE_CS_WRITE_CACHE_REMOTE_FAE_TABLE        0X8F //7.8.X+7 LE CS Write Cache Remote FAE Table command
-#define HCI_CMD_LE_CS_CREATE_CONFIG                       0X90 //7.8.X+8 LE CS Create Config command
-#define HCI_CMD_LE_CS_REMOVE_CONFIG                       0X91 //7.8.X+9 LE CS Remove Config command
-#define HCI_CMD_LE_CS_SET_Channel_CLASSIFICATION          0X92 //7.8.X+10 LE CS Set Channel Classification command
-#define HCI_CMD_LE_CS_SET_PROCEDURE_PARAMETERS            0X93 //7.8.X+11 LE CS Set Procedure Parameters command
-#define HCI_CMD_LE_CS_PROCEDURE_ENABLE                    0X94 //7.8.X+12 LE CS Procedure Enable command
-#define HCI_CMD_LE_CS_TEST                                0X95 //7.8.X+13 LE CS Test command
-#define HCI_CMD_LE_CS_TEST_END                            0X96 //7.8.X+14 LE CS Test End command
+#define HCI_CMD_LE_CS_READ_REMOTE_FAE_TABLE               0x8E //7.8.X+6 LE CS Read Remote FAE Table command
+#define HCI_CMD_LE_CS_WRITE_CACHE_REMOTE_FAE_TABLE        0x8F //7.8.X+7 LE CS Write Cache Remote FAE Table command
+#define HCI_CMD_LE_CS_CREATE_CONFIG                       0x90 //7.8.X+8 LE CS Create Config command
+#define HCI_CMD_LE_CS_REMOVE_CONFIG                       0x91 //7.8.X+9 LE CS Remove Config command
+#define HCI_CMD_LE_CS_SET_Channel_CLASSIFICATION          0x92 //7.8.X+10 LE CS Set Channel Classification command
+#define HCI_CMD_LE_CS_SET_PROCEDURE_PARAMETERS            0x93 //7.8.X+11 LE CS Set Procedure Parameters command
+#define HCI_CMD_LE_CS_PROCEDURE_ENABLE                    0x94 //7.8.X+12 LE CS Procedure Enable command
+#define HCI_CMD_LE_CS_TEST                                0x95 //7.8.X+13 LE CS Test command
+#define HCI_CMD_LE_CS_TEST_END                            0x96 //7.8.X+14 LE CS Test End command
 //channel sounding end
+//monitoring advertisers begin
+#define HCI_CMD_LE_ADD_DEVICE_TO_MONITORED_ADVERTISERS_LIST         0x98 //7.8.146 LE Add Device To Monitored Advertisers List command
+#define HCI_CMD_LE_REMOVE_DEVICE_FROM_MONITORED_ADVERTISERS_LIST    0x99 //7.8.147 LE Remove Device From Monitored Advertisers List command
+#define HCI_CMD_LE_CLEAR_MONITORED_ADVERTISERS_LIST                 0x9A //7.8.148 LE Clear Monitored Advertisers List command
+#define HCI_CMD_LE_READ_MONITORED_ADVERTISERS_LIST_SIZE             0x9B //7.8.150 LE Read Monitored Advertisers List Size command
+#define HCI_CMD_LE_ENABLE_MONITORING_ADVERTISERS                    0x9C //7.8.149 LE Enable Monitoring Advertisers command
+//monitoring advertisers end
+
+//Frame space update begin
+#define HCI_CMD_LE_FRAME_SPACE_UPDATE                               0x9D
+//Frame space update end
+//core_6.0 end
+
+// Higher data throughput Commands
+//-- OGF --
+#define HCI_CMD_HDT_OPCODE_OGF 0xFB //((OGF = 0x3E) <<2 = 0xF8 )  |  (OCF >>8 == 03)   =  0xFB
+//-- OCF --
+#define HCI_CMD_LE_SET_CIG_PARAMETERS_V3                    0XFE
+#define HCI_CMD_LE_SET_CIG_PARAMETERS_TEST_V3               0XFD
+#define HCI_CMD_LE_CREATE_BIG_V2                            0XF9
+#define HCI_CMD_LE_CREATE_BIG_TEST_V2                       0XF8
+#define HCI_CMD_LE_SET_HDT_DEFAULT_PARAMETERS               0XF7
+#define HCI_CMD_LE_SET_HDT_PARAMETERS_TEST                  0XF6
+#define HCI_CMD_LE_READ_HDT_LOCAL_SUPPORTED_CAPABILITIES    0XF5
+#define HCI_CMD_LE_TRANSMITTER_TEST_V5                      0XF2
+#define HCI_CMD_HDT_TEST_END_V2                             0XF1
+#define HCI_CMD_LE_READ_MAXIMUM_DATA_LENGTH_V2              0XE7
+
+#define HCI_CMD_REFRESH_ENCRYPTION_KEY_V2                   0XE8
+#define HCI_CMD_LE_START_ENCRYPTION_V2                      0xE9
+
+
+
 
 #define HCI_CMD_LINK_POLICY_OPCODE_OGF 0x08 //0x02<<2 = 0x08
 #define HCI_CMD_TEST_OPCODE_OGF        0x18 //0x06<<2 = 0x18

@@ -31,5 +31,12 @@
  */
 void otp_get_ieee_addr(unsigned char *buf);
 
+/**
+ * @brief      This function is used to calib ADC 1.2V vref.
+ * @param[in]  none
+ * @return     DRV_API_SUCCESS - the calibration value update, DRV_API_FAILURE - the calibration value is not update.
+ */
+drv_api_status_e otp_calib_adc_vref(void);
+
 
 #endif /* OTP_H_ */

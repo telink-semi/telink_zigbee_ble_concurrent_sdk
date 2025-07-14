@@ -3,7 +3,7 @@
  *
  * @brief    This is the header file for 8258 BLE SDK
  *
- * @author	 BLE GROUP
+ * @author   BLE GROUP
  * @date         12,2021
  *
  * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
@@ -20,7 +20,6 @@
  *          See the License for the specific language governing permissions and
  *          limitations under the License.
  *******************************************************************************************************/
-
 #pragma once
 
 #include "tl_common.h"
@@ -62,7 +61,6 @@
 
 /** @} end of group hids_uuid */
 
-
 /** @addtogroup  HID_REPORT_ID Hid Report Id
  *  @{
  */
@@ -74,7 +72,7 @@
 #define HID_REPORT_ID_KEYBOARD_INPUT                    1   //!< Keyboard input report ID
 #define HID_REPORT_ID_CONSUME_CONTROL_INPUT             2   //!< Consumer Control input report ID
 #define HID_REPORT_ID_MOUSE_INPUT                       3   //!< Mouse input report ID
-#define HID_REPORT_ID_GAMEPAD_INPUT						4   //!< Gamepad  input report ID
+#define HID_REPORT_ID_GAMEPAD_INPUT                     4   //!< Gamepad  input report ID
 #define HID_REPORT_ID_LED_OUT                           0   //!< LED output report ID
 #define HID_REPORT_ID_FEATURE                           0   //!< Feature report ID
 
@@ -124,12 +122,7 @@
 #define HID_KEYCODE_CC_RELEASE                          0x00
 #define HID_KEYCODE_CC_VOL_UP                           0x01
 #define HID_KEYCODE_CC_VOL_DN                           0x02
-
-
 /** @} end of group Hids_Constant */
-
-
-
 
 /** @addtogroup  Hids_Callbacks Hids Callbacks
  *  @{
@@ -186,21 +179,15 @@ typedef struct {
 
 /** @} end of group Hids_Callbacks */
 
-
  /** @addtogroup  HIDS_Variables  Hids Variables
  *  @{
  */
- 
-
 
 /** @} end of group HIDS_Variables */
-
 
 /** @addtogroup  HIDS_Functions Hids APIs
  *  @{
  */
-
-
 
 /** @} end of group HIDS_Functions */
 

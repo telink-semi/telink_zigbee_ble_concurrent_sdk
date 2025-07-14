@@ -54,5 +54,4 @@ _CODE_ZCL_ status_t zcl_temperature_measurement_register(u8 endpoint, u16 manuCo
     return zcl_registerCluster(endpoint, ZCL_CLUSTER_MS_TEMPERATURE_MEASUREMENT, manuCode, attrNum, attrTbl, NULL, cb);
 }
 
-#endif  /* ZCL_TEMPERATURE_MEASUREMENT */
-
+#endif	/* ZCL_TEMPERATURE_MEASUREMENT */

@@ -233,7 +233,7 @@ extern "C" {
 
 // DEBUG
 #if (TLKAPI_DEBUG_ENABLE)
-#define	DEBUG_INFO_TX_PIN       GPIO_PC4//print
+#define	DEBUG_INFO_TX_PIN       GPIO_PA0//print
 #endif
 
 enum {

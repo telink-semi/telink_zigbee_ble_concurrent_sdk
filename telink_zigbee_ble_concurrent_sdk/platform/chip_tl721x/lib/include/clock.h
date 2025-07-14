@@ -45,7 +45,12 @@
 /**********************************************************************************************************************
  *                                           global macro                                                             *
  *********************************************************************************************************************/
-
+/*
+ * ALG_MODULE_MAX_CLK is configured to 30:
+ *  -The alg clock source is pclk, with a default division of 1/2.
+ *  - Whether it is 0.8v or 0.9v, the maximum is 30m,It is necessary to modify the frequency division based on the current size of the pclk.
+ */
+#define ALG_MODULE_MAX_CLK                30
 /**
  * @brief system clock type
  * |                                     |                                    |               |
@@ -70,7 +75,9 @@ typedef enum
  */
 //clock_bbpll_config(PLL_CLK_240M);
 //core 0.9V
+#define PLL_240M_CCLK_240M_HCLK_120M_PCLK_120M_MSPI_60M clock_init(BASEBAND_PLL, CLK_DIV1, CCLK_DIV2_TO_HCLK_DIV2_TO_PCLK, CLK_DIV4)//This frequency is only applicable to chips with built-in Flash
 #define PLL_240M_CCLK_240M_HCLK_120M_PCLK_120M_MSPI_48M clock_init(BASEBAND_PLL, CLK_DIV1, CCLK_DIV2_TO_HCLK_DIV2_TO_PCLK, CLK_DIV5)
+
 //core 0.8V
 #define PLL_240M_CCLK_120M_HCLK_60M_PCLK_60M_MSPI_48M clock_init(BASEBAND_PLL, CLK_DIV2, CCLK_DIV2_TO_HCLK_DIV2_TO_PCLK, CLK_DIV5)
 #define PLL_240M_CCLK_120M_HCLK_60M_PCLK_30M_MSPI_48M clock_init(BASEBAND_PLL, CLK_DIV2, CCLK_DIV2_TO_HCLK_DIV4_TO_PCLK, CLK_DIV5)
@@ -86,7 +93,7 @@ typedef enum
 #define PLL_240M_CCLK_60M_HCLK_30M_PCLK_15M_MSPI_48M  clock_init(BASEBAND_PLL, CLK_DIV4, CCLK_DIV2_TO_HCLK_DIV4_TO_PCLK, CLK_DIV5)
 
 #define PLL_240M_CCLK_48M_HCLK_48M_PCLK_48M_MSPI_48M  clock_init(BASEBAND_PLL, CLK_DIV5, CCLK_DIV1_TO_HCLK_DIV1_TO_PCLK, CLK_DIV5)
-#define PLL_240M_CCLK_120M_HCLK_60M_PCLK_60M_MSPI_48M clock_init(BASEBAND_PLL, CLK_DIV2, CCLK_DIV2_TO_HCLK_DIV2_TO_PCLK, CLK_DIV5)
+
 #define PLL_240M_CCLK_120M_HCLK_60M_PCLK_60M_MSPI_40M clock_init(BASEBAND_PLL, CLK_DIV2, CCLK_DIV2_TO_HCLK_DIV2_TO_PCLK, CLK_DIV6)
 #define PLL_240M_CCLK_120M_HCLK_60M_PCLK_30M_MSPI_40M clock_init(BASEBAND_PLL, CLK_DIV2, CCLK_DIV2_TO_HCLK_DIV4_TO_PCLK, CLK_DIV6)
 
@@ -262,7 +269,7 @@ _attribute_ram_code_sec_noinline_ void clock_32k_init(clk_32k_type_e src);
 unsigned char clock_kick_32k_xtal(unsigned char xtal_times);
 
 /**
- * @brief     This function performs to select 24M as the system clock source.
+ * @brief     This function serves to calibrate 24M RC.
  *            24M RC is inaccurate, and it is greatly affected by temperature, if need use it so real-time calibration is required
  *            The 24M RC needs to be calibrated before the pm_sleep_wakeup function,
  *            because this clock will be used to kick 24m xtal start after wake up,
@@ -272,19 +279,19 @@ unsigned char clock_kick_32k_xtal(unsigned char xtal_times);
 _attribute_ram_code_sec_noinline_ void clock_cal_24m_rc(void);
 
 /**
- * @brief     This function performs to select 32K as the system clock source.
+ * @brief     This function serves to calibrate 32K RC.
  * @return    none.
  */
 void clock_cal_32k_rc(void);
 
 /**
- * @brief  This function serves to get the 32k tick.
- * @return none.
+ * @brief  This function serves to get the 32k tick currently.
+ * @return the current 32k tick.
  */
 _attribute_ram_code_sec_optimize_o2_noinline_ unsigned int clock_get_32k_tick(void);
 
 /**
- * @brief  This function serves to set the 32k tick.
+ * @brief  This function serves to set the 32k tick for sleep.
  * @param  tick - the value of to be set to 32k.
  * @return none.
  */

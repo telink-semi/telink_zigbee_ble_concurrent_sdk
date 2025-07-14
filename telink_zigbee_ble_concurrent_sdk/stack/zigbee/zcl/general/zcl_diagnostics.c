@@ -53,5 +53,5 @@ _CODE_ZCL_ status_t zcl_diagnostics_register(u8 endpoint, u16 manuCode, u8 attrN
     return zcl_registerCluster(endpoint, ZCL_CLUSTER_GEN_DIAGNOSTICS, manuCode, attrNum, attrTbl, NULL, cb);
 }
 
-#endif  /* ZCL_DIAGNOSTICS */
+#endif	/* ZCL_DIAGNOSTICS */
 

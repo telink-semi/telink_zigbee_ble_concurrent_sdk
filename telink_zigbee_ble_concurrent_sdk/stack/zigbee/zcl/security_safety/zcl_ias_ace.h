@@ -22,10 +22,8 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-
 #ifndef ZCL_IAS_ACE_H
 #define ZCL_IAS_ACE_H
-
 
 
 /*********************************************************************
@@ -33,27 +31,27 @@
  */
 /* Command ID */
 // Client generated command
-#define ZCL_CMD_ARM                                 0x00
-#define ZCL_CMD_BYPASS                              0x01
-#define ZCL_CMD_EMERGENCY                           0x02
-#define ZCL_CMD_FIRE                                0x03
-#define ZCL_CMD_PANIC                               0x04
-#define ZCL_CMD_GET_ZONE_ID_MAP                     0x05
-#define ZCL_CMD_GET_ZONE_INFORMATION                0x06
-#define ZCL_CMD_GET_PANEL_STATUS                    0x07
-#define ZCL_CMD_GET_BYPASSED_ZONE_LIST              0x08
-#define ZCL_CMD_GET_ZONE_STATUS                     0x09
+#define ZCL_CMD_ARM                             0x00
+#define ZCL_CMD_BYPASS                          0x01
+#define ZCL_CMD_EMERGENCY                       0x02
+#define ZCL_CMD_FIRE                            0x03
+#define ZCL_CMD_PANIC                           0x04
+#define ZCL_CMD_GET_ZONE_ID_MAP                 0x05
+#define ZCL_CMD_GET_ZONE_INFORMATION            0x06
+#define ZCL_CMD_GET_PANEL_STATUS                0x07
+#define ZCL_CMD_GET_BYPASSED_ZONE_LIST          0x08
+#define ZCL_CMD_GET_ZONE_STATUS                 0x09
 
 // Server generated command
-#define ZCL_CMD_ARM_RESPONSE                        0x00
-#define ZCL_CMD_GET_ZONE_ID_MAP_RESPONSE            0x01
-#define ZCL_CMD_GET_ZONE_INFORMATION_RESPONSE       0x02
-#define ZCL_CMD_ZONE_STATUS_CHANGED                 0x03
-#define ZCL_CMD_PANEL_STATUS_CHANGED                0x04
-#define ZCL_CMD_GET_PANEL_STATUS_RESPONSE           0x05
-#define ZCL_CMD_SET_BYPASSED_ZONE_LIST              0x06
-#define ZCL_CMD_BYPASS_RESPONSE                     0x07
-#define ZCL_CMD_GET_ZONE_STATUS_RESPONSE            0x08
+#define ZCL_CMD_ARM_RESPONSE                    0x00
+#define ZCL_CMD_GET_ZONE_ID_MAP_RESPONSE        0x01
+#define ZCL_CMD_GET_ZONE_INFORMATION_RESPONSE   0x02
+#define ZCL_CMD_ZONE_STATUS_CHANGED             0x03
+#define ZCL_CMD_PANEL_STATUS_CHANGED            0x04
+#define ZCL_CMD_GET_PANEL_STATUS_RESPONSE       0x05
+#define ZCL_CMD_SET_BYPASSED_ZONE_LIST          0x06
+#define ZCL_CMD_BYPASS_RESPONSE                 0x07
+#define ZCL_CMD_GET_ZONE_STATUS_RESPONSE        0x08
 
 
 /*********************************************************************
@@ -92,7 +90,7 @@ typedef struct {
  */
 typedef struct {
     UTF8String_t zoneLabel;
-    u8  zoneId;
+    u8 zoneId;
     u16 zoneType;
     extAddr_t ieeeAddr;
 } getZoneInfoRsp_t;
@@ -102,9 +100,9 @@ typedef struct {
  */
 typedef struct {
     UTF8String_t zoneLabel;
-    u8  zoneId;
+    u8 zoneId;
     u16 zoneStatus;
-    u8  audibleNotification;
+    u8 audibleNotification;
 } zoneStatusChanged_t;
 
 /**
@@ -154,7 +152,7 @@ typedef struct {
 
 #if 0
 /* Command Callback Function Type */
-typedef u8 (*zcl_armCb_t)(apsdeDataInd_t *pApsdeInd, arm_t *pAram);
+typedef u8 (*zcl_armCb_t)(apsdeDataInd_t *pApsdeInd, arm_t *pArm);
 typedef void (*zcl_bypassCb_t)(apsdeDataInd_t *pApsdeInd, bypass_t *pBypass);
 typedef void (*zcl_emergencyCb_t)(apsdeDataInd_t *pApsdeInd);
 typedef void (*zcl_fireCb_t)(apsdeDataInd_t *pApsdeInd);
@@ -178,25 +176,25 @@ typedef void (*zcl_getZoneStatusRspCb_t)(apsdeDataInd_t *pApsdeInd, getZoneStatu
  *  @brief  Structure definition for commands callback functions in ias ace cluster
  */
 typedef struct {
-    zcl_armCb_t                     armCbFunc;
-    zcl_bypassCb_t                  bypassCbFunc;
-    zcl_emergencyCb_t               emergencyCbFunc;
-    zcl_fireCb_t                    fireCbFunc;
-    zcl_panicCb_t                   panicCbFunc;
-    zcl_getZoneIdMapCb_t            getZoneIdMapCbFunc;
-    zcl_getZoneInformationCb_t      getZoneInformationCbFunc;
-    zcl_getPanelStatusCb_t          getPanelStatusCbFunc;
-    zcl_getBypassZoneListCb_t       getBypassZoneListCbFunc;
-    zcl_getZoneStatusCb_t           getZoneStatusCbFunc;
-    zcl_armRspCb_t                  armRspCbFunc;
-    zcl_getZoneIdMapRspCb_t         getZoneIdMapRspCbFunc;
-    zcl_getZoneInformationRspCb_t   getZoneInformationRspCbFunc;
-    zcl_zoneStatusChangedCb_t       zoneStatusChangedCbFunc;
-    zcl_panelStatusChangedCb_t      panelStatusChangedCbFunc;
-    zcl_getPanelStatusRspCb_t       getPanelStatusRspCbFunc;
-    zcl_setBypassedZoneListCb_t     setBypassedZoneListCbFunc;
-    zcl_bypassRspCb_t               bypassRspCbFunc;
-    zcl_getZoneStatusRspCb_t        getZoneStatusRspCbFunc;
+    zcl_armCb_t armCbFunc;
+    zcl_bypassCb_t bypassCbFunc;
+    zcl_emergencyCb_t emergencyCbFunc;
+    zcl_fireCb_t fireCbFunc;
+    zcl_panicCb_t panicCbFunc;
+    zcl_getZoneIdMapCb_t getZoneIdMapCbFunc;
+    zcl_getZoneInformationCb_t getZoneInformationCbFunc;
+    zcl_getPanelStatusCb_t getPanelStatusCbFunc;
+    zcl_getBypassZoneListCb_t getBypassZoneListCbFunc;
+    zcl_getZoneStatusCb_t getZoneStatusCbFunc;
+    zcl_armRspCb_t armRspCbFunc;
+    zcl_getZoneIdMapRspCb_t getZoneIdMapRspCbFunc;
+    zcl_getZoneInformationRspCb_t getZoneInformationRspCbFunc;
+    zcl_zoneStatusChangedCb_t zoneStatusChangedCbFunc;
+    zcl_panelStatusChangedCb_t panelStatusChangedCbFunc;
+    zcl_getPanelStatusRspCb_t getPanelStatusRspCbFunc;
+    zcl_setBypassedZoneListCb_t setBypassedZoneListCbFunc;
+    zcl_bypassRspCb_t bypassRspCbFunc;
+    zcl_getZoneStatusRspCb_t getZoneStatusRspCbFunc;
 } zcl_iasAce_AppCallbacks_t;
 #endif
 
@@ -214,8 +212,8 @@ status_t zcl_iasAce_bypassResp(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefault
 
 status_t zcl_iasAce_getZoneStatusResp(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, getZoneStatusRsp_t *pGetZoneStatusRsp);
 
-status_t zcl_iasAce_arm(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, arm_t *pAram);
-#define zcl_iasAce_armCmd(a,b,c,d)  (zcl_iasAce_arm((a), (b), (c), ZCL_SEQ_NUM, (d)))
+status_t zcl_iasAce_arm(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, arm_t *pArm);
+#define zcl_iasAce_armCmd(a,b,c,d)      (zcl_iasAce_arm((a), (b), (c), ZCL_SEQ_NUM, (d)))
 
 status_t zcl_iasAce_bypass(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, bypass_t *pBypass);
 #define zcl_iasAce_bypassCmd(a,b,c,d)   (zcl_iasAce_bypass((a), (b), (c), ZCL_SEQ_NUM, (d)))
@@ -224,24 +222,24 @@ status_t zcl_iasAce_emergency(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultR
 #define zcl_iasAce_emergencyCmd(a,b,c)  (zcl_iasAce_emergency((a), (b), (c), ZCL_SEQ_NUM))
 
 status_t zcl_iasAce_fire(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo);
-#define zcl_iasAce_fireCmd(a,b,c)   (zcl_iasAce_fire((a), (b), (c), ZCL_SEQ_NUM))
+#define zcl_iasAce_fireCmd(a,b,c)       (zcl_iasAce_fire((a), (b), (c), ZCL_SEQ_NUM))
 
 status_t zcl_iasAce_panic(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo);
-#define zcl_iasAce_panicCmd(a,b,c)  (zcl_iasAce_panic((a), (b), (c), ZCL_SEQ_NUM))
+#define zcl_iasAce_panicCmd(a,b,c)      (zcl_iasAce_panic((a), (b), (c), ZCL_SEQ_NUM))
 
 status_t zcl_iasAce_getZoneIdMap(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo);
-#define zcl_iasAce_getZoneIdMapCmd(a,b,c)   (zcl_iasAce_getZoneIdMap((a), (b), (c), ZCL_SEQ_NUM))
+#define zcl_iasAce_getZoneIdMapCmd(a,b,c)       (zcl_iasAce_getZoneIdMap((a), (b), (c), ZCL_SEQ_NUM))
 
 status_t zcl_iasAce_getZoneInfo(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, u8 ZoneId);
-#define zcl_iasAce_getZoneInfoCmd(a,b,c,d)  (zcl_iasAce_getZoneInfo((a), (b), (c), ZCL_SEQ_NUM, (d)))
+#define zcl_iasAce_getZoneInfoCmd(a,b,c,d)      (zcl_iasAce_getZoneInfo((a), (b), (c), ZCL_SEQ_NUM, (d)))
 
 status_t zcl_iasAce_getPanelStatus(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo);
-#define zcl_iasAce_getPanelStatusCmd(a,b,c) (zcl_iasAce_getPanelStatus((a), (b), (c), ZCL_SEQ_NUM))
+#define zcl_iasAce_getPanelStatusCmd(a,b,c)     (zcl_iasAce_getPanelStatus((a), (b), (c), ZCL_SEQ_NUM))
 
 status_t zcl_iasAce_getBypassedZoneList(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo);
-#define zcl_iasAce_getBypassedZoneListCmd(a,b,c)    (zcl_iasAce_getBypassedZoneList((a), (b), (c), ZCL_SEQ_NUM))
+#define zcl_iasAce_getBypassedZoneListCmd(a,b,c)        (zcl_iasAce_getBypassedZoneList((a), (b), (c), ZCL_SEQ_NUM))
 
 status_t zcl_iasAce_getZoneStatus(u8 srcEp, epInfo_t *pDstEpInfo, u8 disableDefaultRsp, u8 seqNo, getZoneStatus_t *pGetZoneStatus);
 #define zcl_iasAce_getZoneStatusCmd(a,b,c,d)    (zcl_iasAce_getZoneStatus((a), (b), (c), ZCL_SEQ_NUM, (d)))
 
-#endif  /* ZCL_IAS_ACE_H */
+#endif	/* ZCL_IAS_ACE_H */
