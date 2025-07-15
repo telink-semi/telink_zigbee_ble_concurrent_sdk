@@ -176,7 +176,7 @@ static startup_state_e platform_wakeup_init(void)
 #if (BLE_APP_PM_ENABLE || PM_ENABLE)
     blc_pm_select_internal_32k_crystal();   //for ble
 #endif
-    sys_init(LDO_0P94_LDO_1P8, VBAT_MAX_VALUE_GREATER_THAN_3V6, INTERNAL_CAP_XTAL24M);
+    sys_init(DCDC_0P94_LDO_1P8, VBAT_MAX_VALUE_GREATER_THAN_3V6, INTERNAL_CAP_XTAL24M);
 #elif defined(MCU_CORE_TL321X)
 #if (BLE_APP_PM_ENABLE || PM_ENABLE)
     blc_pm_select_internal_32k_crystal();   //for ble
