@@ -1,3 +1,84 @@
+## V2.4.1.0
+
+### Version
+* Chips
+  - TC32: TLSR8258
+  - RISCV: TLSR921x(B91), TL321x, TL721x
+* Driver Version
+  - tl_platform_sdk V3.7.0(TL321x, TL721x)
+* BLE Version
+  - tl_ble_sdk V4.0.4.4(TL321x, TL721x)
+* Zigbee Version
+  - telink_zigbee_sdk V3.7.1.4
+* Toolchain Version
+  - TLSR8258: TC32 ELF GCC4.3
+  - TLSR921x(B91): TL32 ELF MCULIB V5F GCC7.4
+  - TL321x: TL32 ELF MCULIB V5 GCC12.2
+  - TL721x: TL32 ELF MCULIB V5F GCC12.2
+* IDE Version
+  - Telink IDE: [Telink IDE](https://wiki.telink-semi.cn/tools_and_sdk/Tools/IDE/Telink_IDE.zip)
+  - Telink V323 RDS: [telink_v323_rds](https://wiki.telink-semi.cn/tools_and_sdk/Tools/IDE/telink_v323_rds_official_windows.zip)
+  - Telink IoT Studio: [TelinkIoTStudio_V2024.8](http://wiki.telink-semi.cn/tools_and_sdk/Tools/IoTStudio/TelinkIoTStudio_V2024.8.zip)
+### Features
+* Add BLE controller and Zigbee concurrent demo for tl321x
+* Enable Zigbee greenpower by default in coordinator and router mode
+* Support ML7218A-GAIA and ML7218D1-MERCURY module board
+* Clean code style
+### Bug Fixes
+* Restart 1 second timer when wakeup form suspend mode
+* Disable interrupt when push Zigbee mac data to transport list
+### Performance
+* None
+### BREAKING CHANGES
+* None
+### CodeSize
+* Units: KBytes(RAM/FLASH Size)
+
+|   chip   | concurrent_sampleGW | concurrent_sampleLight | concurrent_sampleSwitch | concurrent_sampleLightAdv | concurrent_sampleSwitchAdv |
+| :------- | :-----------------: | :--------------------: | :---------------------: | :-----------------------: | :------------------------: |
+| TLSR8258 | 44 / 223            | 41 / 221               | 32 / 171                |  \				     	| \	                         |
+| TLSR921x | 48 / 213            | 46 / 207               | 38 / 158                |  \						| \                          |
+| TL321x   | 70 / 248            | 67 / 249               | 64 / 205                | 48 / 204	                | 46 / 161                   |
+| TL721x   | 73 / 248            | 71 / 249               | 67 / 205                | 52 / 205                  | 49 / 161                   |
+
+|   chip   | concurrent_sampleGW_BLEcontroller | 
+| :------- | :-------------------------------: |
+| TL321x   | 77 / 243                          |
+
+###版本
+* 芯片
+  - TC32: TLSR8258
+  - RISCV: TLSR921x(B91), TL321x, TL721x
+* 驱动版本
+  - tl_platform_sdk V3.7.0(TL321x, TL721x)
+* BLE版本
+  - TLSR8258 BLE单连接
+  - TLSR921x BLE单连接
+  - tl_ble_sdk V4.0.4.4(TL321x, TL721x BLE多连接)
+* Zigbee版本
+  - telink_zigbee_sdk V3.7.1.4
+* 工具链版本
+  - TLSR8258: TC32 ELF GCC4.3
+  - TLSR921x(B91): TL32 ELF MCULIB V5F GCC7.4
+  - TL321x: TL32 ELF MCULIB V5 GCC12.2
+  - TL721x: TL32 ELF MCULIB V5F GCC12.2
+* IDE版本
+  - Telink IDE: [Telink IDE](https://wiki.telink-semi.cn/tools_and_sdk/Tools/IDE/Telink_IDE.zip)
+  - Telink V323 RDS: [telink_v323_rds](https://wiki.telink-semi.cn/tools_and_sdk/Tools/IDE/telink_v323_rds_official_windows.zip)
+  - Telink IoT Studio: [TelinkIoTStudio_V2024.8](http://wiki.telink-semi.cn/tools_and_sdk/Tools/IoTStudio/TelinkIoTStudio_V2024.8.zip)
+### Features
+* 在tl321x上支持跑BLE controller和Zigbee双模示例
+* 在Zigbee coordinator和router模式下，默认打开Zigbee greenpower选项
+* 支持ML7218A-GAIA 和 ML7218D1-MERCURY模块板
+* 统一代码格式
+### Bug Fixes
+* 在suspend休眠醒来后重新打开Zigbee协议栈1秒定时器
+* 在将Zigbee mac层数据放入发送队列时要做中断保护，防止数据错乱
+### Performance
+* None
+### BREAKING CHANGES
+* None
+
 ## V2.4.0.1
 
 ### Version
